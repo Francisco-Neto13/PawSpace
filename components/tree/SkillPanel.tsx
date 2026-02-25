@@ -8,21 +8,21 @@ interface SkillPanelProps {
 }
 
 export function SkillPanel({ data, onClose }: SkillPanelProps) {
-  if (!data) return null;
+  // ── Hooks ANTES do early return — regra dos hooks do React ────────────────
+  const theme = useMemo(() =>
+    data ? CATEGORY_THEME[data.category as SkillCategory] || CATEGORY_THEME.keystone : CATEGORY_THEME.keystone,
+  [data?.category]);
 
-  const { theme, xpPercent } = useMemo(() => {
-    const categoryTheme = CATEGORY_THEME[data.category as SkillCategory] || CATEGORY_THEME.support;
-    const percent = data.xpToNextLevel > 0
-      ? Math.round((data.xp / data.xpToNextLevel) * 100)
-      : 0;
-    
-    return { theme: categoryTheme, xpPercent: percent };
-  }, [data.category, data.xp, data.xpToNextLevel]);
+  const xpPercent = useMemo(() =>
+    data && data.xpToNextLevel > 0
+      ? Math.min(Math.round((data.xp / data.xpToNextLevel) * 100), 100)
+      : 0,
+  [data?.xp, data?.xpToNextLevel]);
 
   const panelStyle: React.CSSProperties = useMemo(() => ({
-    position: 'absolute', 
-    bottom: 24, 
-    right: 24, 
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
     zIndex: 50,
     width: 256,
     background: '#0e0e12',
@@ -32,24 +32,27 @@ export function SkillPanel({ data, onClose }: SkillPanelProps) {
     boxShadow: `0 0 24px ${theme.glow}`,
     fontFamily: 'Georgia, serif',
   }), [theme]);
+  // ─────────────────────────────────────────────────────────────────────────
+
+  if (!data) return null;
 
   return (
     <div style={panelStyle} className="animate-in fade-in slide-in-from-right-4 duration-300">
       {(['tl', 'tr', 'bl', 'br'] as const).map(pos => {
-        const isTop = pos.startsWith('t');
+        const isTop  = pos.startsWith('t');
         const isLeft = pos.endsWith('l');
         return (
           <div key={pos} style={{
             position: 'absolute',
             width: 7, height: 7,
-            top: isTop ? 6 : undefined,
+            top:    isTop  ? 6 : undefined,
             bottom: !isTop ? 6 : undefined,
-            left: isLeft ? 6 : undefined,
-            right: !isLeft ? 6 : undefined,
-            borderTop: isTop ? `1px solid ${theme.color}` : undefined,
+            left:   isLeft  ? 6 : undefined,
+            right:  !isLeft ? 6 : undefined,
+            borderTop:    isTop  ? `1px solid ${theme.color}` : undefined,
             borderBottom: !isTop ? `1px solid ${theme.color}` : undefined,
-            borderLeft: isLeft ? `1px solid ${theme.color}` : undefined,
-            borderRight: !isLeft ? `1px solid ${theme.color}` : undefined,
+            borderLeft:   isLeft  ? `1px solid ${theme.color}` : undefined,
+            borderRight:  !isLeft ? `1px solid ${theme.color}` : undefined,
             opacity: 0.45,
             pointerEvents: 'none',
           }} />
@@ -69,9 +72,9 @@ export function SkillPanel({ data, onClose }: SkillPanelProps) {
       </div>
 
       <div className="flex items-center gap-[12px] mb-[10px]">
-        <div 
+        <div
           className="w-[40px] h-[40px] flex items-center justify-center text-[20px] bg-[#08080a]"
-          style={{ 
+          style={{
             border: `1px solid ${data.isUnlocked ? theme.border : '#1e1e25'}`,
             clipPath: 'polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)',
           }}
@@ -90,7 +93,6 @@ export function SkillPanel({ data, onClose }: SkillPanelProps) {
 
       <div className="h-[1px] opacity-20 my-[8px]" style={{ background: theme.border }} />
 
-      {/* Description */}
       <p className="text-[#555560] text-[11px] leading-[1.6] m-0 mb-[10px] italic">
         {data.description}
       </p>
@@ -98,9 +100,9 @@ export function SkillPanel({ data, onClose }: SkillPanelProps) {
       {data.isUnlocked && (
         <>
           <div className="flex justify-between mb-[5px]">
-            <span className="text-[#3a3a45] text-[10px] uppercase tracking-[0.1em]">XP</span>
+            <span className="text-[#3a3a45] text-[10px] uppercase tracking-[0.1em]">XP Progress</span>
             <span className="text-[10px] font-bold" style={{ color: theme.color }}>
-              {data.xp} / {data.xpToNextLevel}
+              {Math.floor(data.xp)} / {data.xpToNextLevel}
             </span>
           </div>
 
@@ -124,7 +126,7 @@ export function SkillPanel({ data, onClose }: SkillPanelProps) {
               fontFamily: 'Georgia, serif',
             }}
           >
-            View Missions
+            Study Modules
           </button>
         </>
       )}

@@ -16,8 +16,10 @@
 .node-pulse, 
 .node-pulse-ks {
   backface-visibility: hidden;
+  perspective: 1000px;
   transform: translateZ(0); 
   will-change: transform, opacity;
+  transform-origin: center;
 }
 
 body {
@@ -27,32 +29,33 @@ body {
   margin: 0;
   overflow: hidden;
   -webkit-font-smoothing: antialiased; 
+  text-rendering: optimizeLegibility;
 }
 
 @keyframes twinkle {
   0%, 100% { opacity: var(--op); }
-  50%      { opacity: calc(var(--op) * 0.2); }
+  50%      { opacity: calc(var(--op) * 0.3); }
 }
 
 @keyframes pulse-ring {
   0%, 100% { 
-    opacity: 0.2; 
-    transform: scale3d(1, 1, 1); 
+    opacity: 0.15; 
+    transform: scale(1); 
   }
   50% { 
     opacity: 0.05; 
-    transform: scale3d(1.1, 1.1, 1); 
+    transform: scale(1.05); 
   }
 }
 
 @keyframes keystone-ring {
   0%, 100% { 
-    opacity: 0.3; 
-    transform: scale3d(1, 1, 1); 
+    opacity: 0.25; 
+    transform: scale(1); 
   }
   50% { 
     opacity: 0.1; 
-    transform: scale3d(1.15, 1.15, 1); 
+    transform: scale(1.1); 
   }
 }
 
@@ -61,17 +64,33 @@ body {
   to   { stroke-dashoffset: 0; }
 }
 
-.node-pulse { animation: pulse-ring 4s ease-in-out infinite; }
-.node-pulse-ks { animation: keystone-ring 3s ease-in-out infinite; }
-.edge-flow { animation: flow 2s linear infinite; }
+.node-pulse { animation: pulse-ring 5s ease-in-out infinite; }
+.node-pulse-ks { animation: keystone-ring 4s ease-in-out infinite; }
+.edge-flow { animation: flow 3s linear infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .node-pulse, .node-pulse-ks, .edge-flow, [class^="tw-"], .star {
+  .node-pulse, .node-pulse-ks, .edge-flow {
     animation: none !important;
     transition: none !important;
-    opacity: 0.6 !important; 
+    opacity: 0.4 !important; 
   }
 }
 
 .react-flow__attribution { display: none !important; }
-.react-flow__handle { pointer-events: none !important; opacity: 0 !important; }
+
+.react-flow__handle { 
+  pointer-events: none !important; 
+  opacity: 0 !important; 
+  min-width: 1px !important;
+  min-height: 1px !important;
+}
+
+.react-flow__node {
+  transition: z-index 0s; 
+}
+
+.starfield-wrapper > svg { will-change: opacity; }
+.starfield-wrapper > svg:nth-child(2) { animation: twinkle 3s ease-in-out infinite; }
+.starfield-wrapper > svg:nth-child(3) { animation: twinkle 4s ease-in-out infinite 0.8s; }
+.starfield-wrapper > svg:nth-child(4) { animation: twinkle 5s ease-in-out infinite 1.6s; }
+.starfield-wrapper > svg:nth-child(5) { animation: twinkle 6s ease-in-out infinite 2.4s; }

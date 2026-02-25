@@ -5,97 +5,82 @@ import { SkillData, CATEGORY_THEME, SkillCategory } from './types';
 
 type CompatibleSkillNode = Node<SkillData & { [key: string]: unknown }>;
 
+export function SvgDefs() {
+  return (
+    <svg width={0} height={0} style={{ position: 'absolute' }}>
+      <defs>
+        <filter id="glow-keystone" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+        <filter id="glow-notable" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
 function SkillNodeComponent({ data }: NodeProps<CompatibleSkillNode>) {
-  const { isUnlocked, level, xp, xpToNextLevel, icon, label, category, onSelect } = data;
-  
-  const theme = useMemo(() => 
-    CATEGORY_THEME[category as SkillCategory] || CATEGORY_THEME.support, 
-  [category]);
+  const { isUnlocked, level, xp, xpToNextLevel, icon, label, category } = data;
+
+  const theme = useMemo(
+    () => CATEGORY_THEME[category as SkillCategory] || CATEGORY_THEME.keystone,
+    [category]
+  );
 
   const isKeystone = category === 'keystone';
-  const isNotable = level >= 5 && !isKeystone;
+  const isNotable  = data.parentId === 'nexus' && !isKeystone;
 
-  const nodeR = isKeystone ? 32 : isNotable ? 26 : 20;
-  const svgSize = 100;
-  const viewBox = '-50 -50 100 100';
-
-  const arcR = nodeR + 3;
-  const arcC = 2 * Math.PI * arcR;
-  const xpFill = xpToNextLevel > 0 ? (xp / xpToNextLevel) * arcC : 0;
-
-  const shape = useMemo(() => {
-    if (category === 'support') return '0,-20 18,0 0,20 -18,0';
-    if (isKeystone) return '0,-32 28,-16 28,16 0,32 -28,16 -28,-16';
-    return 'circle';
-  }, [category, isKeystone]);
+  const nodeR   = isKeystone ? 32 : isNotable ? 26 : 20;
+  const arcR    = nodeR + 3;
+  const arcC    = 2 * Math.PI * arcR;
+  const xpFill  = xpToNextLevel > 0 ? Math.min(xp / xpToNextLevel, 1) * arcC : 0;
 
   const handleStyle: React.CSSProperties = {
-    background: 'transparent',
-    border: 'none',
-    top: '50%',
-    left: '50%',
+    background: 'transparent', border: 'none',
+    top: '50%', left: '50%',
     transform: 'translate(-50%, -50%)',
-    position: 'absolute',
-    opacity: 0,
-    pointerEvents: 'none',
+    position: 'absolute', opacity: 0, pointerEvents: 'none',
   };
 
   return (
-    <div
-      className="group relative flex flex-col items-center transition-all duration-300"
-      onClick={() => onSelect(data)}
-      style={{ cursor: 'pointer' }}
-    >
-      <Handle type="target" position={Position.Top} style={handleStyle} />
+    <div className="group relative flex flex-col items-center">
+      <Handle type="target" position={Position.Top}    style={handleStyle} />
       <Handle type="source" position={Position.Bottom} style={handleStyle} />
 
-      <svg width={svgSize} height={svgSize} viewBox={viewBox} className="overflow-visible z-10">
-        {isUnlocked && (
-          <defs>
-            <filter id={`glow-${category}`} x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation={isKeystone ? "4" : "2"} result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-          </defs>
-        )}
+      <svg width={100} height={100} viewBox="-50 -50 100 100" className="overflow-visible z-10">
 
         {isUnlocked && (
-           <circle
-            r={nodeR + 6}
+          <circle
+            r={nodeR + 7}
             fill="none"
             stroke={theme.color}
             strokeWidth="1"
             className={isKeystone ? 'node-pulse-ks' : 'node-pulse'}
-            opacity="0.2"
           />
         )}
 
-        {shape === 'circle' ? (
-          <circle 
-            r={nodeR} 
-            fill={isUnlocked ? "#111115" : "#070709"} 
-            stroke={isUnlocked ? theme.border : "#222"} 
-            strokeWidth={isNotable ? 3 : 1.5}
+        {isKeystone ? (
+          <polygon
+            points="0,-32 28,-16 28,16 0,32 -28,16 -28,-16"
+            fill={isUnlocked ? '#111115' : '#070709'}
+            stroke={isUnlocked ? theme.border : '#222'}
+            strokeWidth={3}
+            filter={isUnlocked ? 'url(#glow-keystone)' : undefined}
           />
         ) : (
-          <polygon
-            points={shape}
-            fill={isUnlocked ? "#111115" : "#070709"}
-            stroke={isUnlocked ? theme.border : "#222"}
-            strokeWidth={2}
+          <circle
+            r={nodeR}
+            fill={isUnlocked ? '#111115' : '#070709'}
+            stroke={isUnlocked ? theme.border : '#222'}
+            strokeWidth={isNotable ? 2.5 : 1.5}
+            filter={isNotable && isUnlocked ? 'url(#glow-notable)' : undefined}
           />
         )}
 
-        <path
-          d={`M -${nodeR*0.6} -${nodeR*0.2} A ${nodeR*0.8} ${nodeR*0.8} 0 0 1 ${nodeR*0.6} -${nodeR*0.2}`}
-          fill="none"
-          stroke="white"
-          strokeWidth="1"
-          opacity={isUnlocked ? "0.15" : "0.05"}
-          className="pointer-events-none"
-        />
-
-        {isUnlocked && (
+        {isUnlocked && xpFill > 0 && (
           <circle
             r={arcR}
             fill="none"
@@ -104,8 +89,8 @@ function SkillNodeComponent({ data }: NodeProps<CompatibleSkillNode>) {
             strokeLinecap="round"
             strokeDasharray={`${xpFill} ${arcC}`}
             transform="rotate(-90)"
-            className="transition-all duration-700 ease-in-out"
-            style={{ filter: `drop-shadow(0 0 3px ${theme.color})` }}
+            opacity={0.85}
+            style={{ transition: 'stroke-dasharray 0.6s ease-in-out' }}
           />
         )}
 
@@ -113,18 +98,18 @@ function SkillNodeComponent({ data }: NodeProps<CompatibleSkillNode>) {
           textAnchor="middle"
           dominantBaseline="central"
           fontSize={isKeystone ? 22 : 16}
-          className="pointer-events-none transition-all duration-300"
-          style={{ 
+          className="pointer-events-none"
+          style={{
             fill: isUnlocked ? 'white' : '#333',
-            filter: isUnlocked ? `drop-shadow(0 0 2px ${theme.color})` : 'none',
-            userSelect: 'none'
+            userSelect: 'none',
+            opacity: isUnlocked ? 1 : 0.4,
           }}
         >
           {isUnlocked ? icon : '?'}
         </text>
 
-        {isUnlocked && (
-          <g transform={`translate(${nodeR*0.8}, ${-nodeR*0.8})`}>
+        {isUnlocked && level > 0 && (
+          <g transform={`translate(${nodeR * 0.8}, ${-nodeR * 0.8})`}>
             <circle r={8} fill="#000" stroke={theme.border} strokeWidth="1" />
             <text
               textAnchor="middle"
@@ -140,7 +125,7 @@ function SkillNodeComponent({ data }: NodeProps<CompatibleSkillNode>) {
       </svg>
 
       <div className={`
-        mt-1 text-[10px] uppercase tracking-[0.2em] font-medium transition-colors
+        mt-1 text-[10px] uppercase tracking-[0.2em] font-medium text-center max-w-[120px]
         ${isUnlocked ? 'text-[#c8b89a]' : 'text-[#3a3830]'}
       `}>
         {label}
