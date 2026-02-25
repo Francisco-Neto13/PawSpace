@@ -1,6 +1,6 @@
 'use client';
-import React from 'react';
-import { SkillData } from './types';
+import React, { useMemo } from 'react';
+import { SkillData, CATEGORY_THEME, SkillCategory } from './types';
 
 interface SkillPanelProps {
   data: SkillData | null;
@@ -10,54 +10,120 @@ interface SkillPanelProps {
 export function SkillPanel({ data, onClose }: SkillPanelProps) {
   if (!data) return null;
 
-  const xpPercent = data.xpToNextLevel > 0
-    ? Math.round((data.xp / data.xpToNextLevel) * 100)
-    : 0;
+  const { theme, xpPercent } = useMemo(() => {
+    const categoryTheme = CATEGORY_THEME[data.category as SkillCategory] || CATEGORY_THEME.support;
+    const percent = data.xpToNextLevel > 0
+      ? Math.round((data.xp / data.xpToNextLevel) * 100)
+      : 0;
+    
+    return { theme: categoryTheme, xpPercent: percent };
+  }, [data.category, data.xp, data.xpToNextLevel]);
+
+  const panelStyle: React.CSSProperties = useMemo(() => ({
+    position: 'absolute', 
+    bottom: 24, 
+    right: 24, 
+    zIndex: 50,
+    width: 256,
+    background: '#0e0e12',
+    border: `1px solid ${theme.border}`,
+    borderRadius: 2,
+    padding: 20,
+    boxShadow: `0 0 24px ${theme.glow}`,
+    fontFamily: 'Georgia, serif',
+  }), [theme]);
 
   return (
-    <div className="absolute bottom-6 right-6 z-50 w-60 rounded-xl border border-purple-500/30 bg-zinc-950/95 p-5 shadow-[0_0_40px_rgba(168,85,247,0.2)] backdrop-blur-md">
+    <div style={panelStyle} className="animate-in fade-in slide-in-from-right-4 duration-300">
+      {(['tl', 'tr', 'bl', 'br'] as const).map(pos => {
+        const isTop = pos.startsWith('t');
+        const isLeft = pos.endsWith('l');
+        return (
+          <div key={pos} style={{
+            position: 'absolute',
+            width: 7, height: 7,
+            top: isTop ? 6 : undefined,
+            bottom: !isTop ? 6 : undefined,
+            left: isLeft ? 6 : undefined,
+            right: !isLeft ? 6 : undefined,
+            borderTop: isTop ? `1px solid ${theme.color}` : undefined,
+            borderBottom: !isTop ? `1px solid ${theme.color}` : undefined,
+            borderLeft: isLeft ? `1px solid ${theme.color}` : undefined,
+            borderRight: !isLeft ? `1px solid ${theme.color}` : undefined,
+            opacity: 0.45,
+            pointerEvents: 'none',
+          }} />
+        );
+      })}
+
       <button
         onClick={onClose}
-        className="absolute top-3 right-3 text-zinc-500 hover:text-white transition-colors text-base leading-none"
-      >
-        ✕
-      </button>
+        className="absolute top-[10px] right-[12px] bg-transparent border-none text-[#3a3a45] cursor-pointer text-[13px] hover:text-white transition-colors"
+      >✕</button>
 
-      <div className="flex items-center gap-3 mb-3">
-        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl border-2 ${
-          data.isUnlocked
-            ? 'border-purple-500 bg-purple-500/10 shadow-[0_0_20px_rgba(168,85,247,0.4)]'
-            : 'border-zinc-700 bg-zinc-900'
-        }`}>
-          {data.isUnlocked ? data.icon : '🔒'}
+      <div className="flex items-center gap-[6px] mb-[12px]">
+        <div className="w-[2px] h-[20px] rounded-[1px]" style={{ background: theme.color }} />
+        <span className="text-[9px] uppercase tracking-[0.2em]" style={{ color: theme.color }}>
+          {theme.label}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-[12px] mb-[10px]">
+        <div 
+          className="w-[40px] h-[40px] flex items-center justify-center text-[20px] bg-[#08080a]"
+          style={{ 
+            border: `1px solid ${data.isUnlocked ? theme.border : '#1e1e25'}`,
+            clipPath: 'polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)',
+          }}
+        >
+          {data.isUnlocked ? data.icon : '·'}
         </div>
         <div>
-          <p className="text-sm font-bold text-zinc-100">{data.label}</p>
-          <p className="text-[10px] text-purple-400 uppercase tracking-widest">
-            {data.isUnlocked ? `Level ${data.level}` : 'Locked'}
+          <p className="font-bold text-[13px] m-0" style={{ color: data.isUnlocked ? '#ddd8cc' : '#3a3a45' }}>
+            {data.label}
+          </p>
+          <p className="text-[10px] m-0 mt-[2px] uppercase tracking-[0.12em]" style={{ color: data.isUnlocked ? theme.color : '#2a2a32' }}>
+            {data.isUnlocked ? `Level ${data.level}` : '— Locked —'}
           </p>
         </div>
       </div>
 
-      <p className="text-xs text-zinc-500 mb-3 leading-relaxed">{data.description}</p>
+      <div className="h-[1px] opacity-20 my-[8px]" style={{ background: theme.border }} />
+
+      {/* Description */}
+      <p className="text-[#555560] text-[11px] leading-[1.6] m-0 mb-[10px] italic">
+        {data.description}
+      </p>
 
       {data.isUnlocked && (
         <>
-          <div className="flex justify-between mb-1.5">
-            <span className="text-[11px] text-zinc-400">Experience</span>
-            <span className="text-[11px] text-purple-400 font-bold">
-              {data.xp} / {data.xpToNextLevel} XP
+          <div className="flex justify-between mb-[5px]">
+            <span className="text-[#3a3a45] text-[10px] uppercase tracking-[0.1em]">XP</span>
+            <span className="text-[10px] font-bold" style={{ color: theme.color }}>
+              {data.xp} / {data.xpToNextLevel}
             </span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-400 transition-all duration-500"
-              style={{ width: `${xpPercent}%` }}
-            />
-          </div>
-          <p className="text-[10px] text-zinc-600 text-right mt-1">{xpPercent}% to next level</p>
 
-          <button className="mt-3 w-full rounded-lg bg-gradient-to-r from-violet-700 to-purple-500 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-[0_4px_15px_rgba(168,85,247,0.4)] hover:opacity-90 transition-opacity">
+          <div className="h-[4px] bg-[#0a0a0d] border border-[#1e1e25] rounded-[1px] overflow-hidden mb-[10px]">
+            <div style={{
+              height: '100%',
+              width: `${xpPercent}%`,
+              background: theme.color,
+              opacity: 0.8,
+              transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            }} />
+          </div>
+
+          <div className="h-[1px] opacity-[0.15] mb-[10px]" style={{ background: theme.border }} />
+
+          <button
+            className="w-full py-[7px] bg-[#13131a] border rounded-[2px] text-[10px] font-bold cursor-pointer tracking-[0.18em] uppercase hover:bg-[#1a1a24] transition-colors"
+            style={{
+              borderColor: theme.border,
+              color: theme.color,
+              fontFamily: 'Georgia, serif',
+            }}
+          >
             View Missions
           </button>
         </>

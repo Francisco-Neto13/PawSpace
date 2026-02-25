@@ -1,109 +1,152 @@
 'use client';
-import React from 'react';
-import { Handle, Position } from '@xyflow/react';
-import { SkillData } from './types';
+import React, { memo, useMemo } from 'react';
+import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
+import { SkillData, CATEGORY_THEME, SkillCategory } from './types';
 
-export function SkillNode({ data }: { data: SkillData }) {
-  const { isUnlocked, level, xp, xpToNextLevel, icon, label, onSelect } = data;
-  const xpPercent = xpToNextLevel > 0 ? (xp / xpToNextLevel) * 100 : 0;
-  const circumference = 169.6; // 2π × 27
+type CompatibleSkillNode = Node<SkillData & { [key: string]: unknown }>;
+
+function SkillNodeComponent({ data }: NodeProps<CompatibleSkillNode>) {
+  const { isUnlocked, level, xp, xpToNextLevel, icon, label, category, onSelect } = data;
+  
+  const theme = useMemo(() => 
+    CATEGORY_THEME[category as SkillCategory] || CATEGORY_THEME.support, 
+  [category]);
+
+  const isKeystone = category === 'keystone';
+  const isNotable = level >= 5 && !isKeystone;
+
+  const nodeR = isKeystone ? 32 : isNotable ? 26 : 20;
+  const svgSize = 100;
+  const viewBox = '-50 -50 100 100';
+
+  const arcR = nodeR + 3;
+  const arcC = 2 * Math.PI * arcR;
+  const xpFill = xpToNextLevel > 0 ? (xp / xpToNextLevel) * arcC : 0;
+
+  const shape = useMemo(() => {
+    if (category === 'support') return '0,-20 18,0 0,20 -18,0';
+    if (isKeystone) return '0,-32 28,-16 28,16 0,32 -28,16 -28,-16';
+    return 'circle';
+  }, [category, isKeystone]);
+
+  const handleStyle: React.CSSProperties = {
+    background: 'transparent',
+    border: 'none',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    position: 'absolute',
+    opacity: 0,
+    pointerEvents: 'none',
+  };
 
   return (
-    <div className="group relative flex flex-col items-center" onClick={() => onSelect(data)}>
-      {/* Outer pulse glow */}
-      {isUnlocked && (
-        <div className="absolute inset-0 rounded-full animate-ping bg-purple-500/10 scale-150 pointer-events-none" />
-      )}
+    <div
+      className="group relative flex flex-col items-center transition-all duration-300"
+      onClick={() => onSelect(data)}
+      style={{ cursor: 'pointer' }}
+    >
+      <Handle type="target" position={Position.Top} style={handleStyle} />
+      <Handle type="source" position={Position.Bottom} style={handleStyle} />
 
-      <svg width={80} height={80} viewBox="-40 -40 80 80" style={{ overflow: 'visible' }}>
-        <defs>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-          <linearGradient id="xpGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#7c3aed" />
-            <stop offset="100%" stopColor="#e879f9" />
-          </linearGradient>
-        </defs>
-
-        {/* Animated outer ring */}
+      <svg width={svgSize} height={svgSize} viewBox={viewBox} className="overflow-visible z-10">
         {isUnlocked && (
-          <circle r={36} fill="none" stroke="#a855f7" strokeWidth="1" opacity="0.3">
-            <animate attributeName="r" values="33;38;33" dur="3s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.3;0.05;0.3" dur="3s" repeatCount="indefinite" />
-          </circle>
+          <defs>
+            <filter id={`glow-${category}`} x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation={isKeystone ? "4" : "2"} result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
         )}
 
-        {/* Main circle */}
-        <circle
-          r={24}
-          fill={isUnlocked ? '#18181b' : '#09090b'}
-          stroke={isUnlocked ? '#a855f7' : '#3f3f46'}
-          strokeWidth={isUnlocked ? 2 : 1.5}
-          filter={isUnlocked ? 'url(#glow)' : undefined}
-        />
-
-        {/* XP arc */}
-        {isUnlocked && xpToNextLevel > 0 && (
-          <circle
-            r={27}
+        {isUnlocked && (
+           <circle
+            r={nodeR + 6}
             fill="none"
-            stroke="url(#xpGrad)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeDasharray={`${(xpPercent / 100) * circumference} ${circumference}`}
-            transform="rotate(-90)"
-            opacity="0.9"
+            stroke={theme.color}
+            strokeWidth="1"
+            className={isKeystone ? 'node-pulse-ks' : 'node-pulse'}
+            opacity="0.2"
           />
         )}
 
-        {/* Icon */}
+        {shape === 'circle' ? (
+          <circle 
+            r={nodeR} 
+            fill={isUnlocked ? "#111115" : "#070709"} 
+            stroke={isUnlocked ? theme.border : "#222"} 
+            strokeWidth={isNotable ? 3 : 1.5}
+          />
+        ) : (
+          <polygon
+            points={shape}
+            fill={isUnlocked ? "#111115" : "#070709"}
+            stroke={isUnlocked ? theme.border : "#222"}
+            strokeWidth={2}
+          />
+        )}
+
+        <path
+          d={`M -${nodeR*0.6} -${nodeR*0.2} A ${nodeR*0.8} ${nodeR*0.8} 0 0 1 ${nodeR*0.6} -${nodeR*0.2}`}
+          fill="none"
+          stroke="white"
+          strokeWidth="1"
+          opacity={isUnlocked ? "0.15" : "0.05"}
+          className="pointer-events-none"
+        />
+
+        {isUnlocked && (
+          <circle
+            r={arcR}
+            fill="none"
+            stroke={theme.color}
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeDasharray={`${xpFill} ${arcC}`}
+            transform="rotate(-90)"
+            className="transition-all duration-700 ease-in-out"
+            style={{ filter: `drop-shadow(0 0 3px ${theme.color})` }}
+          />
+        )}
+
         <text
           textAnchor="middle"
           dominantBaseline="central"
-          fontSize={isUnlocked ? 18 : 14}
-          style={{ filter: isUnlocked ? 'none' : 'grayscale(1) opacity(0.3)' }}
+          fontSize={isKeystone ? 22 : 16}
+          className="pointer-events-none transition-all duration-300"
+          style={{ 
+            fill: isUnlocked ? 'white' : '#333',
+            filter: isUnlocked ? `drop-shadow(0 0 2px ${theme.color})` : 'none',
+            userSelect: 'none'
+          }}
         >
-          {isUnlocked ? icon : '🔒'}
+          {isUnlocked ? icon : '?'}
         </text>
 
-        {/* Level badge */}
         {isUnlocked && (
-          <g transform="translate(16, -16)">
-            <circle r={9} fill="#7c3aed" stroke="#09090b" strokeWidth="1.5" />
-            <text textAnchor="middle" dominantBaseline="central" fontSize={8} fontWeight="bold" fill="white">
+          <g transform={`translate(${nodeR*0.8}, ${-nodeR*0.8})`}>
+            <circle r={8} fill="#000" stroke={theme.border} strokeWidth="1" />
+            <text
+              textAnchor="middle"
+              dominantBaseline="central"
+              fontSize={7}
+              fontWeight="bold"
+              fill={theme.color}
+            >
               {level}
             </text>
           </g>
         )}
-
-        {/* Label */}
-        <text
-          y={36}
-          textAnchor="middle"
-          fontSize={8}
-          fontWeight="600"
-          fill={isUnlocked ? '#d4d4d8' : '#52525b'}
-          letterSpacing="0.08em"
-          style={{ textTransform: 'uppercase' }}
-        >
-          {label}
-        </text>
       </svg>
 
-      {/* Hover tooltip */}
-      <div className="absolute -top-14 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 transition-transform origin-bottom z-50 pointer-events-none">
-        <div className="rounded-md bg-black/90 border border-white/10 px-3 py-1.5 whitespace-nowrap text-center">
-          <p className="text-xs font-bold text-white">{label}</p>
-          <p className="text-[10px] text-purple-400 uppercase tracking-wider">
-            {isUnlocked ? `Level ${level}` : 'Locked'}
-          </p>
-        </div>
+      <div className={`
+        mt-1 text-[10px] uppercase tracking-[0.2em] font-medium transition-colors
+        ${isUnlocked ? 'text-[#c8b89a]' : 'text-[#3a3830]'}
+      `}>
+        {label}
       </div>
-
-      <Handle type="target" position={Position.Top} className="opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Bottom} className="opacity-0 !w-1 !h-1" />
     </div>
   );
 }
+
+export const SkillNode = memo(SkillNodeComponent);

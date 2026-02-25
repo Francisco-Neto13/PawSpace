@@ -1,6 +1,14 @@
 'use client';
-import React, { useState } from 'react';
-import { ReactFlow, Background, NodeTypes, Edge, useNodesState, useEdgesState } from '@xyflow/react';
+import React, { useState, useCallback } from 'react';
+import { 
+  ReactFlow, 
+  Background, 
+  type Node, 
+  type Edge, 
+  BackgroundVariant, 
+  type NodeTypes,
+  ConnectionMode 
+} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import { SkillData } from './types';
@@ -9,90 +17,76 @@ import { SkillEdge } from './SkillEdge';
 import { SkillPanel } from './SkillPanel';
 import { StarField } from './StarField';
 
-const nodeTypes: NodeTypes = { skill: SkillNode as any };
+const nodeTypes: NodeTypes = { skill: SkillNode };
 const edgeTypes = { skill: SkillEdge };
 
 export function SkillTree() {
+  const [nodes] = useState<Node<SkillData>[]>(INITIAL_NODES);
+  const [edges] = useState<Edge[]>(INITIAL_EDGES);
   const [selectedSkill, setSelectedSkill] = useState<SkillData | null>(null);
-
-  const makeData = (d: Omit<SkillData, 'onSelect'>) => ({
-    ...d,
-    onSelect: setSelectedSkill,
-  });
-
-  const [nodes] = useNodesState([
-    { id: '1', type: 'skill', position: { x: 250, y: 50  }, data: makeData({ label: 'Origin',       icon: '🔥', isUnlocked: true,  level: 10, xp: 80, xpToNextLevel: 100, description: 'The beginning of all paths' }) },
-    { id: '2', type: 'skill', position: { x: 80,  y: 220 }, data: makeData({ label: 'Strength',     icon: '💪', isUnlocked: true,  level: 5,  xp: 30, xpToNextLevel: 100, description: 'Raw physical power' }) },
-    { id: '3', type: 'skill', position: { x: 420, y: 220 }, data: makeData({ label: 'Arcane',       icon: '🔮', isUnlocked: false, level: 0,  xp: 0,  xpToNextLevel: 100, description: 'Requires Origin Lv.5' }) },
-    { id: '4', type: 'skill', position: { x: -80, y: 400 }, data: makeData({ label: 'Berserker',    icon: '⚔️', isUnlocked: true,  level: 3,  xp: 60, xpToNextLevel: 100, description: 'Fury unleashed' }) },
-    { id: '5', type: 'skill', position: { x: 240, y: 400 }, data: makeData({ label: 'Guardian',     icon: '🛡️', isUnlocked: false, level: 0,  xp: 0,  xpToNextLevel: 100, description: 'Requires Strength Lv.3' }) },
-    { id: '6', type: 'skill', position: { x: 600, y: 400 }, data: makeData({ label: 'Elementalist', icon: '🌊', isUnlocked: false, level: 0,  xp: 0,  xpToNextLevel: 100, description: 'Master of elements' }) },
-  ]);
-
-  const [edges] = useEdgesState<Edge>([
-    { id: 'e1-2', source: '1', target: '2', type: 'skill', data: { unlocked: true } },
-    { id: 'e1-3', source: '1', target: '3', type: 'skill', data: { unlocked: false } },
-    { id: 'e2-4', source: '2', target: '4', type: 'skill', data: { unlocked: true } },
-    { id: 'e2-5', source: '2', target: '5', type: 'skill', data: { unlocked: false } },
-    { id: 'e3-6', source: '3', target: '6', type: 'skill', data: { unlocked: false } },
-  ]);
-
-  const unlockedCount = nodes.filter(n => (n.data as SkillData).isUnlocked).length;
+  const onNodeClick = useCallback((_: any, node: Node) => {
+    const data = node.data as SkillData;
+    setSelectedSkill(data);
+  }, []);
 
   return (
-    <main className="h-screen w-screen overflow-hidden bg-[#050505] relative">
-      <style>{`
-        .react-flow__attribution { display: none; }
-        .react-flow__handle { pointer-events: none; }
-      `}</style>
-
+    <main className="h-screen w-screen overflow-hidden relative bg-[#030304] select-none text-[#c8b89a]">
       <StarField />
 
-      <div className="absolute top-7 left-7 z-10 pointer-events-none">
-        <h1
-          className="text-3xl font-black tracking-tighter text-white italic uppercase"
-          style={{ textShadow: '0 0 30px rgba(168,85,247,0.6)' }}
-        >
-          ASCENSION <span className="text-purple-500">TREE</span>
+      <div className="absolute top-8 left-8 z-10">
+        <h1 className="text-3xl font-serif italic tracking-tighter text-[#c8b89a] drop-shadow-2xl">
+          Skill Tree
         </h1>
-        <p className="text-[11px] text-zinc-600 uppercase tracking-widest mt-1">
-          {unlockedCount} / {nodes.length} Skills Unlocked
-        </p>
+        <div className="h-[1px] w-32 bg-gradient-to-r from-[#c8b89a] to-transparent mt-1 opacity-30" />
       </div>
-
-      <div className="absolute top-7 right-7 z-10 flex gap-2">
-        {[
-          { label: 'Total XP', value: nodes.reduce((acc, n) => acc + (n.data as SkillData).xp, 0) },
-          { label: 'Avg Lv',   value: Math.round(nodes.filter(n => (n.data as SkillData).isUnlocked).reduce((acc, n) => acc + (n.data as SkillData).level, 0) / unlockedCount) },
-        ].map(s => (
-          <div key={s.label} className="rounded-lg border border-purple-500/20 bg-zinc-950/80 px-3 py-2 text-center backdrop-blur-sm">
-            <p className="text-base font-extrabold text-purple-400">{s.value}</p>
-            <p className="text-[10px] text-zinc-600 uppercase tracking-wider">{s.label}</p>
-          </div>
-        ))}
-      </div>
-
-      <p className="absolute bottom-6 left-6 z-10 text-[11px] text-zinc-700 uppercase tracking-widest pointer-events-none">
-        Scroll to zoom · Drag to pan · Click node to inspect
-      </p>
 
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        onNodeClick={onNodeClick}
         fitView
-        colorMode="dark"
         nodesDraggable={false}
-        nodesConnectable={false}
-        elementsSelectable={false}
         panOnDrag
         zoomOnScroll
+        connectionMode={ConnectionMode.Loose}
       >
-        <Background color="#111" gap={40} size={1} />
+        <Background variant={BackgroundVariant.Dots} gap={30} size={1} color="#1a1a1e" />
       </ReactFlow>
 
       <SkillPanel data={selectedSkill} onClose={() => setSelectedSkill(null)} />
     </main>
   );
 }
+
+const INITIAL_NODES: Node<SkillData>[] = [
+  { id: '1', type: 'skill', position: { x: 300, y: 300 }, data: { label: 'The Nexus', icon: '⚜️', isUnlocked: true, level: 10, xp: 0, xpToNextLevel: 100, description: 'The starting point of all fate.', category: 'keystone', onSelect: () => {} } },
+  { id: '2', type: 'skill', position: { x: 150, y: 150 }, data: { label: 'Raw Might', icon: '👊', isUnlocked: true, level: 1, xp: 40, xpToNextLevel: 100, description: '+10 Strength.', category: 'strength', onSelect: () => {} } },
+  { id: '3', type: 'skill', position: { x: 450, y: 150 }, data: { label: 'Quickness', icon: '👟', isUnlocked: true, level: 1, xp: 20, xpToNextLevel: 100, description: '+10 Dexterity.', category: 'dexterity', onSelect: () => {} } },
+  { id: '4', type: 'skill', position: { x: 300, y: 500 }, data: { label: 'Insight', icon: '🧠', isUnlocked: true, level: 1, xp: 70, xpToNextLevel: 100, description: '+10 Intelligence.', category: 'intelligence', onSelect: () => {} } },
+  { id: '5', type: 'skill', position: { x: -20, y: 80 }, data: { label: 'Iron Grip', icon: '🛡️', isUnlocked: true, level: 5, xp: 10, xpToNextLevel: 100, description: 'Strength bonus applies to projectiles.', category: 'strength', onSelect: () => {} } },
+  { id: '6', type: 'skill', position: { x: 100, y: -50 }, data: { label: 'Bloodlust', icon: '🩸', isUnlocked: true, level: 5, xp: 85, xpToNextLevel: 100, description: 'Life leech on physical hits.', category: 'strength', onSelect: () => {} } },
+  { id: '7', type: 'skill', position: { x: 500, y: -50 }, data: { label: 'Deadeye', icon: '🎯', isUnlocked: true, level: 5, xp: 30, xpToNextLevel: 100, description: 'Critical strikes never miss.', category: 'dexterity', onSelect: () => {} } },
+  { id: '8', type: 'skill', position: { x: 620, y: 80 }, data: { label: 'Wind Walker', icon: '💨', isUnlocked: true, level: 5, xp: 60, xpToNextLevel: 100, description: 'Chance to dodge spells.', category: 'dexterity', onSelect: () => {} } },
+  { id: '9', type: 'skill', position: { x: 150, y: 650 }, data: { label: 'Void Battery', icon: '🔮', isUnlocked: true, level: 5, xp: 45, xpToNextLevel: 100, description: 'Mana regenerates based on level.', category: 'intelligence', onSelect: () => {} } },
+  { id: '10', type: 'skill', position: { x: 450, y: 650 }, data: { label: 'Static Shock', icon: '⚡', isUnlocked: true, level: 5, xp: 90, xpToNextLevel: 100, description: 'Lightning spells chain once more.', category: 'intelligence', onSelect: () => {} } },
+  { id: '11', type: 'skill', position: { x: -150, y: -150 }, data: { label: 'Unstoppable Force', icon: '🌋', isUnlocked: true, level: 1, xp: 0, xpToNextLevel: 100, description: 'Cannot be slowed. Physical damage is doubled.', category: 'keystone', onSelect: () => {} } },
+  { id: '12', type: 'skill', position: { x: 750, y: -150 }, data: { label: 'Ghost Dance', icon: '👻', isUnlocked: true, level: 1, xp: 0, xpToNextLevel: 100, description: '30% chance to take no damage when hit.', category: 'keystone', onSelect: () => {} } },
+  { id: '13', type: 'skill', position: { x: 300, y: 800 }, data: { label: 'Chaos Inoculation', icon: '☣️', isUnlocked: true, level: 1, xp: 0, xpToNextLevel: 100, description: 'Immune to Chaos. Maximum Life becomes 1.', category: 'keystone', onSelect: () => {} } },
+];
+
+const INITIAL_EDGES: Edge[] = [
+  { id: 'e1-2', source: '1', target: '2', type: 'skill', data: { unlocked: true, category: 'strength' } },
+  { id: 'e1-3', source: '1', target: '3', type: 'skill', data: { unlocked: true, category: 'dexterity' } },
+  { id: 'e1-4', source: '1', target: '4', type: 'skill', data: { unlocked: true, category: 'intelligence' } },
+  { id: 'e2-5', source: '2', target: '5', type: 'skill', data: { unlocked: true, category: 'strength' } },
+  { id: 'e2-6', source: '2', target: '6', type: 'skill', data: { unlocked: true, category: 'strength' } },
+  { id: 'e3-7', source: '3', target: '7', type: 'skill', data: { unlocked: true, category: 'dexterity' } },
+  { id: 'e3-8', source: '3', target: '8', type: 'skill', data: { unlocked: true, category: 'dexterity' } },
+  { id: 'e4-9', source: '4', target: '9', type: 'skill', data: { unlocked: true, category: 'intelligence' } },
+  { id: 'e4-10', source: '4', target: '10', type: 'skill', data: { unlocked: true, category: 'intelligence' } },
+  { id: 'e5-11', source: '5', target: '11', type: 'skill', data: { unlocked: true, category: 'keystone' } },
+  { id: 'e7-12', source: '7', target: '12', type: 'skill', data: { unlocked: true, category: 'keystone' } },
+  { id: 'e9-13', source: '9', target: '13', type: 'skill', data: { unlocked: true, category: 'keystone' } },
+];
