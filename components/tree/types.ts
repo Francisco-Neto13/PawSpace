@@ -1,6 +1,5 @@
 export type SkillCategory = 'html' | 'css' | 'javascript' | 'backend' | 'keystone';
 
-
 export const CATEGORY_THEME: Record<SkillCategory, {
   color: string;
   glow: string;
@@ -43,12 +42,10 @@ export interface SkillData {
   label: string;
   icon: string;
   isUnlocked: boolean;
-  level: number;
-  xp: number;
-  xpToNextLevel: number;
   description: string;
   category: SkillCategory;
-  parentId?: string; 
+  parentId?: string;
+  links?: { label: string; url: string }[]; 
   onSelect?: (data: SkillData) => void;
   [key: string]: any; 
 }

@@ -1,16 +1,7 @@
 import { Node, Edge } from '@xyflow/react';
-import { SkillData, SkillCategory } from '../components/tree/types';
+import { SkillData } from '../components/tree/types';
 
-
-const RADIUS_STEP = 280; 
-
-/**
- * @param tree Objeto aninhado de skills
- * @param parentId ID do nó pai (para recursão)
- * @param startAngle Ângulo inicial da "fatia" (0-360)
- * @param endAngle Ângulo final da "fatia" (0-360)
- * @param level Nível de profundidade (0 = Nexus)
- */
+const RADIUS_STEP = 280;
 
 export function generateTreeLayout(
   tree: any,
@@ -33,11 +24,12 @@ export function generateTreeLayout(
     
     const currentAngle = startAngle + angleStep * index + angleStep / 2;
     const angleRad = (currentAngle * Math.PI) / 180;
-
     const radius = level * RADIUS_STEP;
 
     const x = Math.cos(angleRad) * radius;
     const y = Math.sin(angleRad) * radius;
+    
+    const isUnlockedInitial = level === 0;
 
     nodes.push({
       id,
@@ -47,12 +39,10 @@ export function generateTreeLayout(
         label: skill.label,
         icon: skill.icon || '🔹',
         category: skill.category || 'keystone',
-        isUnlocked: true,
-        level: skill.level || 0,
-        xp: 0,
-        xpToNextLevel: 100,
+        isUnlocked: isUnlockedInitial, 
         description: skill.description || 'No description provided.',
         parentId: parentId || undefined,
+        links: skill.links || [], 
       },
     });
 
@@ -63,7 +53,7 @@ export function generateTreeLayout(
         target: id,
         type: 'skill',
         data: { 
-          unlocked: true, 
+          unlocked: isUnlockedInitial, 
           category: skill.category 
         }
       });
@@ -83,4 +73,39 @@ export function generateTreeLayout(
   });
 
   return { nodes, edges };
+}
+
+export function calculateRecursiveProgress(nodes: Node<SkillData>[], edges: Edge[]): Node<SkillData>[] {
+  const getDescendantIds = (parentId: string): string[] => {
+    const directChildren = edges
+      .filter((e) => e.source === parentId)
+      .map((e) => e.target);
+
+    let descendants = [...directChildren];
+    directChildren.forEach((childId) => {
+      descendants = [...descendants, ...getDescendantIds(childId)];
+    });
+    
+    return descendants;
+  };
+
+  return nodes.map((node) => {
+    const descendantIds = getDescendantIds(node.id);
+
+    if (descendantIds.length === 0) {
+      return { ...node, data: { ...node.data, progress: 0 } };
+    }
+
+    const unlockedCount = nodes.filter(
+      (n) => descendantIds.includes(n.id) && n.data.isUnlocked
+    ).length;
+
+    return {
+      ...node,
+      data: {
+        ...node.data,
+        progress: unlockedCount / descendantIds.length,
+      },
+    };
+  });
 }
