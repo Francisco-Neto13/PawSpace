@@ -1,26 +1,41 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+
+  if (pathname === '/login') return null;
 
   const links = [
-    { name: "Resumo", href: "/dashboard/overview" },
-    { name: "Skill Tree", href: "/dashboard/tree" },
-    { name: "Biblioteca", href: "/dashboard/library" },
-    { name: "Configurações", href: "/dashboard/settings" },
+    { name: "Resumo", href: "/overview" },
+    { name: "Skill Tree", href: "/tree" },
+    { name: "Biblioteca", href: "/library" },
+    { name: "Configurações", href: "/settings" },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push('/login');
+      router.refresh();
+    } catch (error) {
+      console.error('Erro ao sair:', error);
+    }
+  };
 
   return (
     <nav className="w-full border-b border-white/5 bg-black/60 backdrop-blur-xl sticky top-0 z-[100] transition-all duration-300">
       <div className="px-4 md:px-16 lg:px-24 py-4 flex justify-between items-center sm:grid sm:grid-cols-3">
         
         <div className="justify-self-start">
-          <Link href="/dashboard/overview" className="flex items-center gap-3 group">
+          <Link href="/overview" className="flex items-center gap-3 group">
             <div className="h-9 w-9 rounded-full border border-[#c8b89a]/30 bg-[#c8b89a]/10 flex items-center justify-center transition-colors group-hover:border-[#c8b89a]/60">
               <span className="text-[#c8b89a] text-sm font-black">F</span>
             </div>
@@ -51,7 +66,10 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center justify-end justify-self-end gap-4">
-          <button className="hidden sm:block px-5 py-2 border border-white/10 bg-white/5 text-zinc-400 hover:bg-red-600 hover:border-red-500 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-500 cursor-pointer">
+          <button 
+            onClick={handleLogout}
+            className="hidden sm:block px-5 py-2 border border-white/10 bg-white/5 text-zinc-400 hover:bg-red-600 hover:border-red-500 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-500 cursor-pointer"
+          >
             Logout
           </button>
 
@@ -78,7 +96,10 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="h-px w-full bg-white/5" />
-            <button className="text-red-400 text-left text-[11px] font-black uppercase tracking-widest">
+            <button 
+              onClick={handleLogout}
+              className="text-red-400 text-left text-[11px] font-black uppercase tracking-widest"
+            >
               Logout
             </button>
           </div>
