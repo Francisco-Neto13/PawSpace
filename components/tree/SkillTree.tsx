@@ -17,9 +17,6 @@ import { SkillEdge } from './SkillEdge';
 import { SkillPanel } from './SkillPanel';
 import { StarField } from './StarField';
 
-import { CharacterStats } from '@/components/ui/rpg/CharacterStats';
-import { ExperienceBar }  from '@/components/ui/rpg/ExperienceBar';
-
 import {
   generateTreeLayout,
   calculateRecursiveProgress,
@@ -108,13 +105,6 @@ export function SkillTree() {
     });
   }, []);
 
-  const exportLayout = useCallback(() => {
-    const layout = JSON.stringify(nodes.map(n => ({ id: n.id, position: n.position })), null, 2);
-    console.log('=== NEXUS PROTOCOL: LAYOUT EXPORT ===');
-    console.log(layout);
-    alert('SYSTEM: Layout data streamed to terminal (console).');
-  }, [nodes]);
-
   const handleToggleStatus = useCallback((nodeId: string) => {
     setNodes(prev => {
       const target = prev.find(n => n.id === nodeId);
@@ -194,11 +184,6 @@ export function SkillTree() {
         nodesConnectable={false}
         style={{ background: 'transparent' }}
       />
-
-      <div className="absolute inset-0 z-40 pointer-events-none">
-        <CharacterStats />
-        <ExperienceBar onExportLayout={exportLayout} />
-      </div>
 
       <SkillPanel
         data={panelData}

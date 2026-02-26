@@ -1,63 +1,89 @@
 'use client';
-import React from 'react';
+import { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Menu, X } from 'lucide-react';
 
-interface NavbarProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-}
+export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
-export function Navbar({ activeTab, setActiveTab }: NavbarProps) {
-  const tabs = [
-    { id: 'resumo', label: 'Resumo' },
-    { id: 'skilltree', label: 'Skill Tree' },
-    { id: 'configuracoes', label: 'Configurações' }
+  const links = [
+    { name: "Resumo", href: "/dashboard/overview" },
+    { name: "Skill Tree", href: "/dashboard/tree" },
+    { name: "Biblioteca", href: "/dashboard/library" },
+    { name: "Configurações", href: "/dashboard/settings" },
   ];
-  
+
   return (
-    <nav className="w-full h-16 border-b border-[#c8b89a]/20 bg-[#030304] z-[60] shrink-0">
-      <div className="mx-auto max-w-7xl h-full flex items-center justify-between px-8">
+    <nav className="w-full border-b border-white/5 bg-black/60 backdrop-blur-xl sticky top-0 z-[100] transition-all duration-300">
+      <div className="px-4 md:px-16 lg:px-24 py-4 flex justify-between items-center sm:grid sm:grid-cols-3">
         
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full border border-[#c8b89a]/30 bg-[#c8b89a]/10 flex items-center justify-center">
-            <span className="text-[#c8b89a] text-sm font-bold">U1</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm text-[#f0ede6] font-bold leading-none">Operator Nexus</span>
-            <span className="text-[10px] text-[#c8b89a]/50 font-medium mt-1 uppercase tracking-wider">Admin Level 04</span>
-          </div>
+        <div className="justify-self-start">
+          <Link href="/dashboard/overview" className="flex items-center gap-3 group">
+            <div className="h-9 w-9 rounded-full border border-[#c8b89a]/30 bg-[#c8b89a]/10 flex items-center justify-center transition-colors group-hover:border-[#c8b89a]/60">
+              <span className="text-[#c8b89a] text-sm font-black">F</span>
+            </div>
+            <span className="text-zinc-200 text-[11px] font-black uppercase tracking-[0.2em] group-hover:text-[#c8b89a] transition-colors">
+              Francisco
+            </span>
+          </Link>
         </div>
 
-        <div className="hidden md:flex h-full items-center gap-2">
-          {tabs.map((tab) => {
-            const isActive = tab.label === activeTab;
+        <div className="hidden md:flex justify-self-center items-center gap-6 lg:gap-8">
+          {links.map((link) => {
+            const isActive = pathname === link.href;
             return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.label)} 
-                className={`px-5 h-10 text-[11px] uppercase tracking-widest font-bold transition-all duration-200 rounded-md
-                ${isActive 
-                  ? 'text-black bg-[#c8b89a]' 
-                  : 'text-[#c8b89a]/60 hover:text-[#c8b89a] hover:bg-white/5'}`}
+              <Link
+                key={link.name}
+                href={link.href}
+                className={`relative text-[10px] lg:text-[11px] font-black uppercase tracking-[0.2em] transition-colors group py-1 ${
+                  isActive ? 'text-[#c8b89a]' : 'text-zinc-400 hover:text-[#c8b89a]'
+                }`}
               >
-                {tab.label}
-              </button>
+                {link.name}
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#c8b89a] transition-all duration-300 shadow-[0_0_10px_rgba(200,184,154,0.5)] ${
+                  isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                }`} />
+              </Link>
             );
           })}
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="flex flex-col items-end">
-            <span className="text-[9px] text-[#c8b89a]/50 uppercase font-bold tracking-tighter leading-none">Knowledge Points</span>
-            <span className="text-sm font-bold text-[#c8b89a] mt-0.5">
-              1,450 <span className="text-[10px] font-normal opacity-60">SP</span>
-            </span>
-          </div>
-          <div className="w-[1px] h-8 bg-white/10" />
-          <button className="text-[10px] font-bold text-[#ff4444]/70 hover:text-[#ff4444] uppercase tracking-widest transition-colors">
+        <div className="flex items-center justify-end justify-self-end gap-4">
+          <button className="hidden sm:block px-5 py-2 border border-white/10 bg-white/5 text-zinc-400 hover:bg-red-600 hover:border-red-500 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-500 cursor-pointer">
             Logout
+          </button>
+
+          <button
+            className="md:hidden text-zinc-400 hover:text-white transition-colors"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
+
+      {isOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-black border-b border-white/5 animate-in slide-in-from-top duration-300">
+          <div className="flex flex-col p-6 gap-6">
+            {links.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-[#c8b89a]"
+              >
+                {link.name}
+              </Link>
+            ))}
+            <div className="h-px w-full bg-white/5" />
+            <button className="text-red-400 text-left text-[11px] font-black uppercase tracking-widest">
+              Logout
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

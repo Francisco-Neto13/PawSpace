@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Rajdhani, Share_Tech_Mono } from "next/font/google"; 
 import "./globals.css";
+import Navbar from "@/components/shared/Navbar";
+import Footer from '@/components/shared/Footer'; 
 
 const futuristicSans = Rajdhani({
   variable: "--font-futuristic",
@@ -15,7 +17,7 @@ const futuristicMono = Share_Tech_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RPG Skill Tree | Nexus Protocol",
+  title: "Skill Tree",
   description: "Master your path in the digital void",
 };
 
@@ -27,15 +29,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           ${futuristicSans.variable} 
           ${futuristicMono.variable} 
           bg-[#030304] 
-          h-full w-full 
+          h-screen w-screen 
           overflow-hidden 
           font-sans 
           antialiased
         `}
       >
-
-        <div className="flex flex-col h-full w-full">
-          {children}
+        <div className="flex flex-col h-full w-full items-stretch">
+          <Navbar /> 
+          
+          <main className="relative flex-1 w-full overflow-hidden">
+            {children}
+          </main>
+          
+          <Footer /> 
         </div>
       </body>
     </html>
