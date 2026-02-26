@@ -2,12 +2,12 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   ReactFlow,
-  Background,
+  applyNodeChanges,
+  ConnectionMode,
   type Node,
   type Edge,
-  BackgroundVariant,
   type NodeTypes,
-  ConnectionMode,
+  type OnNodesChange,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -17,12 +17,27 @@ import { SkillEdge } from './SkillEdge';
 import { SkillPanel } from './SkillPanel';
 import { StarField } from './StarField';
 
-import { generateTreeLayout, calculateRecursiveProgress } from '@/utils/treeUtils';
+import { HUDFrame }       from '@/components/ui/rpg/HUDFrame';
+import { CharacterStats } from '@/components/ui/rpg/CharacterStats';
+import { ExperienceBar }  from '@/components/ui/rpg/ExperienceBar';
+
+import {
+  generateTreeLayout,
+  calculateRecursiveProgress,
+  calculateGlobalProgress,
+} from '@/utils/treeUtils';
 import { SKILL_TREE_DATA } from '@/constants/skills';
 
 const nodeTypes: NodeTypes = { skill: SkillNode };
 const edgeTypes = { skill: SkillEdge };
-const STORAGE_KEY = 'skill-tree-progress-v1';
+
+const PROGRESS_KEY = 'skill-tree-progress-v1';
+const LAYOUT_KEY   = 'skill-tree-layout-v1';
+
+const defaultEdgeOptions = {
+  type: 'skill',
+  style: { strokeWidth: 2, transition: 'stroke 0.5s ease' },
+};
 
 export function SkillTree() {
   const initialData = useMemo(() => generateTreeLayout(SKILL_TREE_DATA), []);
@@ -34,45 +49,79 @@ export function SkillTree() {
 
   useEffect(() => {
     setIsMounted(true);
-    const savedProgress = localStorage.getItem(STORAGE_KEY);
+    const savedProgress = localStorage.getItem(PROGRESS_KEY);
+    const savedLayout   = localStorage.getItem(LAYOUT_KEY);
+
+    let currentNodes = [...initialData.nodes];
+    let unlockedIds: string[] = [];
+
     if (savedProgress) {
       try {
-        const unlockedIds = JSON.parse(savedProgress) as string[];
-        const restoredNodes = initialData.nodes.map(node => ({
+        unlockedIds = JSON.parse(savedProgress);
+        currentNodes = currentNodes.map(node => ({
           ...node,
           data: { ...node.data, isUnlocked: unlockedIds.includes(node.id) },
         }));
-        setNodes(calculateRecursiveProgress(restoredNodes, initialData.edges));
-        setEdges(initialData.edges.map(edge => ({
-          ...edge,
-          data: { ...edge.data, unlocked: unlockedIds.includes(edge.target) },
-        })));
-      } catch (e) {
-        console.error('Erro ao carregar:', e);
-      }
-    } else {
-      setNodes(calculateRecursiveProgress(initialData.nodes, initialData.edges));
+      } catch (e) { console.error('Erro ao carregar progresso', e); }
     }
+
+    if (savedLayout) {
+      try {
+        const layoutMap = JSON.parse(savedLayout) as { id: string; position: { x: number; y: number } }[];
+        currentNodes = currentNodes.map(node => {
+          const saved = layoutMap.find(l => l.id === node.id);
+          return saved ? { ...node, position: saved.position } : node;
+        });
+      } catch (e) { console.error('Erro ao carregar layout', e); }
+    }
+
+    setNodes(calculateRecursiveProgress(currentNodes, initialData.edges));
+    setEdges(initialData.edges.map(edge => ({
+      ...edge,
+      type: 'skill',
+      data: { ...edge.data, unlocked: unlockedIds.includes(edge.target) },
+    })));
   }, [initialData]);
 
   useEffect(() => {
     if (!isMounted) return;
     const unlockedIds = nodes.filter(n => n.data.isUnlocked).map(n => n.id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(unlockedIds));
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(unlockedIds));
+    window.dispatchEvent(
+      new CustomEvent('skill-progress-update', { detail: calculateGlobalProgress(nodes) })
+    );
   }, [nodes, isMounted]);
+
+  const onNodesChange: OnNodesChange<Node<SkillData>> = useCallback((changes) => {
+    setNodes(nds => {
+      const updated = applyNodeChanges(changes, nds);
+      const hasPosChange = changes.some(c => c.type === 'position' && c.dragging === false);
+      if (hasPosChange) {
+        localStorage.setItem(
+          LAYOUT_KEY,
+          JSON.stringify(updated.map(n => ({ id: n.id, position: n.position })))
+        );
+      }
+      return updated;
+    });
+  }, []);
+
+  const exportLayout = useCallback(() => {
+    console.log('=== LAYOUT ===');
+    console.log(JSON.stringify(nodes.map(n => ({ id: n.id, position: n.position })), null, 2));
+    alert('Layout logado no console!');
+  }, [nodes]);
 
   const handleToggleStatus = useCallback((nodeId: string) => {
     setNodes(prev => {
       const target = prev.find(n => n.id === nodeId);
       if (!target) return prev;
-
       const currentlyUnlocked = target.data.isUnlocked;
 
       if (currentlyUnlocked) {
         const childIds = edges.filter(e => e.source === nodeId).map(e => e.target);
-        const hasUnlockedChildren = prev.some(n => childIds.includes(n.id) && n.data.isUnlocked);
-        if (hasUnlockedChildren) {
-          alert('Não é possível esquecer esta habilidade enquanto houver especializações ativas abaixo dela!');
+        if (prev.some(n => childIds.includes(n.id) && n.data.isUnlocked)) {
+          alert('Dependências ativas!');
           return prev;
         }
       }
@@ -117,54 +166,39 @@ export function SkillTree() {
   if (!isMounted) return <div className="h-screen w-screen bg-[#030304]" />;
 
   return (
-    <main className="h-screen w-screen overflow-hidden relative bg-[#030304] select-none text-[#c8b89a]">
+    <div className="h-screen w-screen overflow-hidden relative bg-[#030304] select-none">
       <SvgDefs />
-
       <StarField />
-
-      <div className="absolute top-8 left-8 z-10 pointer-events-none">
-        <h1 className="text-3xl font-serif italic tracking-tighter text-[#c8b89a] drop-shadow-2xl">
-          Learning Path
-        </h1>
-        <div className="h-[1px] w-48 bg-gradient-to-r from-[#c8b89a] to-transparent mt-1 opacity-30" />
-        <p className="text-[10px] uppercase tracking-[0.2em] mt-2 text-[#c8b89a]/50">
-          Personal Knowledge Map
-        </p>
-      </div>
 
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        onNodesChange={onNodesChange}
         onNodeClick={onNodeClick}
+        defaultEdgeOptions={defaultEdgeOptions}
         fitView
-        nodesDraggable={false}
+        nodesDraggable
         panOnDrag
         zoomOnScroll
+        minZoom={0.05}
+        maxZoom={2}
         connectionMode={ConnectionMode.Loose}
-      >
-        <Background variant={BackgroundVariant.Dots} gap={40} size={1} color="#1a1a1e" />
-      </ReactFlow>
+        nodesConnectable={false}
+      />
 
+      <div className="absolute inset-0 z-40 pointer-events-none">
+        <HUDFrame />
+        <CharacterStats />
+        <ExperienceBar onExportLayout={exportLayout} />
+      </div>
       <SkillPanel
         data={panelData}
         onClose={() => setSelectedSkillId(null)}
         onToggleStatus={handleToggleStatus}
         isAvailable={isPanelAvailable}
       />
-
-      <button
-        onClick={() => {
-          if (confirm('Resetar todo o progresso?')) {
-            localStorage.clear();
-            window.location.reload();
-          }
-        }}
-        className="absolute bottom-6 left-6 z-10 text-[9px] uppercase tracking-widest text-[#3a3a45] hover:text-red-500 transition-colors bg-transparent border-none cursor-pointer"
-      >
-        Reset Journey
-      </button>
-    </main>
+    </div>
   );
 }

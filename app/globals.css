@@ -1,16 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 @import "tailwindcss";
 
 :root {
   --background: #030304;
   --foreground: #ededed;
   --rpg-gold: #c8b89a;
+  --rpg-gold-bright: #ddd8cc;
   --rpg-muted: #3a3830;
+  --rpg-glow: rgba(200, 184, 154, 0.4);
+  
+  --font-pixel-title: 'Press Start 2P', cursive;
+  --font-pixel-body: 'VT323', monospace;
+
   color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-rpg-gold: var(--rpg-gold);
+  --color-rpg-muted: var(--rpg-muted);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-pixel-body);
+  font-size: 1.5rem; 
+  margin: 0;
+  overflow: hidden;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6, 
+button, 
+.skill-label-text {
+  font-family: var(--font-pixel-body); 
+  font-size: 1.1rem; 
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  text-shadow: 1px 1px 0px #000; 
+  font-weight: normal;
+}
+
+p, span:not(.skill-label-text) {
+  font-family: var(--font-pixel-body);
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 0px rgba(0,0,0,0.8);
+}
+
+.text-glow-gold {
+  text-shadow: 2px 2px 0px #000, 0 0 4px var(--rpg-gold);
+}
+
+.glass-reflection {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-reflection::after {
+  content: "";
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 300%;
+  height: 300%;
+  background: linear-gradient(
+    45deg,
+    transparent 45%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 55%
+  );
+  animation: shine 12s steps(8) infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(0) translateY(0); }
+  20%, 100% { transform: translateX(50%) translateY(50%); }
 }
 
 .node-pulse,
@@ -21,17 +93,6 @@
   transform-box: fill-box;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Georgia, serif;
-  margin: 0;
-  overflow: hidden;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-/* Animações */
 @keyframes twinkle {
   0%, 100% { opacity: var(--op); }
   50%      { opacity: calc(var(--op) * 0.3); }
@@ -52,10 +113,9 @@ body {
   to   { stroke-dashoffset: 0; }
 }
 
-.node-pulse    { animation: pulse-ring    5s ease-in-out infinite; }
-.node-pulse-ks { animation: keystone-ring 4s ease-in-out infinite; }
-
-.edge-flow { animation: flow 3s linear infinite; }
+.node-pulse    { animation: pulse-ring 5s steps(4) infinite; }
+.node-pulse-ks { animation: keystone-ring 4s steps(4) infinite; }
+.edge-flow     { animation: flow 3s steps(10) linear infinite; }
 
 .react-flow__edge { z-index: 0 !important; }
 .react-flow__node {
@@ -65,13 +125,11 @@ body {
 .react-flow__node.selected { z-index: 100 !important; }
 
 .skill-label-text {
-  text-shadow:
-    0 0 10px rgba(0,0,0,1),
-    0 0 5px rgba(0,0,0,1),
-    2px 2px 2px rgba(0,0,0,1);
+  text-shadow: 2px 2px 0px #000;
 }
 
 .react-flow__attribution { display: none !important; }
+
 .react-flow__handle {
   pointer-events: none !important;
   opacity: 0 !important;
@@ -80,15 +138,14 @@ body {
 }
 
 .starfield-wrapper > svg { will-change: opacity; }
-.starfield-wrapper > svg:nth-child(2) { animation: twinkle 3s ease-in-out infinite; }
-.starfield-wrapper > svg:nth-child(3) { animation: twinkle 4s ease-in-out infinite 0.8s; }
-.starfield-wrapper > svg:nth-child(4) { animation: twinkle 5s ease-in-out infinite 1.6s; }
-.starfield-wrapper > svg:nth-child(5) { animation: twinkle 6s ease-in-out infinite 2.4s; }
-
+.starfield-wrapper > svg:nth-child(2) { animation: twinkle 3s steps(3) infinite; }
+.starfield-wrapper > svg:nth-child(3) { animation: twinkle 4s steps(3) infinite 0.8s; }
+.starfield-wrapper > svg:nth-child(4) { animation: twinkle 5s steps(3) infinite 1.6s; }
+.starfield-wrapper > svg:nth-child(5) { animation: twinkle 6s steps(3) infinite 2.4s; }
 
 @media (prefers-reduced-motion: reduce) {
   .node-pulse, .node-pulse-ks, .edge-flow,
-  .starfield-wrapper > svg {
+  .starfield-wrapper > svg, .glass-reflection::after {
     animation: none !important;
     transition: none !important;
   }

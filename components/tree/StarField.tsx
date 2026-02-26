@@ -1,24 +1,5 @@
 'use client';
-import React, { useEffect, useRef, memo, useMemo } from 'react';
-
-function seededRandom(seed: number) {
-  const x = Math.sin(seed + 1) * 10000;
-  return x - Math.floor(x);
-}
-
-function generateStars(count: number) {
-  return Array.from({ length: count }, (_, i) => ({
-    x: seededRandom(i * 4 + 0),
-    y: seededRandom(i * 4 + 1),
-    r: seededRandom(i * 4 + 2) * 1.1 + 0.2,
-    opacity: seededRandom(i * 4 + 3) * 0.4 + 0.1,
-    bucket: Math.floor(seededRandom(i * 4 + 3) * 4),
-  }));
-}
-
-const STARS = generateStars(60);
-
-const BUCKETS = [0, 1, 2, 3].map(b => STARS.filter(s => s.bucket === b));
+import React, { useEffect, useRef, memo } from 'react';
 
 const StarFieldComponent = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -29,73 +10,68 @@ const StarFieldComponent = () => {
 
     const draw = () => {
       const { width, height } = canvas.getBoundingClientRect();
-      canvas.width  = width;
+      canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      const bg = ctx.createRadialGradient(
-        width * 0.5, height * 0.4, 0,
-        width * 0.5, height * 0.4, Math.max(width, height) * 0.7
-      );
-      bg.addColorStop(0, '#0d0d0f');
-      bg.addColorStop(1, '#030304');
-      ctx.fillStyle = bg;
+      ctx.fillStyle = '#030304';
       ctx.fillRect(0, 0, width, height);
 
-      STARS.forEach(s => {
-        ctx.beginPath();
-        ctx.arc(s.x * width, s.y * height, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(200, 212, 232, ${s.opacity})`;
-        ctx.fill();
-      });
+      const gridSize = 100;
+      ctx.strokeStyle = 'rgba(200, 184, 154, 0.02)'; 
+      ctx.lineWidth = 1;
 
-      const vig = ctx.createRadialGradient(
+      for (let x = 0; x <= width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = 'rgba(200, 184, 154, 0.03)';
+      ctx.beginPath();
+      ctx.arc(width / 2, height / 2, Math.min(width, height) * 0.2, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(width / 2, height / 2, Math.min(width, height) * 0.4, 0, Math.PI * 2);
+      ctx.stroke();
+
+      const centerGlow = ctx.createRadialGradient(
         width * 0.5, height * 0.5, 0,
-        width * 0.5, height * 0.5, Math.max(width, height) * 0.65
+        width * 0.5, height * 0.5, Math.max(width, height) * 0.6
       );
-      vig.addColorStop(0, 'rgba(0,0,0,0)');
-      vig.addColorStop(1, 'rgba(0,0,0,0.9)');
-      ctx.fillStyle = vig;
+      centerGlow.addColorStop(0, 'rgba(58, 56, 48, 0.1)');
+      centerGlow.addColorStop(1, 'rgba(3, 3, 4, 0)');
+      ctx.fillStyle = centerGlow;
       ctx.fillRect(0, 0, width, height);
     };
 
     draw();
-
-    let timeout: ReturnType<typeof setTimeout>;
-    const onResize = () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(draw, 200);
-    };
-    window.addEventListener('resize', onResize);
-    return () => {
-      window.removeEventListener('resize', onResize);
-      clearTimeout(timeout);
-    };
+    window.addEventListener('resize', draw);
+    return () => window.removeEventListener('resize', draw);
   }, []);
 
   return (
-    <div className="starfield-wrapper absolute inset-0 w-full h-full pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
+    <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden bg-[#030304]" style={{ zIndex: 0 }}>
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
-      {BUCKETS.map((stars, bucket) => (
-        <svg
-          key={bucket}
-          className="absolute inset-0 w-full h-full"
-          style={{ willChange: 'opacity' }}
-        >
-          {stars.map((s, i) => (
-            <circle
-              key={i}
-              cx={`${s.x * 100}%`}
-              cy={`${s.y * 100}%`}
-              r={s.r}
-              fill={`rgba(200, 212, 232, ${s.opacity})`}
-            />
-          ))}
-        </svg>
-      ))}
+      <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none" 
+           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.60' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
+      />
 
+      <div className="absolute top-0 left-0 w-32 h-32 border-t border-l border-[#c8b89a]/10 m-8" />
+      <div className="absolute top-0 right-0 w-32 h-32 border-t border-r border-[#c8b89a]/10 m-8" />
+      <div className="absolute bottom-0 left-0 w-32 h-32 border-b border-l border-[#c8b89a]/10 m-8" />
+      <div className="absolute bottom-0 right-0 w-32 h-32 border-b border-r border-[#c8b89a]/10 m-8" />
+      
+      <div className="absolute inset-0 shadow-[inset_0_0_150px_rgba(0,0,0,0.9)]" />
     </div>
   );
 };

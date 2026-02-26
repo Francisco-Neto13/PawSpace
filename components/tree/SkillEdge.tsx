@@ -1,6 +1,6 @@
 'use client';
 import React, { memo } from 'react';
-import { EdgeProps, BaseEdge, getBezierPath, type Edge } from '@xyflow/react';
+import { EdgeProps, BaseEdge, getStraightPath, type Edge } from '@xyflow/react';
 import { SkillEdgeData, CATEGORY_THEME, SkillCategory } from './types';
 
 type CompatibleSkillEdge = Edge<SkillEdgeData & { [key: string]: unknown }>;
@@ -9,20 +9,18 @@ type SkillEdgeProps = EdgeProps<CompatibleSkillEdge>;
 function SkillEdgeComponent({
   id,
   sourceX, sourceY, targetX, targetY,
-  sourcePosition, targetPosition,
   data,
 }: SkillEdgeProps) {
-  const [path] = getBezierPath({
+  const [path] = getStraightPath({
     sourceX, sourceY, targetX, targetY,
-    sourcePosition, targetPosition,
-    curvature: 0.15,
   });
 
-  const unlocked  = data?.unlocked ?? false;
-  const category  = data?.category as SkillCategory;
-  const color     = category && CATEGORY_THEME[category]
+  const unlocked = data?.unlocked ?? false;
+  const category = data?.category as SkillCategory;
+  
+  const themeColor = category && CATEGORY_THEME[category]
     ? CATEGORY_THEME[category].color
-    : '#2a2a35';
+    : '#3a3a45';
 
   return (
     <>
@@ -32,30 +30,32 @@ function SkillEdgeComponent({
         style={{
           stroke: '#000',
           strokeWidth: unlocked ? 5 : 3,
-          opacity: 0.5,
+          opacity: 0.9,
         }}
       />
 
       <path
         d={path}
         fill="none"
-        stroke={unlocked ? color : '#1e1e24'}
-        strokeWidth={unlocked ? 1.5 : 1}
-        strokeDasharray={unlocked ? undefined : '2 4'}
-        strokeLinecap="round"
-        opacity={unlocked ? 0.85 : 0.3}
-        className="pointer-events-none"
+        stroke={unlocked ? themeColor : '#1a1a1f'}
+        strokeWidth={unlocked ? 2.5 : 1.5}
+        strokeLinecap="butt" 
+        opacity={unlocked ? 1 : 0.6}
+        className="pointer-events-none transition-all duration-500"
+        style={{
+          filter: unlocked ? `drop-shadow(0 0 3px ${themeColor})` : 'none',
+        }}
       />
 
       {unlocked && (
         <path
           d={path}
           fill="none"
-          stroke="white"
+          stroke="#fff"
           strokeWidth={1}
-          strokeLinecap="round"
-          strokeDasharray="2 36"
-          opacity={0.55}
+          strokeLinecap="butt"
+          strokeDasharray="4 60" 
+          opacity={0.5}
           className="edge-flow pointer-events-none"
         />
       )}

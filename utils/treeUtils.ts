@@ -1,35 +1,41 @@
 import { Node, Edge } from '@xyflow/react';
 import { SkillData } from '../components/tree/types';
 
-const RADIUS_STEP = 280;
+const X_OFFSET = 140; 
+const Y_OFFSET = 160;
+
+function getSubtreeWidth(node: any): number {
+  if (!node.children || Object.keys(node.children).length === 0) {
+    return 1;
+  }
+  return Object.values(node.children).reduce(
+    (acc: number, child: any) => acc + getSubtreeWidth(child),
+    0
+  );
+}
 
 export function generateTreeLayout(
   tree: any,
   parentId: string | null = null,
-  startAngle: number = 0,
-  endAngle: number = 360,
-  level: number = 0
+  level: number = 0,
+  startX: number = 0
 ) {
   let nodes: Node<SkillData>[] = [];
   let edges: Edge[] = [];
 
   const keys = Object.keys(tree);
-  if (keys.length === 0) return { nodes, edges };
+  let currentX = startX;
 
-  const angleStep = (endAngle - startAngle) / keys.length;
-
-  keys.forEach((key, index) => {
+  keys.forEach((key) => {
     const skill = tree[key];
     const id = parentId ? `${parentId}-${key}` : key;
     
-    const currentAngle = startAngle + angleStep * index + angleStep / 2;
-    const angleRad = (currentAngle * Math.PI) / 180;
-    const radius = level * RADIUS_STEP;
-
-    const x = Math.cos(angleRad) * radius;
-    const y = Math.sin(angleRad) * radius;
+    const subtreeWidth = getSubtreeWidth(skill);
     
-    const isUnlockedInitial = level === 0;
+    const x = currentX + (subtreeWidth * X_OFFSET) / 2 - X_OFFSET / 2;
+    const y = level * Y_OFFSET;
+
+    const isUnlockedInitial = id === 'nexus';
 
     nodes.push({
       id,
@@ -40,7 +46,7 @@ export function generateTreeLayout(
         icon: skill.icon || '🔹',
         category: skill.category || 'keystone',
         isUnlocked: isUnlockedInitial, 
-        description: skill.description || 'No description provided.',
+        description: skill.description || '',
         parentId: parentId || undefined,
         links: skill.links || [], 
       },
@@ -60,16 +66,17 @@ export function generateTreeLayout(
     }
 
     if (skill.children) {
-      const { nodes: childNodes, edges: childEdges } = generateTreeLayout(
+      const childLayout = generateTreeLayout(
         skill.children,
         id,
-        startAngle + angleStep * index,
-        startAngle + angleStep * (index + 1),
-        level + 1
+        level + 1,
+        currentX
       );
-      nodes = [...nodes, ...childNodes];
-      edges = [...edges, ...childEdges];
+      nodes = [...nodes, ...childLayout.nodes];
+      edges = [...edges, ...childLayout.edges];
     }
+
+    currentX += subtreeWidth * X_OFFSET;
   });
 
   return { nodes, edges };
@@ -77,21 +84,16 @@ export function generateTreeLayout(
 
 export function calculateRecursiveProgress(nodes: Node<SkillData>[], edges: Edge[]): Node<SkillData>[] {
   const getDescendantIds = (parentId: string): string[] => {
-    const directChildren = edges
-      .filter((e) => e.source === parentId)
-      .map((e) => e.target);
-
+    const directChildren = edges.filter((e) => e.source === parentId).map((e) => e.target);
     let descendants = [...directChildren];
     directChildren.forEach((childId) => {
       descendants = [...descendants, ...getDescendantIds(childId)];
     });
-    
     return descendants;
   };
 
   return nodes.map((node) => {
     const descendantIds = getDescendantIds(node.id);
-
     if (descendantIds.length === 0) {
       return { ...node, data: { ...node.data, progress: 0 } };
     }
@@ -108,4 +110,10 @@ export function calculateRecursiveProgress(nodes: Node<SkillData>[], edges: Edge
       },
     };
   });
+}
+
+export function calculateGlobalProgress(nodes: Node<SkillData>[]): number {
+  if (nodes.length === 0) return 0;
+  const unlockedCount = nodes.filter((n) => n.data.isUnlocked).length;
+  return Math.round((unlockedCount / nodes.length) * 100);
 }

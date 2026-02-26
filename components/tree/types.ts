@@ -7,33 +7,33 @@ export const CATEGORY_THEME: Record<SkillCategory, {
   label: string;
 }> = {
   html: { 
-    color: '#e67e22', 
-    glow: 'rgba(230,126,34,0.5)', 
-    border: '#d35400', 
+    color: '#c8b89a', 
+    glow: 'rgba(200, 184, 154, 0.2)', 
+    border: '#3a3830', 
     label: 'Structure (HTML)' 
   },
   css: { 
-    color: '#2ecc71', 
-    glow: 'rgba(46,204,113,0.5)', 
-    border: '#27ae60', 
+    color: '#c8b89a', 
+    glow: 'rgba(200, 184, 154, 0.2)', 
+    border: '#3a3830', 
     label: 'Styling (CSS)' 
   },
   javascript: { 
-    color: '#f1c40f', 
-    glow: 'rgba(241,196,15,0.5)', 
-    border: '#f39c12', 
+    color: '#c8b89a', 
+    glow: 'rgba(200, 184, 154, 0.3)', 
+    border: '#c8b89a', 
     label: 'Logic (JS)' 
   },
   backend: { 
-    color: '#9b59b6', 
-    glow: 'rgba(155,89,182,0.5)', 
-    border: '#8e44ad', 
+    color: '#c8b89a', 
+    glow: 'rgba(200, 184, 154, 0.3)', 
+    border: '#c8b89a', 
     label: 'Server (Node/DB)' 
   },
   keystone: { 
-    color: '#f3f4f6', 
-    glow: 'rgba(255,255,255,0.6)', 
-    border: '#9ca3af', 
+    color: '#ddd8cc', 
+    glow: 'rgba(200, 184, 154, 0.6)', 
+    border: '#ddd8cc', 
     label: 'Fundamentals' 
   },
 };
