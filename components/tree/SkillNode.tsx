@@ -1,7 +1,6 @@
 'use client';
 import React, { memo, useMemo } from 'react';
-
-import { Handle, Position, type NodeProps, type Node, useViewport } from '@xyflow/react';
+import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { SkillData, CATEGORY_THEME, SkillCategory } from './types';
 
 type CompatibleSkillNode = Node<SkillData>;
@@ -21,8 +20,6 @@ export function SvgDefs() {
 
 function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) {
   const { isUnlocked, icon, label, category, progress = 0 } = data;
-  
-  const { zoom } = useViewport();
 
   const theme = useMemo(
     () => CATEGORY_THEME[category as SkillCategory] || CATEGORY_THEME.keystone,
@@ -31,8 +28,6 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
 
   const isKeystone = category === 'keystone';
   
-  const textScale = 1 / zoom;
-
   const centralHandleStyle: React.CSSProperties = {
     background: 'transparent',
     border: 'none',
@@ -60,14 +55,15 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
         <div 
           className="absolute inset-0 transition-colors duration-500 pointer-events-none"
           style={{
-            backgroundColor: isUnlocked ? theme.color : '#26262a',
+            backgroundColor: isUnlocked ? theme.color : '#1a1a1e',
             clipPath: 'polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%)',
-            filter: isUnlocked && isKeystone ? 'url(#glow-keystone)' : 'none'
+            filter: isUnlocked && isKeystone ? 'url(#glow-keystone)' : 'none',
+            opacity: isUnlocked ? 1 : 0.4
           }}
         />
 
         <div 
-          className="absolute inset-[3px] bg-[#0d0d0f] pointer-events-none"
+          className="absolute inset-[2px] bg-[#030304] pointer-events-none"
           style={{
             clipPath: 'polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%)',
           }}
@@ -75,42 +71,44 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
 
         <span className={`relative z-10 select-none transition-all duration-300 pointer-events-none
           ${isKeystone ? 'text-3xl' : 'text-xl'}
-          ${isUnlocked ? 'grayscale-0 opacity-100' : 'grayscale opacity-30'}
+          ${isUnlocked ? 'grayscale-0 opacity-100' : 'grayscale opacity-20'}
         `}>
-          {icon || '?'}
+          {icon || '✦'}
         </span>
 
         {selected && (
-          <div className="absolute -inset-1 border border-white/20 animate-pulse pointer-events-none" 
+          <div className="absolute -inset-1 border border-[#c8b89a]/40 animate-pulse pointer-events-none" 
                style={{ clipPath: 'polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%)' }} 
           />
         )}
       </div>
 
-      <div 
-        className="absolute -bottom-10 w-[140px] flex flex-col items-center pointer-events-none z-30"
-        style={{ 
-          transform: `scale(${textScale})`,
-          transformOrigin: 'top center'
-        }}
-      >
-        <span className={`skill-label-text uppercase font-bold text-center leading-tight transition-colors
-          ${isUnlocked ? 'text-[#ddd8cc]' : 'text-[#3a3a45]'}`}
+      <div className="absolute -bottom-12 w-[160px] flex flex-col items-center pointer-events-none z-30">
+        <span className={`
+          font-sans text-center uppercase transition-all duration-300 px-1 tracking-[0.12em]
+          ${isUnlocked 
+            ? 'text-[#f0ede6] font-bold drop-shadow-[0_0_8px_rgba(200,184,154,0.4)]' 
+            : 'text-[#4a4a55] font-semibold'}
+        `}
           style={{ 
-            fontSize: '11px', 
-            letterSpacing: '0.5px'
+            fontSize: '11px',
+            lineHeight: '1.2'
           }}
         >
           {label}
         </span>
         
         {progress > 0 && progress < 1 && (
-          <div className="w-8 h-1 bg-black mt-1 border border-white/5 overflow-hidden">
+          <div className="w-10 h-[2px] bg-black/60 mt-2 border border-[#c8b89a]/10 overflow-hidden">
             <div 
-              className="h-full bg-[#c8b89a] transition-all duration-700" 
+              className="h-full bg-[#c8b89a] shadow-[0_0_5px_rgba(200,184,154,0.6)]" 
               style={{ width: `${progress * 100}%` }}
             />
           </div>
+        )}
+
+        {selected && (
+          <div className="w-8 h-[1px] bg-[#c8b89a] mt-1.5 opacity-60 shadow-[0_0_4px_#c8b89a]" />
         )}
       </div>
     </div>

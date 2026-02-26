@@ -1,38 +1,42 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Rajdhani, Share_Tech_Mono } from "next/font/google"; 
 import "./globals.css";
-import { SvgDefs } from "@/components/tree/SkillNode";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const futuristicSans = Rajdhani({
+  variable: "--font-futuristic",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const futuristicMono = Share_Tech_Mono({
+  variable: "--font-futuristic-mono",
   subsets: ["latin"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
-  title: "RPG Skill Tree",
-  description: "Master your path",
+  title: "RPG Skill Tree | Nexus Protocol",
+  description: "Master your path in the digital void",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#030304] text-[#ededed] overflow-hidden`}
+    <html lang="en" className="dark h-full">
+      <body 
+        className={`
+          ${futuristicSans.variable} 
+          ${futuristicMono.variable} 
+          bg-[#030304] 
+          h-full w-full 
+          overflow-hidden 
+          font-sans 
+          antialiased
+        `}
       >
-        <SvgDefs />
 
-        <main className="relative z-10 w-screen h-screen">
+        <div className="flex flex-col h-full w-full">
           {children}
-        </main>
+        </div>
       </body>
     </html>
   );

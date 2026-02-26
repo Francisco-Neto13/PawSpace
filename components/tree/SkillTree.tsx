@@ -17,7 +17,6 @@ import { SkillEdge } from './SkillEdge';
 import { SkillPanel } from './SkillPanel';
 import { StarField } from './StarField';
 
-import { HUDFrame }       from '@/components/ui/rpg/HUDFrame';
 import { CharacterStats } from '@/components/ui/rpg/CharacterStats';
 import { ExperienceBar }  from '@/components/ui/rpg/ExperienceBar';
 
@@ -62,7 +61,7 @@ export function SkillTree() {
           ...node,
           data: { ...node.data, isUnlocked: unlockedIds.includes(node.id) },
         }));
-      } catch (e) { console.error('Erro ao carregar progresso', e); }
+      } catch (e) { console.error('Nexus Sync Error', e); }
     }
 
     if (savedLayout) {
@@ -72,7 +71,7 @@ export function SkillTree() {
           const saved = layoutMap.find(l => l.id === node.id);
           return saved ? { ...node, position: saved.position } : node;
         });
-      } catch (e) { console.error('Erro ao carregar layout', e); }
+      } catch (e) { console.error('Layout Recovery Error', e); }
     }
 
     setNodes(calculateRecursiveProgress(currentNodes, initialData.edges));
@@ -87,15 +86,18 @@ export function SkillTree() {
     if (!isMounted) return;
     const unlockedIds = nodes.filter(n => n.data.isUnlocked).map(n => n.id);
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(unlockedIds));
+    
     window.dispatchEvent(
-      new CustomEvent('skill-progress-update', { detail: calculateGlobalProgress(nodes) })
+      new CustomEvent('skill-progress-update', { 
+        detail: calculateGlobalProgress(nodes) 
+      })
     );
   }, [nodes, isMounted]);
 
   const onNodesChange: OnNodesChange<Node<SkillData>> = useCallback((changes) => {
     setNodes(nds => {
       const updated = applyNodeChanges(changes, nds);
-      const hasPosChange = changes.some(c => c.type === 'position' && c.dragging === false);
+      const hasPosChange = changes.some(c => c.type === 'position' && !c.dragging);
       if (hasPosChange) {
         localStorage.setItem(
           LAYOUT_KEY,
@@ -107,9 +109,10 @@ export function SkillTree() {
   }, []);
 
   const exportLayout = useCallback(() => {
-    console.log('=== LAYOUT ===');
-    console.log(JSON.stringify(nodes.map(n => ({ id: n.id, position: n.position })), null, 2));
-    alert('Layout logado no console!');
+    const layout = JSON.stringify(nodes.map(n => ({ id: n.id, position: n.position })), null, 2);
+    console.log('=== NEXUS PROTOCOL: LAYOUT EXPORT ===');
+    console.log(layout);
+    alert('SYSTEM: Layout data streamed to terminal (console).');
   }, [nodes]);
 
   const handleToggleStatus = useCallback((nodeId: string) => {
@@ -121,7 +124,7 @@ export function SkillTree() {
       if (currentlyUnlocked) {
         const childIds = edges.filter(e => e.source === nodeId).map(e => e.target);
         if (prev.some(n => childIds.includes(n.id) && n.data.isUnlocked)) {
-          alert('Dependências ativas!');
+          alert('ACCESS DENIED: Active dependencies detected.');
           return prev;
         }
       }
@@ -135,7 +138,10 @@ export function SkillTree() {
 
       setEdges(prevEdges => prevEdges.map(edge => ({
         ...edge,
-        data: { ...edge.data, unlocked: !!finalNodes.find(n => n.id === edge.target)?.data.isUnlocked },
+        data: { 
+          ...edge.data, 
+          unlocked: !!finalNodes.find(n => n.id === edge.target)?.data.isUnlocked 
+        },
       })));
 
       return finalNodes;
@@ -163,10 +169,10 @@ export function SkillTree() {
     return !!nodes.find(n => n.id === parentId)?.data.isUnlocked;
   }, [selectedNode, nodes]);
 
-  if (!isMounted) return <div className="h-screen w-screen bg-[#030304]" />;
+  if (!isMounted) return null;
 
   return (
-    <div className="h-screen w-screen overflow-hidden relative bg-[#030304] select-none">
+    <div className="h-full w-full overflow-hidden relative select-none font-sans bg-[#030304]">
       <SvgDefs />
       <StarField />
 
@@ -186,13 +192,14 @@ export function SkillTree() {
         maxZoom={2}
         connectionMode={ConnectionMode.Loose}
         nodesConnectable={false}
+        style={{ background: 'transparent' }}
       />
 
       <div className="absolute inset-0 z-40 pointer-events-none">
-        <HUDFrame />
         <CharacterStats />
         <ExperienceBar onExportLayout={exportLayout} />
       </div>
+
       <SkillPanel
         data={panelData}
         onClose={() => setSelectedSkillId(null)}

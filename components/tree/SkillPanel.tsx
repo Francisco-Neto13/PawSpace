@@ -33,7 +33,6 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
 
   if (!data) return null;
 
-  // Cor da borda externa da carta
   const borderColor = isAvailable
     ? (data.isUnlocked ? theme.color : 'var(--rpg-gold)')
     : 'var(--rpg-muted)';
@@ -42,38 +41,22 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md animate-in fade-in duration-300">
       <div className="absolute inset-0 cursor-pointer" onClick={onClose} />
 
-      {/* Carta */}
       <div
-        className="relative w-[320px] min-h-[500px] animate-in zoom-in-95 duration-500 p-[3px]"
+        className="relative w-[340px] min-h-[520px] animate-in zoom-in-95 duration-500 p-[2px]"
         style={{
           clipPath: poly,
           backgroundColor: borderColor,
-          filter: data.isUnlocked ? `drop-shadow(0 0 25px ${theme.color}55)` : 'none',
         }}
       >
-        {/* Fundo interno */}
         <div className="w-full h-full flex flex-col overflow-hidden" style={{ clipPath: poly, backgroundColor: '#000' }}>
           <div
-            className="flex-1 m-[2px] flex flex-col p-6 relative overflow-hidden"
+            className="flex-1 m-[1px] flex flex-col p-8 relative overflow-hidden"
             style={{ clipPath: poly, backgroundColor: '#050505' }}
           >
-            {/* Brilho de fundo — mantido pois é só opacity, sem blur pesado */}
-            <div
-              className="absolute -top-20 -left-20 w-64 h-64 opacity-10 pointer-events-none"
-              style={{ backgroundColor: theme.color, filter: 'blur(60px)' }}
-            />
-
-            {/* Scanlines */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_50%,transparent_50%)] bg-[length:100%_4px] pointer-events-none opacity-30" />
-
-            {/* HEADER */}
             <div className="flex justify-between items-center mb-8 relative z-10">
               <div
-                className="px-3 py-1 border"
+                className="px-3 py-0.5 border font-mono text-[10px] tracking-[0.2em] font-bold"
                 style={{
-                  fontFamily: 'var(--font-pixel-title)',
-                  fontSize: 7,
-                  letterSpacing: '0.2em',
                   color: theme.color,
                   borderColor: `${theme.color}44`,
                   backgroundColor: `${theme.color}11`,
@@ -84,69 +67,61 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
 
               <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center border cursor-pointer transition-colors"
+                className="w-8 h-8 flex items-center justify-center border font-mono text-xs cursor-pointer transition-all duration-300 hover:bg-white/10"
                 style={{
-                  fontFamily: 'var(--font-pixel-title)',
-                  fontSize: 8,
-                  color: 'var(--rpg-muted)',
-                  borderColor: 'var(--rpg-muted)',
-                  background: 'transparent',
+                  color: 'var(--rpg-gold)',
+                  borderColor: 'var(--rpg-gold-bright)',
+                  opacity: 0.6
                 }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--rpg-gold)'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--rpg-muted)'}
               >
-                X
+                ✕
               </button>
             </div>
 
-            {/* ÍCONE */}
             <div
-              className="relative w-full h-40 flex items-center justify-center mb-6 overflow-hidden border"
+              className="relative w-full h-44 flex items-center justify-center mb-8 overflow-hidden border border-white/5"
               style={{
-                borderColor: data.isUnlocked ? `${theme.color}66` : 'var(--rpg-muted)',
-                backgroundColor: 'rgba(0,0,0,0.6)',
+                backgroundColor: 'rgba(255,255,255,0.02)',
               }}
             >
-              {/* Dot grid decorativo */}
               <div
-                className="absolute inset-0 pointer-events-none opacity-[0.04]"
-                style={{ backgroundImage: `radial-gradient(var(--rpg-gold) 1.5px, transparent 1.5px)`, backgroundSize: '15px 15px' }}
+                className="absolute inset-0 pointer-events-none opacity-20"
+                style={{ 
+                   backgroundImage: `radial-gradient(${theme.color} 1px, transparent 0)`, 
+                   backgroundSize: '20px 20px' 
+                }}
               />
-              <span className={`text-6xl transition-all duration-700 ${data.isUnlocked ? 'grayscale-0 scale-110' : 'grayscale opacity-30'}`}>
+              <span className={`text-7xl transition-all duration-1000 ${data.isUnlocked ? 'grayscale-0 scale-110 drop-shadow-[0_0_20px_rgba(200,184,154,0.3)]' : 'grayscale opacity-20'}`}>
                 {isAvailable ? data.icon : '🔒'}
               </span>
             </div>
 
-            {/* TEXTO */}
-            <div className="flex-1 text-center flex flex-col items-center relative z-10 mt-2">
-              <h2 style={{ fontFamily: 'var(--font-pixel-title)', fontSize: 11, color: '#fff', letterSpacing: '0.1em', marginBottom: 12, lineHeight: 1.6 }}>
+            <div className="flex-1 text-center flex flex-col items-center relative z-10">
+              <h2 className="font-sans text-xl font-bold text-white tracking-[0.1em] mb-4 leading-tight">
                 {data.label.toUpperCase()}
               </h2>
 
-              <div className="w-16 h-[2px] mb-6" style={{ backgroundColor: isAvailable ? theme.color : 'var(--rpg-muted)' }} />
+              <div className="w-12 h-[2px] mb-6" style={{ backgroundColor: isAvailable ? theme.color : 'var(--rpg-muted)' }} />
 
-              <p style={{ fontFamily: 'var(--font-pixel-body)', fontSize: 15, color: 'rgba(200,184,154,0.6)', lineHeight: 1.7, padding: '0 8px' }}>
+              <p className="font-sans text-sm font-medium leading-relaxed px-2 transition-colors duration-500"
+                 style={{ color: isAvailable ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)' }}>
                 {isAvailable
-                  ? `"${data.description}"`
-                  : 'REQUIRES FURTHER PROGRESSION TO UNLOCK THIS KNOWLEDGE.'}
+                  ? data.description
+                  : 'SISTEMA BLOQUEADO. REQUER PROGRESSÃO ADICIONAL NO PROTOCOLO NEXUS PARA LIBERAR ESTE CONHECIMENTO.'}
               </p>
             </div>
 
-            {/* BOTÃO */}
             <div className="mt-8 relative z-10">
               <button
                 disabled={!isAvailable}
                 onClick={() => onToggleStatus?.(data.id as string)}
-                className="w-full py-4 border transition-all duration-300 cursor-pointer"
+                className="w-full py-4 border font-mono text-[11px] tracking-[0.2em] font-bold transition-all duration-300 flex items-center justify-center gap-2"
                 style={{
-                  fontFamily: 'var(--font-pixel-title)',
-                  fontSize: 8,
-                  letterSpacing: '0.25em',
                   cursor: isAvailable ? 'pointer' : 'not-allowed',
                   background: !isAvailable
                     ? 'transparent'
                     : data.isUnlocked
-                      ? 'rgba(255,40,40,0.1)'
+                      ? 'rgba(255,68,68,0.1)'
                       : theme.color,
                   borderColor: !isAvailable
                     ? 'var(--rpg-muted)'
@@ -158,18 +133,16 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
                     : data.isUnlocked
                       ? '#ff4444'
                       : '#000',
-                  boxShadow: isAvailable ? `3px 3px 0px rgba(0,0,0,0.8)` : 'none',
                 }}
               >
-                {data.isUnlocked ? '[ FORGET SKILL ]' : isAvailable ? '[ MASTER SKILL ]' : '[ LOCKED ]'}
+                {data.isUnlocked ? '[ FORGET_SKILL ]' : isAvailable ? '[ MASTER_PROTOCOL ]' : '[ ACCESS_DENIED ]'}
               </button>
             </div>
 
-            {/* ORNAMENTO */}
-            <div className="mt-6 flex justify-center gap-3">
-              <div className="w-1.5 h-1.5 rotate-45" style={{ backgroundColor: isAvailable ? theme.color : 'var(--rpg-muted)' }} />
-              <div className="w-2 h-2 rotate-45 border" style={{ borderColor: 'var(--rpg-gold)', opacity: 0.3 }} />
-              <div className="w-1.5 h-1.5 rotate-45" style={{ backgroundColor: isAvailable ? theme.color : 'var(--rpg-muted)' }} />
+            <div className="mt-6 flex justify-center gap-4 opacity-40">
+              <div className="w-1.5 h-1.5 rotate-45 border border-current" style={{ color: borderColor }} />
+              <div className="w-1.5 h-1.5 rotate-45 border border-current" style={{ color: borderColor }} />
+              <div className="w-1.5 h-1.5 rotate-45 border border-current" style={{ color: borderColor }} />
             </div>
 
           </div>

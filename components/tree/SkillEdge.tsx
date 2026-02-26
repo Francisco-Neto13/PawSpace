@@ -42,9 +42,6 @@ function SkillEdgeComponent({
         strokeLinecap="butt" 
         opacity={unlocked ? 1 : 0.6}
         className="pointer-events-none transition-all duration-500"
-        style={{
-          filter: unlocked ? `drop-shadow(0 0 3px ${themeColor})` : 'none',
-        }}
       />
 
       {unlocked && (

@@ -15,7 +15,7 @@ export function CharacterStats() {
   }, []);
 
   const rank = useMemo(() => {
-    if (progress >= 100) return { title: "Nexus Master",     rank: "SS" };
+    if (progress >= 100) return { title: "Nexus Master",    rank: "SS" };
     if (progress >= 80)  return { title: "Lead Architect",   rank: "S"  };
     if (progress >= 50)  return { title: "Senior Developer", rank: "A"  };
     if (progress >= 20)  return { title: "Specialist",       rank: "B"  };
@@ -23,66 +23,57 @@ export function CharacterStats() {
   }, [progress]);
 
   return (
-    <div className="absolute top-12 left-12 right-12 flex flex-row justify-between items-start pointer-events-none z-40">
-
-      <div className="flex flex-col pointer-events-auto">
-        <div className="relative">
-          <h1 className="text-2xl font-normal tracking-wider text-[#c8b89a] leading-none">
+    <div className="absolute top-8 left-8 right-8 flex flex-row justify-between items-start pointer-events-none z-40">
+      <div className="flex flex-col pointer-events-auto group">
+        <div className="relative transition-transform duration-300 group-hover:scale-105">
+          <h1 className="text-xl font-bold tracking-[0.2em] uppercase text-[#c8b89a] leading-none drop-shadow-[0_0_8px_rgba(200,184,154,0.3)]">
             Learning Path
           </h1>
-          <div className="absolute -top-2 -left-3 w-3 h-3 border-t-2 border-l-2 border-[#c8b89a]/40" />
+          <div className="absolute -top-2 -left-3 w-3 h-3 border-t border-l border-[#c8b89a]/40" />
+          <span className="font-mono text-[8px] text-[#c8b89a]/30 uppercase mt-1.5 block tracking-[0.2em]">
+            Neural Net v1.0.4
+          </span>
         </div>
       </div>
 
-      <div className="pointer-events-auto">
-        <GlassPanel title="Character Status" className="w-[320px]">
-          <div className="p-5 flex items-center gap-5">
-
+      <div className="pointer-events-auto group/panel">
+        <GlassPanel 
+          title="Status" 
+          className="w-[280px] transition-all duration-300 group-hover/panel:border-[#c8b89a]/40"
+        >
+          <div className="p-4 flex items-center gap-4 relative z-10">
             <div className="relative shrink-0">
-              <div className="w-14 h-14 border-2 border-[#3a3830] bg-[#1a1a1c] flex items-center justify-center shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
-                <div className="text-3xl grayscale opacity-60">👤</div>
+              <div className="w-12 h-12 border border-[#3a3830] bg-[#0d0d0f] flex items-center justify-center">
+                <div className="text-2xl grayscale opacity-40 transition-all group-hover/panel:grayscale-0 group-hover/panel:opacity-100">
+                  👤
+                </div>
               </div>
-              <div className="absolute -top-2 -right-2 w-7 h-7 bg-[#c8b89a] text-[#0d0d0f] flex items-center justify-center font-bold text-[13px] border-2 border-[#0d0d0f] shadow-[2px_2px_0px_rgba(0,0,0,0.4)]">
+              <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-[#c8b89a] text-[#0d0d0f] flex items-center justify-center font-mono font-bold text-[10px] border border-[#0d0d0f]">
                 {rank.rank}
               </div>
             </div>
 
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="text-[10px] uppercase tracking-[0.15em] text-[#c8b89a]/60 font-bold mb-1">
+              <span className="font-sans text-[9px] uppercase tracking-wider text-[#c8b89a]/60 font-bold leading-none mb-1">
                 {rank.title}
               </span>
-              <h2 className="text-lg text-[#ddd8cc] truncate leading-none mb-3">
+              <h2 className="font-sans text-base font-bold text-[#ddd8cc] uppercase tracking-tight truncate leading-none mb-3 group-hover/panel:text-white">
                 Francisco
               </h2>
 
-              <div className="space-y-2.5 w-full">
+              <div className="space-y-2 w-full">
                 <div className="flex flex-col gap-1">
-                  <div className="flex justify-between">
-                    <span className="text-[9px] text-[#c8b89a]/80 font-bold tracking-tighter">EXP</span>
-                    <span className="text-[9px] text-[#c8b89a]/50">{progress}/100</span>
+                  <div className="flex justify-between items-end leading-none">
+                    <span className="font-sans text-[8px] text-[#c8b89a]/80 font-bold tracking-widest">EXP</span>
+                    <span className="font-mono text-[9px] text-[#c8b89a]/50">{progress}%</span>
                   </div>
-                  <div className="h-2 w-full bg-black border border-[#3a3830] p-[1px]">
-                    <div
-                      className="h-full bg-[#c8b89a] transition-all duration-1000 ease-out"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <span className="text-[9px] text-blue-400/80 font-bold tracking-tighter">SYN</span>
-                  <div className="h-2 w-full bg-black border border-[#3a3830] p-[1px]">
-                    <div
-                      className="h-full bg-blue-600/60 animate-pulse"
-                      style={{ width: `${Math.min(progress * 1.1, 100)}%` }}
-                    />
+                  <div className="h-1 w-full bg-black/50 border border-[#3a3830]">
+                    <div className="h-full bg-[#c8b89a] transition-all duration-1000" style={{ width: `${progress}%` }} />
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_50%,transparent_50%)] bg-[length:100%_4px] pointer-events-none opacity-20" />
         </GlassPanel>
       </div>
     </div>
