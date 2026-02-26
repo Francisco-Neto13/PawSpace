@@ -1,4 +1,4 @@
-import OverviewHeader from "@/components/overview/Index";
+import OverviewHeader from "@/components/overview/OverviewContent";
 
 
 export default function OverviewPage() {

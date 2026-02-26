@@ -7,97 +7,46 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-        
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-
-  accounts Account[]
-  sessions Session[]
-  skills   Skill[]
-}
 
 model Skill {
   id          String  @id @default(cuid())
+  userId      String
   name        String
-  description String?
+  description String? @db.Text
+  icon        String?
+  category    String  @default("keystone")
 
   level         Int @default(1)
   xp            Int @default(0)
-  xpToNextLevel Int @default(100) 
+  xpToNextLevel Int @default(100)
 
   positionX Float @default(0)
   positionY Float @default(0)
 
-  parentId String?
-  parent   Skill?  @relation("SkillHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-  children Skill[] @relation("SkillHierarchy")
+  parentId            String?
+  parent              Skill?  @relation("SkillHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children            Skill[] @relation("SkillHierarchy")
+  requiredParentLevel Int     @default(0)
+  isUnlocked          Boolean @default(false)
 
-  requiredParentLevel Int @default(0)
-
-  isUnlocked Boolean @default(false)
+  contents LibraryContent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId   String
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  missions Mission[]
+  @@index([userId])
 }
 
-model Mission {
+model LibraryContent {
   id          String  @id @default(cuid())
+  skillId     String
+  skill       Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
   title       String
+  url         String?
   description String? @db.Text
-  xpReward    Int     @default(25)
-
-  isCompleted   Boolean   @default(false)
-  completedAt   DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  skillId String
-  skill   Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  @@index([skillId])
 }

@@ -23,26 +23,28 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark h-full">
+    <html lang="en" className="dark">
       <body 
         className={`
           ${futuristicSans.variable} 
           ${futuristicMono.variable} 
           bg-[#030304] 
-          h-screen w-screen 
-          overflow-hidden 
+          min-h-screen
           font-sans 
           antialiased
+          text-white
         `}
       >
-        <div className="flex flex-col h-full w-full items-stretch">
+        <div className="flex flex-col min-h-screen w-full">
+          
           <Navbar /> 
           
-          <main className="relative flex-1 w-full overflow-hidden">
+          <main className="relative flex-1 w-full">
             {children}
           </main>
           
           <Footer /> 
+          
         </div>
       </body>
     </html>
