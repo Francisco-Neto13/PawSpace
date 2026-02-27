@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from 'react';
+'use client';
+import { useCallback, useState } from 'react';
 import { applyNodeChanges, type OnNodesChange, type Node } from '@xyflow/react';
 import { useSkillTreeContext } from '../context/SkillTreeContext';
 import { SkillData } from '../types';
@@ -15,15 +16,18 @@ export function useSkillDrag() {
       c => c.type === 'position' && c.dragging === false && c.position
     );
 
-    if (positionChange?.type === 'position') {
+    if (positionChange) {
       setHasUnsavedChanges(true);
     }
   }, [setNodes]);
 
   const saveLayout = useCallback(async (nodes: Node<SkillData>[]) => {
+    if (nodes.length === 0) return;
+
     setIsSaving(true);
+    
     try {
-      await fetch('/api/skills/positions', {
+      const response = await fetch('/api/skills/positions', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -33,10 +37,19 @@ export function useSkillDrag() {
             y: n.position.y,
           })),
         }),
+        cache: 'no-store'
       });
+
+      if (!response.ok) {
+        throw new Error('Falha ao sincronizar com o servidor');
+      }
+
       setHasUnsavedChanges(false);
+
     } catch (err) {
       console.error('Erro ao salvar layout:', err);
+      setHasUnsavedChanges(true);
+      alert('Sistema Nexus: Falha na sincronização de coordenadas. Verifique sua conexão e tente novamente.');
     } finally {
       setIsSaving(false);
     }

@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { ReactFlow, ConnectionMode, type NodeTypes, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Plus, Save } from 'lucide-react';
+import { Plus, Save, Loader2 } from 'lucide-react';
 
 import { SkillNode, SvgDefs } from './parts/SkillNode';
 import { SkillEdge } from './parts/SkillEdge';
@@ -41,18 +41,18 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
     if (!rootNode) return;
 
     const timer = setTimeout(() => {
-    fitView({
-      nodes: [rootNode],
-      padding: 0.4,
-      duration: 800,
-      maxZoom: 1  
-    });
+      fitView({
+        nodes: [rootNode],
+        padding: 0.4,
+        duration: 800,
+        maxZoom: 1  
+      });
 
       setHasCentered(true);
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [isLoading, nodes, hasCentered]);
+  }, [isLoading, nodes, hasCentered, fitView]);
 
   return null;
 }
@@ -66,8 +66,22 @@ function SkillTreeInner() {
   const [modalParentId, setModalParentId] = useState<string | null | undefined>(undefined);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges || isSaving) {
+        e.preventDefault();
+        e.returnValue = 'Existem protocolos não sincronizados no Nexus. Deseja realmente sair?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges, isSaving]);
+
   const selectedNode = useMemo(() => nodes.find(n => n.id === selectedSkillId), [nodes, selectedSkillId]);
   const panelData = useMemo(() => selectedNode ? { ...selectedNode.data, id: selectedNode.id } : null, [selectedNode]);
+  
   const isPanelAvailable = useMemo(() => {
     if (!selectedNode) return false;
     const parentId = selectedNode.data.parentId;
@@ -108,9 +122,17 @@ function SkillTreeInner() {
           <button
             onClick={() => saveLayout(nodes)}
             disabled={isSaving}
-            className="flex items-center gap-3 px-6 py-3 border border-[#c8b89a]/40 bg-[#030304]/90 text-[#c8b89a] hover:bg-[#c8b89a]/10 transition-all backdrop-blur-sm disabled:opacity-50"
+            className={`flex items-center gap-3 px-6 py-3 border transition-all backdrop-blur-sm shadow-2xl
+              ${isSaving 
+                ? 'border-[#c8b89a]/20 bg-[#030304]/60 text-[#c8b89a]/40 cursor-not-allowed' 
+                : 'border-[#c8b89a]/40 bg-[#030304]/90 text-[#c8b89a] hover:bg-[#c8b89a]/10 active:scale-95'
+              }`}
           >
-            <Save size={14} />
+            {isSaving ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Save size={14} />
+            )}
             <span className="text-[10px] font-black uppercase tracking-widest">
               {isSaving ? 'Salvando...' : 'Salvar Layout'}
             </span>
@@ -133,8 +155,11 @@ function SkillTreeInner() {
           }}
           onPaneClick={() => { setContextMenu(null); setSelectedSkillId(null); }}
           defaultEdgeOptions={defaultEdgeOptions}
-          nodesDraggable panOnDrag zoomOnScroll
-          minZoom={0.05} maxZoom={2}
+          nodesDraggable 
+          panOnDrag 
+          zoomOnScroll
+          minZoom={0.05} 
+          maxZoom={2}
           connectionMode={ConnectionMode.Loose}
           nodesConnectable={false}
           style={{ background: 'transparent' }}
@@ -151,16 +176,25 @@ function SkillTreeInner() {
         />
       )}
 
-      <SkillPanel data={panelData} onClose={() => setSelectedSkillId(null)}
-        onToggleStatus={handleToggleStatus} isAvailable={isPanelAvailable} />
+      <SkillPanel 
+        data={panelData} 
+        onClose={() => setSelectedSkillId(null)}
+        onToggleStatus={handleToggleStatus} 
+        isAvailable={isPanelAvailable} 
+      />
 
-      <AddSkillModal isOpen={modalParentId !== undefined} onClose={() => setModalParentId(undefined)}
-        onAdd={async (data) => { await handleCreateSkill(data); setModalParentId(undefined); }}
+      <AddSkillModal 
+        isOpen={modalParentId !== undefined} 
+        onClose={() => setModalParentId(undefined)}
+        onAdd={async (data) => { 
+          await handleCreateSkill(data); 
+          setModalParentId(undefined); 
+        }}
         existingSkills={nodes.map(n => ({ id: n.id, name: n.data.label ?? n.data.name }))}
-        preselectedParentId={modalParentId} />
+        preselectedParentId={modalParentId} 
+      />
 
     </div>
-    
   );
 }
 

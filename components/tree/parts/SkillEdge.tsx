@@ -41,7 +41,7 @@ function SkillEdgeComponent({
         strokeWidth={unlocked ? 2.5 : 1.5}
         strokeLinecap="butt" 
         opacity={unlocked ? 1 : 0.6}
-        className="pointer-events-none transition-all duration-500"
+        className="pointer-events-none transition-[stroke,opacity] duration-300 ease-in-out"
       />
 
       {unlocked && (

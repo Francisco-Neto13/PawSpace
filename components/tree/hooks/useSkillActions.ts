@@ -1,3 +1,4 @@
+'use client';
 import { useCallback, useTransition } from 'react';
 import { useSkillTreeContext } from '../context/SkillTreeContext';
 import { toggleSkillStatus, deleteSkill, addSkill } from '@/app/actions/skills';
@@ -53,10 +54,19 @@ export function useSkillActions() {
 
   const handleDelete = useCallback((nodeId: string) => {
     if (!confirm('Deletar este nó e todos os seus filhos?')) return;
+    
+    setNodes(prev => prev.filter(n => n.id !== nodeId));
+    setEdges(prev => prev.filter(e => e.source !== nodeId && e.target !== nodeId));
+
     startTransition(() => {
-      deleteSkill(nodeId).then(() => loadTreeData());
+      deleteSkill(nodeId).then(result => {
+        if (!result.success) {
+          alert('Erro na sincronização. Recarregando Nexus...');
+          loadTreeData();
+        }
+      });
     });
-  }, [loadTreeData]);
+  }, [setNodes, setEdges, loadTreeData]);
 
   const handleCreateSkill = useCallback(async (data: {
     name: string;
@@ -88,10 +98,40 @@ export function useSkillActions() {
     }
 
     const result = await addSkill({ ...data, userId: user.id, positionX, positionY });
-    if (!result.success) throw new Error(String(result.error));
+    
+    if (!result.success || !result.skill) {
+      throw new Error(String(result.error));
+    }
 
-    await loadTreeData();
-  }, [nodes, edges, supabase, loadTreeData]);
+    const s = result.skill;
+
+    const newNode = {
+      id: s.id,
+      type: 'skill',
+      position: { x: s.positionX, y: s.positionY },
+      data: {
+        ...s,
+        label: s.name,
+        progress: 0,
+        shape: s.shape as SkillShape,
+        category: s.category as any,
+      },
+    };
+
+    setNodes((nds) => [...nds, newNode as any]);
+
+    if (s.parentId) {
+      const newEdge = {
+        id: `e-${s.parentId}-${s.id}`,
+        source: s.parentId,
+        target: s.id,
+        type: 'skill',
+        data: { unlocked: false }
+      };
+      setEdges((eds) => [...eds, newEdge as any]);
+    }
+    
+  }, [nodes, edges, supabase, setNodes, setEdges]);
 
   return { handleToggleStatus, handleDelete, handleCreateSkill };
 }

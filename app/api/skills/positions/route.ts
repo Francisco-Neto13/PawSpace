@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 
 export async function PATCH(request: NextRequest) {
@@ -17,8 +16,6 @@ export async function PATCH(request: NextRequest) {
       )
     );
 
-    revalidatePath('/tree', 'page'); 
-    
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Erro ao salvar posições:', error);
