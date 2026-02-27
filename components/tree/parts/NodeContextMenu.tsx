@@ -42,13 +42,11 @@ export function NodeContextMenu({ x, y, nodeName, onAddChild, onDelete, onClose 
     <div ref={menuRef} style={style}>
       <div className="bg-[#0a0a0b] border border-[#c8b89a]/20 shadow-[0_0_30px_rgba(0,0,0,0.8)] min-w-[200px] overflow-hidden">
         
-        {/* Header — nome do nó */}
         <div className="px-4 py-3 border-b border-white/5">
           <p className="text-[9px] text-zinc-600 uppercase font-black tracking-widest">Nó selecionado</p>
           <p className="text-[#c8b89a] text-xs font-bold mt-0.5 truncate">{nodeName}</p>
         </div>
 
-        {/* Opções */}
         <div className="py-1">
           <button
             onClick={() => { onAddChild(); onClose(); }}

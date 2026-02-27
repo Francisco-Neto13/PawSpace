@@ -1,41 +1,20 @@
 'use client';
-import React, { useState, useCallback, useMemo, useEffect, useTransition } from 'react';
-import {
-  ReactFlow,
-  applyNodeChanges,
-  ConnectionMode,
-  type Node,
-  type Edge,
-  type NodeTypes,
-  type OnNodesChange,
-} from '@xyflow/react';
+import { useState, useMemo, useEffect } from 'react';
+import { ReactFlow, ConnectionMode, type NodeTypes, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Plus } from 'lucide-react';
+import { Plus, Save } from 'lucide-react';
 
-import { SkillData } from './types';
-import { SkillNode, SvgDefs } from './SkillNode';
-import { SkillEdge } from './SkillEdge';
-import { SkillPanel } from './SkillPanel';
-import { StarField } from './StarField';
-import { AddSkillModal } from './AddSkillModal';
-import { NodeContextMenu } from './NodeContextMenu';
+import { SkillNode, SvgDefs } from './parts/SkillNode';
+import { SkillEdge } from './parts/SkillEdge';
+import { SkillPanel } from './parts/SkillPanel';
+import { StarField } from './parts/StarField';
+import { AddSkillModal } from './parts/AddSkillModal';
+import { NodeContextMenu } from './parts/NodeContextMenu';
 
-import {
-  generateTreeLayout,
-  calculateRecursiveProgress,
-  calculateGlobalProgress,
-  buildHierarchy,
-} from '@/utils/treeUtils';
-
-import { createClient } from '@/utils/supabase/client';
-import { getSkills, addSkill, toggleSkillStatus, updateSkillPosition, deleteSkill } from '@/app/actions/skills';
-
-const nodeTypes: NodeTypes = { skill: SkillNode };
-const edgeTypes = { skill: SkillEdge };
-const defaultEdgeOptions = {
-  type: 'skill',
-  style: { strokeWidth: 2, transition: 'stroke 0.5s ease' },
-};
+import { SkillTreeProvider } from './context/SkillTreeContext';
+import { useSkillNodes } from './hooks/useSkillNodes';
+import { useSkillDrag } from './hooks/useSkillDrag';
+import { useSkillActions } from './hooks/useSkillActions';
 
 interface ContextMenu {
   x: number;
@@ -44,186 +23,51 @@ interface ContextMenu {
   nodeName: string;
 }
 
-export function SkillTree() {
-  const [nodes, setNodes] = useState<Node<SkillData>[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
-  const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+const nodeTypes: NodeTypes = { skill: SkillNode };
+const edgeTypes = { skill: SkillEdge };
+const defaultEdgeOptions = {
+  type: 'skill',
+  style: { strokeWidth: 2, transition: 'stroke 0.5s ease' },
+};
 
-  const [modalParentId, setModalParentId] = useState<string | null | undefined>(undefined);
-
-  const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
-
-  const [, startTransition] = useTransition();
-  const supabase = useMemo(() => createClient(), []);
-
-
-  const loadTreeData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setIsLoading(false); return; }
-
-      const rawSkills = await getSkills(user.id);
-
-      if (rawSkills.length > 0) {
-        const hierarchy = buildHierarchy(rawSkills);
-        const { nodes: layoutNodes, edges: layoutEdges } = generateTreeLayout(hierarchy);
-        const nodesWithProgress = calculateRecursiveProgress(layoutNodes, layoutEdges);
-        setNodes(nodesWithProgress);
-        setEdges(layoutEdges);
-      } else {
-        setNodes([]);
-        setEdges([]);
-      }
-    } catch (error) {
-      console.error('Erro ao carregar árvore:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [supabase]);
-
-  useEffect(() => { loadTreeData(); }, [loadTreeData]);
-
+function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }) {
+  const { fitView } = useReactFlow();
+  const [hasCentered, setHasCentered] = useState(false);
 
   useEffect(() => {
-    if (nodes.length === 0) return;
-    window.dispatchEvent(
-      new CustomEvent('skill-progress-update', { detail: calculateGlobalProgress(nodes) })
-    );
-  }, [nodes]);
+    if (isLoading || nodes.length === 0 || hasCentered) return;
 
+    const rootNode = nodes.find(n => !n.data.parentId);
+    if (!rootNode) return;
 
-  const onNodesChange: OnNodesChange<Node<SkillData>> = useCallback((changes) => {
-    setNodes(nds => applyNodeChanges(changes, nds));
-
-    const positionChanges = changes.filter(
-      c => c.type === 'position' && c.dragging === false && c.position
-    );
-    if (positionChanges.length > 0) {
-      startTransition(() => {
-        positionChanges.forEach(c => {
-          if (c.type === 'position' && c.position) {
-            updateSkillPosition(c.id, c.position.x, c.position.y);
-          }
-        });
-      });
-    }
-  }, [startTransition]);
-
-
-  const handleToggleStatus = useCallback((nodeId: string) => {
-    let nextUnlocked = false;
-
-    setNodes(prev => {
-      const target = prev.find(n => n.id === nodeId);
-      if (!target) return prev;
-
-      const currentlyUnlocked = target.data.isUnlocked;
-
-      if (currentlyUnlocked) {
-        const childIds = edges.filter(e => e.source === nodeId).map(e => e.target);
-        if (prev.some(n => childIds.includes(n.id) && n.data.isUnlocked)) {
-          alert('ACCESS DENIED: Active dependencies detected.');
-          return prev;
-        }
-      }
-
-      nextUnlocked = !currentlyUnlocked;
-
-      const nextNodes = prev.map(node =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, isUnlocked: nextUnlocked } }
-          : node
-      );
-      const finalNodes = calculateRecursiveProgress(nextNodes, edges);
-
-      setEdges(prevEdges => prevEdges.map(edge => ({
-        ...edge,
-        data: {
-          ...edge.data,
-          unlocked: !!finalNodes.find(n => n.id === edge.target)?.data.isUnlocked,
-        },
-      })));
-
-      return finalNodes;
+    const timer = setTimeout(() => {
+    fitView({
+      nodes: [rootNode],
+      padding: 0.4,
+      duration: 800,
+      maxZoom: 1  
     });
 
-    startTransition(() => {
-      toggleSkillStatus(nodeId, nextUnlocked).then(result => {
-        if (!result.success) {
-          console.error('Falha ao persistir toggle — revertendo do banco');
-          loadTreeData();
-        }
-      });
-    });
-  }, [edges, loadTreeData, startTransition]);
+      setHasCentered(true);
+    }, 300);
 
+    return () => clearTimeout(timer);
+  }, [isLoading, nodes, hasCentered]);
 
-  const handleDelete = useCallback((nodeId: string) => {
-    if (!confirm('Deletar este nó e todos os seus filhos?')) return;
-    startTransition(() => {
-      deleteSkill(nodeId).then(() => loadTreeData());
-    });
-  }, [loadTreeData, startTransition]);
+  return null;
+}
 
+function SkillTreeInner() {
+  const { nodes, edges, isLoading } = useSkillNodes();
+  const { onNodesChange, hasUnsavedChanges, isSaving, saveLayout } = useSkillDrag();
+  const { handleToggleStatus, handleDelete, handleCreateSkill } = useSkillActions();
 
-  const handleCreateSkill = async (data: {
-    name: string;
-    description?: string;
-    icon?: string;
-    category: string;
-    parentId: string | null;
-  }) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+  const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
+  const [modalParentId, setModalParentId] = useState<string | null | undefined>(undefined);
+  const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
 
-      const result = await addSkill({ ...data, userId: user.id });
-      if (!result.success) throw new Error(String(result.error));
-
-      await loadTreeData();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error('Erro ao criar skill:', message);
-      alert(`Erro: ${message}`);
-    }
-  };
-
-
-  const onNodeClick = useCallback((_: unknown, node: Node) => {
-    setContextMenu(null);
-    setSelectedSkillId(node.id);
-  }, []);
-
-
-  const onNodeContextMenu = useCallback((event: React.MouseEvent, node: Node) => {
-    event.preventDefault();
-    setSelectedSkillId(null);
-    setContextMenu({
-      x: event.clientX,
-      y: event.clientY,
-      nodeId: node.id,
-      nodeName: (node.data as SkillData).label ?? (node.data as SkillData).name,
-    });
-  }, []);
-
-  const onPaneClick = useCallback(() => {
-    setContextMenu(null);
-    setSelectedSkillId(null);
-  }, []);
-
-
-  const selectedNode = useMemo(
-    () => nodes.find(n => n.id === selectedSkillId),
-    [nodes, selectedSkillId]
-  );
-
-  const panelData = useMemo(
-    () => selectedNode ? { ...selectedNode.data, id: selectedNode.id } : null,
-    [selectedNode]
-  );
-
+  const selectedNode = useMemo(() => nodes.find(n => n.id === selectedSkillId), [nodes, selectedSkillId]);
+  const panelData = useMemo(() => selectedNode ? { ...selectedNode.data, id: selectedNode.id } : null, [selectedNode]);
   const isPanelAvailable = useMemo(() => {
     if (!selectedNode) return false;
     const parentId = selectedNode.data.parentId;
@@ -231,21 +75,17 @@ export function SkillTree() {
     return !!nodes.find(n => n.id === parentId)?.data.isUnlocked;
   }, [selectedNode, nodes]);
 
-  const isModalOpen = modalParentId !== undefined;
-
   return (
-    <div
-      className="relative w-full bg-[#030304] overflow-hidden select-none font-sans"
-      style={{ height: 'calc(100vh - 160px)' }}
-    >
-      {isLoading && (
+    <div className="relative w-full bg-[#030304] overflow-hidden select-none font-sans"
+      style={{ height: 'calc(100vh - 160px)' }}>
+
+      {isLoading && nodes.length === 0 && (
         <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#030304]/80 backdrop-blur-md pointer-events-none">
           <div className="flex flex-col items-center gap-4">
             <div className="w-8 h-8 border-2 border-[#c8b89a]/20 border-t-[#c8b89a] rounded-full animate-spin" />
             <p className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
               Sincronizando Nexus...
             </p>
-            <div className="h-px w-24 bg-gradient-to-r from-transparent via-[#c8b89a]/30 to-transparent" />
           </div>
         </div>
       )}
@@ -255,74 +95,81 @@ export function SkillTree() {
 
       {!isLoading && nodes.length === 0 && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 pointer-events-none">
-          <div className="flex flex-col items-center gap-2 text-center">
-            <p className="text-[#c8b89a]/40 text-[10px] font-black uppercase tracking-[0.4em]">
-              Nexus Vazio
-            </p>
-            <p className="text-zinc-600 text-xs max-w-[220px]">
-              Crie o nó raiz para iniciar sua árvore de conhecimento
-            </p>
-          </div>
+          <button onClick={() => setModalParentId(null)}
+            className="pointer-events-auto flex items-center gap-3 px-8 py-4 border border-[#c8b89a]/30 bg-[#c8b89a]/5 text-[#c8b89a] hover:bg-[#c8b89a]/10 transition-all">
+            <Plus size={16} />
+            <span className="text-[10px] font-black uppercase tracking-widest">Criar Raiz do Nexus</span>
+          </button>
+        </div>
+      )}
+
+      {hasUnsavedChanges && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50">
           <button
-            onClick={() => setModalParentId(null)}
-            className="pointer-events-auto flex items-center gap-3 px-8 py-4 border border-[#c8b89a]/30 bg-[#c8b89a]/5 text-[#c8b89a] hover:bg-[#c8b89a]/10 hover:border-[#c8b89a]/60 transition-all group"
+            onClick={() => saveLayout(nodes)}
+            disabled={isSaving}
+            className="flex items-center gap-3 px-6 py-3 border border-[#c8b89a]/40 bg-[#030304]/90 text-[#c8b89a] hover:bg-[#c8b89a]/10 transition-all backdrop-blur-sm disabled:opacity-50"
           >
-            <Plus size={16} strokeWidth={2.5} />
+            <Save size={14} />
             <span className="text-[10px] font-black uppercase tracking-widest">
-              Criar Raiz do Nexus
+              {isSaving ? 'Salvando...' : 'Salvar Layout'}
             </span>
           </button>
         </div>
       )}
 
-      <div style={{ width: '100%', height: 'calc(100vh - 160px)' }} className="relative">
+      <div style={{ width: '100%', height: '100%' }} className="relative">
         <ReactFlow
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
-          onNodeClick={onNodeClick}
-          onNodeContextMenu={onNodeContextMenu}
-          onPaneClick={onPaneClick}
+          onNodeClick={(_, node) => { setContextMenu(null); setSelectedSkillId(node.id); }}
+          onNodeContextMenu={(e, node) => {
+            e.preventDefault();
+            setSelectedSkillId(null);
+            setContextMenu({ x: e.clientX, y: e.clientY, nodeId: node.id, nodeName: node.data.label ?? node.data.name });
+          }}
+          onPaneClick={() => { setContextMenu(null); setSelectedSkillId(null); }}
           defaultEdgeOptions={defaultEdgeOptions}
-          fitView
-          nodesDraggable
-          panOnDrag
-          zoomOnScroll
-          minZoom={0.05}
-          maxZoom={2}
+          nodesDraggable panOnDrag zoomOnScroll
+          minZoom={0.05} maxZoom={2}
           connectionMode={ConnectionMode.Loose}
           nodesConnectable={false}
           style={{ background: 'transparent' }}
-        />
+        >
+          <CenterOnRoot nodes={nodes} isLoading={isLoading} />
+        </ReactFlow>
       </div>
 
       {contextMenu && (
-        <NodeContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          nodeName={contextMenu.nodeName}
-          onAddChild={() => setModalParentId(contextMenu.nodeId)}
-          onDelete={() => handleDelete(contextMenu.nodeId)}
+        <NodeContextMenu {...contextMenu}
+          onAddChild={() => { setModalParentId(contextMenu.nodeId); setContextMenu(null); }}
+          onDelete={() => { handleDelete(contextMenu.nodeId); setContextMenu(null); }}
           onClose={() => setContextMenu(null)}
         />
       )}
 
-      <SkillPanel
-        data={panelData}
-        onClose={() => setSelectedSkillId(null)}
-        onToggleStatus={handleToggleStatus}
-        isAvailable={isPanelAvailable}
-      />
+      <SkillPanel data={panelData} onClose={() => setSelectedSkillId(null)}
+        onToggleStatus={handleToggleStatus} isAvailable={isPanelAvailable} />
 
-      <AddSkillModal
-        isOpen={isModalOpen}
-        onClose={() => setModalParentId(undefined)}
-        onAdd={handleCreateSkill}
+      <AddSkillModal isOpen={modalParentId !== undefined} onClose={() => setModalParentId(undefined)}
+        onAdd={async (data) => { await handleCreateSkill(data); setModalParentId(undefined); }}
         existingSkills={nodes.map(n => ({ id: n.id, name: n.data.label ?? n.data.name }))}
-        preselectedParentId={modalParentId}
-      />
+        preselectedParentId={modalParentId} />
+
     </div>
+    
+  );
+}
+
+export function SkillTree() {
+  return (
+    <SkillTreeProvider>
+      <ReactFlowProvider>
+        <SkillTreeInner />
+      </ReactFlowProvider>
+    </SkillTreeProvider>
   );
 }

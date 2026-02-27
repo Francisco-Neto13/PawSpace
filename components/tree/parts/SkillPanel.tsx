@@ -1,6 +1,6 @@
 'use client';
 import React, { useMemo, memo } from 'react';
-import { SkillData, CATEGORY_THEME, SkillCategory } from './types';
+import { SkillData, CATEGORY_THEME, SkillCategory } from '../types';
 
 interface SkillPanelProps {
   data: (SkillData & { id?: string }) | null;
@@ -33,9 +33,12 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
 
   if (!data) return null;
 
+  const displayLabel = data.label || data.name || "MÓDULO DESCONHECIDO";
+  const skillId = data.id || "";
+
   const borderColor = isAvailable
-    ? (data.isUnlocked ? theme.color : 'var(--rpg-gold)')
-    : 'var(--rpg-muted)';
+    ? (data.isUnlocked ? theme.color : '#c8b89a') 
+    : '#3f3f46';
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md animate-in fade-in duration-300">
@@ -62,15 +65,15 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
                   backgroundColor: `${theme.color}11`,
                 }}
               >
-                {data.category.toUpperCase()}
+                {data.category?.toUpperCase() || 'CORE'}
               </div>
 
               <button
                 onClick={onClose}
                 className="w-8 h-8 flex items-center justify-center border font-mono text-xs cursor-pointer transition-all duration-300 hover:bg-white/10"
                 style={{
-                  color: 'var(--rpg-gold)',
-                  borderColor: 'var(--rpg-gold-bright)',
+                  color: '#c8b89a',
+                  borderColor: '#c8b89a',
                   opacity: 0.6
                 }}
               >
@@ -92,21 +95,21 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
                 }}
               />
               <span className={`text-7xl transition-all duration-1000 ${data.isUnlocked ? 'grayscale-0 scale-110 drop-shadow-[0_0_20px_rgba(200,184,154,0.3)]' : 'grayscale opacity-20'}`}>
-                {isAvailable ? data.icon : '🔒'}
+                {isAvailable ? (data.icon || '✦') : '🔒'}
               </span>
             </div>
 
             <div className="flex-1 text-center flex flex-col items-center relative z-10">
               <h2 className="font-sans text-xl font-bold text-white tracking-[0.1em] mb-4 leading-tight">
-                {data.label.toUpperCase()}
+                {displayLabel.toUpperCase()}
               </h2>
 
-              <div className="w-12 h-[2px] mb-6" style={{ backgroundColor: isAvailable ? theme.color : 'var(--rpg-muted)' }} />
+              <div className="w-12 h-[2px] mb-6" style={{ backgroundColor: isAvailable ? theme.color : '#3f3f46' }} />
 
               <p className="font-sans text-sm font-medium leading-relaxed px-2 transition-colors duration-500"
                  style={{ color: isAvailable ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)' }}>
                 {isAvailable
-                  ? data.description
+                  ? (data.description || 'Nenhuma descrição disponível para este protocolo.')
                   : 'SISTEMA BLOQUEADO. REQUER PROGRESSÃO ADICIONAL NO PROTOCOLO NEXUS PARA LIBERAR ESTE CONHECIMENTO.'}
               </p>
             </div>
@@ -114,7 +117,7 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
             <div className="mt-8 relative z-10">
               <button
                 disabled={!isAvailable}
-                onClick={() => onToggleStatus?.(data.id as string)}
+                onClick={() => skillId && onToggleStatus?.(skillId)}
                 className="w-full py-4 border font-mono text-[11px] tracking-[0.2em] font-bold transition-all duration-300 flex items-center justify-center gap-2"
                 style={{
                   cursor: isAvailable ? 'pointer' : 'not-allowed',
@@ -124,12 +127,12 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
                       ? 'rgba(255,68,68,0.1)'
                       : theme.color,
                   borderColor: !isAvailable
-                    ? 'var(--rpg-muted)'
+                    ? '#3f3f46'
                     : data.isUnlocked
                       ? '#ff4444'
                       : theme.color,
                   color: !isAvailable
-                    ? 'var(--rpg-muted)'
+                    ? '#3f3f46'
                     : data.isUnlocked
                       ? '#ff4444'
                       : '#000',

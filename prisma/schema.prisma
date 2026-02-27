@@ -15,6 +15,7 @@ model Skill {
   description String? @db.Text
   icon        String?
   category    String  @default("keystone")
+  shape  String  @default("hexagon")
 
   level         Int @default(1)
   xp            Int @default(0)

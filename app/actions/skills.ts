@@ -9,6 +9,7 @@ export type SkillRow = {
   description: string | null;
   icon: string | null;
   category: string;
+  shape: string;
   isUnlocked: boolean;
   parentId: string | null;
   positionX: number;
@@ -18,26 +19,26 @@ export type SkillRow = {
 
 export async function getSkills(userId: string): Promise<SkillRow[]> {
   try {
-    const skills = await prisma.skill.findMany({
+    return await prisma.skill.findMany({
       where: { userId },
       include: { contents: true },
       orderBy: { createdAt: 'asc' },
     });
-    return skills;
   } catch (error) {
     console.error('Erro ao buscar skills:', error);
     return [];
   }
 }
 
-
 export async function addSkill(data: {
   userId: string;
   name: string;
   description?: string;
   icon?: string;
-  category?: string;
+  shape?: string;
   parentId?: string | null;
+  positionX?: number;
+  positionY?: number;
 }) {
   try {
     const newSkill = await prisma.skill.create({
@@ -46,13 +47,15 @@ export async function addSkill(data: {
         name: data.name,
         description: data.description ?? null,
         icon: data.icon ?? null,
-        category: data.category ?? 'keystone',
+        shape: data.shape ?? 'hexagon',
         parentId: data.parentId ?? null,
+        positionX: data.positionX ?? 0,
+        positionY: data.positionY ?? 0,
         isUnlocked: false,
       },
     });
-    revalidatePath('/tree');
-    revalidatePath('/overview');
+    revalidatePath('/tree', 'page');
+    revalidatePath('/overview', 'page');
     return { success: true, skill: newSkill };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -63,14 +66,13 @@ export async function addSkill(data: {
 
 export async function toggleSkillStatus(skillId: string, isUnlocked: boolean) {
   try {
-    const updated = await prisma.skill.update({
+    await prisma.skill.update({
       where: { id: skillId },
       data: { isUnlocked },
     });
-    revalidatePath('/tree');
-    return { success: true, skill: updated };
+    return { success: true };
   } catch (error) {
-    console.error('Erro ao atualizar skill:', error);
+    console.error('Erro ao atualizar status da skill:', error);
     return { success: false, error };
   }
 }
@@ -91,8 +93,8 @@ export async function updateSkillPosition(skillId: string, x: number, y: number)
 export async function deleteSkill(skillId: string) {
   try {
     await prisma.skill.delete({ where: { id: skillId } });
-    revalidatePath('/tree');
-    revalidatePath('/overview');
+    revalidatePath('/tree', 'page');
+    revalidatePath('/overview', 'page');
     return { success: true };
   } catch (error) {
     console.error('Erro ao deletar skill:', error);

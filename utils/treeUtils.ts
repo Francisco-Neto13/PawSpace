@@ -1,22 +1,18 @@
 import { Node, Edge } from '@xyflow/react';
-import { SkillData, SkillCategory } from '../components/tree/types';
+import { SkillData, SkillCategory, SkillShape } from '../components/tree/types';
 import type { SkillRow } from '@/app/actions/skills';
 
 const X_OFFSET = 250;
 const Y_OFFSET = 180;
-
 
 type SkillNode = SkillRow & { children: SkillNode[] };
 
 export function buildHierarchy(skills: SkillRow[]): SkillNode[] {
   const map = new Map<string, SkillNode>();
 
-  skills.forEach(skill => {
-    map.set(skill.id, { ...skill, children: [] });
-  });
+  skills.forEach(skill => map.set(skill.id, { ...skill, children: [] }));
 
   const roots: SkillNode[] = [];
-
   skills.forEach(skill => {
     const node = map.get(skill.id)!;
     if (skill.parentId && map.has(skill.parentId)) {
@@ -34,6 +30,20 @@ function getSubtreeWidth(node: SkillNode): number {
   return node.children.reduce((acc, child) => acc + getSubtreeWidth(child), 0);
 }
 
+export function getNewChildPosition(
+  parentX: number,
+  parentY: number,
+  siblingCount: number
+): { x: number; y: number } {
+  const direction = siblingCount % 2 === 0 ? 1 : -1;
+  const multiplier = Math.ceil(siblingCount / 2);
+
+  return {
+    x: parentX + direction * multiplier * (X_OFFSET * 0.8),
+    y: parentY + Y_OFFSET,
+  };
+}
+
 export function generateTreeLayout(
   treeArray: SkillNode[],
   parentId: string | null = null,
@@ -45,15 +55,17 @@ export function generateTreeLayout(
   let currentX = startX;
 
   treeArray.forEach(skill => {
-    const subtreeWidth = getSubtreeWidth(skill);
-    const x = currentX + (subtreeWidth * X_OFFSET) / 2 - X_OFFSET / 2;
-    const y = level * Y_OFFSET;
+    const hasSavedPosition = skill.positionX !== null && skill.positionY !== null;
 
-    const savedX = skill.positionX ?? 0;
-    const savedY = skill.positionY ?? 0;
-    const hasSavedPosition = savedX !== 0 || savedY !== 0;
-    const finalX = hasSavedPosition ? savedX : x;
-    const finalY = hasSavedPosition ? savedY : y;
+    const subtreeWidth = getSubtreeWidth(skill);
+    const autoX = currentX + (subtreeWidth * X_OFFSET) / 2 - X_OFFSET / 2;
+    const autoY = level * Y_OFFSET;
+
+    const finalX = hasSavedPosition ? skill.positionX : autoX;
+    const finalY = hasSavedPosition ? skill.positionY : autoY;
+
+    const isRoot = !skill.parentId;
+    const shape = isRoot ? 'hexagon' : ((skill.shape ?? 'hexagon') as SkillShape);
 
     nodes.push({
       id: skill.id,
@@ -63,15 +75,16 @@ export function generateTreeLayout(
         id: skill.id,
         userId: skill.userId,
         name: skill.name,
-        positionX: x,
-        positionY: y,
+        positionX: finalX,
+        positionY: finalY,
         label: skill.name,
         icon: skill.icon ?? '🔹',
         category: (skill.category ?? 'keystone') as SkillCategory,
+        shape,
         isUnlocked: skill.isUnlocked,
         description: skill.description ?? '',
-        parentId: parentId ?? undefined,
-        links: skill.contents ?? [],
+        parentId: skill.parentId ?? undefined,
+        links: (skill as any).contents ?? [],
       },
     });
 
@@ -94,7 +107,11 @@ export function generateTreeLayout(
       edges = [...edges, ...childLayout.edges];
     }
 
-    currentX += subtreeWidth * X_OFFSET;
+    if (!hasSavedPosition) {
+      currentX += subtreeWidth * X_OFFSET;
+    } else {
+      currentX += X_OFFSET;
+    }
   });
 
   return { nodes, edges };
@@ -104,25 +121,49 @@ export function calculateRecursiveProgress(
   nodes: Node<SkillData>[],
   edges: Edge[]
 ): Node<SkillData>[] {
+  const sourceToTargets = new Map<string, string[]>();
+  edges.forEach(e => {
+    const existing = sourceToTargets.get(e.source) ?? [];
+    existing.push(e.target);
+    sourceToTargets.set(e.source, existing);
+  });
+
+  const nodeMap = new Map(nodes.map(n => [n.id, n]));
+
   const getDescendantIds = (parentId: string): string[] => {
-    const children = edges.filter(e => e.source === parentId).map(e => e.target);
-    return children.reduce<string[]>(
-      (acc, childId) => [...acc, childId, ...getDescendantIds(childId)],
-      []
-    );
+    const result: string[] = [];
+    const stack = [...(sourceToTargets.get(parentId) ?? [])];
+
+    while (stack.length > 0) {
+      const id = stack.pop()!;
+      result.push(id);
+      const children = sourceToTargets.get(id);
+      if (children) stack.push(...children);
+    }
+
+    return result;
   };
 
   return nodes.map(node => {
     const descendantIds = getDescendantIds(node.id);
-    if (descendantIds.length === 0) return { ...node, data: { ...node.data, progress: 0 } };
+    if (descendantIds.length === 0) {
+      return { ...node, data: { ...node.data, progress: 0 } };
+    }
 
-    const unlockedCount = nodes.filter(
-      n => descendantIds.includes(n.id) && n.data.isUnlocked
-    ).length;
+    let total = 0;
+    let unlocked = 0;
+
+    for (const id of descendantIds) {
+      const n = nodeMap.get(id);
+      if (n) {
+        total++;
+        if (n.data.isUnlocked) unlocked++;
+      }
+    }
 
     return {
       ...node,
-      data: { ...node.data, progress: unlockedCount / descendantIds.length },
+      data: { ...node.data, progress: total > 0 ? unlocked / total : 0 },
     };
   });
 }

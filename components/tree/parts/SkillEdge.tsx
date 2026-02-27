@@ -1,7 +1,7 @@
 'use client';
 import React, { memo } from 'react';
 import { EdgeProps, BaseEdge, getStraightPath, type Edge } from '@xyflow/react';
-import { SkillEdgeData, CATEGORY_THEME, SkillCategory } from './types';
+import { SkillEdgeData, CATEGORY_THEME, SkillCategory } from '../types';
 
 type CompatibleSkillEdge = Edge<SkillEdgeData & { [key: string]: unknown }>;
 type SkillEdgeProps = EdgeProps<CompatibleSkillEdge>;
