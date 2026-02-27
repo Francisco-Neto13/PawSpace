@@ -25,6 +25,7 @@ export function buildHierarchy(skills: SkillRow[]): SkillNode[] {
   return roots;
 }
 
+
 function getSubtreeWidth(node: SkillNode): number {
   if (node.children.length === 0) return 1;
   return node.children.reduce((acc, child) => acc + getSubtreeWidth(child), 0);
@@ -55,14 +56,17 @@ export function generateTreeLayout(
   let currentX = startX;
 
   treeArray.forEach(skill => {
-    const hasSavedPosition = skill.positionX !== null && skill.positionY !== null;
+    const hasSavedPosition = 
+      typeof skill.positionX === 'number' && 
+      typeof skill.positionY === 'number';
 
     const subtreeWidth = getSubtreeWidth(skill);
+    
     const autoX = currentX + (subtreeWidth * X_OFFSET) / 2 - X_OFFSET / 2;
     const autoY = level * Y_OFFSET;
 
-    const finalX = hasSavedPosition ? skill.positionX : autoX;
-    const finalY = hasSavedPosition ? skill.positionY : autoY;
+    const finalX = hasSavedPosition ? (skill.positionX as number) : autoX;
+    const finalY = hasSavedPosition ? (skill.positionY as number) : autoY;
 
     const isRoot = !skill.parentId;
     const shape = isRoot ? 'hexagon' : ((skill.shape ?? 'hexagon') as SkillShape);
@@ -75,8 +79,8 @@ export function generateTreeLayout(
         id: skill.id,
         userId: skill.userId,
         name: skill.name,
-        positionX: finalX,
-        positionY: finalY,
+        positionX: skill.positionX,
+        positionY: skill.positionY,
         label: skill.name,
         icon: skill.icon ?? '🔹',
         category: (skill.category ?? 'keystone') as SkillCategory,
@@ -107,11 +111,7 @@ export function generateTreeLayout(
       edges = [...edges, ...childLayout.edges];
     }
 
-    if (!hasSavedPosition) {
-      currentX += subtreeWidth * X_OFFSET;
-    } else {
-      currentX += X_OFFSET;
-    }
+    currentX += subtreeWidth * X_OFFSET;
   });
 
   return { nodes, edges };

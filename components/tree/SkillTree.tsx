@@ -57,8 +57,8 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
   return null;
 }
 
-function SkillTreeInner() {
-  const { nodes, edges, isLoading } = useSkillNodes();
+function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
+  const { nodes, edges, isLoading } = useSkillNodes(initialSkills);
   const { onNodesChange, hasUnsavedChanges, isSaving, saveLayout } = useSkillDrag();
   const { handleToggleStatus, handleDelete, handleCreateSkill } = useSkillActions();
 
@@ -198,11 +198,11 @@ function SkillTreeInner() {
   );
 }
 
-export function SkillTree() {
+export function SkillTree({ initialSkills }: { initialSkills?: any[] }) {
   return (
     <SkillTreeProvider>
       <ReactFlowProvider>
-        <SkillTreeInner />
+        <SkillTreeInner initialSkills={initialSkills} />
       </ReactFlowProvider>
     </SkillTreeProvider>
   );

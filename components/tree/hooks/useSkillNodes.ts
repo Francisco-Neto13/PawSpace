@@ -1,13 +1,16 @@
-// hooks/useSkillNodes.ts
 import { useEffect } from 'react';
 import { useSkillTreeContext } from '../context/SkillTreeContext';
 
-export function useSkillNodes() {
-  const { loadTreeData, isLoading, nodes, edges } = useSkillTreeContext();
+export function useSkillNodes(initialSkills?: any[]) {
+  const { loadTreeData, isLoading, nodes, edges, setInitialData } = useSkillTreeContext();
 
   useEffect(() => {
-    loadTreeData();
-  }, []); 
+    if (initialSkills && initialSkills.length > 0 && nodes.length === 0) {
+      setInitialData(initialSkills);
+    } else if (nodes.length === 0) {
+      loadTreeData();
+    }
+  }, [initialSkills, nodes.length, setInitialData, loadTreeData]); 
 
-  return { isLoading, nodes, edges };
+  return { isLoading: nodes.length === 0 && isLoading, nodes, edges };
 }

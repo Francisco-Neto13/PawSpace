@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { useSkillTreeContext } from '../context/SkillTreeContext';
 import { toggleSkillStatus, deleteSkill, addSkill } from '@/app/actions/skills';
 import { calculateRecursiveProgress, getNewChildPosition } from '@/utils/treeUtils';
@@ -9,6 +10,7 @@ import { createClient } from '@/utils/supabase/client';
 export function useSkillActions() {
   const { nodes, edges, setNodes, setEdges, loadTreeData } = useSkillTreeContext();
   const [, startTransition] = useTransition();
+  const router = useRouter(); 
   const supabase = createClient();
 
   const handleToggleStatus = useCallback((nodeId: string) => {
@@ -48,9 +50,13 @@ export function useSkillActions() {
     });
 
     toggleSkillStatus(nodeId, nextUnlocked).then(result => {
-      if (!result.success) loadTreeData();
+      if (result.success) {
+        router.refresh(); 
+      } else {
+        loadTreeData();
+      }
     });
-  }, [nodes, edges, setNodes, setEdges, loadTreeData]);
+  }, [nodes, edges, setNodes, setEdges, loadTreeData, router]);
 
   const handleDelete = useCallback((nodeId: string) => {
     if (!confirm('Deletar este nó e todos os seus filhos?')) return;
@@ -60,13 +66,15 @@ export function useSkillActions() {
 
     startTransition(() => {
       deleteSkill(nodeId).then(result => {
-        if (!result.success) {
+        if (result.success) {
+          router.refresh(); 
+        } else {
           alert('Erro na sincronização. Recarregando Nexus...');
           loadTreeData();
         }
       });
     });
-  }, [setNodes, setEdges, loadTreeData]);
+  }, [setNodes, setEdges, loadTreeData, router]);
 
   const handleCreateSkill = useCallback(async (data: {
     name: string;
@@ -100,7 +108,7 @@ export function useSkillActions() {
     const result = await addSkill({ ...data, userId: user.id, positionX, positionY });
     
     if (!result.success || !result.skill) {
-      throw new Error(String(result.error));
+      throw new Error("Falha ao criar skill no Nexus.");
     }
 
     const s = result.skill;
@@ -130,8 +138,10 @@ export function useSkillActions() {
       };
       setEdges((eds) => [...eds, newEdge as any]);
     }
+
+    router.refresh(); 
     
-  }, [nodes, edges, supabase, setNodes, setEdges]);
+  }, [nodes, edges, supabase, setNodes, setEdges, router]);
 
   return { handleToggleStatus, handleDelete, handleCreateSkill };
 }

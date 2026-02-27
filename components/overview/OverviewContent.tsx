@@ -8,14 +8,23 @@ import { createClient } from '@/utils/supabase/client';
 import { Node } from '@xyflow/react';
 import { SkillData } from '../tree/types';
 
-export default function OverviewContent() {
+interface OverviewContentProps {
+  initialData: {
+    total: number;
+    unlocked: number;
+    progress: number;
+  };
+}
+
+export default function OverviewContent({ initialData }: OverviewContentProps) {
   const [nodes, setNodes] = useState<Node<SkillData>[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     async function loadStats() {
-      setIsLoading(true);
+      if (!initialData) setIsLoading(true);
+      
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -33,16 +42,17 @@ export default function OverviewContent() {
       }
     }
     loadStats();
-  }, [supabase]);
+  }, [supabase, initialData]);
 
   const treeStats = useMemo(() => {
-    if (nodes.length === 0) return { progress: 0, total: 0, unlocked: 0 };
+    if (nodes.length === 0) return initialData;
+    
     return {
       progress: calculateGlobalProgress(nodes),
       total: nodes.length,
       unlocked: nodes.filter(n => n.data.isUnlocked).length,
     };
-  }, [nodes]);
+  }, [nodes, initialData]);
 
   return (
     <div className="relative min-h-[calc(100vh-160px)] w-full bg-[#030304] overflow-x-hidden flex flex-col">
@@ -96,7 +106,7 @@ export default function OverviewContent() {
 
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div className="text-zinc-400 text-sm leading-relaxed max-w-xl font-light min-h-[60px]">
-                {!isLoading && treeStats.total > 0 ? (
+                {treeStats.total > 0 ? (
                   <p>
                     Atualmente, você domina{' '}
                     <span className="text-white font-bold">{treeStats.unlocked} módulos</span> fundamentais.

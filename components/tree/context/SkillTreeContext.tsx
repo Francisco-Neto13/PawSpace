@@ -18,6 +18,7 @@ interface SkillTreeContextValue {
   setNodes: React.Dispatch<React.SetStateAction<Node<SkillData>[]>>;
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   loadTreeData: () => Promise<void>;
+  setInitialData: (skills: any[]) => void; 
 }
 
 const SkillTreeContext = createContext<SkillTreeContextValue | null>(null);
@@ -34,18 +35,34 @@ export function SkillTreeProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const supabase = createClient();
 
+  const setInitialData = useCallback((skills: any[]) => {
+    if (!skills || skills.length === 0) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const hierarchy = buildHierarchy(skills);
+      const { nodes: layoutNodes, edges: layoutEdges } = generateTreeLayout(hierarchy);
+      const nodesWithProgress = calculateRecursiveProgress(layoutNodes, layoutEdges);
+      
+      setNodes(nodesWithProgress);
+      setEdges(layoutEdges);
+    } catch (error) {
+      console.error("Erro na hidratação do Nexus:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const loadTreeData = useCallback(async () => {
-    setIsLoading(true);
+    if (nodes.length === 0) setIsLoading(true);
+    
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const rawSkills = await getSkills(user.id);
-console.log('Posições do banco:', rawSkills.map(s => ({ 
-  name: s.name, 
-  x: s.positionX, 
-  y: s.positionY 
-})));
 
       if (rawSkills?.length > 0) {
         const hierarchy = buildHierarchy(rawSkills);
@@ -60,7 +77,7 @@ console.log('Posições do banco:', rawSkills.map(s => ({
     } finally {
       setIsLoading(false);
     }
-  }, [supabase]);
+  }, [supabase, nodes.length]);
 
   useEffect(() => {
     if (nodes.length === 0) return;
@@ -72,7 +89,17 @@ console.log('Posições do banco:', rawSkills.map(s => ({
   }, [nodes]);
 
   return (
-    <SkillTreeContext.Provider value={{ nodes, edges, isLoading, setNodes, setEdges, loadTreeData }}>
+    <SkillTreeContext.Provider 
+      value={{ 
+        nodes, 
+        edges, 
+        isLoading, 
+        setNodes, 
+        setEdges, 
+        loadTreeData, 
+        setInitialData 
+      }}
+    >
       {children}
     </SkillTreeContext.Provider>
   );
