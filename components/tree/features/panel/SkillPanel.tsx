@@ -31,43 +31,44 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
     [data?.category]
   );
 
-  const activeColor = useMemo(() => {
-    return data?.color || theme.color;
-  }, [data?.color, theme.color]);
+  const activeColor = useMemo(() => data?.color || theme.color, [data?.color, theme.color]);
 
   if (!data) return null;
 
-  const displayLabel = data.label || data.name || "MÓDULO DESCONHECIDO";
-  const skillId = data.id || "";
+  const displayLabel = data.label || data.name || 'MÓDULO DESCONHECIDO';
+  const skillId = data.id || '';
 
-  const borderColor = data.isUnlocked 
-    ? activeColor 
-    : (isAvailable ? '#71717a' : '#3f3f46');
+  const borderColor = data.isUnlocked
+    ? activeColor
+    : isAvailable ? '#52525b' : '#27272a';
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
       <div className="absolute inset-0 cursor-pointer" onClick={onClose} />
 
       <div
-        className="relative w-[340px] min-h-[520px] animate-in zoom-in-95 duration-500 p-[2px]"
-        style={{
-          clipPath: poly,
-          backgroundColor: borderColor, 
-          transition: 'background-color 0.3s ease'
-        }}
+        className="relative w-[340px] min-h-[520px] animate-in zoom-in-95 duration-500 p-[1.5px] z-10"
+        style={{ clipPath: poly, backgroundColor: borderColor, transition: 'background-color 0.5s ease' }}
       >
-        <div className="w-full h-full flex flex-col overflow-hidden" style={{ clipPath: poly, backgroundColor: '#000' }}>
+        <div className="w-full h-full" style={{ clipPath: poly, backgroundColor: '#000' }}>
           <div
-            className="flex-1 m-[1px] flex flex-col p-8 relative overflow-hidden"
-            style={{ clipPath: poly, backgroundColor: '#050505' }}
+            className="flex-1 flex flex-col p-8 relative overflow-hidden h-full"
+            style={{ clipPath: poly, backgroundColor: '#080808' }}
           >
+            <div
+              className="absolute inset-0 opacity-[0.025] pointer-events-none"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
+              }}
+            />
+
             <div className="flex justify-between items-center mb-8 relative z-10">
               <div
-                className="px-3 py-0.5 border font-mono text-[10px] tracking-[0.2em] font-bold"
+                className="px-3 py-0.5 border text-[9px] font-black tracking-[0.4em] uppercase"
                 style={{
-                  color: data.isUnlocked ? activeColor : '#71717a',
-                  borderColor: data.isUnlocked ? `${activeColor}44` : '#3f3f46',
-                  backgroundColor: data.isUnlocked ? `${activeColor}11` : 'transparent',
+                  color: data.isUnlocked ? activeColor : '#52525b',
+                  borderColor: data.isUnlocked ? `${activeColor}30` : '#27272a',
+                  backgroundColor: data.isUnlocked ? `${activeColor}0d` : 'transparent',
                 }}
               >
                 {data.category?.toUpperCase() || 'CORE'}
@@ -75,45 +76,84 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
 
               <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center border font-mono text-xs cursor-pointer transition-all duration-300 hover:bg-white/10 text-zinc-500 border-zinc-700"
+                className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-600 hover:text-zinc-300 hover:border-white/20 transition-all duration-300 text-xs cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             <div
-              className="relative w-full h-44 flex items-center justify-center mb-8 overflow-hidden border border-white/5"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.02)',
-              }}
+              className="relative w-full h-40 flex items-center justify-center mb-8 overflow-hidden border border-white/[0.04]"
+              style={{ backgroundColor: 'rgba(255,255,255,0.01)' }}
             >
               <div
-                className="absolute inset-0 pointer-events-none opacity-20"
-                style={{ 
-                   backgroundImage: `radial-gradient(${data.isUnlocked ? activeColor : '#71717a'} 1px, transparent 0)`, 
-                   backgroundSize: '20px 20px' 
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                  backgroundImage: `radial-gradient(${data.isUnlocked ? activeColor : '#3f3f46'} 1px, transparent 0)`,
+                  backgroundSize: '20px 20px',
                 }}
               />
-              <span className={`text-7xl transition-all duration-1000 ${data.isUnlocked ? 'grayscale-0 scale-110' : 'grayscale opacity-20'}`}
-                style={{
-                   filter: data.isUnlocked ? `drop-shadow(0 0 20px ${activeColor}55)` : 'none'
-                }}
+              <span
+                className={`text-7xl transition-all duration-700 ${data.isUnlocked ? 'grayscale-0 scale-110' : 'grayscale opacity-20'}`}
+                style={{ filter: 'none' }}
               >
                 {isAvailable ? (data.icon || '✦') : '🔒'}
               </span>
             </div>
 
-            <div className="flex-1 text-center flex flex-col items-center relative z-10">
-              <h2 className="font-sans text-xl font-bold text-white tracking-[0.1em] mb-4 leading-tight">
-                {displayLabel.toUpperCase()}
+            <div className="flex-1 flex flex-col items-center text-center relative z-10">
+
+              <h2 className="text-white text-base font-black uppercase tracking-[0.3em] leading-tight mb-3">
+                {displayLabel}
               </h2>
 
-              <div className="w-12 h-[2px] mb-6" style={{ backgroundColor: data.isUnlocked ? activeColor : '#3f3f46' }} />
+              <div
+                className="w-12 h-[1px] mb-5"
+                style={{
+                  background: `linear-gradient(to right, transparent, ${data.isUnlocked ? activeColor : '#3f3f46'}, transparent)`,
+                }}
+              />
 
-              <p className="font-sans text-sm font-medium leading-relaxed px-2 transition-colors duration-500 text-zinc-400">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex items-center gap-1.5">
+                  <div
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{
+                      backgroundColor: data.isUnlocked ? activeColor : '#3f3f46',
+                      boxShadow: data.isUnlocked ? `0 0 6px ${activeColor}` : 'none',
+                    }}
+                  />
+                  <span
+                    className="text-[9px] font-black uppercase tracking-[0.2em]"
+                    style={{ color: data.isUnlocked ? activeColor : '#52525b' }}
+                  >
+                    {data.isUnlocked ? 'Desbloqueado' : 'Bloqueado'}
+                  </span>
+                </div>
+
+                <div className="w-[1px] h-3 bg-white/10" />
+
+                <div className="flex items-center gap-1.5">
+                  <div
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{
+                      backgroundColor: isAvailable ? '#34d399' : '#3f3f46',
+                      boxShadow: isAvailable ? '0 0 6px #34d399' : 'none',
+                    }}
+                  />
+                  <span
+                    className="text-[9px] font-black uppercase tracking-[0.2em]"
+                    style={{ color: isAvailable ? '#34d399' : '#52525b' }}
+                  >
+                    {isAvailable ? 'Disponível' : 'Indisponível'}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-zinc-400 text-sm font-medium leading-relaxed px-2 min-h-[60px]">
                 {isAvailable
                   ? (data.description || 'Nenhuma descrição disponível para este protocolo.')
-                  : 'SISTEMA BLOQUEADO. REQUER PROGRESSÃO ADICIONAL NO PROTOCOLO NEXUS PARA LIBERAR ESTE CONHECIMENTO.'}
+                  : 'Sistema bloqueado. Requer progressão adicional no protocolo Nexus para liberar este conhecimento.'}
               </p>
             </div>
 
@@ -121,30 +161,42 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
               <button
                 disabled={!isAvailable}
                 onClick={() => skillId && onToggleStatus?.(skillId)}
-                className="w-full py-4 border font-mono text-[11px] tracking-[0.2em] font-bold transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full py-4 border text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-300 flex items-center justify-center gap-2"
                 style={{
                   cursor: isAvailable ? 'pointer' : 'not-allowed',
-                  background: !isAvailable 
-                    ? 'transparent' 
-                    : data.isUnlocked 
-                      ? 'rgba(255,255,255,0.05)' 
-                      : 'rgba(255,255,255,0.95)', 
-                  borderColor: !isAvailable ? '#3f3f46' : '#71717a',
-                  color: !isAvailable 
-                    ? '#3f3f46' 
-                    : data.isUnlocked 
-                      ? '#ffffff' 
-                      : '#000000',
+                  background: !isAvailable
+                    ? 'transparent'
+                    : data.isUnlocked
+                      ? 'rgba(255,255,255,0.04)'
+                      : 'transparent',
+                  borderColor: !isAvailable
+                    ? '#27272a'
+                    : data.isUnlocked
+                      ? `${activeColor}40`
+                      : '#52525b',
+                  color: !isAvailable
+                    ? '#3f3f46'
+                    : data.isUnlocked
+                      ? activeColor
+                      : '#a1a1aa',
                 }}
               >
-                {data.isUnlocked ? '[ Bloquear ]' : isAvailable ? '[ Desbloquear ]' : '[ Acesso Negado ]'}
+                {!isAvailable
+                  ? '[ Acesso Negado ]'
+                  : data.isUnlocked
+                    ? '[ Bloquear Módulo ]'
+                    : '[ Desbloquear Módulo ]'}
               </button>
             </div>
 
-            <div className="mt-6 flex justify-center gap-4 opacity-40">
-              <div className="w-1.5 h-1.5 rotate-45 border border-current" style={{ color: borderColor }} />
-              <div className="w-1.5 h-1.5 rotate-45 border border-current" style={{ color: borderColor }} />
-              <div className="w-1.5 h-1.5 rotate-45 border border-current" style={{ color: borderColor }} />
+            <div className="mt-5 flex justify-center gap-3 opacity-30 relative z-10">
+              {[0, 1, 2].map(i => (
+                <div
+                  key={i}
+                  className="w-1.5 h-1.5 rotate-45 border"
+                  style={{ borderColor }}
+                />
+              ))}
             </div>
 
           </div>

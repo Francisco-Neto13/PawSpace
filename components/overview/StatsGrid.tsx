@@ -1,63 +1,142 @@
 'use client';
-import { Zap, Target, Layout } from 'lucide-react';
+import { useMemo } from 'react';
+import { Zap, Target, Layout, LucideIcon } from 'lucide-react';
 
-export default function StatsGrid({ unlockedCount, totalCount, progress }: any) {
-  const stats = [
-    { 
-      label: 'Nós Concluídos', 
-      value: unlockedCount, 
-      sub: `de ${totalCount} no roadmap`, 
-      icon: Zap, 
-      color: 'text-amber-400' 
-    },
-    { 
-      label: 'Aproveitamento', 
-      value: `${progress}%`, 
-      sub: 'Total Dominado', 
-      icon: Target, 
-      color: 'text-[#c8b89a]' 
-    },
-    { 
-      label: 'Nós Pendentes', 
-      value: totalCount - unlockedCount, 
-      sub: 'Aguardando ação', 
-      icon: Layout, 
-      color: 'text-zinc-500' 
-    },
-  ];
+interface StatsGridProps {
+  unlockedCount: number;
+  totalCount: number;
+  progress: number;
+}
+
+interface StatItem {
+  label: string;
+  value: string | number;
+  sub: string;
+  icon: LucideIcon;
+  color: string;
+  glowColor: string;
+  barColor: string;
+  barWidth: number;
+}
+
+const DOTS = [0, 1, 2];
+
+export default function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
+  
+  const stats = useMemo<StatItem[]>(() => {
+    const pending = totalCount - unlockedCount;
+    const progressSafe = totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
+    const pendingSafe = totalCount > 0 ? (pending / totalCount) * 100 : 0;
+
+    return [
+      {
+        label: 'Nós Concluídos',
+        value: unlockedCount,
+        sub: `de ${totalCount} no roadmap`,
+        icon: Zap,
+        color: 'text-amber-400',
+        glowColor: 'rgba(251, 191, 36, 0.15)',
+        barColor: '#fbbf24',
+        barWidth: progressSafe,
+      },
+      {
+        label: 'Aproveitamento',
+        value: `${progress}%`,
+        sub: 'Total Dominado',
+        icon: Target,
+        color: 'text-[#c8b89a]',
+        glowColor: 'rgba(200, 184, 154, 0.15)',
+        barColor: '#c8b89a',
+        barWidth: progress,
+      },
+      {
+        label: 'Nós Pendentes',
+        value: pending,
+        sub: 'Aguardando ação',
+        icon: Layout,
+        color: 'text-zinc-500',
+        glowColor: 'rgba(113, 113, 122, 0.1)',
+        barColor: '#52525b',
+        barWidth: pendingSafe,
+      },
+    ];
+  }, [unlockedCount, totalCount, progress]);
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {stats.map((item) => (
-        <div 
-          key={item.label} 
-          className="group relative p-[1px] rounded-sm overflow-hidden bg-white/5 hover:bg-gradient-to-br hover:from-[#c8b89a]/30 hover:to-transparent transition-all duration-500"
+      {stats.map((item, index) => (
+        <div
+          key={item.label}
+          className="group relative rounded-sm overflow-hidden reveal-up"
+          style={{ animationDelay: `${index * 100}ms` }}
         >
-          <div className="relative bg-[#0d0d0f] p-8 h-full w-full flex flex-col justify-between overflow-hidden">
-            
-            <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:100%_6px]" />
+          <div
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-0"
+            style={{
+              background: `linear-gradient(135deg, ${item.glowColor}, transparent 60%)`,
+            }}
+          />
+          <div className="absolute inset-[1px] bg-[#0a0a0c] rounded-sm z-0" />
 
-            <div className="relative z-10">
-              <div className="flex justify-between items-start mb-6">
-                <item.icon size={20} className={`${item.color} opacity-80 group-hover:opacity-100 transition-all`} />
-                <div className="h-px w-8 bg-white/10 mt-2.5" />
+          <div className="absolute inset-0 opacity-[0.025] pointer-events-none z-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(255,255,255,0.03)_2px,rgba(255,255,255,0.03)_4px)]" />
+
+          <div className="relative z-10 p-8 flex flex-col justify-between h-full border border-white/[0.04] group-hover:border-white/[0.08] transition-colors duration-500 rounded-sm">
+            
+            <div className="flex justify-between items-start mb-8">
+              <div className="relative">
+                <div
+                  className="absolute inset-0 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+                  style={{ backgroundColor: item.glowColor }}
+                />
+                <item.icon
+                  size={18}
+                  className={`${item.color} relative z-10 transition-transform duration-300 group-hover:scale-110`}
+                />
               </div>
-              
-              <div className="text-4xl font-black text-white mb-2 tracking-tighter font-mono">
+
+              <div className="flex gap-1 mt-1">
+                {DOTS.map((i) => (
+                  <div
+                    key={i}
+                    className="w-1 h-1 rounded-full bg-white/10 group-hover:bg-white/20 transition-colors duration-300"
+                    style={{ transitionDelay: `${i * 50}ms` }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-5xl font-black text-white mb-3 tracking-tighter font-mono leading-none">
                 {item.value}
               </div>
-              
-              <div className="flex flex-col">
-                <span className="text-[10px] font-black text-[#c8b89a] uppercase tracking-[0.2em] mb-1">
-                  {item.label}
-                </span>
-                <span className="text-[9px] font-medium text-zinc-600 uppercase tracking-tight italic">
-                  // {item.sub}
+              <span className="text-[10px] font-black text-[#c8b89a] uppercase tracking-[0.25em] block mb-1">
+                {item.label}
+              </span>
+              <span className="text-[9px] font-medium text-zinc-600 uppercase tracking-tight">
+                // {item.sub}
+              </span>
+            </div>
+
+            <div className="mt-6 space-y-1.5">
+              <div className="h-[2px] w-full bg-white/5 overflow-hidden">
+                <div
+                  className="h-full transition-all duration-1000 ease-out shadow-[0_0_8px_currentColor]"
+                  style={{
+                    width: `${item.barWidth}%`,
+                    backgroundColor: item.barColor,
+                    color: item.barColor 
+                  }}
+                />
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[8px] text-zinc-700 font-mono">0</span>
+                <span className="text-[8px] font-mono" style={{ color: item.barColor }}>
+                  {Math.round(item.barWidth)}%
                 </span>
               </div>
             </div>
 
-            <div className="absolute -bottom-6 -right-6 w-16 h-16 bg-[#c8b89a]/5 blur-2xl group-hover:bg-[#c8b89a]/10 transition-all duration-700" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-white/10 group-hover:border-white/20 transition-colors duration-300" />
           </div>
         </div>
       ))}

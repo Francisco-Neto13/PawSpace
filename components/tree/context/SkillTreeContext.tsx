@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { type Node, type Edge } from '@xyflow/react';
 import { SkillData } from '../types';
 import { createClient } from '@/utils/supabase/client';
@@ -11,6 +11,8 @@ import {
   buildHierarchy,
 } from '@/utils/treeUtils';
 
+const supabase = createClient();
+
 interface SkillTreeContextValue {
   nodes: Node<SkillData>[];
   edges: Edge[];
@@ -18,7 +20,7 @@ interface SkillTreeContextValue {
   setNodes: React.Dispatch<React.SetStateAction<Node<SkillData>[]>>;
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   loadTreeData: () => Promise<void>;
-  setInitialData: (skills: any[]) => void; 
+  setInitialData: (skills: any[]) => void;
 }
 
 const SkillTreeContext = createContext<SkillTreeContextValue | null>(null);
@@ -33,31 +35,31 @@ export function SkillTreeProvider({ children }: { children: React.ReactNode }) {
   const [nodes, setNodes] = useState<Node<SkillData>[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClient();
+  const isLoadingRef = useRef(false); 
 
   const setInitialData = useCallback((skills: any[]) => {
     if (!skills || skills.length === 0) {
       setIsLoading(false);
       return;
     }
-
     try {
       const hierarchy = buildHierarchy(skills);
       const { nodes: layoutNodes, edges: layoutEdges } = generateTreeLayout(hierarchy);
       const nodesWithProgress = calculateRecursiveProgress(layoutNodes, layoutEdges);
-      
       setNodes(nodesWithProgress);
       setEdges(layoutEdges);
     } catch (error) {
-      console.error("Erro na hidratação do Nexus:", error);
+      console.error('Erro na hidratação do Nexus:', error);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const loadTreeData = useCallback(async () => {
-    if (nodes.length === 0) setIsLoading(true);
-    
+    if (isLoadingRef.current) return;
+    isLoadingRef.current = true;
+    setIsLoading(true);
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -76,8 +78,9 @@ export function SkillTreeProvider({ children }: { children: React.ReactNode }) {
       }
     } finally {
       setIsLoading(false);
+      isLoadingRef.current = false;
     }
-  }, [supabase, nodes.length]);
+  }, []); 
 
   useEffect(() => {
     if (nodes.length === 0) return;
@@ -89,16 +92,8 @@ export function SkillTreeProvider({ children }: { children: React.ReactNode }) {
   }, [nodes]);
 
   return (
-    <SkillTreeContext.Provider 
-      value={{ 
-        nodes, 
-        edges, 
-        isLoading, 
-        setNodes, 
-        setEdges, 
-        loadTreeData, 
-        setInitialData 
-      }}
+    <SkillTreeContext.Provider
+      value={{ nodes, edges, isLoading, setNodes, setEdges, loadTreeData, setInitialData }}
     >
       {children}
     </SkillTreeContext.Provider>

@@ -3,10 +3,12 @@ import prisma from "@/lib/prisma";
 
 async function getOverviewData() {
   try {
-    const total = await prisma.skill.count();
-    const unlocked = await prisma.skill.count({ 
-      where: { isUnlocked: true } 
-    });
+    const [total, unlocked] = await Promise.all([
+      prisma.skill.count(),
+      prisma.skill.count({ 
+        where: { isUnlocked: true } 
+      })
+    ]);
 
     return {
       total,

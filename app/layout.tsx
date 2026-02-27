@@ -33,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           font-sans 
           antialiased
           text-white
+          font-medium
         `}
       >
         <div className="flex flex-col min-h-screen w-full">

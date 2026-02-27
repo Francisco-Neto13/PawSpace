@@ -14,6 +14,33 @@
   color-scheme: dark;
 }
 
+@layer base {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--rpg-muted);
+    border-radius: 10px;
+    border: 1px solid var(--background);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--rpg-gold);
+    box-shadow: 0 0 8px var(--rpg-glow);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--rpg-muted) var(--background);
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -28,21 +55,22 @@ body {
   font-size: 16px; 
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden; 
+  overflow-y: auto;   
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  scrollbar-gutter: stable;
 }
 
-h1, h2, h3, h4, h5, h6, 
-button, 
+h1, h2, h3, h4, h5, h6,
+button,
 .skill-label-text {
   font-family: var(--font-main);
-  font-weight: 600; 
-  line-height: 1.1;
-  letter-spacing: 0.05em; 
-  text-shadow: 0 0 10px rgba(200, 184, 154, 0.2);
-  text-transform: uppercase; 
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em; 
 }
 
 .skill-label-text {
@@ -51,10 +79,10 @@ button,
 
 p, span:not(.skill-label-text):not(.text-technical) {
   font-family: var(--font-main);
-  font-weight: 400;
-  line-height: 1.5;
-  letter-spacing: 0.02em;
-  color: #d1d1d1;
+  font-weight: 500;      
+  line-height: 1.6;     
+  letter-spacing: 0.01em;
+  color: #e4e4e4;     
 }
 
 .text-technical, .font-mono {
@@ -131,3 +159,46 @@ p, span:not(.skill-label-text):not(.text-technical) {
     transition: none !important;
   }
 }
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes reveal-line {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.reveal-up {
+  opacity: 0;
+  animation: reveal-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.reveal-fade {
+  opacity: 0;
+  animation: reveal-fade 0.8s ease forwards;
+}
+
+.reveal-line {
+  transform-origin: left;
+  animation: reveal-line 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.delay-0   { animation-delay: 0ms; }
+.delay-100 { animation-delay: 150ms; }
+.delay-200 { animation-delay: 300ms; }
+.delay-300 { animation-delay: 450ms; }
+.delay-400 { animation-delay: 600ms; }
+.delay-500 { animation-delay: 750ms; }
