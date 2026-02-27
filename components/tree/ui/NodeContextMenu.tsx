@@ -1,12 +1,13 @@
 'use client';
 import React, { useEffect, useRef } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Edit3 } from 'lucide-react';
 
 interface NodeContextMenuProps {
   x: number;
   y: number;
   nodeName: string;
   onAddChild: () => void;
+  onEdit: () => void; 
   onDelete?: () => void;
   onClose: () => void;
 }
@@ -25,7 +26,15 @@ const polySmall = `polygon(
   0 6px
 )`;
 
-export function NodeContextMenu({ x, y, nodeName, onAddChild, onDelete, onClose }: NodeContextMenuProps) {
+export function NodeContextMenu({ 
+  x, 
+  y, 
+  nodeName, 
+  onAddChild, 
+  onEdit, 
+  onDelete, 
+  onClose 
+}: NodeContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,7 +78,7 @@ export function NodeContextMenu({ x, y, nodeName, onAddChild, onDelete, onClose 
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-1 h-3 bg-[#c8b89a]/40" />
                 <p className="text-[8px] text-zinc-600 uppercase font-black tracking-[0.25em]">
-                  Nó selecionado
+                  Módulo Selecionado
                 </p>
               </div>
               <p className="text-[#c8b89a] text-[11px] font-bold truncate pl-3">{nodeName}</p>
@@ -77,11 +86,19 @@ export function NodeContextMenu({ x, y, nodeName, onAddChild, onDelete, onClose 
 
             <div className="py-1.5 relative z-10">
               <button
+                onClick={() => { onEdit(); onClose(); }}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-300 hover:bg-white/[0.04] hover:text-[#c8b89a] transition-all duration-200 group cursor-pointer"
+              >
+                <Edit3 size={13} className="text-[#c8b89a]/60 group-hover:text-[#c8b89a] transition-colors shrink-0" />
+                <span className="text-[9px] font-black uppercase tracking-widest">Configurar Protocolo</span>
+              </button>
+
+              <button
                 onClick={() => { onAddChild(); onClose(); }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-400 hover:bg-white/[0.04] hover:text-[#c8b89a] transition-all duration-200 group cursor-pointer"
               >
                 <Plus size={13} className="text-[#c8b89a]/60 group-hover:text-[#c8b89a] transition-colors shrink-0" />
-                <span className="text-[9px] font-black uppercase tracking-widest">Adicionar Filho</span>
+                <span className="text-[9px] font-black uppercase tracking-widest">Expandir Nexus</span>
               </button>
 
               {onDelete && (
@@ -92,7 +109,7 @@ export function NodeContextMenu({ x, y, nodeName, onAddChild, onDelete, onClose 
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-600 hover:bg-red-500/[0.06] hover:text-red-400 transition-all duration-200 group cursor-pointer"
                   >
                     <Trash2 size={13} className="shrink-0 group-hover:text-red-400 transition-colors" />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Deletar Nó</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">Remover Unidade</span>
                   </button>
                 </>
               )}

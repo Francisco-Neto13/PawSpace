@@ -1,6 +1,6 @@
 import { Node, Edge } from '@xyflow/react';
 import { SkillData, SkillCategory, SkillShape } from '../components/tree/types';
-import type { SkillRow } from '@/app/actions/skills';
+import type { SkillRow } from '../app/actions/skills/types'; 
 
 const X_OFFSET = 250;
 const Y_OFFSET = 180;
@@ -27,7 +27,7 @@ export function buildHierarchy(skills: SkillRow[]): SkillNode[] {
 
 function getSubtreeWidth(node: SkillNode): number {
   if (node.children.length === 0) return 1;
-  return node.children.reduce((acc, child) => acc + getSubtreeWidth(child), 0);
+  return node.children.reduce((acc: number, child: SkillNode) => acc + getSubtreeWidth(child), 0);
 }
 
 export function getNewChildPosition(

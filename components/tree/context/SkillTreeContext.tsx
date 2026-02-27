@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useCallback, useEffect, useRef } f
 import { type Node, type Edge } from '@xyflow/react';
 import { SkillData } from '../types';
 import { createClient } from '@/utils/supabase/client';
-import { getSkills } from '@/app/actions/skills';
+import { getSkillsFull } from '@/app/actions/skills';
 import {
   generateTreeLayout,
   calculateRecursiveProgress,
@@ -64,9 +64,9 @@ export function SkillTreeProvider({ children }: { children: React.ReactNode }) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const rawSkills = await getSkills(user.id);
+      const rawSkills = await getSkillsFull(user.id);
 
-      if (rawSkills?.length > 0) {
+      if (rawSkills && rawSkills.length > 0) {
         const hierarchy = buildHierarchy(rawSkills);
         const { nodes: layoutNodes, edges: layoutEdges } = generateTreeLayout(hierarchy);
         const nodesWithProgress = calculateRecursiveProgress(layoutNodes, layoutEdges);
@@ -76,6 +76,8 @@ export function SkillTreeProvider({ children }: { children: React.ReactNode }) {
         setNodes([]);
         setEdges([]);
       }
+    } catch (error) {
+      console.error('Erro ao carregar dados do Nexus:', error);
     } finally {
       setIsLoading(false);
       isLoadingRef.current = false;

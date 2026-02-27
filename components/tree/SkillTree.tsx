@@ -8,7 +8,7 @@ import { SkillNode, SvgDefs } from './ui/SkillNode';
 import { SkillEdge } from './ui/SkillEdge';
 import { SkillPanel } from './features/panel/SkillPanel';
 import { StarField } from './ui/StarField';
-import { AddSkillModal } from './features/editor/AddSkillModal';
+import { EditSkillModal } from './features/editor/EditSkillModal';
 import { NodeContextMenu } from './ui/NodeContextMenu';
 
 import { SkillTreeProvider } from './context/SkillTreeContext';
@@ -36,18 +36,11 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
 
   useEffect(() => {
     if (isLoading || nodes.length === 0 || hasCentered) return;
-
     const rootNode = nodes.find(n => !n.data.parentId);
     if (!rootNode) return;
 
     const timer = setTimeout(() => {
-      fitView({
-        nodes: [rootNode],
-        padding: 0.4,
-        duration: 800,
-        maxZoom: 1  
-      });
-
+      fitView({ nodes: [rootNode], padding: 0.4, duration: 800, maxZoom: 1 });
       setHasCentered(true);
     }, 300);
 
@@ -59,29 +52,44 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
 
 function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
   const { nodes, edges, isLoading } = useSkillNodes(initialSkills);
-  const { onNodesChange, hasUnsavedChanges, isSaving, saveLayout } = useSkillDrag();
-  const { handleToggleStatus, handleDelete, handleCreateSkill } = useSkillActions();
+  const { onNodesChange, hasUnsavedChanges: hasDragChanges, isSaving, saveLayout } = useSkillDrag();
+  const {
+    handleToggleStatus,
+    handleDelete,
+    handleCreateQuickSkill,
+    handleUpdateSkill,
+    handleGlobalSave,
+  } = useSkillActions();
 
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
-  const [modalParentId, setModalParentId] = useState<string | null | undefined>(undefined);
+  const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
+  const [hasDataChanges, setHasDataChanges] = useState(false);
+
+  const canSave = hasDragChanges || hasDataChanges;
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges || isSaving) {
+      if (canSave || isSaving) {
         e.preventDefault();
-        e.returnValue = 'Existem protocolos não sincronizados no Nexus. Deseja realmente sair?';
-        return e.returnValue;
+        e.returnValue = 'Existem protocolos não sincronizados no Nexus.';
       }
     };
-
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges, isSaving]);
+  }, [canSave, isSaving]);
+
+  const onSaveAll = async () => {
+    const success = await handleGlobalSave();
+    if (success) {
+      setHasDataChanges(false);
+      saveLayout(nodes);
+    }
+  };
 
   const selectedNode = useMemo(() => nodes.find(n => n.id === selectedSkillId), [nodes, selectedSkillId]);
   const panelData = useMemo(() => selectedNode ? { ...selectedNode.data, id: selectedNode.id } : null, [selectedNode]);
-  
+
   const isPanelAvailable = useMemo(() => {
     if (!selectedNode) return false;
     const parentId = selectedNode.data.parentId;
@@ -90,11 +98,13 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
   }, [selectedNode, nodes]);
 
   return (
-    <div className="relative w-full bg-[#030304] overflow-hidden select-none font-sans"
-      style={{ height: 'calc(100vh - 160px)' }}>
+    <div
+      className="relative w-full bg-[#030304] overflow-hidden select-none font-sans"
+      style={{ height: 'calc(100vh - 160px)' }}
+    >
 
       {isLoading && nodes.length === 0 && (
-        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#030304]/80 backdrop-blur-md pointer-events-none">
+        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#030304]/80 backdrop-blur-md">
           <div className="flex flex-col items-center gap-4">
             <div className="w-8 h-8 border-2 border-[#c8b89a]/20 border-t-[#c8b89a] rounded-full animate-spin" />
             <p className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
@@ -108,33 +118,31 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
       <StarField />
 
       {!isLoading && nodes.length === 0 && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 pointer-events-none">
-          <button onClick={() => setModalParentId(null)}
-            className="pointer-events-auto flex items-center gap-3 px-8 py-4 border border-[#c8b89a]/30 bg-[#c8b89a]/5 text-[#c8b89a] hover:bg-[#c8b89a]/10 transition-all">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6">
+          <button
+            onClick={() => handleCreateQuickSkill(null)}
+            className="flex items-center gap-3 px-8 py-4 border border-[#c8b89a]/30 bg-[#c8b89a]/5 text-[#c8b89a] hover:bg-[#c8b89a]/10 transition-all cursor-pointer"
+          >
             <Plus size={16} />
-            <span className="text-[10px] font-black uppercase tracking-widest">Criar Raiz do Nexus</span>
+            <span className="text-[10px] font-black uppercase tracking-widest">Iniciar Protocolo Primário</span>
           </button>
         </div>
       )}
 
-      {hasUnsavedChanges && (
+      {canSave && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50">
           <button
-            onClick={() => saveLayout(nodes)}
+            onClick={onSaveAll}
             disabled={isSaving}
             className={`flex items-center gap-3 px-6 py-3 border transition-all backdrop-blur-sm shadow-2xl
-              ${isSaving 
-                ? 'border-[#c8b89a]/20 bg-[#030304]/60 text-[#c8b89a]/40 cursor-not-allowed' 
-                : 'border-[#c8b89a]/40 bg-[#030304]/90 text-[#c8b89a] hover:bg-[#c8b89a]/10 active:scale-95'
+              ${isSaving
+                ? 'border-[#c8b89a]/20 bg-[#030304]/60 text-[#c8b89a]/40 cursor-not-allowed'
+                : 'border-[#c8b89a]/40 bg-[#030304]/90 text-[#c8b89a] hover:bg-[#c8b89a]/10 active:scale-95 cursor-pointer'
               }`}
           >
-            {isSaving ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Save size={14} />
-            )}
+            {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             <span className="text-[10px] font-black uppercase tracking-widest">
-              {isSaving ? 'Salvando...' : 'Salvar Layout'}
+              {isSaving ? 'Sincronizando...' : 'Salvar Alterações'}
             </span>
           </button>
         </div>
@@ -147,18 +155,29 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
-          onNodeClick={(_, node) => { setContextMenu(null); setSelectedSkillId(node.id); }}
+          onNodeClick={(_, node) => {
+            setContextMenu(null);
+            setSelectedSkillId(node.id);
+          }}
           onNodeContextMenu={(e, node) => {
             e.preventDefault();
             setSelectedSkillId(null);
-            setContextMenu({ x: e.clientX, y: e.clientY, nodeId: node.id, nodeName: node.data.label ?? node.data.name });
+            setContextMenu({
+              x: e.clientX,
+              y: e.clientY,
+              nodeId: node.id,
+              nodeName: node.data.label ?? node.data.name,
+            });
           }}
-          onPaneClick={() => { setContextMenu(null); setSelectedSkillId(null); }}
+          onPaneClick={() => {
+            setContextMenu(null);
+            setSelectedSkillId(null);
+          }}
           defaultEdgeOptions={defaultEdgeOptions}
-          nodesDraggable 
-          panOnDrag 
+          nodesDraggable
+          panOnDrag
           zoomOnScroll
-          minZoom={0.05} 
+          minZoom={0.05}
           maxZoom={2}
           connectionMode={ConnectionMode.Loose}
           nodesConnectable={false}
@@ -169,29 +188,31 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
       </div>
 
       {contextMenu && (
-        <NodeContextMenu {...contextMenu}
-          onAddChild={() => { setModalParentId(contextMenu.nodeId); setContextMenu(null); }}
+        <NodeContextMenu
+          {...contextMenu}
+          onAddChild={() => { handleCreateQuickSkill(contextMenu.nodeId); setContextMenu(null); }}
+          onEdit={() => { setEditingSkillId(contextMenu.nodeId); setContextMenu(null); }}
           onDelete={() => { handleDelete(contextMenu.nodeId); setContextMenu(null); }}
           onClose={() => setContextMenu(null)}
         />
       )}
 
-      <SkillPanel 
-        data={panelData} 
+      <SkillPanel
+        data={panelData}
         onClose={() => setSelectedSkillId(null)}
-        onToggleStatus={handleToggleStatus} 
-        isAvailable={isPanelAvailable} 
+        onToggleStatus={handleToggleStatus}
+        isAvailable={isPanelAvailable}
       />
 
-      <AddSkillModal 
-        isOpen={modalParentId !== undefined} 
-        onClose={() => setModalParentId(undefined)}
-        onAdd={async (data) => { 
-          await handleCreateSkill(data); 
-          setModalParentId(undefined); 
+      <EditSkillModal
+        isOpen={editingSkillId !== null}
+        onClose={() => setEditingSkillId(null)}
+        onUpdate={async (id, data) => {
+          await handleUpdateSkill(id, data);
+          setHasDataChanges(true);
         }}
+        skillData={nodes.find(n => n.id === editingSkillId)?.data}
         existingSkills={nodes.map(n => ({ id: n.id, name: n.data.label ?? n.data.name }))}
-        preselectedParentId={modalParentId} 
       />
 
     </div>

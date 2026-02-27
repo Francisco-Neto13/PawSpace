@@ -1,9 +1,8 @@
 'use server';
 import prisma from '@/lib/prisma';
-import { cache } from 'react';
 import { SkillRow } from './types';
 
-export const getSkillsFull = cache(async (userId: string): Promise<SkillRow[]> => {
+export async function getSkillsFull(userId: string): Promise<SkillRow[]> {
   const start = Date.now();
   try {
     const skills = await prisma.skill.findMany({
@@ -13,29 +12,27 @@ export const getSkillsFull = cache(async (userId: string): Promise<SkillRow[]> =
     });
     
     console.log(`[Nexus Query] Full Fetch: ${Date.now() - start}ms`);
+    
     return skills as unknown as SkillRow[];
   } catch (error) {
-    console.error('❌ [Nexus Query] Erro ao buscar skills completas:', error);
+    console.error('❌ [Nexus Query] Erro ao buscar skills:', error);
     return [];
   }
-});
+}
 
-export const getSkillsSummary = cache(async (userId: string) => {
-  const start = Date.now();
+export async function getSkillsSummary(userId: string) {
+  const start = Date.now(); 
   try {
     const skills = await prisma.skill.findMany({
       where: { userId },
-      select: {
-        id: true,
-        isUnlocked: true,
-        category: true,
-      },
+      select: { id: true, isUnlocked: true, category: true },
     });
+
+    console.log(`Query (Summary): ${Date.now() - start}ms`);
     
-    console.log(`[Nexus Query] Summary Fetch: ${Date.now() - start}ms`);
     return skills;
   } catch (error) {
-    console.error('❌ [Nexus Query] Erro ao buscar resumo de skills:', error);
+    console.error('❌ [Nexus Query] Erro ao buscar resumo:', error);
     return [];
   }
-});
+}

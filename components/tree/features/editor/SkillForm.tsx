@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ColorPicker } from './ColorPicker';
 import { EmojiPicker } from './EmojiPicker';
 import { SkillCategory, SkillShape } from '../../types';
@@ -17,6 +17,8 @@ interface SkillFormProps {
   isLoading?: boolean;
   initialParentId?: string | null;
   existingSkills: { id: string; name: string }[];
+  initialData?: any;
+  isEditing?: boolean;
 }
 
 export function SkillForm({
@@ -25,6 +27,8 @@ export function SkillForm({
   isLoading,
   initialParentId,
   existingSkills,
+  initialData,
+  isEditing = false,
 }: SkillFormProps) {
   const [formData, setFormData] = useState({
     label: '',
@@ -35,6 +39,27 @@ export function SkillForm({
     shape: 'hexagon' as SkillShape,
     parentId: initialParentId ?? '',
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        label: initialData.label || initialData.name || '',
+        description: initialData.description || '',
+        category: initialData.category || 'core',
+        icon: initialData.icon || '✦',
+        color: initialData.color || '#3b82f6',
+        shape: (initialData.shape as SkillShape) || 'hexagon',
+        parentId: initialData.parentId || initialParentId || '',
+      });
+    }
+  }, [initialData, initialParentId]);
+
+  const emitPreview = (patch: Partial<typeof formData>) => {
+    if (!initialData?.id) return;
+    window.dispatchEvent(new CustomEvent('skill-preview', {
+      detail: { skillId: initialData.id, ...patch },
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +79,11 @@ export function SkillForm({
           autoFocus
           type="text"
           value={formData.label}
-          onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+          onChange={(e) => {
+            const label = e.target.value;
+            setFormData({ ...formData, label });
+            emitPreview({ label });
+          }}
           className={inputClass}
           placeholder="Ex: TypeScript Avançado"
         />
@@ -65,11 +94,17 @@ export function SkillForm({
         <div className="grid grid-cols-2 gap-3">
           <EmojiPicker
             currentEmoji={formData.icon}
-            onSelect={(emoji) => setFormData({ ...formData, icon: emoji })}
+            onSelect={(icon) => {
+              setFormData({ ...formData, icon });
+              emitPreview({ icon });
+            }}
           />
           <ColorPicker
             value={formData.color}
-            onChange={(color) => setFormData({ ...formData, color })}
+            onChange={(color) => {
+              setFormData({ ...formData, color });
+              emitPreview({ color });
+            }}
           />
         </div>
       </div>
@@ -118,7 +153,7 @@ export function SkillForm({
         />
       </div>
 
-      {initialParentId === undefined && (
+      {!isEditing && initialParentId === undefined && (
         <div>
           <label className={labelClass}>Requisito de Desbloqueio</label>
           <select
@@ -145,14 +180,14 @@ export function SkillForm({
           onClick={onCancel}
           className="flex-1 py-3.5 border border-white/[0.06] text-zinc-600 text-[10px] font-black uppercase tracking-widest hover:bg-white/[0.02] hover:text-zinc-400 hover:border-white/10 transition-all duration-300 cursor-pointer"
         >
-          Abortar
+          Cancelar
         </button>
         <button
           type="submit"
           disabled={isLoading || !formData.label.trim()}
           className="flex-1 py-3.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[10px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 hover:border-[#c8b89a]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
         >
-          {isLoading ? 'Sincronizando...' : 'Confirmar'}
+          {isLoading ? 'Sincronizando...' : isEditing ? 'Salvar Nexus' : 'Confirmar'}
         </button>
       </div>
 

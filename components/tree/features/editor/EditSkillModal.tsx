@@ -3,19 +3,12 @@ import React from 'react';
 import { SkillShape } from '../../types';
 import { SkillForm } from './SkillForm';
 
-interface AddSkillModalProps {
+interface EditSkillModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (data: {
-    name: string;
-    description?: string;
-    icon?: string;
-    color?: string;
-    shape: SkillShape;
-    parentId: string | null;
-  }) => Promise<void>;
+  onUpdate: (skillId: string, data: any) => Promise<void>;
+  skillData?: any; 
   existingSkills: { id: string; name: string }[];
-  preselectedParentId?: string | null;
 }
 
 const poly = `polygon(
@@ -32,29 +25,17 @@ const poly = `polygon(
   0 10px
 )`;
 
-export function AddSkillModal({
+export function EditSkillModal({
   isOpen,
   onClose,
-  onAdd,
+  onUpdate,
+  skillData,
   existingSkills,
-  preselectedParentId,
-}: AddSkillModalProps) {
-  if (!isOpen) return null;
-
-  const isRootCreation = preselectedParentId === null;
-  const parentName = preselectedParentId
-    ? existingSkills.find(s => s.id === preselectedParentId)?.name
-    : null;
+}: EditSkillModalProps) {
+  if (!isOpen || !skillData) return null;
 
   const handleFormSubmit = async (formData: any) => {
-    await onAdd({
-      name: formData.label,
-      description: formData.description,
-      icon: formData.icon,
-      color: formData.color,
-      shape: formData.shape || 'hexagon',
-      parentId: preselectedParentId ?? (formData.parentId || null),
-    });
+    await onUpdate(skillData.id, formData);
     onClose();
   };
 
@@ -84,10 +65,10 @@ export function AddSkillModal({
                   <div className="w-1 h-5 bg-[#c8b89a]" />
                   <div>
                     <p className="text-[8px] text-zinc-600 uppercase tracking-[0.3em] font-black mb-0.5">
-                      {isRootCreation ? 'Inicialização' : 'Expansão do Nexus'}
+                      Configuração de Unidade
                     </p>
                     <h2 className="text-[#c8b89a] text-[13px] font-black uppercase tracking-[0.3em]">
-                      {isRootCreation ? 'Iniciar Nexus' : 'Novo Módulo'}
+                      Ajustar Protocolo
                     </h2>
                   </div>
                 </div>
@@ -104,27 +85,17 @@ export function AddSkillModal({
                 className="h-[1px] w-full"
                 style={{ background: 'linear-gradient(to right, #c8b89a22, transparent)' }}
               />
-
-              {parentName && (
-                <div className="mt-4 flex items-center gap-2 p-3 border border-white/[0.04] bg-white/[0.02]">
-                  <div className="w-1 h-4 bg-[#c8b89a]/40" />
-                  <p className="text-[10px] text-zinc-500 uppercase tracking-tighter">
-                    Conectando ao nó:{' '}
-                    <span className="text-[#c8b89a] font-bold">{parentName}</span>
-                  </p>
-                </div>
-              )}
             </div>
 
             <div className="relative z-10">
               <SkillForm
                 onSubmit={handleFormSubmit}
                 onCancel={onClose}
-                initialParentId={preselectedParentId}
+                isEditing={true}
+                initialData={skillData}
                 existingSkills={existingSkills}
               />
             </div>
-
           </div>
         </div>
       </div>

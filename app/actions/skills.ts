@@ -1,14 +1,18 @@
-export { 
-  getSkillsFull as getSkills, 
-  getSkillsFull, 
-  getSkillsSummary 
-} from './skills/queries';
+'use server';
 
-export { 
+import * as mutations from './skills/mutations';
+import * as queries from './skills/queries';
+
+export const { 
   addSkill, 
+  updateSkill, 
   updateManySkillPositions, 
+  saveNexusChanges, 
   toggleSkillStatus, 
   deleteSkill 
-} from './skills/mutations';
+} = mutations;
 
-export type { SkillRow } from './skills/types';
+export const { 
+  getSkillsFull, 
+  getSkillsSummary 
+} = queries;

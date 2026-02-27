@@ -11,16 +11,16 @@ function SkillEdgeComponent({
   sourceX, sourceY, targetX, targetY,
   data,
 }: SkillEdgeProps) {
-  const [path] = getStraightPath({
-    sourceX, sourceY, targetX, targetY,
-  });
+  const [path] = getStraightPath({ sourceX, sourceY, targetX, targetY });
 
   const unlocked = data?.unlocked ?? false;
   const category = data?.category as SkillCategory;
-  
+
   const themeColor = category && CATEGORY_THEME[category]
     ? CATEGORY_THEME[category].color
-    : '#3a3a45';
+    : '#c8b89a'; 
+
+  const strokeColor = unlocked ? themeColor : '#1a1a1f';
 
   return (
     <>
@@ -31,19 +31,19 @@ function SkillEdgeComponent({
           stroke: '#000',
           strokeWidth: unlocked ? 5 : 3,
           opacity: 0.9,
+          transition: 'stroke-width 0.3s ease',
         }}
       />
-
       <path
         d={path}
         fill="none"
-        stroke={unlocked ? themeColor : '#1a1a1f'}
+        stroke={strokeColor}
         strokeWidth={unlocked ? 2.5 : 1.5}
-        strokeLinecap="butt" 
+        strokeLinecap="butt"
         opacity={unlocked ? 1 : 0.6}
-        className="pointer-events-none transition-[stroke,opacity] duration-300 ease-in-out"
+        className="pointer-events-none"
+        style={{ transition: 'stroke 0.5s ease, stroke-width 0.3s ease, opacity 0.3s ease' }}
       />
-
       {unlocked && (
         <path
           d={path}
@@ -51,7 +51,7 @@ function SkillEdgeComponent({
           stroke="#fff"
           strokeWidth={1}
           strokeLinecap="butt"
-          strokeDasharray="4 60" 
+          strokeDasharray="4 60"
           opacity={0.5}
           className="edge-flow pointer-events-none"
         />
