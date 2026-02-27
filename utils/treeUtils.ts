@@ -25,7 +25,6 @@ export function buildHierarchy(skills: SkillRow[]): SkillNode[] {
   return roots;
 }
 
-
 function getSubtreeWidth(node: SkillNode): number {
   if (node.children.length === 0) return 1;
   return node.children.reduce((acc, child) => acc + getSubtreeWidth(child), 0);
@@ -84,6 +83,7 @@ export function generateTreeLayout(
         label: skill.name,
         icon: skill.icon ?? '🔹',
         category: (skill.category ?? 'keystone') as SkillCategory,
+        color: skill.color ?? undefined, 
         shape,
         isUnlocked: skill.isUnlocked,
         description: skill.description ?? '',
@@ -101,6 +101,7 @@ export function generateTreeLayout(
         data: {
           unlocked: skill.isUnlocked,
           category: skill.category,
+          color: skill.color,
         },
       });
     }

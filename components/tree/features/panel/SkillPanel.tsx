@@ -1,6 +1,6 @@
 'use client';
 import React, { useMemo, memo } from 'react';
-import { SkillData, CATEGORY_THEME, SkillCategory } from '../types';
+import { SkillData, CATEGORY_THEME, SkillCategory } from '../../types';
 
 interface SkillPanelProps {
   data: (SkillData & { id?: string }) | null;
@@ -31,14 +31,18 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
     [data?.category]
   );
 
+  const activeColor = useMemo(() => {
+    return data?.color || theme.color;
+  }, [data?.color, theme.color]);
+
   if (!data) return null;
 
   const displayLabel = data.label || data.name || "MÓDULO DESCONHECIDO";
   const skillId = data.id || "";
 
-  const borderColor = isAvailable
-    ? (data.isUnlocked ? theme.color : '#c8b89a') 
-    : '#3f3f46';
+  const borderColor = data.isUnlocked 
+    ? activeColor 
+    : (isAvailable ? '#71717a' : '#3f3f46');
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md animate-in fade-in duration-300">
@@ -48,7 +52,8 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
         className="relative w-[340px] min-h-[520px] animate-in zoom-in-95 duration-500 p-[2px]"
         style={{
           clipPath: poly,
-          backgroundColor: borderColor,
+          backgroundColor: borderColor, 
+          transition: 'background-color 0.3s ease'
         }}
       >
         <div className="w-full h-full flex flex-col overflow-hidden" style={{ clipPath: poly, backgroundColor: '#000' }}>
@@ -60,9 +65,9 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
               <div
                 className="px-3 py-0.5 border font-mono text-[10px] tracking-[0.2em] font-bold"
                 style={{
-                  color: theme.color,
-                  borderColor: `${theme.color}44`,
-                  backgroundColor: `${theme.color}11`,
+                  color: data.isUnlocked ? activeColor : '#71717a',
+                  borderColor: data.isUnlocked ? `${activeColor}44` : '#3f3f46',
+                  backgroundColor: data.isUnlocked ? `${activeColor}11` : 'transparent',
                 }}
               >
                 {data.category?.toUpperCase() || 'CORE'}
@@ -70,12 +75,7 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
 
               <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center border font-mono text-xs cursor-pointer transition-all duration-300 hover:bg-white/10"
-                style={{
-                  color: '#c8b89a',
-                  borderColor: '#c8b89a',
-                  opacity: 0.6
-                }}
+                className="w-8 h-8 flex items-center justify-center border font-mono text-xs cursor-pointer transition-all duration-300 hover:bg-white/10 text-zinc-500 border-zinc-700"
               >
                 ✕
               </button>
@@ -90,11 +90,15 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
               <div
                 className="absolute inset-0 pointer-events-none opacity-20"
                 style={{ 
-                   backgroundImage: `radial-gradient(${theme.color} 1px, transparent 0)`, 
+                   backgroundImage: `radial-gradient(${data.isUnlocked ? activeColor : '#71717a'} 1px, transparent 0)`, 
                    backgroundSize: '20px 20px' 
                 }}
               />
-              <span className={`text-7xl transition-all duration-1000 ${data.isUnlocked ? 'grayscale-0 scale-110 drop-shadow-[0_0_20px_rgba(200,184,154,0.3)]' : 'grayscale opacity-20'}`}>
+              <span className={`text-7xl transition-all duration-1000 ${data.isUnlocked ? 'grayscale-0 scale-110' : 'grayscale opacity-20'}`}
+                style={{
+                   filter: data.isUnlocked ? `drop-shadow(0 0 20px ${activeColor}55)` : 'none'
+                }}
+              >
                 {isAvailable ? (data.icon || '✦') : '🔒'}
               </span>
             </div>
@@ -104,10 +108,9 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
                 {displayLabel.toUpperCase()}
               </h2>
 
-              <div className="w-12 h-[2px] mb-6" style={{ backgroundColor: isAvailable ? theme.color : '#3f3f46' }} />
+              <div className="w-12 h-[2px] mb-6" style={{ backgroundColor: data.isUnlocked ? activeColor : '#3f3f46' }} />
 
-              <p className="font-sans text-sm font-medium leading-relaxed px-2 transition-colors duration-500"
-                 style={{ color: isAvailable ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)' }}>
+              <p className="font-sans text-sm font-medium leading-relaxed px-2 transition-colors duration-500 text-zinc-400">
                 {isAvailable
                   ? (data.description || 'Nenhuma descrição disponível para este protocolo.')
                   : 'SISTEMA BLOQUEADO. REQUER PROGRESSÃO ADICIONAL NO PROTOCOLO NEXUS PARA LIBERAR ESTE CONHECIMENTO.'}
@@ -121,24 +124,20 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
                 className="w-full py-4 border font-mono text-[11px] tracking-[0.2em] font-bold transition-all duration-300 flex items-center justify-center gap-2"
                 style={{
                   cursor: isAvailable ? 'pointer' : 'not-allowed',
-                  background: !isAvailable
-                    ? 'transparent'
-                    : data.isUnlocked
-                      ? 'rgba(255,68,68,0.1)'
-                      : theme.color,
-                  borderColor: !isAvailable
-                    ? '#3f3f46'
-                    : data.isUnlocked
-                      ? '#ff4444'
-                      : theme.color,
-                  color: !isAvailable
-                    ? '#3f3f46'
-                    : data.isUnlocked
-                      ? '#ff4444'
-                      : '#000',
+                  background: !isAvailable 
+                    ? 'transparent' 
+                    : data.isUnlocked 
+                      ? 'rgba(255,255,255,0.05)' 
+                      : 'rgba(255,255,255,0.95)', 
+                  borderColor: !isAvailable ? '#3f3f46' : '#71717a',
+                  color: !isAvailable 
+                    ? '#3f3f46' 
+                    : data.isUnlocked 
+                      ? '#ffffff' 
+                      : '#000000',
                 }}
               >
-                {data.isUnlocked ? '[ FORGET_SKILL ]' : isAvailable ? '[ MASTER_PROTOCOL ]' : '[ ACCESS_DENIED ]'}
+                {data.isUnlocked ? '[ Bloquear ]' : isAvailable ? '[ Desbloquear ]' : '[ Acesso Negado ]'}
               </button>
             </div>
 

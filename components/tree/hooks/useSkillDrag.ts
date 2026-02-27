@@ -1,6 +1,5 @@
 'use client';
 import { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation'; // ✅ Importar o router
 import { applyNodeChanges, type OnNodesChange, type Node } from '@xyflow/react';
 import { useSkillTreeContext } from '../context/SkillTreeContext';
 import { SkillData } from '../types';
@@ -10,7 +9,6 @@ export function useSkillDrag() {
   const { setNodes } = useSkillTreeContext();
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const router = useRouter(); 
 
   const onNodesChange: OnNodesChange<Node<SkillData>> = useCallback((changes) => {
     setNodes(nds => applyNodeChanges(changes, nds));
@@ -28,7 +26,6 @@ export function useSkillDrag() {
     if (nodes.length === 0) return;
 
     setIsSaving(true);
-    setHasUnsavedChanges(false);
 
     const payload = nodes.map(n => ({
       skillId: n.id,
@@ -43,17 +40,18 @@ export function useSkillDrag() {
         throw new Error('Falha na sincronização do Nexus');
       }
 
-      router.refresh(); 
-
-      console.log('✅ Layout sincronizado e cache atualizado');
+      setHasUnsavedChanges(false);
+      
+      console.log('[Nexus] Layout sincronizado com sucesso.');
     } catch (err) {
-      console.error('❌ Erro ao salvar layout:', err);
+      console.error('[Nexus] Erro ao salvar layout:', err);
+
       setHasUnsavedChanges(true);
-      alert('Sistema Nexus: Falha na sincronização.');
+      alert('Sincronização Falhou: Verifique sua conexão com o Nexus.');
     } finally {
       setIsSaving(false);
     }
-  }, [router]);
+  }, []);
 
   return { onNodesChange, hasUnsavedChanges, isSaving, saveLayout };
 }

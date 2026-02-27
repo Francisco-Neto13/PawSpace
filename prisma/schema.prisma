@@ -16,6 +16,7 @@ model Skill {
   icon        String?
   category    String  @default("keystone")
   shape  String  @default("hexagon")
+  color      String?
 
   level         Int @default(1)
   xp            Int @default(0)

@@ -4,12 +4,12 @@ import { ReactFlow, ConnectionMode, type NodeTypes, useReactFlow, ReactFlowProvi
 import '@xyflow/react/dist/style.css';
 import { Plus, Save, Loader2 } from 'lucide-react';
 
-import { SkillNode, SvgDefs } from './parts/SkillNode';
-import { SkillEdge } from './parts/SkillEdge';
-import { SkillPanel } from './parts/SkillPanel';
-import { StarField } from './parts/StarField';
-import { AddSkillModal } from './parts/AddSkillModal';
-import { NodeContextMenu } from './parts/NodeContextMenu';
+import { SkillNode, SvgDefs } from './ui/SkillNode';
+import { SkillEdge } from './ui/SkillEdge';
+import { SkillPanel } from './features/panel/SkillPanel';
+import { StarField } from './ui/StarField';
+import { AddSkillModal } from './features/editor/AddSkillModal';
+import { NodeContextMenu } from './ui/NodeContextMenu';
 
 import { SkillTreeProvider } from './context/SkillTreeContext';
 import { useSkillNodes } from './hooks/useSkillNodes';

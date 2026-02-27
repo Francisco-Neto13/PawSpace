@@ -1,6 +1,5 @@
 'use client';
 import { useCallback, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
 import { useSkillTreeContext } from '../context/SkillTreeContext';
 import { toggleSkillStatus, deleteSkill, addSkill } from '@/app/actions/skills';
 import { calculateRecursiveProgress, getNewChildPosition } from '@/utils/treeUtils';
@@ -10,7 +9,6 @@ import { createClient } from '@/utils/supabase/client';
 export function useSkillActions() {
   const { nodes, edges, setNodes, setEdges, loadTreeData } = useSkillTreeContext();
   const [, startTransition] = useTransition();
-  const router = useRouter(); 
   const supabase = createClient();
 
   const handleToggleStatus = useCallback((nodeId: string) => {
@@ -50,13 +48,11 @@ export function useSkillActions() {
     });
 
     toggleSkillStatus(nodeId, nextUnlocked).then(result => {
-      if (result.success) {
-        router.refresh(); 
-      } else {
+      if (!result.success) {
         loadTreeData();
       }
     });
-  }, [nodes, edges, setNodes, setEdges, loadTreeData, router]);
+  }, [nodes, edges, setNodes, setEdges, loadTreeData]);
 
   const handleDelete = useCallback((nodeId: string) => {
     if (!confirm('Deletar este nó e todos os seus filhos?')) return;
@@ -66,20 +62,19 @@ export function useSkillActions() {
 
     startTransition(() => {
       deleteSkill(nodeId).then(result => {
-        if (result.success) {
-          router.refresh(); 
-        } else {
+        if (!result.success) {
           alert('Erro na sincronização. Recarregando Nexus...');
           loadTreeData();
         }
       });
     });
-  }, [setNodes, setEdges, loadTreeData, router]);
+  }, [setNodes, setEdges, loadTreeData]);
 
   const handleCreateSkill = useCallback(async (data: {
     name: string;
     description?: string;
     icon?: string;
+    color?: string; 
     shape: SkillShape;
     parentId: string | null;
   }) => {
@@ -123,6 +118,7 @@ export function useSkillActions() {
         progress: 0,
         shape: s.shape as SkillShape,
         category: s.category as any,
+        color: s.color, 
       },
     };
 
@@ -138,10 +134,7 @@ export function useSkillActions() {
       };
       setEdges((eds) => [...eds, newEdge as any]);
     }
-
-    router.refresh(); 
-    
-  }, [nodes, edges, supabase, setNodes, setEdges, router]);
+  }, [nodes, edges, supabase, setNodes, setEdges]);
 
   return { handleToggleStatus, handleDelete, handleCreateSkill };
 }
