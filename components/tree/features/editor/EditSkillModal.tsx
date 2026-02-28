@@ -1,8 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BookOpen, Plus, Trash2, ExternalLink, Link2, FileText, StickyNote, Video } from 'lucide-react';
 import { SkillForm } from './SkillForm';
 import { AddContentModal } from '@/components/library/features/editor/AddContentModal';
+import { useNexus } from '@/contexts/NexusContext';
+import { getContentsBySkill, deleteContent } from '@/app/actions/contents'; 
 
 interface Content {
   id: string;
@@ -49,28 +51,70 @@ export function EditSkillModal({
   skillData,
   existingSkills,
 }: EditSkillModalProps) {
+  const { setNodes } = useNexus(); 
   const [showAddContent, setShowAddContent] = useState(false);
-  const [contents, setContents] = useState<Content[]>(skillData?.contents ?? []);
+  const [contents, setContents] = useState<Content[]>([]);
+
+  useEffect(() => {
+    if (skillData?.contents) {
+      setContents(skillData.contents);
+    }
+  }, [skillData]);
 
   if (!isOpen || !skillData) return null;
 
   const handleFormSubmit = async (formData: any) => {
-    await onUpdate(skillData.id, formData);
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === skillData.id
+          ? { 
+              ...node, 
+              data: { 
+                ...node.data, 
+                ...formData, 
+                label: formData.name || formData.label 
+              } 
+            }
+          : node
+      )
+    );
+
     onClose();
+
+    try {
+      await onUpdate(skillData.id, formData);
+    } catch (error) {
+      console.error("Erro ao sincronizar com o servidor:", error);
+    }
   };
 
   const handleContentAdded = async () => {
-    const { getContentsBySkill } = await import('@/app/actions/contents');
     const updated = await getContentsBySkill(skillData.id);
-    setContents(updated as Content[]);
+    const newContents = updated as Content[];
+    setContents(newContents);
+
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === skillData.id
+          ? { ...node, data: { ...node.data, contents: newContents } }
+          : node
+      )
+    );
   };
 
   const handleDeleteContent = async (contentId: string) => {
-    const { deleteContent } = await import('@/app/actions/contents');
-    const result = await deleteContent(contentId);
-    if (result.success) {
-      setContents(prev => prev.filter(c => c.id !== contentId));
-    }
+    const filtered = contents.filter(c => c.id !== contentId);
+    setContents(filtered);
+    
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === skillData.id
+          ? { ...node, data: { ...node.data, contents: filtered } }
+          : node
+      )
+    );
+
+    await deleteContent(contentId);
   };
 
   return (
@@ -178,7 +222,7 @@ export function EditSkillModal({
                         className="group flex items-center gap-3 p-3 border border-white/[0.04] bg-white/[0.01] hover:border-white/[0.08] transition-all duration-300"
                       >
                         <div className="text-zinc-600 shrink-0">
-                          {TYPE_ICON[c.type]}
+                          {TYPE_ICON[c.type] || <Link2 size={11} />}
                         </div>
 
                         <p className="flex-1 text-zinc-400 text-[10px] font-medium truncate">
@@ -208,7 +252,6 @@ export function EditSkillModal({
                   </div>
                 )}
               </div>
-
             </div>
           </div>
         </div>

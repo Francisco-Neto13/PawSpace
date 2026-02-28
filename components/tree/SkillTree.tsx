@@ -2,9 +2,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { ReactFlow, ConnectionMode, type NodeTypes, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Plus, Save, Loader2 } from 'lucide-react';
+import { Save, Loader2, AlertCircle } from 'lucide-react';
 
-import { SkillNode, SvgDefs } from './ui/SkillNode';
+import { SkillNode as SkillNodeComponent, SvgDefs } from './ui/SkillNode';
 import { SkillEdge } from './ui/SkillEdge';
 import { SkillPanel } from './features/panel/SkillPanel';
 import { StarField } from './ui/StarField';
@@ -12,8 +12,8 @@ import { EditSkillModal } from './features/editor/EditSkillModal';
 import { NodeContextMenu } from './ui/NodeContextMenu';
 import { TreeOnboarding } from './ui/TreeOnboarding';
 
-import { SkillTreeProvider, useSkillTreeContext } from './context/SkillTreeContext';
-import { useSkillNodes } from './hooks/useSkillNodes';
+import { useNexus } from '@/contexts/NexusContext'; 
+import { SkillTreeProvider } from './context/SkillTreeContext';
 import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
 
@@ -24,7 +24,7 @@ interface ContextMenu {
   nodeName: string;
 }
 
-const nodeTypes: NodeTypes = { skill: SkillNode };
+const nodeTypes: NodeTypes = { skill: SkillNodeComponent };
 const edgeTypes = { skill: SkillEdge };
 const defaultEdgeOptions = {
   type: 'skill',
@@ -37,6 +37,7 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
 
   useEffect(() => {
     if (isLoading || nodes.length === 0 || hasCentered) return;
+    
     const rootNode = nodes.find(n => !n.data.parentId);
     if (!rootNode) return;
 
@@ -51,9 +52,9 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
   return null;
 }
 
-function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
-  const { nodes, edges, isLoading, userId } = useSkillTreeContext();
-  useSkillNodes(initialSkills);
+function SkillTreeInner() {
+  const { nodes, edges, isLoading: isLoadingNexus, refreshNexus, setIsDirty, isDirty: isGlobalDirty } = useNexus();
+  
   const { onNodesChange, hasUnsavedChanges: hasDragChanges, isSaving, saveLayout } = useSkillDrag();
   const {
     handleToggleStatus,
@@ -68,29 +69,56 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
   const [hasDataChanges, setHasDataChanges] = useState(false);
 
-  const canSave = hasDragChanges || hasDataChanges;
+  const canSave = isGlobalDirty || hasDragChanges || hasDataChanges;
+
+  useEffect(() => {
+    refreshNexus(true); 
+  }, [refreshNexus]);
+
+  useEffect(() => {
+    if ((hasDragChanges || hasDataChanges) && setIsDirty) {
+      setIsDirty(true);
+    }
+  }, [hasDragChanges, hasDataChanges, setIsDirty]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (canSave || isSaving) {
+      if (canSave) {
         e.preventDefault();
-        e.returnValue = 'Existem protocolos não sincronizados no Nexus.';
+        e.returnValue = ''; 
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [canSave, isSaving]);
+  }, [canSave]);
 
   const onSaveAll = async () => {
-    const success = await handleGlobalSave();
-    if (success) {
-      setHasDataChanges(false);
-      saveLayout(nodes);
+    console.log("[SkillTree] Iniciando consolidação...");
+    try {
+      const success = await handleGlobalSave();
+      if (success) {
+        await saveLayout(nodes as any);
+        
+        setHasDataChanges(false);
+        
+        if (setIsDirty) setIsDirty(false);
+        
+        await refreshNexus(false); 
+      }
+    } catch (error) {
+      console.error("❌ [SkillTree] Erro crítico na sincronização:", error);
     }
   };
 
-  const selectedNode = useMemo(() => nodes.find(n => n.id === selectedSkillId), [nodes, selectedSkillId]);
-  const panelData = useMemo(() => selectedNode ? { ...selectedNode.data, id: selectedNode.id } : null, [selectedNode]);
+  const selectedNode = useMemo(() => 
+    nodes.find(n => n.id === selectedSkillId), 
+    [nodes, selectedSkillId]
+  );
+  
+  const panelData = useMemo(() => {
+    if (!selectedNode) return null;
+    return { ...selectedNode.data, id: selectedNode.id } as any;
+  }, [selectedNode]);
 
   const isPanelAvailable = useMemo(() => {
     if (!selectedNode) return false;
@@ -104,10 +132,12 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
       className="relative w-full bg-[#030304] overflow-hidden select-none font-sans"
       style={{ height: 'calc(100vh - 160px)' }}
     >
-
-      {isLoading && nodes.length === 0 && (
-        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#030304]/80 backdrop-blur-md">
-          <div className="flex flex-col items-center gap-4">
+      {isLoadingNexus && nodes.length === 0 && (
+        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#030304]">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
+          </div>
+          <div className="relative flex flex-col items-center gap-4">
             <div className="w-8 h-8 border-2 border-[#c8b89a]/20 border-t-[#c8b89a] rounded-full animate-spin" />
             <p className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
               Sincronizando Nexus...
@@ -119,32 +149,27 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
       <SvgDefs />
       <StarField />
 
-      {!isLoading && nodes.length === 0 && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6">
-          <button
-            onClick={() => handleCreateQuickSkill(null)}
-            className="flex items-center gap-3 px-8 py-4 border border-[#c8b89a]/30 bg-[#c8b89a]/5 text-[#c8b89a] hover:bg-[#c8b89a]/10 transition-all cursor-pointer"
-          >
-            <Plus size={16} />
-            <span className="text-[10px] font-black uppercase tracking-widest">Iniciar Protocolo Primário</span>
-          </button>
-        </div>
-      )}
-
       {canSave && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 animate-in slide-in-from-bottom-5 duration-500">
+          <div className="flex items-center gap-2 px-3 py-1 bg-black/80 border border-[#c8b89a]/20 backdrop-blur-md shadow-2xl">
+             <AlertCircle size={10} className="text-[#c8b89a] animate-pulse" />
+             <span className="text-[7px] text-[#c8b89a]/70 font-black uppercase tracking-[0.2em]">
+                Protocolos pendentes de consolidação
+             </span>
+          </div>
+
           <button
             onClick={onSaveAll}
             disabled={isSaving}
-            className={`flex items-center gap-3 px-6 py-3 border transition-all backdrop-blur-sm shadow-2xl
+            className={`flex items-center gap-3 px-8 py-4 border transition-all backdrop-blur-md shadow-2xl group
               ${isSaving
                 ? 'border-[#c8b89a]/20 bg-[#030304]/60 text-[#c8b89a]/40 cursor-not-allowed'
-                : 'border-[#c8b89a]/40 bg-[#030304]/90 text-[#c8b89a] hover:bg-[#c8b89a]/10 active:scale-95 cursor-pointer'
+                : 'border-[#c8b89a]/40 bg-[#030304]/90 text-[#c8b89a] hover:bg-[#c8b89a]/10 hover:border-[#c8b89a] active:scale-95 cursor-pointer'
               }`}
           >
-            {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+            {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} className="group-hover:scale-110 transition-transform" />}
             <span className="text-[10px] font-black uppercase tracking-widest">
-              {isSaving ? 'Sincronizando...' : 'Salvar Alterações'}
+              {isSaving ? 'Consolidando...' : 'Consolidar Protocolos'}
             </span>
           </button>
         </div>
@@ -152,7 +177,7 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
 
       <div style={{ width: '100%', height: '100%' }} className="relative">
         <ReactFlow
-          nodes={nodes}
+          nodes={nodes as any}
           edges={edges}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
@@ -168,7 +193,7 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
               x: e.clientX,
               y: e.clientY,
               nodeId: node.id,
-              nodeName: node.data.label ?? node.data.name,
+              nodeName: (node.data as any).label || (node.data as any).name || '',
             });
           }}
           onPaneClick={() => {
@@ -185,16 +210,24 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
           nodesConnectable={false}
           style={{ background: 'transparent' }}
         >
-          <CenterOnRoot nodes={nodes} isLoading={isLoading} />
+          <CenterOnRoot nodes={nodes} isLoading={isLoadingNexus && nodes.length === 0} />
         </ReactFlow>
       </div>
 
       {contextMenu && (
         <NodeContextMenu
           {...contextMenu}
-          onAddChild={() => { handleCreateQuickSkill(contextMenu.nodeId); setContextMenu(null); }}
+          onAddChild={() => { 
+            handleCreateQuickSkill(contextMenu.nodeId); 
+            setHasDataChanges(true); 
+            setContextMenu(null); 
+          }}
           onEdit={() => { setEditingSkillId(contextMenu.nodeId); setContextMenu(null); }}
-          onDelete={() => { handleDelete(contextMenu.nodeId); setContextMenu(null); }}
+          onDelete={() => { 
+            handleDelete(contextMenu.nodeId); 
+            setHasDataChanges(true); 
+            setContextMenu(null); 
+          }}
           onClose={() => setContextMenu(null)}
         />
       )}
@@ -202,7 +235,10 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
       <SkillPanel
         data={panelData}
         onClose={() => setSelectedSkillId(null)}
-        onToggleStatus={handleToggleStatus}
+        onToggleStatus={async (id) => {
+          await handleToggleStatus(id);
+          setHasDataChanges(true);
+        }}
         isAvailable={isPanelAvailable}
       />
 
@@ -211,23 +247,25 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
         onClose={() => setEditingSkillId(null)}
         onUpdate={async (id, data) => {
           await handleUpdateSkill(id, data);
-          setHasDataChanges(true);
+          setHasDataChanges(true); 
         }}
-        skillData={nodes.find(n => n.id === editingSkillId)?.data}
-        existingSkills={nodes.map(n => ({ id: n.id, name: n.data.label ?? n.data.name }))}
+        skillData={nodes.find(n => n.id === editingSkillId)?.data as any}
+        existingSkills={nodes.map(n => ({ 
+          id: n.id, 
+          name: (n.data as any).label || (n.data as any).name || ''
+        }))}
       />
 
       <TreeOnboarding />
-
     </div>
   );
 }
 
-export function SkillTree({ initialSkills }: { initialSkills?: any[] }) {
+export function SkillTree() {
   return (
     <SkillTreeProvider>
       <ReactFlowProvider>
-        <SkillTreeInner initialSkills={initialSkills} />
+        <SkillTreeInner />
       </ReactFlowProvider>
     </SkillTreeProvider>
   );

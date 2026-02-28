@@ -3,6 +3,7 @@ import { Rajdhani, Share_Tech_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Footer from '@/components/shared/Footer'; 
+import { NexusProvider } from "@/contexts/NexusContext";
 
 const futuristicSans = Rajdhani({
   variable: "--font-futuristic",
@@ -36,17 +37,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           font-medium
         `}
       >
-        <div className="flex flex-col min-h-screen w-full">
-          
-          <Navbar /> 
-          
-          <main className="relative flex-1 w-full">
-            {children}
-          </main>
-          
-          <Footer /> 
-          
-        </div>
+        <NexusProvider>
+          <div className="flex flex-col min-h-screen w-full">
+            
+            <Navbar /> 
+            
+            <main className="relative flex-1 w-full">
+              {children}
+            </main>
+            
+            <Footer /> 
+            
+          </div>
+        </NexusProvider>
       </body>
     </html>
   );

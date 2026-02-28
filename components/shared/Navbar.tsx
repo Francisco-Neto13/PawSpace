@@ -4,14 +4,34 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import { useNexus } from '@/contexts/NexusContext';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+  
+  const { isDirty, setIsDirty } = useNexus(); 
 
   if (pathname === '/login') return null;
+
+  const handleSafeNavigation = (e: React.MouseEvent, href: string) => {
+    e.preventDefault();
+
+    if (isDirty) {
+      const confirmExit = window.confirm(
+        "Você tem alterações não salvas na sua Skill Tree. Se sair agora, elas serão perdidas. Deseja sair mesmo assim?"
+      );
+      
+      if (!confirmExit) return;
+      console.log("♻️ [Navbar] Usuário confirmou saída. Limpando estado isDirty.");
+      setIsDirty(false);
+    }
+
+    setIsOpen(false);
+    router.push(href);
+  };
 
   const links = [
     { name: "Resumo", href: "/overview" },
@@ -20,7 +40,15 @@ export default function Navbar() {
     { name: "Configurações", href: "/settings" },
   ];
 
-  const handleLogout = async () => {
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (isDirty) {
+      const confirmExit = window.confirm("Sair e perder alterações não salvas?");
+      if (!confirmExit) return;
+      setIsDirty(false); 
+    }
+
     try {
       await supabase.auth.signOut();
       router.push('/login');
@@ -35,7 +63,11 @@ export default function Navbar() {
       <div className="px-4 md:px-16 lg:px-24 py-4 flex justify-between items-center sm:grid sm:grid-cols-3">
         
         <div className="justify-self-start">
-          <Link href="/overview" className="flex items-center gap-3 group">
+          <Link 
+            href="/overview" 
+            onClick={(e) => handleSafeNavigation(e, "/overview")}
+            className="flex items-center gap-3 group"
+          >
             <div className="h-9 w-9 rounded-full border border-[#c8b89a]/30 bg-[#c8b89a]/10 flex items-center justify-center transition-colors group-hover:border-[#c8b89a]/60">
               <span className="text-[#c8b89a] text-sm font-black">F</span>
             </div>
@@ -52,6 +84,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
+                onClick={(e) => handleSafeNavigation(e, link.href)}
                 className={`relative text-[10px] lg:text-[11px] font-black uppercase tracking-[0.2em] transition-colors group py-1 ${
                   isActive ? 'text-[#c8b89a]' : 'text-zinc-400 hover:text-[#c8b89a]'
                 }`}
@@ -89,7 +122,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleSafeNavigation(e, link.href)}
                 className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-[#c8b89a]"
               >
                 {link.name}

@@ -1,14 +1,11 @@
 'use client';
 import { useState } from 'react';
 import { Link2, Video, FileText, StickyNote, X } from 'lucide-react';
-import { addContent, uploadPdf, ContentInput } from '@/app/actions/contents';
+import { addContent, uploadPdf } from '@/app/actions/contents';
 import { ContentType } from '../../types';
 import { LinkForm, VideoForm } from './UrlForms';
 import { PdfForm } from './PdfForm';
 import { NoteForm } from './NoteForm';
-import { createClient } from '@/utils/supabase/client';
-
-const supabase = createClient();
 
 const TABS: { type: ContentType; label: string; icon: React.ReactNode }[] = [
   { type: 'link',  label: 'Link',   icon: <Link2 size={13} />      },
@@ -73,12 +70,15 @@ export function AddContentModal({
   const handleSubmit = async () => {
     if (!isValid() || isLoading) return;
     setIsLoading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return;
-      const userId = session.user.id;
 
-      let payload: ContentInput = { skillId, userId, type: activeTab, title: form.title.trim() };
+    try {
+      // O payload não envia mais o userId explicitamente. 
+      // A Server Action deve obtê-lo no servidor para maior segurança.
+      let payload: any = { 
+        skillId, 
+        type: activeTab, 
+        title: form.title.trim() 
+      };
 
       if (activeTab === 'link' || activeTab === 'video') {
         payload.url = form.url.trim();
@@ -88,8 +88,11 @@ export function AddContentModal({
         if (pdfMode === 'upload' && pdfFile) {
           const fd = new FormData();
           fd.append('file', pdfFile);
-          const upload = await uploadPdf(fd, userId);
+          
+          // O uploadPdf agora também resolve o usuário no lado do servidor
+          const upload = await uploadPdf(fd); 
           if (!upload.success) throw new Error('Falha no upload');
+          
           payload.url = upload.publicUrl;
           payload.fileKey = upload.fileKey;
         } else {
@@ -97,14 +100,17 @@ export function AddContentModal({
         }
       }
 
-      if (activeTab === 'note') payload.body = form.body.trim();
+      if (activeTab === 'note') {
+        payload.body = form.body.trim();
+      }
 
       const result = await addContent(payload);
       if (!result.success) throw new Error('Falha ao salvar');
+
       onSuccess();
       handleClose();
     } catch (err) {
-      console.error('❌ [AddContentModal]', err);
+      console.error('❌ [AddContentModal] Erro ao adicionar conteúdo:', err);
     } finally {
       setIsLoading(false);
     }
@@ -214,12 +220,14 @@ export function AddContentModal({
 
             <div className="relative z-10 flex gap-3">
               <button
+                type="button"
                 onClick={handleClose}
                 className="flex-1 py-3.5 border border-white/[0.06] text-zinc-600 text-[10px] font-black uppercase tracking-widest hover:bg-white/[0.02] hover:text-zinc-400 hover:border-white/10 transition-all duration-300 cursor-pointer"
               >
                 Cancelar
               </button>
               <button
+                type="button"
                 onClick={handleSubmit}
                 disabled={!isValid() || isLoading}
                 className="flex-1 py-3.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[10px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 hover:border-[#c8b89a]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"

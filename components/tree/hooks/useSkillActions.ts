@@ -1,23 +1,22 @@
 'use client';
 import { useCallback, useEffect } from 'react';
-import { useSkillTreeContext } from '../context/SkillTreeContext';
+import { useNexus, SkillNode, SkillData } from '@/contexts/NexusContext'; 
 import { toggleSkillStatus, deleteSkill, addSkill, saveNexusChanges } from '@/app/actions/skills';
 import { calculateRecursiveProgress, getNewChildPosition } from '@/utils/treeUtils';
 import { SkillShape } from '../types';
-import { createClient } from '@/utils/supabase/client';
-
-const supabase = createClient();
+import { Edge, Node } from '@xyflow/react';
 
 export function useSkillActions() {
-  const { nodes, edges, setNodes, setEdges, loadTreeData } = useSkillTreeContext();
+  const { nodes, edges, setNodes, setEdges, refreshNexus } = useNexus();
 
   useEffect(() => {
     const handlePreview = (e: Event) => {
       const { skillId, label, color, icon } = (e as CustomEvent).detail;
       if (!skillId) return;
-      setNodes(prev => prev.map(n =>
+
+      setNodes((prev) => prev.map(n =>
         n.id === skillId
-          ? {
+          ? ({
               ...n,
               data: {
                 ...n.data,
@@ -25,7 +24,7 @@ export function useSkillActions() {
                 ...(color !== undefined && { color }),
                 ...(icon  !== undefined && { icon }),
               },
-            }
+            } as SkillNode)
           : n
       ));
     };
@@ -34,7 +33,7 @@ export function useSkillActions() {
     return () => window.removeEventListener('skill-preview', handlePreview);
   }, [setNodes]);
 
-  const handleToggleStatus = useCallback((nodeId: string) => {
+  const handleToggleStatus = useCallback(async (nodeId: string) => {
     const target = nodes.find(n => n.id === nodeId);
     if (!target) return;
 
@@ -51,45 +50,46 @@ export function useSkillActions() {
 
     const nextUnlocked = !currentlyUnlocked;
 
-    setNodes(prev => {
+    setNodes((prev) => {
       const nextNodes = prev.map(n =>
-        n.id === nodeId ? { ...n, data: { ...n.data, isUnlocked: nextUnlocked } } : n
+        n.id === nodeId ? ({ ...n, data: { ...n.data, isUnlocked: nextUnlocked } } as SkillNode) : n
       );
-      const finalNodes = calculateRecursiveProgress(nextNodes, edges);
-      setEdges(prevEdges =>
+      
+      const finalNodes = calculateRecursiveProgress(nextNodes as any, edges);
+      
+      setEdges((prevEdges: Edge[]) =>
         prevEdges.map(edge => ({
           ...edge,
           data: {
             ...edge.data,
-            unlocked: !!finalNodes.find(n => n.id === edge.target)?.data.isUnlocked,
+            unlocked: !!(finalNodes as any[]).find(n => n.id === edge.target)?.data.isUnlocked,
           },
         }))
       );
-      return finalNodes;
+      
+      return finalNodes as SkillNode[];
     });
 
-    toggleSkillStatus(nodeId, nextUnlocked).then(result => {
-      if (!result.success) loadTreeData();
-    });
-  }, [nodes, edges, setNodes, setEdges, loadTreeData]);
+    const result = await toggleSkillStatus(nodeId, nextUnlocked);
+    if (!result.success) {
+      await refreshNexus();
+    }
+  }, [nodes, edges, setNodes, setEdges, refreshNexus]);
 
   const handleDelete = useCallback(async (nodeId: string) => {
     if (!confirm('Eliminar este nó e todos os protocolos dependentes?')) return;
 
-    setNodes(prev => prev.filter(n => n.id !== nodeId));
-    setEdges(prev => prev.filter(e => e.source !== nodeId && e.target !== nodeId));
+    setNodes((prev) => prev.filter(n => n.id !== nodeId));
+    setEdges((prev) => prev.filter(e => e.source !== nodeId && e.target !== nodeId));
 
     const result = await deleteSkill(nodeId);
     if (!result.success) {
       alert('Erro na sincronização. Recarregando Nexus...');
-      loadTreeData();
+      await refreshNexus();
     }
-  }, [setNodes, setEdges, loadTreeData]);
+  }, [setNodes, setEdges, refreshNexus]);
 
   const handleCreateQuickSkill = useCallback(async (parentId: string | null) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
-
     let positionX = 0, positionY = 0;
     const parentNode = parentId ? nodes.find(n => n.id === parentId) : null;
 
@@ -101,32 +101,35 @@ export function useSkillActions() {
     }
 
     const tempId = `temp-${Date.now()}`;
-    const tempNode = {
+    
+    const newData: SkillData = {
+      id: tempId,
+      name: 'Novo Protocolo',
+      label: 'Novo Protocolo',
+      description: 'Defina as diretrizes deste nó.',
+      icon: '⚡',
+      color: '#c8b89a',
+      shape: 'hexagon' as SkillShape,
+      category: 'keystone' as any,
+      isUnlocked: false,
+      parentId: parentId ?? undefined,
+      positionX,
+      positionY,
+      progress: 0,
+      userId: '',
+    };
+
+    const tempNode: SkillNode = {
       id: tempId,
       type: 'skill',
       position: { x: positionX, y: positionY },
-      data: {
-        id: tempId,
-        userId: user.id,
-        name: 'Novo Protocolo',
-        label: 'Novo Protocolo',
-        description: 'Defina as diretrizes deste nó através do menu de edição.',
-        icon: '⚡',
-        color: '#c8b89a',
-        shape: 'hexagon' as SkillShape,
-        category: 'keystone' as any,
-        isUnlocked: false,
-        parentId: parentId ?? undefined,
-        positionX,
-        positionY,
-        progress: 0,
-      },
+      data: newData,
     };
 
-    setNodes(nds => [...nds, tempNode as any]);
+    setNodes((nds) => [...nds, tempNode]);
 
     if (parentId) {
-      setEdges(eds => [...eds, {
+      setEdges((eds) => [...eds, {
         id: `e-${parentId}-${tempId}`,
         source: parentId,
         target: tempId,
@@ -135,54 +138,59 @@ export function useSkillActions() {
           unlocked: false,
           category: parentNode?.data.category ?? 'keystone',
         },
-      } as any]);
+      }] as Edge[]);
     }
 
     const result = await addSkill({
-      name: 'Novo Protocolo',
-      description: 'Defina as diretrizes deste nó através do menu de edição.',
-      icon: '⚡',
-      color: '#c8b89a',
-      shape: 'hexagon',
-      category: 'keystone',
+      name: newData.name,
+      description: newData.description || '',
+      icon: newData.icon,
+      color: newData.color,
+      shape: newData.shape as string,
+      category: newData.category as string,
       parentId,
-      userId: user.id,
       positionX,
       positionY,
     });
 
     if (result.success && result.skill) {
       const s = result.skill;
-      setNodes(nds => nds.map(n =>
+      setNodes((nds) => nds.map(n =>
         n.id === tempId
-          ? { ...n, id: s.id, data: { ...n.data, id: s.id } }
+          ? ({ ...n, id: s.id, data: { ...n.data, id: s.id } } as SkillNode)
           : n
       ));
-      setEdges(eds => eds.map(e => ({
+      setEdges((eds) => eds.map(e => ({
         ...e,
         id: e.id.includes(tempId) ? `e-${parentId}-${s.id}` : e.id,
         target: e.target === tempId ? s.id : e.target,
       })));
       return s.id;
     } else {
-      setNodes(nds => nds.filter(n => n.id !== tempId));
-      setEdges(eds => eds.filter(e => e.target !== tempId));
+      await refreshNexus();
       return null;
     }
-  }, [nodes, edges, setNodes, setEdges]);
+  }, [nodes, edges, setNodes, setEdges, refreshNexus]);
 
-  const handleUpdateSkill = useCallback(async (skillId: string, data: any) => {
-    setNodes(prev => prev.map(n =>
+  const handleUpdateSkill = useCallback(async (skillId: string, data: Partial<SkillData>) => {
+    setNodes((prev) => prev.map(n =>
       n.id === skillId
-        ? { ...n, data: { ...n.data, ...data, label: data.name || data.label || n.data.label } }
+        ? ({ 
+            ...n, 
+            data: { 
+              ...n.data, 
+              ...data, 
+              label: data.name || data.label || n.data.label 
+            } 
+          } as SkillNode)
         : n
     ));
   }, [setNodes]);
 
   const handleGlobalSave = useCallback(async () => {
-    const result = await saveNexusChanges(nodes);
+    const result = await saveNexusChanges(nodes as any);
     if (!result.success) {
-      alert('Erro ao sincronizar mudanças com o servidor.');
+      alert('Erro ao sincronizar mudanças.');
     }
     return result.success;
   }, [nodes]);

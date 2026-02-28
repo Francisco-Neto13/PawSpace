@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 
 export type ContentInput = {
   skillId: string;
-  userId: string;
+  userId?: string; // Tornamos opcional aqui para o TS não reclamar no payload
   type: 'link' | 'video' | 'pdf' | 'note';
   title: string;
   url?: string;
@@ -14,7 +14,23 @@ export type ContentInput = {
 
 export async function addContent(data: ContentInput) {
   try {
-    const content = await prisma.libraryContent.create({ data });
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Prioriza o ID que vem da sessão do servidor por segurança
+    const finalUserId = user?.id || data.userId;
+
+    if (!finalUserId) {
+      throw new Error("Usuário não identificado.");
+    }
+
+    const content = await prisma.libraryContent.create({ 
+      data: {
+        ...data,
+        userId: finalUserId // Garante que o ID correto seja gravado
+      } 
+    });
+    
     return { success: true, content };
   } catch (error) {
     console.error('❌ [Library] Erro ao adicionar conteúdo:', error);
@@ -54,15 +70,28 @@ export async function getContentsBySkill(skillId: string) {
   }
 }
 
-export async function uploadPdf(formData: FormData, userId: string) {
+/**
+ * Upload de PDF
+ * userId agora é opcional (?) para evitar o erro do TypeScript no Modal
+ */
+export async function uploadPdf(formData: FormData, userId?: string) {
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Se não passou userId, usa o da sessão
+    const finalUserId = userId || user?.id;
+
+    if (!finalUserId) {
+      return { success: false, error: 'Usuário não autenticado' };
+    }
+
     const file = formData.get('file') as File;
     if (!file) return { success: false, error: 'Nenhum arquivo enviado' };
 
     const ext = file.name.split('.').pop();
-    const fileKey = `${userId}/${Date.now()}.${ext}`;
+    const fileKey = `${finalUserId}/${Date.now()}.${ext}`;
 
-    const supabase = await createClient();
     const { error } = await supabase.storage
       .from('biblioteca-pdfs')
       .upload(fileKey, file, { contentType: file.type });

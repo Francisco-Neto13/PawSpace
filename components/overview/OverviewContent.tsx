@@ -1,12 +1,8 @@
 'use client';
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo } from 'react';
 import OverviewHeader from './OverviewHeader';
 import StatsGrid from './StatsGrid';
-import { getSkillsSummary as getSkills } from '@/app/actions/skills';
-import { createClient } from '@/utils/supabase/client';
-import { SkillData } from '../tree/types';
-
-const supabase = createClient();
+import { useNexus } from '@/contexts/NexusContext';
 
 interface OverviewContentProps {
   initialData: {
@@ -17,56 +13,35 @@ interface OverviewContentProps {
 }
 
 export default function OverviewContent({ initialData }: OverviewContentProps) {
-  const [rawSkills, setRawSkills] = useState<SkillData[]>([]);
-  
-  const [isLoading, setIsLoading] = useState(!initialData);
-
-  const loadStats = useCallback(async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
-        setIsLoading(false);
-        return;
-      }
-
-      const data = await getSkills(session.user.id);
-      
-      if (data && data.length > 0) {
-        setRawSkills(data as unknown as SkillData[]);
-      }
-    } catch (e) {
-      console.error('Erro ao sincronizar Nexus:', e);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadStats();
-  }, [loadStats]);
+  const { nodes, isLoading } = useNexus();
 
   const treeStats = useMemo(() => {
-    if (rawSkills.length === 0) return initialData;
+    if (!nodes || nodes.length === 0) return initialData;
 
-    const unlockedCount = rawSkills.reduce((acc, skill) => skill.isUnlocked ? acc + 1 : acc, 0);
-    const totalCount = rawSkills.length;
-    const progress = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
-
+    const unlockedCount = nodes.reduce((acc, skill) => 
+      skill.data?.isUnlocked ? acc + 1 : acc, 0
+    );
+    
+    const totalCount = nodes.length;
+    
     return {
-      progress,
       total: totalCount,
       unlocked: unlockedCount,
+      progress: totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0,
     };
-  }, [rawSkills, initialData]);
+  }, [nodes, initialData]);
 
   return (
     <div className="relative min-h-screen w-full bg-[#030304] overflow-x-hidden flex flex-col">
       
-      {isLoading && rawSkills.length === 0 && !initialData && (
-        <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#030304]/90 backdrop-blur-md">
-          <div className="flex flex-col items-center gap-4">
+      {isLoading && nodes.length === 0 && (
+        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#030304]">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
+          </div>
+          <div className="relative flex flex-col items-center gap-4">
             <div className="w-8 h-8 border-2 border-[#c8b89a]/20 border-t-[#c8b89a] rounded-full animate-spin" />
-            <p className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em]">
+            <p className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
               Sincronizando Nexus...
             </p>
           </div>
