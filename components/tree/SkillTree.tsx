@@ -15,6 +15,7 @@ import { SkillTreeProvider } from './context/SkillTreeContext';
 import { useSkillNodes } from './hooks/useSkillNodes';
 import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
+import { TreeOnboarding } from './ui/TreeOnboarding';
 
 interface ContextMenu {
   x: number;
@@ -214,6 +215,8 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
         skillData={nodes.find(n => n.id === editingSkillId)?.data}
         existingSkills={nodes.map(n => ({ id: n.id, name: n.data.label ?? n.data.name }))}
       />
+
+      <TreeOnboarding / >
 
     </div>
   );
