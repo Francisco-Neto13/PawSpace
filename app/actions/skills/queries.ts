@@ -10,9 +10,7 @@ export async function getSkillsFull(userId: string): Promise<SkillRow[]> {
       include: { contents: true },
       orderBy: { createdAt: 'asc' },
     });
-    
     console.log(`[Nexus Query] Full Fetch: ${Date.now() - start}ms`);
-    
     return skills as unknown as SkillRow[];
   } catch (error) {
     console.error('❌ [Nexus Query] Erro ao buscar skills:', error);
@@ -21,18 +19,38 @@ export async function getSkillsFull(userId: string): Promise<SkillRow[]> {
 }
 
 export async function getSkillsSummary(userId: string) {
-  const start = Date.now(); 
+  const start = Date.now();
   try {
     const skills = await prisma.skill.findMany({
       where: { userId },
       select: { id: true, isUnlocked: true, category: true },
     });
-
     console.log(`Query (Summary): ${Date.now() - start}ms`);
-    
     return skills;
   } catch (error) {
     console.error('❌ [Nexus Query] Erro ao buscar resumo:', error);
+    return [];
+  }
+}
+
+export async function getSkillsForLibrary(userId: string) {
+  const start = Date.now();
+  try {
+    const skills = await prisma.skill.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        name: true,
+        icon: true,
+        color: true,
+        isUnlocked: true,
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+    console.log(`[Library Query] Skills: ${Date.now() - start}ms`);
+    return skills;
+  } catch (error) {
+    console.error('❌ [Library Query] Erro:', error);
     return [];
   }
 }

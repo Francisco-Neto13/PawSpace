@@ -4,8 +4,9 @@ export interface Content {
   id: string;
   type: ContentType;
   title: string;
-  url?: string;
-  body?: string;
+  url?: string | null;
+  fileKey?: string | null;
+  body?: string | null;
   createdAt: string;
 }
 

@@ -11,10 +11,13 @@ export type SkillRow = {
   parentId: string | null;
   positionX: number;
   positionY: number;
-  contents: { 
-    id: string; 
-    title: string; 
-    url: string | null; 
-    description: string | null 
+  contents: {
+    id: string;
+    type: string;
+    title: string;
+    url: string | null;
+    fileKey: string | null;
+    body: string | null;
+    createdAt: Date;
   }[];
 };

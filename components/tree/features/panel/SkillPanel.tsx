@@ -1,5 +1,7 @@
 'use client';
 import React, { useMemo, memo } from 'react';
+import { useRouter } from 'next/navigation';
+import { BookOpen } from 'lucide-react';
 import { SkillData, CATEGORY_THEME, SkillCategory } from '../../types';
 
 interface SkillPanelProps {
@@ -24,6 +26,8 @@ const poly = `polygon(
 )`;
 
 function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: SkillPanelProps) {
+  const router = useRouter();
+
   const theme = useMemo(
     () => data
       ? CATEGORY_THEME[data.category as SkillCategory] || CATEGORY_THEME.keystone
@@ -41,6 +45,11 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
   const borderColor = data.isUnlocked
     ? activeColor
     : isAvailable ? '#52525b' : '#27272a';
+
+  const handleViewLibrary = () => {
+    onClose();
+    router.push(`/biblioteca?nodeId=${skillId}`);
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
@@ -102,7 +111,6 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
             </div>
 
             <div className="flex-1 flex flex-col items-center text-center relative z-10">
-
               <h2 className="text-white text-base font-black uppercase tracking-[0.3em] leading-tight mb-3">
                 {displayLabel}
               </h2>
@@ -157,7 +165,19 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
               </p>
             </div>
 
-            <div className="mt-8 relative z-10">
+            {isAvailable && (
+              <div className="mt-6 relative z-10">
+                <button
+                  onClick={handleViewLibrary}
+                  className="w-full py-3 border border-white/[0.06] text-zinc-500 text-[9px] font-black uppercase tracking-[0.3em] hover:border-[#c8b89a]/20 hover:text-[#c8b89a] hover:bg-[#c8b89a]/[0.03] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <BookOpen size={12} />
+                  Visualizar na Biblioteca
+                </button>
+              </div>
+            )}
+
+            <div className="mt-3 relative z-10">
               <button
                 disabled={!isAvailable}
                 onClick={() => skillId && onToggleStatus?.(skillId)}

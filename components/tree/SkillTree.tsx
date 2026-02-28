@@ -10,12 +10,12 @@ import { SkillPanel } from './features/panel/SkillPanel';
 import { StarField } from './ui/StarField';
 import { EditSkillModal } from './features/editor/EditSkillModal';
 import { NodeContextMenu } from './ui/NodeContextMenu';
+import { TreeOnboarding } from './ui/TreeOnboarding';
 
-import { SkillTreeProvider } from './context/SkillTreeContext';
+import { SkillTreeProvider, useSkillTreeContext } from './context/SkillTreeContext';
 import { useSkillNodes } from './hooks/useSkillNodes';
 import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
-import { TreeOnboarding } from './ui/TreeOnboarding';
 
 interface ContextMenu {
   x: number;
@@ -52,7 +52,8 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
 }
 
 function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
-  const { nodes, edges, isLoading } = useSkillNodes(initialSkills);
+  const { nodes, edges, isLoading, userId } = useSkillTreeContext();
+  useSkillNodes(initialSkills);
   const { onNodesChange, hasUnsavedChanges: hasDragChanges, isSaving, saveLayout } = useSkillDrag();
   const {
     handleToggleStatus,
@@ -216,7 +217,7 @@ function SkillTreeInner({ initialSkills }: { initialSkills?: any[] }) {
         existingSkills={nodes.map(n => ({ id: n.id, name: n.data.label ?? n.data.name }))}
       />
 
-      <TreeOnboarding / >
+      <TreeOnboarding />
 
     </div>
   );

@@ -17,6 +17,7 @@ interface SkillTreeContextValue {
   nodes: Node<SkillData>[];
   edges: Edge[];
   isLoading: boolean;
+  userId: string | null;
   setNodes: React.Dispatch<React.SetStateAction<Node<SkillData>[]>>;
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   loadTreeData: () => Promise<void>;
@@ -35,7 +36,8 @@ export function SkillTreeProvider({ children }: { children: React.ReactNode }) {
   const [nodes, setNodes] = useState<Node<SkillData>[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const isLoadingRef = useRef(false); 
+  const [userId, setUserId] = useState<string | null>(null);
+  const isLoadingRef = useRef(false);
 
   const setInitialData = useCallback((skills: any[]) => {
     if (!skills || skills.length === 0) {
@@ -59,13 +61,13 @@ export function SkillTreeProvider({ children }: { children: React.ReactNode }) {
     if (isLoadingRef.current) return;
     isLoadingRef.current = true;
     setIsLoading(true);
-
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const rawSkills = await getSkillsFull(user.id);
+      setUserId(user.id);
 
+      const rawSkills = await getSkillsFull(user.id);
       if (rawSkills && rawSkills.length > 0) {
         const hierarchy = buildHierarchy(rawSkills);
         const { nodes: layoutNodes, edges: layoutEdges } = generateTreeLayout(hierarchy);
@@ -82,7 +84,7 @@ export function SkillTreeProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       isLoadingRef.current = false;
     }
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (nodes.length === 0) return;
@@ -95,7 +97,7 @@ export function SkillTreeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <SkillTreeContext.Provider
-      value={{ nodes, edges, isLoading, setNodes, setEdges, loadTreeData, setInitialData }}
+      value={{ nodes, edges, isLoading, userId, setNodes, setEdges, loadTreeData, setInitialData }}
     >
       {children}
     </SkillTreeContext.Provider>

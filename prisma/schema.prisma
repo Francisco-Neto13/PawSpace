@@ -40,15 +40,19 @@ model Skill {
 }
 
 model LibraryContent {
-  id          String  @id @default(cuid())
-  skillId     String
-  skill       Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  title       String
-  url         String?
-  description String? @db.Text
-
+  id        String   @id @default(cuid())
+  skillId   String
+  userId    String
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  type      String   @default("link") // "link" | "video" | "pdf" | "note"
+  title     String
+  url       String?                   
+  fileKey   String?                  
+  body      String?  @db.Text         
+  metadata  Json?    @default("{}")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([skillId])
+  @@index([userId])
 }

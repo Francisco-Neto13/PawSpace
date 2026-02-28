@@ -1,6 +1,6 @@
 'use client';
 import { ChevronRight } from 'lucide-react';
-import { SkillNode } from './types';
+import { SkillNode } from '../types';
 
 interface BibliotecaSidebarProps {
   nodes: SkillNode[];
