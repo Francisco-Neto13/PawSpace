@@ -9,7 +9,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
   return (
     <div className="flex flex-col gap-2">
       <label className="font-mono text-[10px] tracking-[0.2em] text-zinc-500 uppercase">
-        Assinatura Cromática
+        Cor
       </label>
       <div className="flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-sm hover:border-white/20 transition-colors">
         <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white/20">

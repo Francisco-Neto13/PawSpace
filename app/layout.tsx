@@ -1,20 +1,7 @@
 import type { Metadata } from "next";
-import { Rajdhani, Share_Tech_Mono } from "next/font/google";
 import "./globals.css";
 import { NexusProvider } from "@/contexts/NexusContext";
 import ClientLayout from "./ClientLayout";
-
-const futuristicSans = Rajdhani({
-  variable: "--font-futuristic",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const futuristicMono = Share_Tech_Mono({
-  variable: "--font-futuristic-mono",
-  subsets: ["latin"],
-  weight: ["400"],
-});
 
 export const metadata: Metadata = {
   title: "Skill Tree",
@@ -26,12 +13,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="dark">
       <body
         className={`
-          ${futuristicSans.variable}
-          ${futuristicMono.variable}
-          bg-[#030304]
-          min-h-screen
           font-sans
           antialiased
+          bg-[#030304]
+          min-h-screen
           text-white
           font-medium
         `}

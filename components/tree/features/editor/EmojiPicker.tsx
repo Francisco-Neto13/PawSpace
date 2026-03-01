@@ -39,7 +39,7 @@ export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
   return (
     <div className="relative">
       <label className="font-mono text-[10px] tracking-[0.2em] text-zinc-500 uppercase block mb-2">
-        Protocolo Visual
+        Emoji
       </label>
       <button
         type="button"
