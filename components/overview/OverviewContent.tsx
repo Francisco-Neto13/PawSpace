@@ -84,39 +84,46 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
             </h3>
 
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div className="text-zinc-400 text-sm leading-relaxed max-w-xl font-light">
+              <div className="text-zinc-300 text-sm leading-relaxed max-w-xl font-normal">
                 <p>
                   Atualmente, você domina <span className="text-white font-bold">{treeStats.unlocked} módulos</span>.
-                  Isso representa <span className="text-[#c8b89a] font-bold">{treeStats.progress}%</span> do roadmap.
-                  Faltam <span className="text-white font-semibold">{treeStats.total - treeStats.unlocked} tecnologias</span> para a maestria.
+                  Isso representa <span className="text-[#c8b89a] font-black">{treeStats.progress}%</span> do seu planejamento.
+                  Faltam <span className="text-zinc-100 font-semibold">{treeStats.total - treeStats.unlocked} tecnologias</span> para a maestria total do sistema.
                 </p>
               </div>
 
-              <div className="flex gap-6 shrink-0 font-mono">
+              <div className="flex gap-8 shrink-0 font-mono">
                 <div className="text-right">
-                  <p className="text-zinc-600 text-[9px] uppercase font-bold tracking-widest">Total</p>
-                  <p className="text-white text-2xl font-black">{treeStats.total}</p>
+                  <p className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mb-1">Total</p>
+                  <p className="text-white text-3xl font-black tabular-nums">{treeStats.total}</p>
                 </div>
                 <div className="w-[1px] bg-white/10" />
                 <div className="text-right">
-                  <p className="text-zinc-600 text-[9px] uppercase font-bold tracking-widest">Concluídos</p>
-                  <p className="text-[#c8b89a] text-2xl font-black">{treeStats.unlocked}</p>
+                  <p className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mb-1">Concluídos</p>
+                  <p className="text-[#c8b89a] text-3xl font-black tabular-nums">{treeStats.unlocked}</p>
                 </div>
               </div>
             </div>
           </article>
 
-          <aside className="flex flex-col justify-center p-8 border border-[#c8b89a]/10 bg-gradient-to-br from-[#c8b89a]/[0.04] to-transparent rounded-sm text-center relative">
-            <p className="text-zinc-500 text-[9px] font-black uppercase tracking-widest mb-4">Próxima Meta</p>
-            <div className="py-2 px-4 border border-[#c8b89a]/20 bg-black/40 inline-block mx-auto mb-3">
-              <p className="text-[#c8b89a] font-bold text-xs uppercase">
+          {/* Side Card - Próxima Meta (AJUSTADO PARA LEITURA) */}
+          <aside className="flex flex-col justify-center p-8 border border-[#c8b89a]/20 bg-gradient-to-br from-[#c8b89a]/[0.05] to-transparent rounded-sm text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-2 opacity-10 font-mono text-[40px] font-black select-none pointer-events-none">
+              NEX
+            </div>
+            
+            <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest mb-5">Próxima Meta</p>
+            
+            <div className="py-2.5 px-5 border border-[#c8b89a]/30 bg-black/60 inline-block mx-auto mb-4 backdrop-blur-sm">
+              <p className="text-[#c8b89a] font-black text-xs uppercase tracking-wider">
                 {treeStats.progress < 100 ? 'Expandir Árvore' : 'Sistema Completo'}
               </p>
             </div>
-            <p className="text-[10px] text-zinc-600 font-mono tracking-tighter">
+            
+            <p className="text-[11px] text-zinc-500 font-mono tracking-normal leading-tight">
               {treeStats.total - treeStats.unlocked > 0 
-                ? `${treeStats.total - treeStats.unlocked} passos restantes`
-                : "Protocolo finalizado."}
+                ? `${treeStats.total - treeStats.unlocked} passos pendentes para evolução`
+                : "Protocolo de treinamento finalizado."}
             </p>
           </aside>
         </div>

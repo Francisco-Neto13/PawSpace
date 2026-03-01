@@ -54,9 +54,9 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
         value: pending,
         sub: 'Aguardando ação',
         icon: Layout,
-        color: 'text-zinc-500',
-        glowColor: 'rgba(113, 113, 122, 0.1)',
-        barColor: '#52525b',
+        color: 'text-zinc-400', 
+        glowColor: 'rgba(161, 161, 170, 0.1)',
+        barColor: '#71717a', 
         barWidth: pendingSafe,
       },
     ];
@@ -67,7 +67,7 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
       {stats.map((item, index) => (
         <div
           key={item.label}
-          className="group relative rounded-sm overflow-hidden reveal-up"
+          className="group relative rounded-sm overflow-hidden"
           style={{ animationDelay: `${index * 100}ms` }}
         >
           <div
@@ -80,7 +80,7 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
 
           <div className="absolute inset-0 opacity-[0.025] pointer-events-none z-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(255,255,255,0.03)_2px,rgba(255,255,255,0.03)_4px)]" />
 
-          <div className="relative z-10 p-8 flex flex-col justify-between h-full border border-white/[0.04] group-hover:border-white/[0.08] transition-colors duration-500 rounded-sm">
+          <div className="relative z-10 p-8 flex flex-col justify-between h-full border border-white/[0.06] group-hover:border-white/[0.12] transition-colors duration-500 rounded-sm">
             
             <div className="flex justify-between items-start mb-8">
               <div className="relative">
@@ -89,38 +89,37 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
                   style={{ backgroundColor: item.glowColor }}
                 />
                 <item.icon
-                  size={18}
+                  size={20} 
                   className={`${item.color} relative z-10 transition-transform duration-300 group-hover:scale-110`}
                 />
               </div>
 
-              <div className="flex gap-1 mt-1">
+              <div className="flex gap-1.5 mt-1">
                 {DOTS.map((i) => (
                   <div
                     key={i}
-                    className="w-1 h-1 rounded-full bg-white/10 group-hover:bg-white/20 transition-colors duration-300"
-                    style={{ transitionDelay: `${i * 50}ms` }}
+                    className="w-1 h-1 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors duration-300"
                   />
                 ))}
               </div>
             </div>
 
             <div>
-              <div className="text-5xl font-black text-white mb-3 tracking-tighter font-mono leading-none">
+              <div className="text-5xl font-black text-white mb-4 tracking-tighter font-mono leading-none tabular-nums">
                 {item.value}
               </div>
-              <span className="text-[10px] font-black text-[#c8b89a] uppercase tracking-[0.25em] block mb-1">
+              <span className="text-[10px] font-black text-[#c8b89a] uppercase tracking-[0.3em] block mb-1.5">
                 {item.label}
               </span>
-              <span className="text-[9px] font-medium text-zinc-600 uppercase tracking-tight">
-                // {item.sub}
+              <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wide">
+                <span className="opacity-50 font-mono mr-1">//</span> {item.sub}
               </span>
             </div>
 
-            <div className="mt-6 space-y-1.5">
-              <div className="h-[2px] w-full bg-white/5 overflow-hidden">
+            <div className="mt-8 space-y-2">
+              <div className="h-[3px] w-full bg-white/[0.03] overflow-hidden">
                 <div
-                  className="h-full transition-all duration-1000 ease-out shadow-[0_0_8px_currentColor]"
+                  className="h-full transition-all duration-1000 ease-out shadow-[0_0_10px_currentColor]"
                   style={{
                     width: `${item.barWidth}%`,
                     backgroundColor: item.barColor,
@@ -128,15 +127,15 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
                   }}
                 />
               </div>
-              <div className="flex justify-between">
-                <span className="text-[8px] text-zinc-700 font-mono">0</span>
-                <span className="text-[8px] font-mono" style={{ color: item.barColor }}>
+              <div className="flex justify-between items-center">
+                <span className="text-[9px] text-zinc-500 font-mono font-bold">0%</span>
+                <span className="text-[10px] font-mono font-black" style={{ color: item.barColor }}>
                   {Math.round(item.barWidth)}%
                 </span>
               </div>
             </div>
 
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-white/10 group-hover:border-white/20 transition-colors duration-300" />
+            <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-white/10 group-hover:border-white/30 transition-colors duration-300" />
           </div>
         </div>
       ))}

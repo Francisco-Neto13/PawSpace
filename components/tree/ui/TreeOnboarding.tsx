@@ -115,10 +115,10 @@ export function TreeOnboarding() {
                         {step.icon}
                       </div>
                       <div>
-                        <h4 className="text-[9px] font-black text-[#c8b89a] uppercase tracking-[0.2em] mb-1">
+                        <h4 className="text-[10px] font-black text-[#c8b89a] uppercase tracking-[0.2em] mb-1">
                           {step.title}
                         </h4>
-                        <p className="text-[9px] text-zinc-500 font-medium leading-relaxed">
+                        <p className="text-[10px] text-zinc-300 font-normal leading-relaxed tracking-wide">
                           {step.desc}
                         </p>
                       </div>

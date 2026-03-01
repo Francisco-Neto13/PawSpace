@@ -28,8 +28,8 @@ const poly = `polygon(
   0 10px
 )`;
 
-const labelClass = "text-[8px] text-zinc-600 uppercase font-black tracking-[0.25em] block mb-2";
-const inputClass = "w-full bg-white/[0.02] border border-white/[0.06] p-3.5 text-white text-sm outline-none focus:border-[#c8b89a]/30 transition-colors font-light placeholder:text-zinc-700 cursor-text";
+const labelClass = "text-[9px] text-zinc-500 uppercase font-black tracking-[0.25em] block mb-2.5";
+const inputClass = "w-full bg-white/[0.02] border border-white/[0.08] p-3.5 text-white text-sm outline-none focus:border-[#c8b89a]/40 transition-colors font-normal placeholder:text-zinc-600 cursor-text";
 
 interface AddContentModalProps {
   isOpen: boolean;
@@ -72,8 +72,6 @@ export function AddContentModal({
     setIsLoading(true);
 
     try {
-      // O payload não envia mais o userId explicitamente. 
-      // A Server Action deve obtê-lo no servidor para maior segurança.
       let payload: any = { 
         skillId, 
         type: activeTab, 
@@ -88,11 +86,8 @@ export function AddContentModal({
         if (pdfMode === 'upload' && pdfFile) {
           const fd = new FormData();
           fd.append('file', pdfFile);
-          
-          // O uploadPdf agora também resolve o usuário no lado do servidor
           const upload = await uploadPdf(fd); 
           if (!upload.success) throw new Error('Falha no upload');
-          
           payload.url = upload.publicUrl;
           payload.fileKey = upload.fileKey;
         } else {
@@ -110,7 +105,7 @@ export function AddContentModal({
       onSuccess();
       handleClose();
     } catch (err) {
-      console.error('❌ [AddContentModal] Erro ao adicionar conteúdo:', err);
+      console.error('❌ [AddContentModal] Erro:', err);
     } finally {
       setIsLoading(false);
     }
@@ -141,7 +136,7 @@ export function AddContentModal({
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-5 bg-[#c8b89a]" />
                   <div>
-                    <p className="text-[8px] text-zinc-600 uppercase tracking-[0.3em] font-black mb-0.5">
+                    <p className="text-[9px] text-zinc-500 uppercase tracking-[0.3em] font-black mb-0.5">
                       Repositório de Conhecimento
                     </p>
                     <h2 className="text-[#c8b89a] text-[13px] font-black uppercase tracking-[0.3em]">
@@ -151,7 +146,7 @@ export function AddContentModal({
                 </div>
                 <button
                   onClick={handleClose}
-                  className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-600 hover:text-zinc-300 hover:border-white/20 transition-all duration-300 cursor-pointer"
+                  className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-500 hover:text-zinc-300 hover:border-white/20 transition-all duration-300 cursor-pointer"
                 >
                   <X size={12} />
                 </button>
@@ -168,21 +163,23 @@ export function AddContentModal({
                     setForm({ title: '', url: '', body: '' });
                     setPdfFile(null);
                   }}
-                  className={`flex flex-col items-center gap-1.5 py-3 border text-[8px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer
+                  className={`flex flex-col items-center gap-2 py-3.5 border text-[9px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer
                     ${activeTab === tab.type
                       ? 'border-[#c8b89a]/40 bg-[#c8b89a]/[0.06] text-[#c8b89a]'
-                      : 'border-white/[0.04] text-zinc-600 hover:text-zinc-400 hover:border-white/[0.08]'
+                      : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.02]'
                     }`}
                 >
-                  {tab.icon}
+                  <div className={activeTab === tab.type ? 'text-[#c8b89a]' : 'text-zinc-500'}>
+                    {tab.icon}
+                  </div>
                   {tab.label}
                 </button>
               ))}
             </div>
 
-            <div className="relative z-10 space-y-5">
+            <div className="relative z-10 space-y-6">
               <div>
-                <label className={labelClass}>Título *</label>
+                <label className={labelClass}>Título Identificador *</label>
                 <input
                   autoFocus
                   type="text"
@@ -198,23 +195,25 @@ export function AddContentModal({
                 />
               </div>
 
-              {activeTab === 'link'  && <LinkForm  url={form.url} onChange={url => setForm({ ...form, url })} />}
-              {activeTab === 'video' && <VideoForm url={form.url} onChange={url => setForm({ ...form, url })} />}
-              {activeTab === 'pdf'   && (
-                <PdfForm
-                  mode={pdfMode}
-                  url={form.url}
-                  file={pdfFile}
-                  onModeChange={setPdfMode}
-                  onUrlChange={url => setForm({ ...form, url })}
-                  onFileChange={setPdfFile}
-                />
-              )}
-              {activeTab === 'note'  && <NoteForm body={form.body} onChange={body => setForm({ ...form, body })} />}
+              <div className="animate-in fade-in slide-in-from-top-1 duration-300">
+                {activeTab === 'link'  && <LinkForm  url={form.url} onChange={url => setForm({ ...form, url })} />}
+                {activeTab === 'video' && <VideoForm url={form.url} onChange={url => setForm({ ...form, url })} />}
+                {activeTab === 'pdf'   && (
+                  <PdfForm
+                    mode={pdfMode}
+                    url={form.url}
+                    file={pdfFile}
+                    onModeChange={setPdfMode}
+                    onUrlChange={url => setForm({ ...form, url })}
+                    onFileChange={setPdfFile}
+                  />
+                )}
+                {activeTab === 'note'  && <NoteForm body={form.body} onChange={body => setForm({ ...form, body })} />}
+              </div>
             </div>
 
             <div
-              className="relative z-10 h-[1px] my-6"
+              className="relative z-10 h-[1px] my-8"
               style={{ background: 'linear-gradient(to right, transparent, #ffffff08, transparent)' }}
             />
 
@@ -222,7 +221,7 @@ export function AddContentModal({
               <button
                 type="button"
                 onClick={handleClose}
-                className="flex-1 py-3.5 border border-white/[0.06] text-zinc-600 text-[10px] font-black uppercase tracking-widest hover:bg-white/[0.02] hover:text-zinc-400 hover:border-white/10 transition-all duration-300 cursor-pointer"
+                className="flex-1 py-4 border border-white/[0.06] text-zinc-500 text-[10px] font-black uppercase tracking-widest hover:bg-white/[0.02] hover:text-zinc-300 hover:border-white/20 transition-all duration-300 cursor-pointer"
               >
                 Cancelar
               </button>
@@ -230,9 +229,9 @@ export function AddContentModal({
                 type="button"
                 onClick={handleSubmit}
                 disabled={!isValid() || isLoading}
-                className="flex-1 py-3.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[10px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 hover:border-[#c8b89a]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
+                className="flex-1 py-4 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[10px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 hover:border-[#c8b89a]/50 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
               >
-                {isLoading ? 'Sincronizando...' : 'Confirmar'}
+                {isLoading ? 'Sincronizando...' : 'Confirmar Registro'}
               </button>
             </div>
           </div>
