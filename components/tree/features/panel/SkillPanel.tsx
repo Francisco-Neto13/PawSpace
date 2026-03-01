@@ -48,7 +48,7 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
 
   const handleViewLibrary = () => {
     onClose();
-    router.push(`/biblioteca?nodeId=${skillId}`);
+    router.push(`/library?nodeId=${skillId}`);
   };
 
   return (

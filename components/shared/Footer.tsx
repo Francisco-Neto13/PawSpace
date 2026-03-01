@@ -1,20 +1,23 @@
-"use client";
-import React from 'react';
+'use client';
+import React, { forwardRef } from 'react';
 import { Github, Instagram } from 'lucide-react';
 
-export default function Footer() {
+const Footer = forwardRef<HTMLElement>((_, ref) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t border-white/5 bg-black/60 backdrop-blur-xl transition-all duration-300">
+    <footer
+      ref={ref}
+      className="w-full border-t border-white/5 bg-black/60 backdrop-blur-xl transition-all duration-300"
+    >
       <div className="px-4 md:px-16 lg:px-24 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0 relative">
-          
+
           <div className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] flex items-center order-2 md:order-1">
-            Dev by 
-            <a 
-              href="https://github.com/Francisco-Neto13" 
-              target="_blank" 
+            Dev by
+            <a
+              href="https://github.com/Francisco-Neto13"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-[#c8b89a] ml-2 hover:text-white transition-colors cursor-pointer"
             >
@@ -26,29 +29,29 @@ export default function Footer() {
             <span className="text-white">© {currentYear} • </span>
             <span className="text-[#c8b89a]">Francisco Neto</span>
           </div>
-          
+
           <div className="flex items-center gap-6 order-3">
-            <a 
-              href="https://github.com/Francisco-Neto13" 
-              target="_blank" 
+            <a
+              href="https://github.com/Francisco-Neto13"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-[#c8b89a] transition-all duration-300 hover:scale-110"
             >
               <Github size={18} />
             </a>
-            
-            <a 
-              href="https://www.instagram.com/cisscoo_" 
-              target="_blank" 
+
+            <a
+              href="https://www.instagram.com/cisscoo_"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-[#c8b89a] transition-all duration-300 hover:scale-110"
             >
               <Instagram size={18} />
             </a>
 
-            <a 
-              href="https://discord.com/users/iyasuo_" 
-              target="_blank" 
+            <a
+              href="https://discord.com/users/iyasuo_"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-[#5865F2] transition-all duration-300 hover:scale-110"
             >
@@ -61,4 +64,8 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
+});
+
+Footer.displayName = 'Footer';
+
+export default Footer;

@@ -1,18 +1,18 @@
 'use client';
-import { useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useNexus } from '@/contexts/NexusContext';
 
-export default function Navbar() {
+const Navbar = forwardRef<HTMLElement>((_, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
-  
-  const { isDirty, setIsDirty } = useNexus(); 
+
+  const { isDirty, setIsDirty } = useNexus();
 
   if (pathname === '/login') return null;
 
@@ -23,9 +23,7 @@ export default function Navbar() {
       const confirmExit = window.confirm(
         "Você tem alterações não salvas na sua Skill Tree. Se sair agora, elas serão perdidas. Deseja sair mesmo assim?"
       );
-      
       if (!confirmExit) return;
-      console.log("♻️ [Navbar] Usuário confirmou saída. Limpando estado isDirty.");
       setIsDirty(false);
     }
 
@@ -34,19 +32,19 @@ export default function Navbar() {
   };
 
   const links = [
-    { name: "Resumo", href: "/overview" },
-    { name: "Skill Tree", href: "/tree" },
-    { name: "Biblioteca", href: "/library" },
+    { name: "Resumo",       href: "/overview"  },
+    { name: "Skill Tree",   href: "/tree"      },
+    { name: "Biblioteca",   href: "/library"   },
     { name: "Configurações", href: "/settings" },
   ];
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     if (isDirty) {
       const confirmExit = window.confirm("Sair e perder alterações não salvas?");
       if (!confirmExit) return;
-      setIsDirty(false); 
+      setIsDirty(false);
     }
 
     try {
@@ -59,12 +57,15 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full border-b border-white/5 bg-black/60 backdrop-blur-xl sticky top-0 z-[100] transition-all duration-300">
+    <nav
+      ref={ref}
+      className="w-full border-b border-white/5 bg-black/60 backdrop-blur-xl sticky top-0 z-[100] transition-all duration-300"
+    >
       <div className="px-4 md:px-16 lg:px-24 py-4 flex justify-between items-center sm:grid sm:grid-cols-3">
-        
+
         <div className="justify-self-start">
-          <Link 
-            href="/overview" 
+          <Link
+            href="/overview"
             onClick={(e) => handleSafeNavigation(e, "/overview")}
             className="flex items-center gap-3 group"
           >
@@ -99,7 +100,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center justify-end justify-self-end gap-4">
-          <button 
+          <button
             onClick={handleLogout}
             className="hidden sm:block px-5 py-2 border border-white/10 bg-white/5 text-zinc-400 hover:bg-red-600 hover:border-red-500 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-500 cursor-pointer"
           >
@@ -129,7 +130,7 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="h-px w-full bg-white/5" />
-            <button 
+            <button
               onClick={handleLogout}
               className="text-red-400 text-left text-[11px] font-black uppercase tracking-widest"
             >
@@ -140,4 +141,8 @@ export default function Navbar() {
       )}
     </nav>
   );
-}
+});
+
+Navbar.displayName = 'Navbar';
+
+export default Navbar;

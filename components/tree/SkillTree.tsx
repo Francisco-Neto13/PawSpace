@@ -12,7 +12,7 @@ import { EditSkillModal } from './features/editor/EditSkillModal';
 import { NodeContextMenu } from './ui/NodeContextMenu';
 import { TreeOnboarding } from './ui/TreeOnboarding';
 
-import { useNexus } from '@/contexts/NexusContext'; 
+import { useNexus } from '@/contexts/NexusContext';
 import { SkillTreeProvider } from './context/SkillTreeContext';
 import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
@@ -37,7 +37,7 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
 
   useEffect(() => {
     if (isLoading || nodes.length === 0 || hasCentered) return;
-    
+
     const rootNode = nodes.find(n => !n.data.parentId);
     if (!rootNode) return;
 
@@ -54,7 +54,7 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
 
 function SkillTreeInner() {
   const { nodes, edges, isLoading: isLoadingNexus, refreshNexus, setIsDirty, isDirty: isGlobalDirty } = useNexus();
-  
+
   const { onNodesChange, hasUnsavedChanges: hasDragChanges, isSaving, saveLayout } = useSkillDrag();
   const {
     handleToggleStatus,
@@ -72,7 +72,7 @@ function SkillTreeInner() {
   const canSave = isGlobalDirty || hasDragChanges || hasDataChanges;
 
   useEffect(() => {
-    refreshNexus(true); 
+    refreshNexus(true);
   }, [refreshNexus]);
 
   useEffect(() => {
@@ -85,7 +85,7 @@ function SkillTreeInner() {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (canSave) {
         e.preventDefault();
-        e.returnValue = ''; 
+        e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -93,28 +93,24 @@ function SkillTreeInner() {
   }, [canSave]);
 
   const onSaveAll = async () => {
-    console.log("[SkillTree] Iniciando consolidação...");
     try {
       const success = await handleGlobalSave();
       if (success) {
         await saveLayout(nodes as any);
-        
         setHasDataChanges(false);
-        
         if (setIsDirty) setIsDirty(false);
-        
-        await refreshNexus(false); 
+        await refreshNexus(false);
       }
     } catch (error) {
       console.error("❌ [SkillTree] Erro crítico na sincronização:", error);
     }
   };
 
-  const selectedNode = useMemo(() => 
-    nodes.find(n => n.id === selectedSkillId), 
+  const selectedNode = useMemo(() =>
+    nodes.find(n => n.id === selectedSkillId),
     [nodes, selectedSkillId]
   );
-  
+
   const panelData = useMemo(() => {
     if (!selectedNode) return null;
     return { ...selectedNode.data, id: selectedNode.id } as any;
@@ -130,7 +126,7 @@ function SkillTreeInner() {
   return (
     <div
       className="relative w-full bg-[#030304] overflow-hidden select-none font-sans"
-      style={{ height: 'calc(100vh - 160px)' }}
+      style={{ height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))' }}
     >
       {isLoadingNexus && nodes.length === 0 && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#030304]">
@@ -152,10 +148,10 @@ function SkillTreeInner() {
       {canSave && (
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 animate-in slide-in-from-bottom-5 duration-500">
           <div className="flex items-center gap-2 px-3 py-1 bg-black/80 border border-[#c8b89a]/20 backdrop-blur-md shadow-2xl">
-             <AlertCircle size={10} className="text-[#c8b89a] animate-pulse" />
-             <span className="text-[7px] text-[#c8b89a]/70 font-black uppercase tracking-[0.2em]">
-                Protocolos pendentes de consolidação
-             </span>
+            <AlertCircle size={10} className="text-[#c8b89a] animate-pulse" />
+            <span className="text-[7px] text-[#c8b89a]/70 font-black uppercase tracking-[0.2em]">
+              Protocolos pendentes de consolidação
+            </span>
           </div>
 
           <button
@@ -217,16 +213,16 @@ function SkillTreeInner() {
       {contextMenu && (
         <NodeContextMenu
           {...contextMenu}
-          onAddChild={() => { 
-            handleCreateQuickSkill(contextMenu.nodeId); 
-            setHasDataChanges(true); 
-            setContextMenu(null); 
+          onAddChild={() => {
+            handleCreateQuickSkill(contextMenu.nodeId);
+            setHasDataChanges(true);
+            setContextMenu(null);
           }}
           onEdit={() => { setEditingSkillId(contextMenu.nodeId); setContextMenu(null); }}
-          onDelete={() => { 
-            handleDelete(contextMenu.nodeId); 
-            setHasDataChanges(true); 
-            setContextMenu(null); 
+          onDelete={() => {
+            handleDelete(contextMenu.nodeId);
+            setHasDataChanges(true);
+            setContextMenu(null);
           }}
           onClose={() => setContextMenu(null)}
         />
@@ -247,11 +243,11 @@ function SkillTreeInner() {
         onClose={() => setEditingSkillId(null)}
         onUpdate={async (id, data) => {
           await handleUpdateSkill(id, data);
-          setHasDataChanges(true); 
+          setHasDataChanges(true);
         }}
         skillData={nodes.find(n => n.id === editingSkillId)?.data as any}
-        existingSkills={nodes.map(n => ({ 
-          id: n.id, 
+        existingSkills={nodes.map(n => ({
+          id: n.id,
           name: (n.data as any).label || (n.data as any).name || ''
         }))}
       />

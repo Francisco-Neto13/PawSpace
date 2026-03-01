@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Rajdhani, Share_Tech_Mono } from "next/font/google"; 
+import { Rajdhani, Share_Tech_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/shared/Navbar";
-import Footer from '@/components/shared/Footer'; 
 import { NexusProvider } from "@/contexts/NexusContext";
+import ClientLayout from "./ClientLayout";
 
 const futuristicSans = Rajdhani({
   variable: "--font-futuristic",
@@ -25,30 +24,20 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body 
+      <body
         className={`
-          ${futuristicSans.variable} 
-          ${futuristicMono.variable} 
-          bg-[#030304] 
+          ${futuristicSans.variable}
+          ${futuristicMono.variable}
+          bg-[#030304]
           min-h-screen
-          font-sans 
+          font-sans
           antialiased
           text-white
           font-medium
         `}
       >
         <NexusProvider>
-          <div className="flex flex-col min-h-screen w-full">
-            
-            <Navbar /> 
-            
-            <main className="relative flex-1 w-full">
-              {children}
-            </main>
-            
-            <Footer /> 
-            
-          </div>
+          <ClientLayout>{children}</ClientLayout>
         </NexusProvider>
       </body>
     </html>
