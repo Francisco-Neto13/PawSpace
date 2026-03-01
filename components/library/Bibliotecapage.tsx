@@ -17,6 +17,7 @@ export default function BibliotecaPage() {
   const nodeIdFromUrl = searchParams.get('nodeId');
 
   const { nodes, isLoading: isLoadingNexus, refreshNexus } = useNexus();
+
   const { nodeContents, loadingNodeId, loadNodeContents, refreshNodeContents } = useNodeContents();
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -44,7 +45,7 @@ export default function BibliotecaPage() {
       icon: n.data.icon || '✦',
       color: n.data.color || '#c8b89a',
       isUnlocked: !!n.data.isUnlocked,
-      contents: nodeContents[n.id] ?? [],
+      contents: nodeContents[n.id] ?? []
     })) as SkillNode[];
   }, [nodes, nodeContents]);
 
@@ -89,16 +90,15 @@ export default function BibliotecaPage() {
   if (!selectedNode) return null;
 
   return (
-    <div
+    <div 
       className="relative w-full bg-[#030304] flex flex-col overflow-hidden"
-      style={{ height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))' }}
+      style={{ height: 'calc(100vh - 160px)' }}
     >
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto w-full p-6 flex flex-col gap-6 flex-1 min-h-0">
-
+      <div className="relative z-10 max-w-7xl mx-auto w-full p-6 flex flex-col gap-10 flex-1 min-h-0">
         <header className="shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -108,10 +108,10 @@ export default function BibliotecaPage() {
               </h2>
               <div className="h-[1px] w-32 bg-gradient-to-r from-[#c8b89a]/20 to-transparent" />
             </div>
-
+            
             <div className="flex items-center gap-8">
               {[
-                { label: 'Módulos',       value: nodes.length },
+                { label: 'Módulos',      value: nodes.length },
                 { label: 'Conteúdos',     value: totalContents },
                 { label: 'Desbloqueados', value: nodes.filter(n => n.data.isUnlocked).length },
               ].map((s, i) => (
@@ -156,7 +156,7 @@ export default function BibliotecaPage() {
             </div>
 
             <div
-              className="flex-1 overflow-y-auto pb-6 pr-2"
+              className="flex-1 overflow-y-auto pb-20 pr-2 custom-scrollbar"
               style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(200,184,154,0.1) transparent' }}
             >
               <BibliotecaContentList
@@ -164,6 +164,8 @@ export default function BibliotecaPage() {
                 isLoading={isLoadingContents}
                 isUnlocked={selectedNode.isUnlocked}
                 search={search}
+                // @ts-ignore 
+                node={selectedNode}
               />
             </div>
           </main>
@@ -177,7 +179,7 @@ export default function BibliotecaPage() {
           if (selectedNodeId) {
             await Promise.all([
               refreshNodeContents(selectedNodeId),
-              refreshNexus(),
+              refreshNexus()
             ]);
           }
         }}

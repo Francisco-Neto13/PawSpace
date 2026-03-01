@@ -18,11 +18,12 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
   const treeStats = useMemo(() => {
     if (!nodes || nodes.length === 0) return initialData;
 
-    const unlockedCount = nodes.reduce((acc, skill) =>
+    const unlockedCount = nodes.reduce((acc, skill) => 
       skill.data?.isUnlocked ? acc + 1 : acc, 0
     );
+    
     const totalCount = nodes.length;
-
+    
     return {
       total: totalCount,
       unlocked: unlockedCount,
@@ -31,8 +32,8 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
   }, [nodes, initialData]);
 
   return (
-    <div className="relative w-full bg-[#030304] overflow-x-hidden flex flex-col">
-
+    <div className="relative min-h-screen w-full bg-[#030304] overflow-x-hidden flex flex-col">
+      
       {isLoading && nodes.length === 0 && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#030304]">
           <div className="absolute inset-0 pointer-events-none">
@@ -52,7 +53,7 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
       </div>
 
       <main className="relative z-10 max-w-7xl mx-auto p-6 space-y-10 w-full flex-1">
-        <header className="space-y-2">
+        <header className="space-y-2 pt-2">
           <div className="flex items-center gap-3">
             <div className="w-1 h-4 bg-[#c8b89a]" />
             <h2 className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em]">
@@ -63,15 +64,15 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
         </header>
 
         <section className="space-y-10">
-          <OverviewHeader
-            initialProgress={treeStats.progress}
-            unlockedCount={treeStats.unlocked}
-            totalCount={treeStats.total}
+          <OverviewHeader 
+            initialProgress={treeStats.progress} 
+            unlockedCount={treeStats.unlocked} 
+            totalCount={treeStats.total} 
           />
-          <StatsGrid
-            unlockedCount={treeStats.unlocked}
-            totalCount={treeStats.total}
-            progress={treeStats.progress}
+          <StatsGrid 
+            unlockedCount={treeStats.unlocked} 
+            totalCount={treeStats.total} 
+            progress={treeStats.progress} 
           />
         </section>
 
@@ -113,7 +114,7 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
               </p>
             </div>
             <p className="text-[10px] text-zinc-600 font-mono tracking-tighter">
-              {treeStats.total - treeStats.unlocked > 0
+              {treeStats.total - treeStats.unlocked > 0 
                 ? `${treeStats.total - treeStats.unlocked} passos restantes`
                 : "Protocolo finalizado."}
             </p>
