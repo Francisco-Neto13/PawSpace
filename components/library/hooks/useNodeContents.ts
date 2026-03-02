@@ -7,9 +7,7 @@ export function useNodeContents() {
   const [loadingNodeId, setLoadingNodeId] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Usei useCallback para evitar que o hook cause re-renders infinitos na Biblioteca
   const loadNodeContents = useCallback(async (nodeId: string) => {
-    // 1. Verificação de Cache
     if (nodeContents[nodeId] !== undefined) return;
 
     if (abortControllerRef.current) {

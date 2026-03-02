@@ -1,9 +1,11 @@
 'use client';
 import React, { memo, useMemo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
-import { SkillData, CATEGORY_THEME, SkillCategory, SkillShape, SHAPE_SIZE } from '../types';
+import { SkillData, SkillShape, SHAPE_SIZE } from '../types';
 
 type CompatibleSkillNode = Node<SkillData>;
+
+const DEFAULT_NODE_COLOR = '#c8b89a';
 
 export function SvgDefs() {
   return (
@@ -34,19 +36,12 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
     icon, 
     name, 
     label,
-    category, 
     shape = 'hexagon', 
     color, 
-    progress = 0,
     parentId 
   } = data;
 
-  const theme = useMemo(
-    () => CATEGORY_THEME[category as SkillCategory] || CATEGORY_THEME.keystone,
-    [category]
-  );
-  
-  const nodeColor = useMemo(() => color || theme.color, [color, theme.color]);
+  const nodeColor = useMemo(() => color || DEFAULT_NODE_COLOR, [color]);
 
   const isRoot = !parentId;
   const effectiveShape: SkillShape = isRoot ? 'hexagon' : (shape as SkillShape);

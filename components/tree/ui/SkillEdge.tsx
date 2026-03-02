@@ -1,10 +1,13 @@
 'use client';
 import React, { memo } from 'react';
 import { EdgeProps, BaseEdge, getStraightPath, type Edge } from '@xyflow/react';
-import { SkillEdgeData, CATEGORY_THEME, SkillCategory } from '../types';
+import { SkillEdgeData } from '../types';
 
 type CompatibleSkillEdge = Edge<SkillEdgeData & { [key: string]: unknown }>;
 type SkillEdgeProps = EdgeProps<CompatibleSkillEdge>;
+
+const DEFAULT_EDGE_COLOR = '#c8b89a';
+const LOCKED_EDGE_COLOR = '#1a1a1f';
 
 function SkillEdgeComponent({
   id,
@@ -14,13 +17,10 @@ function SkillEdgeComponent({
   const [path] = getStraightPath({ sourceX, sourceY, targetX, targetY });
 
   const unlocked = data?.unlocked ?? false;
-  const category = data?.category as SkillCategory;
 
-  const themeColor = category && CATEGORY_THEME[category]
-    ? CATEGORY_THEME[category].color
-    : '#c8b89a'; 
-
-  const strokeColor = unlocked ? themeColor : '#1a1a1f';
+  const strokeColor = unlocked 
+    ? (data?.color || DEFAULT_EDGE_COLOR) 
+    : LOCKED_EDGE_COLOR;
 
   return (
     <>
@@ -34,6 +34,7 @@ function SkillEdgeComponent({
           transition: 'stroke-width 0.3s ease',
         }}
       />
+
       <path
         d={path}
         fill="none"
@@ -42,8 +43,11 @@ function SkillEdgeComponent({
         strokeLinecap="butt"
         opacity={unlocked ? 1 : 0.6}
         className="pointer-events-none"
-        style={{ transition: 'stroke 0.5s ease, stroke-width 0.3s ease, opacity 0.3s ease' }}
+        style={{ 
+          transition: 'stroke 0.5s ease, stroke-width 0.3s ease, opacity 0.3s ease' 
+        }}
       />
+
       {unlocked && (
         <path
           d={path}

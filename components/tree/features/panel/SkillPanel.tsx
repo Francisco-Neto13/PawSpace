@@ -2,7 +2,7 @@
 import React, { useMemo, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { BookOpen } from 'lucide-react';
-import { SkillData, CATEGORY_THEME, SkillCategory } from '../../types';
+import { SkillData } from '../../types';
 
 interface SkillPanelProps {
   data: (SkillData & { id?: string }) | null;
@@ -10,6 +10,8 @@ interface SkillPanelProps {
   onToggleStatus?: (nodeId: string) => void;
   isAvailable: boolean;
 }
+
+const DEFAULT_SYSTEM_COLOR = '#c8b89a';
 
 const poly = `polygon(
   10px 0,
@@ -28,14 +30,7 @@ const poly = `polygon(
 function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: SkillPanelProps) {
   const router = useRouter();
 
-  const theme = useMemo(
-    () => data
-      ? CATEGORY_THEME[data.category as SkillCategory] || CATEGORY_THEME.keystone
-      : CATEGORY_THEME.keystone,
-    [data?.category]
-  );
-
-  const activeColor = useMemo(() => data?.color || theme.color, [data?.color, theme.color]);
+  const activeColor = useMemo(() => data?.color || DEFAULT_SYSTEM_COLOR, [data?.color]);
 
   if (!data) return null;
 
@@ -80,7 +75,7 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
                   backgroundColor: data.isUnlocked ? `${activeColor}0d` : 'transparent',
                 }}
               >
-                {data.category?.toUpperCase() || 'CORE'}
+                {data.category?.toUpperCase() || 'PROTOCOLO'}
               </div>
 
               <button
@@ -104,7 +99,6 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
               />
               <span
                 className={`text-7xl transition-all duration-700 ${data.isUnlocked ? 'grayscale-0 scale-110' : 'grayscale opacity-20'}`}
-                style={{ filter: 'none' }}
               >
                 {isAvailable ? (data.icon || '✦') : '🔒'}
               </span>
