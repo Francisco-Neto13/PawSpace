@@ -1,9 +1,10 @@
 import { Node, Edge } from '@xyflow/react';
-import { SkillData, SkillCategory, SkillShape } from '../components/tree/types';
-import type { SkillRow } from '../app/actions/skills/types'; 
+import { SkillData, SkillShape } from '../components/tree/types';
+import type { SkillRow } from '../app/actions/skills/types';
 
 const X_OFFSET = 250;
 const Y_OFFSET = 180;
+
 
 type SkillNode = SkillRow & { children: SkillNode[] };
 
@@ -67,8 +68,7 @@ export function generateTreeLayout(
     const finalX = hasSavedPosition ? (skill.positionX as number) : autoX;
     const finalY = hasSavedPosition ? (skill.positionY as number) : autoY;
 
-    const isRoot = !skill.parentId;
-    const shape = isRoot ? 'hexagon' : ((skill.shape ?? 'hexagon') as SkillShape);
+    const shape = (skill.shape as SkillShape) ?? 'hexagon';
 
     nodes.push({
       id: skill.id,
@@ -78,17 +78,17 @@ export function generateTreeLayout(
         id: skill.id,
         userId: skill.userId,
         name: skill.name,
-        positionX: skill.positionX,
-        positionY: skill.positionY,
         label: skill.name,
-        icon: skill.icon ?? '🔹',
-        category: (skill.category ?? 'keystone') as SkillCategory,
-        color: skill.color ?? undefined, 
-        shape,
+        description: skill.description,
+        category: skill.category,
+        shape: shape,
         isUnlocked: skill.isUnlocked,
-        description: skill.description ?? '',
-        parentId: skill.parentId ?? undefined,
-        links: (skill as any).contents ?? [],
+        parentId: skill.parentId,
+        positionX: finalX,
+        positionY: finalY,
+        icon: skill.icon ?? '🔹',
+        color: skill.color,
+        links: (skill as any).contents ?? (skill as any).links ?? [],
       },
     });
 
@@ -100,8 +100,7 @@ export function generateTreeLayout(
         type: 'skill',
         data: {
           unlocked: skill.isUnlocked,
-          category: skill.category,
-          color: skill.color,
+          color: skill.color ?? undefined,
         },
       });
     }

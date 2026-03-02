@@ -15,54 +15,114 @@ interface JournalEditorProps {
 
 export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEditorProps) {
   const { setIsSaving, isSaving } = useNexus();
+  
   const [title, setTitle] = useState(entry.title);
   const [selectedSkillId, setSelectedSkillId] = useState(entry.skillId);
   const [showSkillPicker, setShowSkillPicker] = useState(false);
+  const [lastInteraction, setLastInteraction] = useState(Date.now());
   
   const bodyRef = useRef<HTMLDivElement>(null);
-  const isInternalUpdate = useRef(false);
+  
+  const skipNextSync = useRef(false);
+  const lastSavedContent = useRef({ title: entry.title, body: entry.body, skillId: entry.skillId });
 
   const skill = getSkill(selectedSkillId, skills);
   const unlockedSkills = skills.filter(s => s.isUnlocked);
 
-  const handleSave = useCallback(async (currentTitle: string, currentSkillId: string | null) => {
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isSaving) {
+        e.preventDefault();
+        e.returnValue = ''; 
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isSaving]);
+
+  const handleSave = useCallback(async () => {
     if (!bodyRef.current) return;
     
-    setIsSaving(true);
     const currentBody = bodyRef.current.innerHTML;
+    const currentTitle = title;
+    const currentSkillId = selectedSkillId;
 
-    const result = await saveJournalEntry({
-      id: entry.id,
-      title: currentTitle,
-      body: currentBody,
-      skillId: currentSkillId,
-    });
+    const hasTitleChanged = currentTitle !== lastSavedContent.current.title;
+    const hasBodyChanged = currentBody !== lastSavedContent.current.body;
+    const hasSkillChanged = currentSkillId !== lastSavedContent.current.skillId;
 
-    if (result.success && result.entry) {
-      isInternalUpdate.current = true;
-      onUpdate(result.entry as unknown as JournalEntry);
+    if (!hasTitleChanged && !hasBodyChanged && !hasSkillChanged) {
+      setIsSaving(false);
+      return;
     }
-    setIsSaving(false);
-  }, [entry.id, setIsSaving, onUpdate]);
+
+    try {
+      const result = await saveJournalEntry({
+        id: entry.id,
+        title: currentTitle,
+        body: currentBody,
+        skillId: currentSkillId,
+      });
+
+      if (result.success && result.entry) {
+        lastSavedContent.current = { 
+          title: currentTitle, 
+          body: currentBody, 
+          skillId: currentSkillId 
+        };
+        
+        skipNextSync.current = true;
+        onUpdate(result.entry as unknown as JournalEntry);
+      }
+    } catch (error) {
+      console.error("❌ [Journal] Erro ao sincronizar:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [entry.id, title, selectedSkillId, setIsSaving, onUpdate]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (title !== entry.title || selectedSkillId !== entry.skillId) {
-        handleSave(title, selectedSkillId);
-      }
-    }, 1500);
+      handleSave();
+    }, 1200);
+
     return () => clearTimeout(timer);
-  }, [title, selectedSkillId, handleSave, entry.title, entry.skillId]);
+  }, [handleSave, lastInteraction]); 
 
   useEffect(() => {
+    if (skipNextSync.current) {
+      skipNextSync.current = false;
+      return;
+    }
+
     setTitle(entry.title);
     setSelectedSkillId(entry.skillId);
+    lastSavedContent.current = { title: entry.title, body: entry.body, skillId: entry.skillId };
     
-    if (bodyRef.current && !isInternalUpdate.current) {
+    if (bodyRef.current && bodyRef.current.innerHTML !== entry.body) {
       bodyRef.current.innerHTML = entry.body;
     }
-    isInternalUpdate.current = false;
-  }, [entry]);
+    setIsSaving(false);
+  }, [entry.id, entry.title, entry.body, entry.skillId, setIsSaving]);
+
+  const handleTitleChange = (newTitle: string) => {
+    setTitle(newTitle);
+    setIsSaving(true);
+    setLastInteraction(Date.now());
+
+    skipNextSync.current = true;
+    onUpdate({ ...entry, title: newTitle });
+  };
+
+  const handleSkillSelect = (skillId: string | null) => {
+    setSelectedSkillId(skillId);
+    setIsSaving(true);
+    setShowSkillPicker(false);
+    setLastInteraction(Date.now());
+
+    skipNextSync.current = true;
+    onUpdate({ ...entry, skillId });
+  };
 
   return (
     <div className="flex flex-col h-full bg-white/[0.01]">
@@ -70,7 +130,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
         <input
           type="text"
           value={title}
-          onChange={e => setTitle(e.target.value)}
+          onChange={e => handleTitleChange(e.target.value)}
           placeholder="Título da entrada..."
           className="w-full bg-transparent text-white text-xl font-black outline-none placeholder:text-zinc-700 tracking-wide antialiased"
         />
@@ -87,7 +147,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             <button
               onClick={() => setShowSkillPicker(!showSkillPicker)}
               className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer hover:opacity-80 antialiased"
-              style={{ color: skill ? skill.color : '#71717a' }}
+              style={{ color: skill?.color ?? '#71717a' }}
             >
               <Tag size={9} />
               {skill ? `${skill.icon} ${skill.name}` : 'Vincular skill'}
@@ -103,7 +163,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                   </div>
                   
                   <button
-                    onClick={() => { setSelectedSkillId(null); setShowSkillPicker(false); }}
+                    onClick={() => handleSkillSelect(null)}
                     className="px-3 py-2 text-[10px] text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.03] text-left transition-colors font-bold uppercase"
                   >
                     Nenhum vínculo
@@ -113,9 +173,9 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                     {unlockedSkills.map(s => (
                       <button
                         key={s.id}
-                        onClick={() => { setSelectedSkillId(s.id); setShowSkillPicker(false); }}
+                        onClick={() => handleSkillSelect(s.id)}
                         className="w-full flex items-center gap-2 px-3 py-2 text-[10px] hover:bg-white/[0.03] text-left transition-colors border-l-2 border-transparent hover:border-current"
-                        style={{ color: s.color || '#fff' }}
+                        style={{ color: s.color ?? '#ffffff' }}
                       >
                         <span className="text-[12px] opacity-80">{s.icon}</span>
                         <span className="font-bold uppercase tracking-wider">{s.name}</span>
@@ -159,11 +219,18 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
           ref={bodyRef}
           contentEditable
           suppressContentEditableWarning
+          onInput={() => {
+            const currentBody = bodyRef.current?.innerHTML || '';
+            if (currentBody !== lastSavedContent.current.body) {
+              setIsSaving(true);
+              setLastInteraction(Date.now());
+            }
+          }}
+          onBlur={handleSave}
           className="flex-1 overflow-y-auto px-8 py-10 text-zinc-200 text-sm font-light leading-relaxed outline-none prose prose-invert max-w-none antialiased"
           style={{ 
             scrollbarWidth: 'thin', 
-            scrollbarColor: 'rgba(200,184,154,0.1) transparent',
-            textShadow: '0 0 1px rgba(255,255,255,0.01)'
+            scrollbarColor: 'rgba(200,184,154,0.1) transparent'
           }}
         />
       </div>

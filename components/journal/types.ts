@@ -3,7 +3,6 @@ export interface JournalEntry {
   title: string;
   body: string;
   skillId: string | null;
-  userId: string;
   createdAt: Date | string;
   updatedAt?: Date | string;
 
@@ -22,7 +21,7 @@ export interface SkillBase {
   isUnlocked: boolean;
 }
 
-export function getSkill(skillId: string | null, skills: any[]) {
+export function getSkill(skillId: string | null, skills: SkillBase[]) {
   if (!skillId) return null;
   return skills.find(s => s.id === skillId) ?? null;
 }
