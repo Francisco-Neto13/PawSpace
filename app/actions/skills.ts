@@ -12,4 +12,3 @@ export async function deleteSkill(id: string) { return mutations.deleteSkill(id)
 
 export async function getSkillsFull() { return queries.getSkillsFull(); }
 export async function getSkillsSummary() { return queries.getSkillsSummary(); }
-export async function getSkillsForLibrary() { return queries.getSkillsForLibrary(); }

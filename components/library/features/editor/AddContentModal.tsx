@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Link2, Video, FileText, StickyNote, X } from 'lucide-react';
-import { addContent, uploadPdf } from '@/app/actions/contents';
+import { addContent, uploadPdf } from '@/app/actions/library';
 import { ContentType } from '../../types';
 import { LinkForm, VideoForm } from './UrlForms';
 import { PdfForm } from './PdfForm';

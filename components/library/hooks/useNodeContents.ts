@@ -19,7 +19,7 @@ export function useNodeContents() {
     setLoadingNodeId(nodeId);
 
     try {
-      const { getContentsBySkill } = await import('@/app/actions/contents');
+      const { getContentsBySkill } = await import('@/app/actions/library');
       const updated = await getContentsBySkill(nodeId);
 
       if (!controller.signal.aborted) {
@@ -28,7 +28,6 @@ export function useNodeContents() {
           [nodeId]: updated.map(c => ({
             ...c,
             type: c.type as Content['type'],
-            // Formatação de data simplificada
             createdAt: new Date(c.createdAt).toISOString().slice(0, 10),
           })),
         }));
@@ -38,12 +37,12 @@ export function useNodeContents() {
     } finally {
       if (!controller.signal.aborted) setLoadingNodeId(null);
     }
-  }, [nodeContents]); // Depende do nodeContents para saber o que já está em cache
+  }, [nodeContents]); 
 
   const refreshNodeContents = async (nodeId: string) => {
     setLoadingNodeId(nodeId);
     try {
-      const { getContentsBySkill } = await import('@/app/actions/contents');
+      const { getContentsBySkill } = await import('@/app/actions/library');
       const updated = await getContentsBySkill(nodeId);
       setNodeContents(prev => ({
         ...prev,

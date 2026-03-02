@@ -1,49 +1,14 @@
 'use server';
+
 import prisma from '@/lib/prisma';
-import { createClient } from '@/utils/supabase/server';
-
-async function getAuthUser() {
-  const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  
-  if (error || !user) {
-    console.warn("⚠️ [Auth] Nenhum usuário autenticado encontrado na sessão.");
-    return null;
-  }
-  return user.id;
-}
-
-export async function getSkillsForLibrary() {
-  const userId = await getAuthUser();
-  if (!userId) return [];
-
-  try {
-    const skills = await prisma.skill.findMany({
-      where: { userId },
-      select: {
-        id: true,
-        name: true,
-        icon: true,
-        color: true,
-        isUnlocked: true,
-      },
-      orderBy: { createdAt: 'asc' },
-    });
-    
-    return skills;
-  } catch (error) {
-    console.error('❌ [Library Query] Erro no Prisma:', error);
-    return [];
-  }
-}
+import { getAuthUser } from './auth-helper';
 
 export async function getSkillsFull() {
   const userId = await getAuthUser();
   if (!userId) return { nodes: [], edges: [] };
 
-  console.log(`🚀 [Nexus Query] Buscando árvore para user: ${userId}`);
-
   try {
+    const start = Date.now();
     const skills = await prisma.skill.findMany({
       where: { userId },
       include: { contents: true },
@@ -67,7 +32,6 @@ export async function getSkillsFull() {
       .filter((s) => s.parentId)
       .map((s) => {
         const parent = skills.find(p => p.id === s.parentId);
-        
         const isPathActive = s.isUnlocked && (parent?.isUnlocked ?? false);
 
         return {
@@ -82,7 +46,7 @@ export async function getSkillsFull() {
         };
       });
 
-    console.log(`📦 [Nexus Query] Mapeamento concluído: ${nodes.length} Nodes e ${edges.length} Edges.`);
+    console.log(`⏱️  [Nexus Query] Fetch: ${Date.now() - start}ms | Nodes: ${nodes.length}`);
     return { nodes, edges };
   } catch (error) {
     console.error('❌ [Nexus Query] Erro Crítico:', error);
