@@ -32,6 +32,7 @@ model Skill {
   isUnlocked          Boolean @default(false)
 
   contents LibraryContent[]
+  journalEntries JournalEntry[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -55,4 +56,20 @@ model LibraryContent {
 
   @@index([skillId])
   @@index([userId])
+}
+
+model JournalEntry {
+  id        String   @id @default(cuid())
+  title     String
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId  String
+  skillId String?
+
+  skill Skill? @relation(fields: [skillId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([skillId])
 }

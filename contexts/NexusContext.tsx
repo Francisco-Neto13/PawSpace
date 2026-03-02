@@ -27,6 +27,8 @@ interface NexusContextType {
   isLoading: boolean;
   isDirty: boolean; 
   setIsDirty: React.Dispatch<React.SetStateAction<boolean>>; 
+  isSaving: boolean;
+  setIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
   refreshNexus: (silent?: boolean) => Promise<void>;
 }
 
@@ -37,6 +39,7 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); 
 
   const isDirtyRef = useRef(isDirty);
 
@@ -96,6 +99,8 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
         isLoading, 
         isDirty,    
         setIsDirty, 
+        isSaving,      
+        setIsSaving,  
         refreshNexus 
       }}
     >

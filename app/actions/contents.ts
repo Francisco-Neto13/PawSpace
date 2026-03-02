@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 
 export type ContentInput = {
   skillId: string;
-  userId?: string; // Tornamos opcional aqui para o TS não reclamar no payload
+  userId?: string; 
   type: 'link' | 'video' | 'pdf' | 'note';
   title: string;
   url?: string;
@@ -17,7 +17,6 @@ export async function addContent(data: ContentInput) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
-    // Prioriza o ID que vem da sessão do servidor por segurança
     const finalUserId = user?.id || data.userId;
 
     if (!finalUserId) {
@@ -27,7 +26,7 @@ export async function addContent(data: ContentInput) {
     const content = await prisma.libraryContent.create({ 
       data: {
         ...data,
-        userId: finalUserId // Garante que o ID correto seja gravado
+        userId: finalUserId 
       } 
     });
     
@@ -70,16 +69,11 @@ export async function getContentsBySkill(skillId: string) {
   }
 }
 
-/**
- * Upload de PDF
- * userId agora é opcional (?) para evitar o erro do TypeScript no Modal
- */
 export async function uploadPdf(formData: FormData, userId?: string) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
-    // Se não passou userId, usa o da sessão
     const finalUserId = userId || user?.id;
 
     if (!finalUserId) {

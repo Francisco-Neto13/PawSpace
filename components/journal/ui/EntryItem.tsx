@@ -1,17 +1,20 @@
 'use client';
 import { Calendar } from 'lucide-react';
-import { JournalEntry, MockSkill, getSkill, formatDate } from '../types';
+import { JournalEntry, SkillBase, getSkill, formatDate } from '../types';
 
 interface EntryItemProps {
   entry: JournalEntry;
-  skills: MockSkill[];
+  skills: SkillBase[]; 
   isSelected: boolean;
   onSelect: () => void;
 }
 
 export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProps) {
   const skill = getSkill(entry.skillId, skills);
-  const preview = entry.body.replace(/<[^>]+>/g, '').slice(0, 60);
+  
+  const preview = entry.body 
+    ? entry.body.replace(/<[^>]+>/g, '').slice(0, 60) 
+    : 'Sem conteúdo adicional...';
 
   return (
     <button
@@ -23,37 +26,49 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
         }`}
     >
       {isSelected && (
-        <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#c8b89a]" />
-      )}
-      {isSelected && (
-        <div
-          className="absolute top-0 left-0 right-0 h-[1px]"
-          style={{ background: 'linear-gradient(to right, #c8b89a33, transparent)' }}
-        />
+        <>
+          <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#c8b89a]" />
+          <div
+            className="absolute top-0 left-0 right-0 h-[1px]"
+            style={{ background: 'linear-gradient(to right, #c8b89a33, transparent)' }}
+          />
+        </>
       )}
 
-      <p className={`text-[11px] font-bold truncate transition-colors ${isSelected ? 'text-[#c8b89a]' : 'text-zinc-300 group-hover:text-zinc-100'}`}>
-        {entry.title}
+      <p className={`text-[11px] font-bold truncate transition-colors ${
+        isSelected ? 'text-[#c8b89a]' : 'text-zinc-300 group-hover:text-zinc-100'
+      }`}>
+        {entry.title || 'Sem Título'}
       </p>
 
-      <p className="text-[10px] text-zinc-500 font-medium leading-relaxed line-clamp-2">
+      <p className="text-[10px] text-zinc-500 font-medium leading-relaxed line-clamp-2 min-h-[30px]">
         {preview}…
       </p>
 
       <div className="flex items-center gap-2 mt-1">
         {skill && (
-          <span
-            className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border"
-            style={{ color: skill.color, borderColor: `${skill.color}30`, backgroundColor: `${skill.color}0d` }}
-          >
-            {skill.icon} {skill.name}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border flex items-center gap-1.5"
+              style={{ 
+                color: skill.color || '#c8b89a', 
+                borderColor: `${skill.color || '#c8b89a'}30`, 
+                backgroundColor: `${skill.color || '#c8b89a'}0d` 
+              }}
+            >
+              <span className="opacity-80 text-[10px]">{skill.icon}</span>
+              {skill.name}
+            </span>
+          </div>
         )}
+        
         <span className="text-[9px] text-zinc-700 font-mono flex items-center gap-1 ml-auto">
           <Calendar size={8} />
           {formatDate(entry.createdAt)}
         </span>
       </div>
+
+      <div className="absolute bottom-0 right-0 w-0 h-0 border-b-[4px] border-r-[4px] border-transparent group-hover:border-r-white/10 group-hover:border-b-white/10 transition-all" />
     </button>
   );
 }
