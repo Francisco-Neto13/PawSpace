@@ -1,13 +1,14 @@
 'use client';
 import { useCallback, useEffect } from 'react';
-import { useNexus, SkillNode, SkillData } from '@/contexts/NexusContext'; 
-import { toggleSkillStatus, deleteSkill, addSkill, saveNexusChanges } from '@/app/actions/skills';
+import { useNexus, SkillNode } from '@/contexts/NexusContext';
+import { SkillData } from '@/components/tree/types';
+import { toggleSkillStatus, updateSkill, saveNexusChanges, deleteSkill, addSkill } from '@/app/actions/skills';
 import { calculateRecursiveProgress, getNewChildPosition } from '@/utils/treeUtils';
 import { SkillShape } from '../types';
-import { Edge, Node } from '@xyflow/react';
+import { Edge } from '@xyflow/react';
 
 export function useSkillActions() {
-  const { nodes, edges, setNodes, setEdges, refreshNexus } = useNexus();
+  const { nodes, edges, setNodes, setEdges, refreshNexus, originalNodeIds } = useNexus();
 
   useEffect(() => {
     const handlePreview = (e: Event) => {
@@ -54,9 +55,9 @@ export function useSkillActions() {
       const nextNodes = prev.map(n =>
         n.id === nodeId ? ({ ...n, data: { ...n.data, isUnlocked: nextUnlocked } } as SkillNode) : n
       );
-      
+
       const finalNodes = calculateRecursiveProgress(nextNodes as any, edges);
-      
+
       setEdges((prevEdges: Edge[]) =>
         prevEdges.map(edge => ({
           ...edge,
@@ -66,7 +67,7 @@ export function useSkillActions() {
           },
         }))
       );
-      
+
       return finalNodes as SkillNode[];
     });
 
@@ -76,20 +77,13 @@ export function useSkillActions() {
     }
   }, [nodes, edges, setNodes, setEdges, refreshNexus]);
 
-  const handleDelete = useCallback(async (nodeId: string) => {
+  const handleDelete = useCallback((nodeId: string) => {
     if (!confirm('Eliminar este nó e todos os protocolos dependentes?')) return;
-
     setNodes((prev) => prev.filter(n => n.id !== nodeId));
     setEdges((prev) => prev.filter(e => e.source !== nodeId && e.target !== nodeId));
+  }, [setNodes, setEdges]);
 
-    const result = await deleteSkill(nodeId);
-    if (!result.success) {
-      alert('Erro na sincronização. Recarregando Nexus...');
-      await refreshNexus();
-    }
-  }, [setNodes, setEdges, refreshNexus]);
-
-  const handleCreateQuickSkill = useCallback(async (parentId: string | null) => {
+  const handleCreateQuickSkill = useCallback((parentId: string | null) => {
     let positionX = 0, positionY = 0;
     const parentNode = parentId ? nodes.find(n => n.id === parentId) : null;
 
@@ -101,7 +95,7 @@ export function useSkillActions() {
     }
 
     const tempId = `temp-${Date.now()}`;
-    
+
     const newData: SkillData = {
       id: tempId,
       name: 'Novo Protocolo',
@@ -141,59 +135,88 @@ export function useSkillActions() {
       }] as Edge[]);
     }
 
-    const result = await addSkill({
-      name: newData.name,
-      description: newData.description || '',
-      icon: newData.icon,
-      color: newData.color,
-      shape: newData.shape as string,
-      category: newData.category as string,
-      parentId,
-      positionX,
-      positionY,
-    });
-
-    if (result.success && result.skill) {
-      const s = result.skill;
-      setNodes((nds) => nds.map(n =>
-        n.id === tempId
-          ? ({ ...n, id: s.id, data: { ...n.data, id: s.id } } as SkillNode)
-          : n
-      ));
-      setEdges((eds) => eds.map(e => ({
-        ...e,
-        id: e.id.includes(tempId) ? `e-${parentId}-${s.id}` : e.id,
-        target: e.target === tempId ? s.id : e.target,
-      })));
-      return s.id;
-    } else {
-      await refreshNexus();
-      return null;
-    }
-  }, [nodes, edges, setNodes, setEdges, refreshNexus]);
+    return tempId;
+  }, [nodes, edges, setNodes, setEdges]);
 
   const handleUpdateSkill = useCallback(async (skillId: string, data: Partial<SkillData>) => {
     setNodes((prev) => prev.map(n =>
       n.id === skillId
-        ? ({ 
-            ...n, 
-            data: { 
-              ...n.data, 
-              ...data, 
-              label: data.name || data.label || n.data.label 
-            } 
+        ? ({
+            ...n,
+            data: {
+              ...n.data,
+              ...data,
+              label: data.name || data.label || n.data.label,
+            },
           } as SkillNode)
         : n
     ));
-  }, [setNodes]);
+
+    const result = await updateSkill(skillId, data);
+    if (!result.success) {
+      console.error('❌ [SkillActions] Erro ao atualizar skill, recarregando...');
+      await refreshNexus();
+    }
+  }, [setNodes, refreshNexus]);
 
   const handleGlobalSave = useCallback(async () => {
-    const result = await saveNexusChanges(nodes as any);
-    if (!result.success) {
+    try {
+      const currentIds = new Set(nodes.map(n => n.id));
+
+      const toCreate = nodes.filter(n => n.id.startsWith('temp-'));
+
+      const toDelete = [...originalNodeIds.current].filter(id => !currentIds.has(id));
+
+      const toUpdate = nodes.filter(n => !n.id.startsWith('temp-'));
+
+      const tempToReal: Record<string, string> = {};
+      for (const node of toCreate) {
+        const result = await addSkill({
+          name: node.data.name,
+          description: node.data.description || '',
+          icon: node.data.icon,
+          color: node.data.color,
+          shape: node.data.shape as string,
+          category: node.data.category as string,
+          parentId: node.data.parentId || null,
+          positionX: node.position.x,
+          positionY: node.position.y,
+        });
+
+        if (result.success && result.skill) {
+          tempToReal[node.id] = result.skill.id;
+        }
+      }
+
+      for (const id of toDelete) {
+        await deleteSkill(id);
+      }
+
+      if (toUpdate.length > 0) {
+        await saveNexusChanges(toUpdate as any);
+      }
+
+      if (Object.keys(tempToReal).length > 0) {
+        setNodes(prev => prev.map(n => {
+          const realId = tempToReal[n.id];
+          if (!realId) return n;
+          return { ...n, id: realId, data: { ...n.data, id: realId } } as SkillNode;
+        }));
+        setEdges(prev => prev.map(e => ({
+          ...e,
+          id: tempToReal[e.target] ? `e-${e.source}-${tempToReal[e.target]}` : e.id,
+          target: tempToReal[e.target] || e.target,
+          source: tempToReal[e.source] || e.source,
+        })));
+      }
+
+      return true;
+    } catch (error) {
+      console.error('❌ [SkillActions] Erro no save global:', error);
       alert('Erro ao sincronizar mudanças.');
+      return false;
     }
-    return result.success;
-  }, [nodes]);
+  }, [nodes, setNodes, setEdges, refreshNexus]);
 
   return {
     handleToggleStatus,

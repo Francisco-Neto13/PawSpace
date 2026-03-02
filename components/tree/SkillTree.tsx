@@ -13,7 +13,7 @@ import { NodeContextMenu } from './ui/NodeContextMenu';
 import { TreeOnboarding } from './ui/TreeOnboarding';
 
 import { useNexus } from '@/contexts/NexusContext';
-import { SkillTreeProvider } from './context/SkillTreeContext';
+import { useSkillTree, SkillTreeProvider } from '@/contexts/SkillTreeContext';
 import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
 
@@ -37,15 +37,12 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
 
   useEffect(() => {
     if (isLoading || nodes.length === 0 || hasCentered) return;
-
     const rootNode = nodes.find(n => !n.data.parentId);
     if (!rootNode) return;
-
     const timer = setTimeout(() => {
       fitView({ nodes: [rootNode], padding: 0.4, duration: 800, maxZoom: 1 });
       setHasCentered(true);
     }, 300);
-
     return () => clearTimeout(timer);
   }, [isLoading, nodes, hasCentered, fitView]);
 
@@ -53,9 +50,10 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
 }
 
 function SkillTreeInner() {
-  const { nodes, edges, isLoading: isLoadingNexus, refreshNexus, setIsDirty, isDirty: isGlobalDirty } = useNexus();
+  const { nodes, edges, isLoading: isLoadingTree } = useSkillTree();
+  const { refreshNexus, setIsDirty, isDirty } = useNexus();
 
-  const { onNodesChange, hasUnsavedChanges: hasDragChanges, isSaving, saveLayout } = useSkillDrag();
+  const { onNodesChange, hasUnsavedChanges: hasDragChanges, isSaving, setIsSaving, resetDirty } = useSkillDrag();
   const {
     handleToggleStatus,
     handleDelete,
@@ -67,19 +65,19 @@ function SkillTreeInner() {
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
-  const [hasDataChanges, setHasDataChanges] = useState(false);
+  const [hasStructuralChanges, setHasStructuralChanges] = useState(false);
 
-  const canSave = isGlobalDirty || hasDragChanges || hasDataChanges;
+  const canSave = isDirty || hasDragChanges || hasStructuralChanges;
 
   useEffect(() => {
     refreshNexus(true);
   }, [refreshNexus]);
 
   useEffect(() => {
-    if ((hasDragChanges || hasDataChanges) && setIsDirty) {
+    if (hasStructuralChanges || hasDragChanges) {
       setIsDirty(true);
     }
-  }, [hasDragChanges, hasDataChanges, setIsDirty]);
+  }, [hasStructuralChanges, hasDragChanges, setIsDirty]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -93,16 +91,19 @@ function SkillTreeInner() {
   }, [canSave]);
 
   const onSaveAll = async () => {
+    setIsSaving(true);
     try {
       const success = await handleGlobalSave();
       if (success) {
-        await saveLayout(nodes as any);
-        setHasDataChanges(false);
-        if (setIsDirty) setIsDirty(false);
+        resetDirty();
+        setHasStructuralChanges(false);
+        setIsDirty(false);
         await refreshNexus(false);
       }
     } catch (error) {
-      console.error("❌ [SkillTree] Erro crítico na sincronização:", error);
+      console.error('❌ [SkillTree] Erro crítico na sincronização:', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -128,7 +129,7 @@ function SkillTreeInner() {
       className="relative w-full bg-[#030304] overflow-hidden select-none font-sans"
       style={{ height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))' }}
     >
-      {isLoadingNexus && nodes.length === 0 && (
+      {isLoadingTree && nodes.length === 0 && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#030304]">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
@@ -163,7 +164,10 @@ function SkillTreeInner() {
                 : 'border-[#c8b89a]/40 bg-[#030304]/90 text-[#c8b89a] hover:bg-[#c8b89a]/10 hover:border-[#c8b89a] active:scale-95 cursor-pointer'
               }`}
           >
-            {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} className="group-hover:scale-110 transition-transform" />}
+            {isSaving
+              ? <Loader2 size={14} className="animate-spin" />
+              : <Save size={14} className="group-hover:scale-110 transition-transform" />
+            }
             <span className="text-[10px] font-black uppercase tracking-widest">
               {isSaving ? 'Consolidando...' : 'Consolidar Protocolos'}
             </span>
@@ -206,7 +210,7 @@ function SkillTreeInner() {
           nodesConnectable={false}
           style={{ background: 'transparent' }}
         >
-          <CenterOnRoot nodes={nodes} isLoading={isLoadingNexus && nodes.length === 0} />
+          <CenterOnRoot nodes={nodes} isLoading={isLoadingTree && nodes.length === 0} />
         </ReactFlow>
       </div>
 
@@ -215,13 +219,13 @@ function SkillTreeInner() {
           {...contextMenu}
           onAddChild={() => {
             handleCreateQuickSkill(contextMenu.nodeId);
-            setHasDataChanges(true);
+            setHasStructuralChanges(true);
             setContextMenu(null);
           }}
           onEdit={() => { setEditingSkillId(contextMenu.nodeId); setContextMenu(null); }}
           onDelete={() => {
             handleDelete(contextMenu.nodeId);
-            setHasDataChanges(true);
+            setHasStructuralChanges(true);
             setContextMenu(null);
           }}
           onClose={() => setContextMenu(null)}
@@ -231,10 +235,7 @@ function SkillTreeInner() {
       <SkillPanel
         data={panelData}
         onClose={() => setSelectedSkillId(null)}
-        onToggleStatus={async (id) => {
-          await handleToggleStatus(id);
-          setHasDataChanges(true);
-        }}
+        onToggleStatus={handleToggleStatus}
         isAvailable={isPanelAvailable}
       />
 
@@ -243,12 +244,11 @@ function SkillTreeInner() {
         onClose={() => setEditingSkillId(null)}
         onUpdate={async (id, data) => {
           await handleUpdateSkill(id, data);
-          setHasDataChanges(true);
         }}
         skillData={nodes.find(n => n.id === editingSkillId)?.data as any}
         existingSkills={nodes.map(n => ({
           id: n.id,
-          name: (n.data as any).label || (n.data as any).name || ''
+          name: (n.data as any).label || (n.data as any).name || '',
         }))}
       />
 

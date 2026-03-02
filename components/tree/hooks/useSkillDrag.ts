@@ -13,35 +13,23 @@ export function useSkillDrag() {
       const isRealMovement = changes.some(
         (c) => c.type === 'position' && 'dragging' in c && c.dragging === true
       );
-
       if (isRealMovement) {
         setHasUnsavedChanges(true);
       }
-
-      setNodes((nds) => {
-        return applyNodeChanges(changes, nds as any) as any;
-      });
+      setNodes((nds) => applyNodeChanges(changes, nds as any) as any);
     },
     [setNodes]
   );
 
-  const saveLayout = async (currentNodes: any[]) => {
-    setIsSaving(true);
-    try {
-      setHasUnsavedChanges(false);
-      return true;
-    } catch (err) {
-      console.error('❌ [useSkillDrag] Erro ao processar layout:', err);
-      return false;
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  const resetDirty = useCallback(() => {
+    setHasUnsavedChanges(false);
+  }, []);
 
   return {
     onNodesChange,
     hasUnsavedChanges,
     isSaving,
-    saveLayout,
+    setIsSaving,
+    resetDirty,
   };
 }

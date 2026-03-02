@@ -25,6 +25,7 @@ export interface SkillEdgeData {
   color?: string; 
 }
 
+
 export const SHAPE_SIZE: Record<SkillShape, number> = {
   hexagon: 64,
   circle:  52,

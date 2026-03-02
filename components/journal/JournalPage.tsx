@@ -1,53 +1,39 @@
 'use client';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { BookOpen, Plus, Loader2 } from 'lucide-react';
 import { JournalSidebar } from './features/viewer/JournalSidebar';
 import { JournalEditor } from './features/editor/JournalEditor';
 import { JournalEntry, SkillBase } from './types';
-import { useNexus } from '@/contexts/NexusContext'; 
-import { getJournalEntries, saveJournalEntry, deleteJournalEntry } from '@/app/actions/journal';
+import { useNexus } from '@/contexts/NexusContext';
+import { useJournal } from '@/contexts/JournalContext';
+import { saveJournalEntry, deleteJournalEntry } from '@/app/actions/journal';
 
 export default function JournalPage() {
-  const { nodes, isLoading: isLoadingNexus, setIsSaving } = useNexus();
-  
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [isLoadingEntries, setIsLoadingEntries] = useState(true);
+  const { nodes, isLoading: isLoadingNexus } = useNexus();
+  const { entries, setEntries, isLoading: isLoadingEntries } = useJournal();
 
-  useEffect(() => {
-    async function load() {
-      setIsLoadingEntries(true);
-      try {
-        const data = await getJournalEntries();
-        const typedData = data as unknown as JournalEntry[];
-        setEntries(typedData);
-        if (typedData.length > 0) setSelectedId(typedData[0].id);
-      } catch (error) {
-        console.error("Erro ao carregar diário:", error);
-      } finally {
-        setIsLoadingEntries(false);
-      }
-    }
-    load();
-  }, []);
+  const [selectedId, setSelectedId] = useState<string | null>(
+    entries.length > 0 ? entries[0].id : null
+  );
+  const [isSaving, setIsSaving] = useState(false);
 
-  const skillList = useMemo(() => {
+  const skillList = useMemo<SkillBase[]>(() => {
     return nodes.map(n => ({
       id: n.id,
       name: n.data.label || n.data.name || 'Sem Nome',
       icon: n.data.icon || '✦',
       color: n.data.color || '#c8b89a',
-      isUnlocked: !!n.data.isUnlocked 
-    })) as SkillBase[];
+      isUnlocked: !!n.data.isUnlocked,
+    }));
   }, [nodes]);
 
-  const selectedEntry = useMemo(() => 
+  const selectedEntry = useMemo(() =>
     entries.find(e => e.id === selectedId) || null
   , [entries, selectedId]);
 
   const handleUpdateEntry = useCallback((updated: JournalEntry) => {
     setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
-  }, []);
+  }, [setEntries]);
 
   const handleNewEntry = async () => {
     const tempId = `temp-${Date.now()}`;
@@ -62,8 +48,8 @@ export default function JournalPage() {
 
     setEntries(prev => [placeholder, ...prev]);
     setSelectedId(tempId);
-    
     setIsSaving(true);
+
     try {
       const result = await saveJournalEntry({
         title: placeholder.title,
@@ -88,7 +74,7 @@ export default function JournalPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Deseja deletar esta entrada?')) return;
-    
+
     const previousEntries = [...entries];
     const remaining = entries.filter(e => e.id !== id);
     setEntries(remaining);
@@ -118,7 +104,10 @@ export default function JournalPage() {
   }
 
   return (
-    <div className="relative w-full bg-[#030304] flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 160px)' }}>
+    <div
+      className="relative w-full bg-[#030304] flex flex-col overflow-hidden"
+      style={{ height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))' }}
+    >
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
       </div>
@@ -128,7 +117,9 @@ export default function JournalPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-1 h-4 bg-[#c8b89a]" />
-              <h2 className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em]">Nexus / Diário de Bordo</h2>
+              <h2 className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em]">
+                Nexus / Diário de Bordo
+              </h2>
               <div className="h-[1px] w-32 bg-gradient-to-r from-[#c8b89a]/20 to-transparent" />
             </div>
 
@@ -139,7 +130,10 @@ export default function JournalPage() {
                 </p>
                 <p className="text-zinc-400 text-[9px] font-black uppercase tracking-widest mt-1">Registros</p>
               </div>
-              <button onClick={handleNewEntry} className="flex items-center gap-2 px-4 py-2.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[9px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 transition-all cursor-pointer active:scale-95">
+              <button
+                onClick={handleNewEntry}
+                className="flex items-center gap-2 px-4 py-2.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[9px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 transition-all cursor-pointer active:scale-95"
+              >
                 <Plus size={11} />
                 Nova Entrada
               </button>
@@ -171,7 +165,9 @@ export default function JournalPage() {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center gap-4 group">
                 <BookOpen size={32} className="text-zinc-800 group-hover:text-zinc-700 transition-colors duration-500" />
-                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] antialiased">Nenhum registro selecionado</p>
+                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] antialiased">
+                  Nenhum registro selecionado
+                </p>
               </div>
             )}
           </main>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { NexusProvider } from "@/contexts/NexusContext";
+import { LibraryProvider } from "@/contexts/LibraryContext";
+import { JournalProvider } from "@/contexts/JournalContext";
 import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
@@ -22,7 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}
       >
         <NexusProvider>
-          <ClientLayout>{children}</ClientLayout>
+          <LibraryProvider>
+            <JournalProvider>
+              <ClientLayout>{children}</ClientLayout>
+            </JournalProvider>
+          </LibraryProvider>
         </NexusProvider>
       </body>
     </html>
