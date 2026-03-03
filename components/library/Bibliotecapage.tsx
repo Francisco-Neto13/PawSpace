@@ -19,38 +19,40 @@ export default function BibliotecaPage() {
   const { nodes, isLoading: isLoadingNexus, refreshNexus } = useNexus();
   const { nodeContents, loadingNodeId, loadNodeContents, refreshNodeContents } = useLibrary();
 
+  const [visible, setVisible] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<ContentType | 'all'>('all');
   const [showAddContent, setShowAddContent] = useState(false);
 
   useEffect(() => {
-    if (isLoadingNexus || nodes.length === 0) return;
+    const t = setTimeout(() => setVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
 
+  useEffect(() => {
+    if (isLoadingNexus || nodes.length === 0) return;
     const targetId = (nodeIdFromUrl && nodes.find(n => n.id === nodeIdFromUrl))
       ? nodeIdFromUrl
       : (selectedNodeId || nodes[0].id);
-
     if (targetId !== selectedNodeId) {
       setSelectedNodeId(targetId);
       loadNodeContents(targetId);
     }
   }, [nodes, isLoadingNexus, nodeIdFromUrl, selectedNodeId, loadNodeContents]);
 
-  const mappedNodes = useMemo(() => {
-    return nodes.map(n => ({
-      ...n,
-      name: n.data.name || n.data.label || 'Sem Nome',
-      icon: n.data.icon || '✦',
-      color: n.data.color || '#c8b89a',
-      isUnlocked: !!n.data.isUnlocked,
-      contents: nodeContents[n.id] ?? [],
-    })) as SkillNode[];
-  }, [nodes, nodeContents]);
+  const mappedNodes = useMemo(() => nodes.map(n => ({
+    ...n,
+    name: n.data.name || n.data.label || 'Sem Nome',
+    icon: n.data.icon || '✦',
+    color: n.data.color || '#c8b89a',
+    isUnlocked: !!n.data.isUnlocked,
+    contents: nodeContents[n.id] ?? [],
+  })) as SkillNode[], [nodes, nodeContents]);
 
   const selectedNode = useMemo(() =>
-    mappedNodes.find(n => n.id === selectedNodeId) ?? mappedNodes[0]
-  , [mappedNodes, selectedNodeId]);
+    mappedNodes.find(n => n.id === selectedNodeId) ?? mappedNodes[0],
+  [mappedNodes, selectedNodeId]);
 
   const currentContents = useMemo(
     () => (selectedNodeId ? nodeContents[selectedNodeId] : []) ?? [],
@@ -91,7 +93,12 @@ export default function BibliotecaPage() {
   return (
     <div
       className="relative w-full bg-[#030304] flex flex-col overflow-hidden"
-      style={{ height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))' }}
+      style={{
+        height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(6px)',
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      }}
     >
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
@@ -116,7 +123,7 @@ export default function BibliotecaPage() {
               ].map((s, i) => (
                 <div key={i} className="text-right">
                   <p className="text-white text-2xl font-black font-mono leading-none">{s.value}</p>
-                  <p className="text-zinc-600 text-[9px] font-black uppercase tracking-widest mt-1">{s.label}</p>
+                  <p className="text-zinc-400 text-[9px] font-black uppercase tracking-widest mt-1">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -143,7 +150,6 @@ export default function BibliotecaPage() {
                 isLoading={isLoadingContents}
                 onAddContent={() => setShowAddContent(true)}
               />
-
               {selectedNode.isUnlocked && (
                 <BibliotecaFilters
                   search={search}

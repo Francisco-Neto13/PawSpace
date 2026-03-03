@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { BookOpen, Plus, Loader2 } from 'lucide-react';
 import { JournalSidebar } from './features/viewer/JournalSidebar';
 import { JournalEditor } from './features/editor/JournalEditor';
@@ -12,24 +12,28 @@ export default function JournalPage() {
   const { nodes, isLoading: isLoadingNexus } = useNexus();
   const { entries, setEntries, isLoading: isLoadingEntries } = useJournal();
 
+  const [visible, setVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(
     entries.length > 0 ? entries[0].id : null
   );
   const [isSaving, setIsSaving] = useState(false);
 
-  const skillList = useMemo<SkillBase[]>(() => {
-    return nodes.map(n => ({
-      id: n.id,
-      name: n.data.label || n.data.name || 'Sem Nome',
-      icon: n.data.icon || '✦',
-      color: n.data.color || '#c8b89a',
-      isUnlocked: !!n.data.isUnlocked,
-    }));
-  }, [nodes]);
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
+
+  const skillList = useMemo<SkillBase[]>(() => nodes.map(n => ({
+    id: n.id,
+    name: n.data.label || n.data.name || 'Sem Nome',
+    icon: n.data.icon || '✦',
+    color: n.data.color || '#c8b89a',
+    isUnlocked: !!n.data.isUnlocked,
+  })), [nodes]);
 
   const selectedEntry = useMemo(() =>
-    entries.find(e => e.id === selectedId) || null
-  , [entries, selectedId]);
+    entries.find(e => e.id === selectedId) || null,
+  [entries, selectedId]);
 
   const handleUpdateEntry = useCallback((updated: JournalEntry) => {
     setEntries(prev => prev.map(e => e.id === updated.id ? updated : e));
@@ -106,7 +110,12 @@ export default function JournalPage() {
   return (
     <div
       className="relative w-full bg-[#030304] flex flex-col overflow-hidden"
-      style={{ height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))' }}
+      style={{
+        height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(6px)',
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      }}
     >
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
@@ -132,7 +141,8 @@ export default function JournalPage() {
               </div>
               <button
                 onClick={handleNewEntry}
-                className="flex items-center gap-2 px-4 py-2.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[9px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 transition-all cursor-pointer active:scale-95"
+                disabled={isSaving}
+                className="flex items-center gap-2 px-4 py-2.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[9px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus size={11} />
                 Nova Entrada
@@ -165,7 +175,7 @@ export default function JournalPage() {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center gap-4 group">
                 <BookOpen size={32} className="text-zinc-800 group-hover:text-zinc-700 transition-colors duration-500" />
-                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] antialiased">
+                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em]">
                   Nenhum registro selecionado
                 </p>
               </div>
