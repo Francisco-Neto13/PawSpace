@@ -1,18 +1,23 @@
 'use client';
 import React, { forwardRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { Github, Instagram } from 'lucide-react';
 
+const HIDDEN_PATHS = ['/journal', '/library', '/tree'];
+
 const Footer = forwardRef<HTMLElement>((_, ref) => {
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
+
+  if (HIDDEN_PATHS.some(p => pathname.startsWith(p))) return null;
 
   return (
     <footer
       ref={ref}
       className="w-full border-t border-white/5 bg-black/60 backdrop-blur-xl transition-all duration-300"
     >
-      <div className="px-4 md:px-16 lg:px-24 py-6">
+      <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 py-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0 relative">
-
           <div className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] flex items-center order-2 md:order-1">
             Dev by
             <a
@@ -24,12 +29,10 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
               Francisco
             </a>
           </div>
-
           <div className="text-[11px] font-black uppercase tracking-[0.2em] order-1 md:order-2 md:absolute md:left-1/2 md:-translate-x-1/2 whitespace-nowrap">
             <span className="text-white">© {currentYear} • </span>
             <span className="text-[#c8b89a]">Francisco Neto</span>
           </div>
-
           <div className="flex items-center gap-6 order-3">
             <a
               href="https://github.com/Francisco-Neto13"
@@ -39,7 +42,6 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             >
               <Github size={18} />
             </a>
-
             <a
               href="https://www.instagram.com/cisscoo_"
               target="_blank"
@@ -48,7 +50,6 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
             >
               <Instagram size={18} />
             </a>
-
             <a
               href="https://discord.com/users/iyasuo_"
               target="_blank"
@@ -67,5 +68,4 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
 });
 
 Footer.displayName = 'Footer';
-
 export default Footer;

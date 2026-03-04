@@ -109,20 +109,17 @@ export default function JournalPage() {
 
   return (
     <div
-      className="relative w-full bg-[#030304] flex flex-col overflow-hidden"
+      className="relative min-h-screen w-full bg-[#030304]"
       style={{
-        height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))',
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(6px)',
         transition: 'opacity 0.5s ease, transform 0.5s ease',
       }}
     >
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
-      </div>
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
 
-      <div className="relative z-10 max-w-7xl mx-auto w-full p-6 flex flex-col gap-10 flex-1 min-h-0">
-        <header className="shrink-0">
+      <div className="relative z-10 w-full py-8 pb-20 space-y-6">
+        <header>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-1 h-4 bg-[#c8b89a]" />
@@ -151,7 +148,7 @@ export default function JournalPage() {
           </div>
         </header>
 
-        <div className="flex gap-8 flex-1 min-h-0 overflow-hidden">
+        <div className="flex gap-8" style={{ minHeight: 'calc(100dvh - var(--navbar-height) - 120px)' }}>
           <JournalSidebar
             entries={entries}
             skills={skillList}
@@ -159,7 +156,7 @@ export default function JournalPage() {
             onSelect={setSelectedId}
           />
 
-          <main className="flex-1 min-w-0 border border-white/[0.04] bg-white/[0.01] overflow-hidden flex flex-col relative rounded-sm shadow-2xl">
+          <main className="flex-1 min-w-0 border border-white/[0.04] bg-white/[0.01] flex flex-col relative rounded-sm shadow-2xl">
             {isLoadingEntries ? (
               <div className="flex-1 flex items-center justify-center">
                 <Loader2 className="text-[#c8b89a]/20 animate-spin" size={24} />
@@ -173,7 +170,7 @@ export default function JournalPage() {
                 onUpdate={handleUpdateEntry}
               />
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center gap-4 group">
+              <div className="flex-1 flex flex-col items-center justify-center gap-4 group py-20">
                 <BookOpen size={32} className="text-zinc-800 group-hover:text-zinc-700 transition-colors duration-500" />
                 <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em]">
                   Nenhum registro selecionado

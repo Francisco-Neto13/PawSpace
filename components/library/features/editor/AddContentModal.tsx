@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link2, Video, FileText, StickyNote, X } from 'lucide-react';
 import { addContent, uploadPdf } from '@/app/actions/library';
 import { ContentType } from '../../types';
@@ -113,7 +114,7 @@ export function AddContentModal({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/90 backdrop-blur-md cursor-pointer" onClick={handleClose} />
 
@@ -237,6 +238,7 @@ export function AddContentModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -63,7 +63,7 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
     >
       <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#c8b89a05_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_50%,transparent_100%)]" />
 
-      <main className="relative z-10 max-w-6xl mx-auto px-6 py-8 space-y-4 pb-20">
+      <main className="relative z-10 py-8 space-y-4 pb-20">
 
         <div className="flex items-center gap-3 mb-6">
           <div className="w-1 h-4 bg-[#c8b89a]" />

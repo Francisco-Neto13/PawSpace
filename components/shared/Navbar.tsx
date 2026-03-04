@@ -18,7 +18,6 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
 
   const handleSafeNavigation = (e: React.MouseEvent, href: string) => {
     e.preventDefault();
-
     if (isDirty) {
       const confirmExit = window.confirm(
         "Você tem alterações não salvas na sua Skill Tree. Se sair agora, elas serão perdidas. Deseja sair mesmo assim?"
@@ -26,28 +25,25 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
       if (!confirmExit) return;
       setIsDirty(false);
     }
-
     setIsOpen(false);
     router.push(href);
   };
 
   const links = [
-    { name: "Resumo",       href: "/overview"  },
-    { name: "Skill Tree",   href: "/tree"      },
-    { name: "Biblioteca",   href: "/library"   },
-    { name: "Diário",       href: "/journal"   },
-    { name: "Configurações", href: "/settings" },
+    { name: "Resumo",        href: "/overview"  },
+    { name: "Skill Tree",    href: "/tree"      },
+    { name: "Biblioteca",    href: "/library"   },
+    { name: "Diário",        href: "/journal"   },
+    { name: "Configurações", href: "/settings"  },
   ];
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
-
     if (isDirty) {
       const confirmExit = window.confirm("Sair e perder alterações não salvas?");
       if (!confirmExit) return;
       setIsDirty(false);
     }
-
     try {
       await supabase.auth.signOut();
       router.push('/login');
@@ -60,9 +56,9 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
   return (
     <nav
       ref={ref}
-      className="w-full border-b border-white/5 bg-black/60 backdrop-blur-xl sticky top-0 z-[100] transition-all duration-300"
+      className="w-full border-b border-white/5 bg-black/60 backdrop-blur-xl sticky top-0 z-[100]"
     >
-      <div className="px-4 md:px-16 lg:px-24 py-4 flex justify-between items-center sm:grid sm:grid-cols-3">
+      <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 py-3 flex justify-between items-center sm:grid sm:grid-cols-3">
 
         <div className="justify-self-start">
           <Link
@@ -79,7 +75,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
           </Link>
         </div>
 
-        <div className="hidden md:flex justify-self-center items-center gap-6 lg:gap-8">
+        <div className="hidden md:flex justify-self-center items-center gap-8 lg:gap-10">
           {links.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -145,5 +141,4 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
 });
 
 Navbar.displayName = 'Navbar';
-
 export default Navbar;

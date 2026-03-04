@@ -32,8 +32,14 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
   }, [isSaving]);
 
   return (
-    <div className="flex flex-col h-full bg-white/[0.01]">
-
+    <div
+      className="flex flex-col bg-white/[0.01] border border-white/[0.04] rounded-sm shadow-2xl"
+      style={{
+        height: 'calc(100dvh - var(--navbar-height) - 120px)',
+        position: 'sticky',
+        top: 'calc(var(--navbar-height) + 24px)',
+      }}
+    >
       <div className="shrink-0 px-8 pt-8 pb-4 border-b border-white/[0.04]">
         <input
           type="text"
@@ -124,7 +130,6 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
         </div>
       </div>
 
-      {/* Toolbar + Área de texto */}
       <div className="flex flex-col flex-1 min-h-0">
         <EditorToolbar />
         <div

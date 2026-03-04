@@ -5,12 +5,12 @@ import { TYPE_CONFIG } from '../../constants';
 import { ContentCard } from '../../ui/ContentCard';
 import { EmptyState } from '../../ui/EmptyState';
 
-
 interface BibliotecaContentListProps {
   contents: Content[];
   isLoading: boolean;
   isUnlocked: boolean;
   search: string;
+  onDelete?: (id: string) => void;
 }
 
 export function BibliotecaContentList({
@@ -18,6 +18,7 @@ export function BibliotecaContentList({
   isLoading,
   isUnlocked,
   search,
+  onDelete,
 }: BibliotecaContentListProps) {
   if (isLoading) {
     return (
@@ -32,16 +33,6 @@ export function BibliotecaContentList({
 
   if (!isUnlocked || contents.length === 0) {
     return <EmptyState nodeUnlocked={isUnlocked} />;
-  }
-
-  if (contents.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <p className="text-zinc-700 text-[10px] font-black uppercase tracking-widest">
-          Nenhum resultado para "{search}"
-        </p>
-      </div>
-    );
   }
 
   return (
@@ -64,7 +55,9 @@ export function BibliotecaContentList({
               <span className="text-[9px] text-zinc-700 font-mono">{items.length}</span>
             </div>
             <div className="flex flex-col gap-3">
-              {items.map(c => <ContentCard key={c.id} content={c} />)}
+              {items.map(c => (
+                <ContentCard key={c.id} content={c} onDelete={onDelete} />
+              ))}
             </div>
           </div>
         );
