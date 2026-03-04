@@ -112,18 +112,18 @@ export default function BibliotecaPage() {
     >
       <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
 
-      <div className="relative z-10 w-full py-8 pb-20 space-y-6">
+      <div className="relative z-10 w-full py-8 pb-20 space-y-4">
+
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-1 h-4 bg-[#c8b89a]" />
+          <span className="text-[#c8b89a] text-[9px] font-black uppercase tracking-[0.4em]">
+            Nexus / Biblioteca
+          </span>
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-[#c8b89a]/15 to-transparent" />
+        </div>
 
         <header>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-4 bg-[#c8b89a]" />
-              <h2 className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em]">
-                Nexus / Biblioteca de Conhecimento
-              </h2>
-              <div className="h-[1px] w-32 bg-gradient-to-r from-[#c8b89a]/20 to-transparent" />
-            </div>
-
+          <div className="flex items-center justify-end">
             <div className="flex items-center gap-8">
               {[
                 { label: 'Módulos',       value: nodes.length },
