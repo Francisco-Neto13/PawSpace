@@ -4,6 +4,10 @@ import { Calendar, Tag, Trash2, CloudCheck, Loader2, ChevronDown } from 'lucide-
 import { EditorToolbar } from './EditorToolbar';
 import { JournalEntry, SkillBase, getSkill, formatDate } from '../../types';
 import { useJournalSinc } from '../../hooks/useJournalSinc';
+import { LIMITS } from '@/lib/limits';
+
+const TITLE_MAX = LIMITS.journal.title;
+const BODY_MAX = LIMITS.journal.body;
 
 interface JournalEditorProps {
   entry: JournalEntry;
@@ -14,18 +18,48 @@ interface JournalEditorProps {
 
 export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEditorProps) {
   const { bodyRef, title, setTitle, skillId, setSkillId, isSaving, save, scheduleBodySave } = useJournalSinc(entry, onUpdate);
-
   const [showSkillPicker, setShowSkillPicker] = useState(false);
+  const [bodyLength, setBodyLength] = useState(0);
 
   const skill = getSkill(skillId, skills);
   const unlockedSkills = skills.filter(s => s.isUnlocked);
 
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isSaving) {
-        e.preventDefault();
-        e.returnValue = '';
+    const el = bodyRef.current;
+    if (!el) return;
+    setBodyLength(el.innerText.length);
+  }, [bodyRef]);
+
+  const handleBodyInput = (e: React.FormEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const len = el.innerText.length;
+
+    if (len > BODY_MAX) {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        el.innerText = el.innerText.slice(0, BODY_MAX);
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
       }
+      setBodyLength(BODY_MAX);
+      return;
+    }
+
+    setBodyLength(len);
+    scheduleBodySave();
+  };
+
+  const showBodyCounter = bodyLength >= BODY_MAX * 0.8;
+  const bodyRemaining   = BODY_MAX - bodyLength;
+  const titleRemaining  = TITLE_MAX - title.length;
+  const showTitleWarn   = title.length >= TITLE_MAX * 0.8;
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isSaving) { e.preventDefault(); e.returnValue = ''; }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -41,13 +75,22 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
       }}
     >
       <div className="shrink-0 px-8 pt-8 pb-4 border-b border-white/[0.04]">
-        <input
-          type="text"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          placeholder="Título da entrada..."
-          className="w-full bg-transparent text-white text-xl font-black outline-none placeholder:text-zinc-700 tracking-wide antialiased"
-        />
+
+        <div className="relative">
+          <input
+            type="text"
+            value={title}
+            onChange={e => setTitle(e.target.value.slice(0, TITLE_MAX))}
+            placeholder="Título da entrada..."
+            maxLength={TITLE_MAX}
+            className="w-full bg-transparent text-white text-xl font-black outline-none placeholder:text-zinc-700 tracking-wide antialiased pr-16"
+          />
+          {showTitleWarn && (
+            <span className={`absolute right-0 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold tabular-nums ${titleRemaining <= 5 ? 'text-red-400' : 'text-zinc-500'}`}>
+              {titleRemaining}
+            </span>
+          )}
+        </div>
 
         <div className="flex items-center gap-4 mt-4">
           <span className="flex items-center gap-1.5 text-[9px] text-zinc-400 font-mono antialiased">
@@ -83,10 +126,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                   >
                     Nenhum vínculo
                   </button>
-                  <div
-                    className="max-h-48 overflow-y-auto"
-                    style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(200,184,154,0.1) transparent' }}
-                  >
+                  <div className="max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(200,184,154,0.1) transparent' }}>
                     {unlockedSkills.map(s => (
                       <button
                         key={s.id}
@@ -118,7 +158,6 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                 </span>
               )}
             </div>
-
             <button
               onClick={onDelete}
               className="flex items-center gap-1.5 text-zinc-500 hover:text-red-400/80 text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer antialiased"
@@ -132,15 +171,25 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
 
       <div className="flex flex-col flex-1 min-h-0">
         <EditorToolbar />
-        <div
-          ref={bodyRef}
-          contentEditable
-          suppressContentEditableWarning
-          onInput={scheduleBodySave}
-          onBlur={save}
-          className="flex-1 overflow-y-auto px-8 py-10 text-zinc-200 text-sm font-light leading-relaxed outline-none prose prose-invert max-w-none antialiased"
-          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(200,184,154,0.1) transparent' }}
-        />
+        <div className="relative flex-1 min-h-0">
+          <div
+            ref={bodyRef}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={handleBodyInput}
+            onBlur={save}
+            className="h-full overflow-y-auto px-8 py-10 text-zinc-200 text-sm font-light leading-relaxed outline-none prose prose-invert max-w-none antialiased"
+            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(200,184,154,0.1) transparent' }}
+          />
+
+          {showBodyCounter && (
+            <div className="absolute bottom-4 right-6 pointer-events-none">
+              <span className={`text-[9px] font-mono font-bold tabular-nums ${bodyRemaining <= 200 ? 'text-red-400' : 'text-zinc-600'}`}>
+                {bodyRemaining.toLocaleString()} restantes
+              </span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

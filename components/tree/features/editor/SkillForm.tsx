@@ -2,7 +2,11 @@
 import { useState, useEffect } from 'react';
 import { ColorPicker } from './ColorPicker';
 import { EmojiPicker } from './EmojiPicker';
-import { SkillCategory, SkillShape } from '../../types';
+import { SkillShape } from '../../types';
+import { LIMITS } from '@/lib/limits';
+
+const NAME_MAX = LIMITS.skill.name;
+const DESC_MAX = LIMITS.skill.description;
 
 const SHAPES: { value: SkillShape; label: string; preview: string }[] = [
   { value: 'hexagon', label: 'Hexágono', preview: 'polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%)' },
@@ -21,6 +25,16 @@ interface SkillFormProps {
   isEditing?: boolean;
 }
 
+function CharCounter({ current, max }: { current: number; max: number }) {
+  const remaining = max - current;
+  if (current < max * 0.8) return null;
+  return (
+    <span className={`text-[9px] font-mono font-bold tabular-nums ${remaining <= 5 ? 'text-red-400' : 'text-zinc-500'}`}>
+      {remaining}
+    </span>
+  );
+}
+
 export function SkillForm({
   onSubmit,
   onCancel,
@@ -31,25 +45,23 @@ export function SkillForm({
   isEditing = false,
 }: SkillFormProps) {
   const [formData, setFormData] = useState({
-    label: '',
+    label:       '',
     description: '',
-    category: 'core' as SkillCategory,
-    icon: '✦',
-    color: '#3b82f6',
-    shape: 'hexagon' as SkillShape,
-    parentId: initialParentId ?? '',
+    icon:        '✦',
+    color:       '#3b82f6',
+    shape:       'hexagon' as SkillShape,
+    parentId:    initialParentId ?? '',
   });
 
   useEffect(() => {
     if (initialData) {
       setFormData({
-        label: initialData.label || initialData.name || '',
+        label:       initialData.label || initialData.name || '',
         description: initialData.description || '',
-        category: initialData.category || 'core',
-        icon: initialData.icon || '✦',
-        color: initialData.color || '#3b82f6',
-        shape: (initialData.shape as SkillShape) || 'hexagon',
-        parentId: initialData.parentId || initialParentId || '',
+        icon:        initialData.icon || '✦',
+        color:       initialData.color || '#3b82f6',
+        shape:       (initialData.shape as SkillShape) || 'hexagon',
+        parentId:    initialData.parentId || initialParentId || '',
       });
     }
   }, [initialData, initialParentId]);
@@ -67,20 +79,24 @@ export function SkillForm({
     onSubmit(formData);
   };
 
-  const labelClass = "text-[8px] text-zinc-600 uppercase font-black tracking-[0.25em] block mb-2";
+  const labelClass = "text-[8px] text-zinc-600 uppercase font-black tracking-[0.25em]";
   const inputClass = "w-full bg-white/[0.02] border border-white/[0.06] p-3.5 text-white text-sm outline-none focus:border-[#c8b89a]/30 transition-colors font-light placeholder:text-zinc-700 cursor-text";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
 
       <div>
-        <label className={labelClass}>Identificação *</label>
+        <div className="flex items-center justify-between mb-2">
+          <label className={labelClass}>Identificação *</label>
+          <CharCounter current={formData.label.length} max={NAME_MAX} />
+        </div>
         <input
           autoFocus
           type="text"
           value={formData.label}
+          maxLength={NAME_MAX}
           onChange={(e) => {
-            const label = e.target.value;
+            const label = e.target.value.slice(0, NAME_MAX);
             setFormData({ ...formData, label });
             emitPreview({ label });
           }}
@@ -90,7 +106,7 @@ export function SkillForm({
       </div>
 
       <div>
-        <label className={labelClass}>Identidade Visual</label>
+        <label className={`${labelClass} block mb-2`}>Identidade Visual</label>
         <div className="grid grid-cols-2 gap-3">
           <EmojiPicker
             currentEmoji={formData.icon}
@@ -110,7 +126,7 @@ export function SkillForm({
       </div>
 
       <div>
-        <label className={labelClass}>Arquitetura do Nó</label>
+        <label className={`${labelClass} block mb-2`}>Arquitetura do Nó</label>
         <div className="grid grid-cols-4 gap-2">
           {SHAPES.map(s => (
             <button
@@ -130,11 +146,9 @@ export function SkillForm({
                   backgroundColor: formData.shape === s.value ? formData.color : '#3f3f46',
                 }}
               />
-              <span
-                className={`text-[7px] font-black uppercase tracking-wider transition-colors duration-300 ${
-                  formData.shape === s.value ? 'text-[#c8b89a]' : 'text-zinc-600 group-hover:text-zinc-500'
-                }`}
-              >
+              <span className={`text-[7px] font-black uppercase tracking-wider transition-colors duration-300 ${
+                formData.shape === s.value ? 'text-[#c8b89a]' : 'text-zinc-600 group-hover:text-zinc-500'
+              }`}>
                 {s.label}
               </span>
             </button>
@@ -143,10 +157,14 @@ export function SkillForm({
       </div>
 
       <div>
-        <label className={labelClass}>Manifesto</label>
+        <div className="flex items-center justify-between mb-2">
+          <label className={labelClass}>Manifesto</label>
+          <CharCounter current={formData.description.length} max={DESC_MAX} />
+        </div>
         <textarea
           value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          maxLength={DESC_MAX}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value.slice(0, DESC_MAX) })}
           className={`${inputClass} resize-none`}
           placeholder="O que será dominado neste nível..."
           rows={3}
@@ -155,7 +173,7 @@ export function SkillForm({
 
       {!isEditing && initialParentId === undefined && (
         <div>
-          <label className={labelClass}>Requisito de Desbloqueio</label>
+          <label className={`${labelClass} block mb-2`}>Requisito de Desbloqueio</label>
           <select
             value={formData.parentId}
             onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
@@ -169,10 +187,7 @@ export function SkillForm({
         </div>
       )}
 
-      <div
-        className="h-[1px]"
-        style={{ background: 'linear-gradient(to right, transparent, #ffffff08, transparent)' }}
-      />
+      <div className="h-[1px]" style={{ background: 'linear-gradient(to right, transparent, #ffffff08, transparent)' }} />
 
       <div className="flex gap-3 pt-1">
         <button
@@ -190,7 +205,6 @@ export function SkillForm({
           {isLoading ? 'Sincronizando...' : isEditing ? 'Salvar Nexus' : 'Confirmar'}
         </button>
       </div>
-
     </form>
   );
 }

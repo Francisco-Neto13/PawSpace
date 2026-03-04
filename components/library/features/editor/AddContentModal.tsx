@@ -7,6 +7,11 @@ import { ContentType } from '../../types';
 import { LinkForm, VideoForm } from './UrlForms';
 import { PdfForm } from './PdfForm';
 import { NoteForm } from './NoteForm';
+import { LIMITS } from '@/lib/limits';
+
+const TITLE_MAX = LIMITS.library.title;
+const URL_MAX = LIMITS.library.url;
+const BODY_MAX = LIMITS.library.body;
 
 const TABS: { type: ContentType; label: string; icon: React.ReactNode }[] = [
   { type: 'link',  label: 'Link',   icon: <Link2 size={13} />      },
@@ -39,12 +44,18 @@ interface AddContentModalProps {
   skillId: string;
 }
 
-export function AddContentModal({
-  isOpen,
-  onClose,
-  onSuccess,
-  skillId,
-}: AddContentModalProps) {
+function CharCounter({ current, max }: { current: number; max: number }) {
+  const remaining = max - current;
+  const warn = current >= max * 0.8;
+  if (!warn) return null;
+  return (
+    <span className={`text-[9px] font-mono font-bold tabular-nums ${remaining <= 10 ? 'text-red-400' : 'text-zinc-500'}`}>
+      {remaining}
+    </span>
+  );
+}
+
+export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddContentModalProps) {
   const [activeTab, setActiveTab] = useState<ContentType>('link');
   const [isLoading, setIsLoading] = useState(false);
   const [pdfMode, setPdfMode] = useState<'upload' | 'link'>('upload');
@@ -73,32 +84,24 @@ export function AddContentModal({
     setIsLoading(true);
 
     try {
-      let payload: any = { 
-        skillId, 
-        type: activeTab, 
-        title: form.title.trim() 
-      };
+      let payload: any = { skillId, type: activeTab, title: form.title.trim() };
 
-      if (activeTab === 'link' || activeTab === 'video') {
-        payload.url = form.url.trim();
-      }
+      if (activeTab === 'link' || activeTab === 'video') payload.url = form.url.trim();
 
       if (activeTab === 'pdf') {
         if (pdfMode === 'upload' && pdfFile) {
           const fd = new FormData();
           fd.append('file', pdfFile);
-          const upload = await uploadPdf(fd); 
+          const upload = await uploadPdf(fd);
           if (!upload.success) throw new Error('Falha no upload');
-          payload.url = upload.publicUrl;
+          payload.url     = upload.publicUrl;
           payload.fileKey = upload.fileKey;
         } else {
           payload.url = form.url.trim();
         }
       }
 
-      if (activeTab === 'note') {
-        payload.body = form.body.trim();
-      }
+      if (activeTab === 'note') payload.body = form.body.trim();
 
       const result = await addContent(payload);
       if (!result.success) throw new Error('Falha ao salvar');
@@ -159,33 +162,34 @@ export function AddContentModal({
               {TABS.map(tab => (
                 <button
                   key={tab.type}
-                  onClick={() => {
-                    setActiveTab(tab.type);
-                    setForm({ title: '', url: '', body: '' });
-                    setPdfFile(null);
-                  }}
+                  onClick={() => { setActiveTab(tab.type); setForm({ title: '', url: '', body: '' }); setPdfFile(null); }}
                   className={`flex flex-col items-center gap-2 py-3.5 border text-[9px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer
                     ${activeTab === tab.type
                       ? 'border-[#c8b89a]/40 bg-[#c8b89a]/[0.06] text-[#c8b89a]'
                       : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.02]'
                     }`}
                 >
-                  <div className={activeTab === tab.type ? 'text-[#c8b89a]' : 'text-zinc-500'}>
-                    {tab.icon}
-                  </div>
+                  <div className={activeTab === tab.type ? 'text-[#c8b89a]' : 'text-zinc-500'}>{tab.icon}</div>
                   {tab.label}
                 </button>
               ))}
             </div>
 
             <div className="relative z-10 space-y-6">
+
               <div>
-                <label className={labelClass}>Título Identificador *</label>
+                <div className="flex items-center justify-between mb-2.5">
+                  <label className="text-[9px] text-zinc-500 uppercase font-black tracking-[0.25em]">
+                    Título Identificador *
+                  </label>
+                  <CharCounter current={form.title.length} max={TITLE_MAX} />
+                </div>
                 <input
                   autoFocus
                   type="text"
                   value={form.title}
-                  onChange={e => setForm({ ...form, title: e.target.value })}
+                  onChange={e => setForm({ ...form, title: e.target.value.slice(0, TITLE_MAX) })}
+                  maxLength={TITLE_MAX}
                   className={inputClass}
                   placeholder={
                     activeTab === 'link'  ? 'Ex: Documentação oficial'   :
@@ -197,19 +201,43 @@ export function AddContentModal({
               </div>
 
               <div className="animate-in fade-in slide-in-from-top-1 duration-300">
-                {activeTab === 'link'  && <LinkForm  url={form.url} onChange={url => setForm({ ...form, url })} />}
-                {activeTab === 'video' && <VideoForm url={form.url} onChange={url => setForm({ ...form, url })} />}
-                {activeTab === 'pdf'   && (
+                {activeTab === 'link' && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2.5">
+                      <label className={labelClass.replace('mb-2.5', '')}>URL *</label>
+                      <CharCounter current={form.url.length} max={URL_MAX} />
+                    </div>
+                    <LinkForm url={form.url} onChange={url => setForm({ ...form, url: url.slice(0, URL_MAX) })} />
+                  </div>
+                )}
+                {activeTab === 'video' && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2.5">
+                      <label className={labelClass.replace('mb-2.5', '')}>URL *</label>
+                      <CharCounter current={form.url.length} max={URL_MAX} />
+                    </div>
+                    <VideoForm url={form.url} onChange={url => setForm({ ...form, url: url.slice(0, URL_MAX) })} />
+                  </div>
+                )}
+                {activeTab === 'pdf' && (
                   <PdfForm
                     mode={pdfMode}
                     url={form.url}
                     file={pdfFile}
                     onModeChange={setPdfMode}
-                    onUrlChange={url => setForm({ ...form, url })}
+                    onUrlChange={url => setForm({ ...form, url: url.slice(0, URL_MAX) })}
                     onFileChange={setPdfFile}
                   />
                 )}
-                {activeTab === 'note'  && <NoteForm body={form.body} onChange={body => setForm({ ...form, body })} />}
+                {activeTab === 'note' && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2.5">
+                      <label className={labelClass.replace('mb-2.5', '')}>Conteúdo *</label>
+                      <CharCounter current={form.body.length} max={BODY_MAX} />
+                    </div>
+                    <NoteForm body={form.body} onChange={body => setForm({ ...form, body: body.slice(0, BODY_MAX) })} />
+                  </div>
+                )}
               </div>
             </div>
 
