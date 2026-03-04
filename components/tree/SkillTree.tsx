@@ -51,7 +51,7 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
 
 function SkillTreeInner() {
   const { nodes, edges, isLoading: isLoadingTree } = useSkillTree();
-  const { refreshNexus, setIsDirty, isDirty } = useNexus();
+  const { refreshNexus, setIsDirty, isDirty, setNodes, setEdges } = useNexus();
 
   const { onNodesChange, hasUnsavedChanges: hasDragChanges, isSaving, setIsSaving, resetDirty } = useSkillDrag();
   const {
@@ -72,6 +72,16 @@ function SkillTreeInner() {
   useEffect(() => {
     refreshNexus(true);
   }, [refreshNexus]);
+
+  useEffect(() => {
+    return () => {
+      setNodes(prev => prev.filter(n => !n.id.startsWith('temp-')));
+      setEdges(prev => prev.filter(e =>
+        !e.source.startsWith('temp-') && !e.target.startsWith('temp-')
+      ));
+      setIsDirty(false);
+    };
+  }, [setNodes, setEdges, setIsDirty]);
 
   useEffect(() => {
     if (hasStructuralChanges || hasDragChanges) {

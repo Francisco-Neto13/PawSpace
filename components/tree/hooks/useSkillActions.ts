@@ -71,6 +71,8 @@ export function useSkillActions() {
       return finalNodes as SkillNode[];
     });
 
+    if (nodeId.startsWith('temp-')) return;
+
     const result = await toggleSkillStatus(nodeId, nextUnlocked);
     if (!result.success) {
       await refreshNexus();
@@ -152,6 +154,8 @@ export function useSkillActions() {
         : n
     ));
 
+    if (skillId.startsWith('temp-')) return;
+
     const result = await updateSkill(skillId, data);
     if (!result.success) {
       console.error('❌ [SkillActions] Erro ao atualizar skill, recarregando...');
@@ -164,9 +168,7 @@ export function useSkillActions() {
       const currentIds = new Set(nodes.map(n => n.id));
 
       const toCreate = nodes.filter(n => n.id.startsWith('temp-'));
-
       const toDelete = [...originalNodeIds.current].filter(id => !currentIds.has(id));
-
       const toUpdate = nodes.filter(n => !n.id.startsWith('temp-'));
 
       const tempToReal: Record<string, string> = {};
