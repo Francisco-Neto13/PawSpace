@@ -2,19 +2,19 @@
 import { Plus } from 'lucide-react';
 import { SkillNode, Content } from '../../types';
 
-interface BibliotecaNodeHeaderProps {
+interface LibraryNodeHeaderProps {
   node: SkillNode;
   contentsCount: number;
   isLoading: boolean;
   onAddContent: () => void;
 }
 
-export function BibliotecaNodeHeader({
+export function LibraryNodeHeader({
   node,
   contentsCount,
   isLoading,
   onAddContent,
-}: BibliotecaNodeHeaderProps) {
+}: LibraryNodeHeaderProps) {
   return (
     <div className="p-8 border border-white/[0.04] bg-white/[0.01] relative overflow-hidden group">
       <div

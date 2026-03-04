@@ -3,19 +3,19 @@ import { Search, Filter, X } from 'lucide-react';
 import { ContentType } from '../../types';
 import { FILTER_OPTIONS } from '../../constants';
 
-interface BibliotecaFiltersProps {
+interface LibraryFiltersProps {
   search: string;
   typeFilter: ContentType | 'all';
   onSearchChange: (v: string) => void;
   onTypeChange: (v: ContentType | 'all') => void;
 }
 
-export function BibliotecaFilters({
+export function LibraryFilters({
   search,
   typeFilter,
   onSearchChange,
   onTypeChange,
-}: BibliotecaFiltersProps) {
+}: LibraryFiltersProps) {
   return (
     <div className="flex items-center gap-4">
       <div className="relative flex-1">

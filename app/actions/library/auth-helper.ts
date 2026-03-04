@@ -1,5 +1,5 @@
 'use server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/shared/supabase/server';
 import { cache } from 'react';
 
 export const getAuthUser = cache(async () => {

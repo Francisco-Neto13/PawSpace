@@ -1,9 +1,9 @@
 'use server';
-import prisma from '@/lib/prisma';
-import { createClient } from '@/utils/supabase/server';
+import prisma from '@/shared/lib/prisma';
+import { createClient } from '@/shared/supabase/server';
 import { getAuthUser } from './auth-helper';
 import { ContentInput } from './types';
-import { LIMITS } from '@/lib/limits';
+import { LIMITS } from '@/shared/lib/limits';
 
 const MAX_CONTENTS = LIMITS.quantity.contentsPerNode;
 const TITLE_MAX    = LIMITS.library.title;

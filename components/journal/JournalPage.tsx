@@ -4,8 +4,8 @@ import { BookOpen, Plus, Loader2 } from 'lucide-react';
 import { JournalSidebar } from './features/viewer/JournalSidebar';
 import { JournalEditor } from './features/editor/JournalEditor';
 import { JournalEntry, SkillBase } from './types';
-import { useNexus } from '@/contexts/NexusContext';
-import { useJournal } from '@/contexts/JournalContext';
+import { useNexus } from '@/shared/contexts/NexusContext';
+import { useJournal } from '@/shared/contexts/JournalContext';
 import { saveJournalEntry, deleteJournalEntry } from '@/app/actions/journal';
 
 export default function JournalPage() {

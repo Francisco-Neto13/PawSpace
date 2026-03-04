@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { NexusProvider } from "@/contexts/NexusContext";
-import { LibraryProvider } from "@/contexts/LibraryContext";
-import { JournalProvider } from "@/contexts/JournalContext";
+import { NexusProvider } from "@/shared/contexts/NexusContext";
+import { LibraryProvider } from "@/shared/contexts/LibraryContext";
+import { JournalProvider } from "@/shared/contexts/JournalContext";
 import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {

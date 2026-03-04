@@ -4,7 +4,7 @@ import { Calendar, Tag, Trash2, CloudCheck, Loader2, ChevronDown } from 'lucide-
 import { EditorToolbar } from './EditorToolbar';
 import { JournalEntry, SkillBase, getSkill, formatDate } from '../../types';
 import { useJournalSinc } from '../../hooks/useJournalSinc';
-import { LIMITS } from '@/lib/limits';
+import { LIMITS } from '@/shared/lib/limits';
 
 const TITLE_MAX = LIMITS.journal.title;
 const BODY_MAX = LIMITS.journal.body;

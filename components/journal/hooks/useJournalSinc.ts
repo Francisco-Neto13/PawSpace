@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { JournalEntry } from '../types';
 import { saveJournalEntry } from '@/app/actions/journal';
-import { useJournal } from '@/contexts/JournalContext';
+import { useJournal } from '@/shared/contexts/JournalContext';
 
 export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalEntry) => void) {
   const { setPending } = useJournal();

@@ -3,8 +3,8 @@ import React, { forwardRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
-import { useNexus } from '@/contexts/NexusContext';
+import { createClient } from '@/shared/supabase/client';
+import { useNexus } from '@/shared/contexts/NexusContext';
 
 const Navbar = forwardRef<HTMLElement>((_, ref) => {
   const [isOpen, setIsOpen] = useState(false);

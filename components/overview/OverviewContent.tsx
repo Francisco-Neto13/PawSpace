@@ -1,6 +1,6 @@
 'use client';
 import { useMemo, useState, useEffect } from 'react';
-import { useNexus } from '@/contexts/NexusContext';
+import { useNexus } from '@/shared/contexts/NexusContext';
 import OverviewHeader from './ui/OverviewHeader';
 import StatsGrid from './features/stats/StatsGrid';
 import CategoryChart from './features/stats/CategoryChart';

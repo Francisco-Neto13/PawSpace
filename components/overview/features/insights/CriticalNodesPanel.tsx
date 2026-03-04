@@ -1,6 +1,6 @@
 'use client';
 import { useMemo } from 'react';
-import { SkillNode } from '@/contexts/NexusContext';
+import { SkillNode } from '@/shared/contexts/NexusContext';
 import { Edge } from '@xyflow/react';
 import { Lock, Unlock } from 'lucide-react';
 

@@ -4,16 +4,16 @@ import { useSearchParams } from 'next/navigation';
 import { Plus, Loader2 } from 'lucide-react';
 
 import { ContentType, SkillNode } from './types';
-import { BibliotecaContentList } from './features/viewer/BibliotecaContentList';
-import { BibliotecaFilters } from './features/viewer/BibliotecaFilters';
+import { LibraryContentList } from './features/viewer/LibraryContentList';
+import { LibraryFilters } from './features/viewer/LibraryFilters';
 import { AddContentModal } from './features/editor/AddContentModal';
-import { BibliotecaSidebar } from './ui/BibliotecaSideBar';
+import { LibrarySidebar } from './ui/LibrarySideBar';
 
 import { useNexus } from '@/contexts/NexusContext';
 import { useLibrary } from '@/contexts/LibraryContext';
 import { deleteContent } from '@/app/actions/library';
 
-export default function BibliotecaPage() {
+export default function LibraryPage() {
   const searchParams = useSearchParams();
   const nodeIdFromUrl = searchParams.get('nodeId');
 
@@ -146,14 +146,14 @@ export default function BibliotecaPage() {
                 className="flex items-center gap-2 px-4 py-2.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[9px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus size={11} />
-                Nova Entrada
+                Novo Conteúdo
               </button>
             </div>
           </div>
         </header>
 
         <div className="flex gap-8" style={{ minHeight: 'calc(100dvh - var(--navbar-height) - 120px)' }}>
-          <BibliotecaSidebar
+          <LibrarySidebar
             nodes={mappedNodes}
             selectedNodeId={selectedNodeId || ''}
             onSelect={id => {
@@ -191,7 +191,7 @@ export default function BibliotecaPage() {
               </div>
 
               {selectedNode.isUnlocked && (
-                <BibliotecaFilters
+                <LibraryFilters
                   search={search}
                   typeFilter={typeFilter}
                   onSearchChange={setSearch}
@@ -204,7 +204,7 @@ export default function BibliotecaPage() {
               className="flex-1 overflow-y-auto px-8 py-6"
               style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(200,184,154,0.1) transparent' }}
             >
-              <BibliotecaContentList
+              <LibraryContentList
                 contents={filteredContents}
                 isLoading={isLoadingContents}
                 isUnlocked={selectedNode.isUnlocked}

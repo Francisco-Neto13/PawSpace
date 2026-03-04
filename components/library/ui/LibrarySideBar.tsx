@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { ChevronRight, Search } from 'lucide-react';
 import { SkillNode } from '../types';
 
-interface BibliotecaSidebarProps {
+interface LibrarySidebarProps {
   nodes: SkillNode[];
   selectedNodeId: string;
   onSelect: (id: string) => void;
 }
 
-export function BibliotecaSidebar({ nodes, selectedNodeId, onSelect }: BibliotecaSidebarProps) {
+export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySidebarProps) {
   const [search, setSearch] = useState('');
 
   const filtered = nodes.filter(n =>

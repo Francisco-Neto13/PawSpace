@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import BibliotecaPage from "@/components/library/BibliotecaPage";
+import LibraryContentPage from "@/components/library/LibraryPage";
 
 export default function LibraryPage() {
   return (
@@ -8,7 +8,7 @@ export default function LibraryPage() {
         <div className="w-6 h-6 border-2 border-[#c8b89a]/20 border-t-[#c8b89a] rounded-full animate-spin" />
       </div>
     }>
-      <BibliotecaPage />
+      <LibraryContentPage />
     </Suspense>
   );
 }

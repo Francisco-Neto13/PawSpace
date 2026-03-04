@@ -5,7 +5,7 @@ import { TYPE_CONFIG } from '../../constants';
 import { ContentCard } from '../../ui/ContentCard';
 import { EmptyState } from '../../ui/EmptyState';
 
-interface BibliotecaContentListProps {
+interface LibraryContentListProps {
   contents: Content[];
   isLoading: boolean;
   isUnlocked: boolean;
@@ -13,13 +13,13 @@ interface BibliotecaContentListProps {
   onDelete?: (id: string) => void;
 }
 
-export function BibliotecaContentList({
+export function LibraryContentList({
   contents,
   isLoading,
   isUnlocked,
   search,
   onDelete,
-}: BibliotecaContentListProps) {
+}: LibraryContentListProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
