@@ -5,6 +5,11 @@ import { getAuthUser } from './auth-helper';
 import { ContentInput } from './types';
 import { LIMITS } from '@/lib/limits';
 
+const MAX_CONTENTS = LIMITS.quantity.contentsPerNode;
+const TITLE_MAX    = LIMITS.library.title;
+const URL_MAX      = LIMITS.library.url;
+const BODY_MAX     = LIMITS.library.body;
+
 export async function addContent(data: ContentInput) {
   const totalStart = Date.now();
   try {
@@ -16,12 +21,16 @@ export async function addContent(data: ContentInput) {
     const url   = (data.url   || '').trim();
     const body  = (data.body  || '').trim();
 
-    if (title.length > LIMITS.library.title)
-      return { success: false, error: `Título pode ter no máximo ${LIMITS.library.title} caracteres.` };
-    if (url && url.length > LIMITS.library.url)
-      return { success: false, error: `URL pode ter no máximo ${LIMITS.library.url} caracteres.` };
-    if (body && body.length > LIMITS.library.body)
-      return { success: false, error: `Nota pode ter no máximo ${LIMITS.library.body} caracteres.` };
+    if (title.length > TITLE_MAX)
+      return { success: false, error: `Título pode ter no máximo ${TITLE_MAX} caracteres.` };
+    if (url && url.length > URL_MAX)
+      return { success: false, error: `URL pode ter no máximo ${URL_MAX} caracteres.` };
+    if (body && body.length > BODY_MAX)
+      return { success: false, error: `Nota pode ter no máximo ${BODY_MAX} caracteres.` };
+
+    const count = await prisma.libraryContent.count({ where: { skillId: data.skillId } });
+    if (count >= MAX_CONTENTS)
+      return { success: false, error: `Limite de ${MAX_CONTENTS} conteúdos por nó atingido.` };
 
     const content = await prisma.libraryContent.create({
       data: { ...data, title, url: url || undefined, body: body || undefined, userId: finalUserId },
@@ -70,8 +79,8 @@ export async function uploadPdf(formData: FormData, userId?: string) {
     const file = formData.get('file') as File;
     if (!file) return { success: false, error: 'Nenhum arquivo enviado' };
 
-    const ext     = file.name.split('.').pop();
-    const fileKey = `${finalUserId}/${Date.now()}.${ext}`;
+    const ext      = file.name.split('.').pop();
+    const fileKey  = `${finalUserId}/${Date.now()}.${ext}`;
     const supabase = await createClient();
 
     const { error } = await supabase.storage

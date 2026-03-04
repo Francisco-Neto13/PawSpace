@@ -5,6 +5,10 @@ import { JournalInput } from './types';
 import { getAuthUser } from './auth-helper';
 import { LIMITS } from '@/lib/limits';
 
+const MAX_ENTRIES = LIMITS.quantity.journalEntries;
+const TITLE_MAX   = LIMITS.journal.title;
+const BODY_MAX    = LIMITS.journal.body;
+
 export async function saveJournalEntry(data: JournalInput) {
   const totalStart = Date.now();
   console.log(`🚀 [Journal] Iniciando POST: ${data.id ? 'UPDATE' : 'CREATE'}`);
@@ -15,10 +19,16 @@ export async function saveJournalEntry(data: JournalInput) {
   const title = (data.title || '').trim();
   const body  = (data.body  || '').trim();
 
-  if (title.length > LIMITS.journal.title)
-    return { success: false, error: `Título pode ter no máximo ${LIMITS.journal.title} caracteres.` };
-  if (body.length > LIMITS.journal.body)
-    return { success: false, error: `Conteúdo pode ter no máximo ${LIMITS.journal.body} caracteres.` };
+  if (title.length > TITLE_MAX)
+    return { success: false, error: `Título pode ter no máximo ${TITLE_MAX} caracteres.` };
+  if (body.length > BODY_MAX)
+    return { success: false, error: `Conteúdo pode ter no máximo ${BODY_MAX} caracteres.` };
+
+  if (!data.id) {
+    const count = await prisma.journalEntry.count({ where: { userId } });
+    if (count >= MAX_ENTRIES)
+      return { success: false, error: `Limite de ${MAX_ENTRIES} entradas no diário atingido.` };
+  }
 
   try {
     const dbStart = Date.now();

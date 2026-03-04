@@ -4,17 +4,25 @@ import prisma from '@/lib/prisma';
 import { getAuthUser } from './auth-helper';
 import { LIMITS } from '@/lib/limits';
 
+const MAX_SKILLS = LIMITS.quantity.skillsPerUser;
+const NAME_MAX   = LIMITS.skill.name;
+const DESC_MAX   = LIMITS.skill.description;
+
 export async function addSkill(data: any) {
   const userId = await getAuthUser();
   if (!userId) return { success: false, error: 'Não autorizado' };
 
-  const name = (data.name || data.label || '').trim();
+  const name        = (data.name || data.label || '').trim();
   const description = (data.description || '').trim();
 
-  if (name.length > LIMITS.skill.name)
-    return { success: false, error: `Nome pode ter no máximo ${LIMITS.skill.name} caracteres.` };
-  if (description.length > LIMITS.skill.description)
-    return { success: false, error: `Descrição pode ter no máximo ${LIMITS.skill.description} caracteres.` };
+  if (name.length > NAME_MAX)
+    return { success: false, error: `Nome pode ter no máximo ${NAME_MAX} caracteres.` };
+  if (description.length > DESC_MAX)
+    return { success: false, error: `Descrição pode ter no máximo ${DESC_MAX} caracteres.` };
+
+  const count = await prisma.skill.count({ where: { userId } });
+  if (count >= MAX_SKILLS)
+    return { success: false, error: `Limite de ${MAX_SKILLS} nós atingido.` };
 
   try {
     const { label, name: _name, ...rest } = data;
@@ -32,13 +40,13 @@ export async function updateSkill(skillId: string, data: any) {
   const userId = await getAuthUser();
   if (!userId) return { success: false };
 
-  const name = (data.name || data.label || '').trim();
+  const name        = (data.name || data.label || '').trim();
   const description = (data.description || '').trim();
 
-  if (name && name.length > LIMITS.skill.name)
-    return { success: false, error: `Nome pode ter no máximo ${LIMITS.skill.name} caracteres.` };
-  if (description && description.length > LIMITS.skill.description)
-    return { success: false, error: `Descrição pode ter no máximo ${LIMITS.skill.description} caracteres.` };
+  if (name && name.length > NAME_MAX)
+    return { success: false, error: `Nome pode ter no máximo ${NAME_MAX} caracteres.` };
+  if (description && description.length > DESC_MAX)
+    return { success: false, error: `Descrição pode ter no máximo ${DESC_MAX} caracteres.` };
 
   try {
     const { id, userId: oldUserId, parentId, label, name: _name, ...updateData } = data;
@@ -62,13 +70,13 @@ export async function saveNexusChanges(nodes: any[]) {
     const validNodes = nodes.filter(n => n.id && !n.id.startsWith('dndnode'));
     if (!validNodes.length) return { success: true };
 
-    const ids = validNodes.map(n => `'${n.id}'`).join(',');
-    const nameCases     = validNodes.map(n => `WHEN id = '${n.id}' THEN '${(n.data.label || n.data.name || '').slice(0, LIMITS.skill.name).replace(/'/g, "''")}'`).join(' ');
+    const ids           = validNodes.map(n => `'${n.id}'`).join(',');
+    const nameCases     = validNodes.map(n => `WHEN id = '${n.id}' THEN '${(n.data.label || n.data.name || '').slice(0, NAME_MAX).replace(/'/g, "''")}'`).join(' ');
     const xCases        = validNodes.map(n => `WHEN id = '${n.id}' THEN ${Math.round(n.position.x)}`).join(' ');
     const yCases        = validNodes.map(n => `WHEN id = '${n.id}' THEN ${Math.round(n.position.y)}`).join(' ');
     const colorCases    = validNodes.map(n => `WHEN id = '${n.id}' THEN '${(n.data.color || '').replace(/'/g, "''")}'`).join(' ');
     const categoryCases = validNodes.map(n => `WHEN id = '${n.id}' THEN '${(n.data.category || '').replace(/'/g, "''")}'`).join(' ');
-    const descCases     = validNodes.map(n => `WHEN id = '${n.id}' THEN '${(n.data.description || '').slice(0, LIMITS.skill.description).replace(/'/g, "''")}'`).join(' ');
+    const descCases     = validNodes.map(n => `WHEN id = '${n.id}' THEN '${(n.data.description || '').slice(0, DESC_MAX).replace(/'/g, "''")}'`).join(' ');
     const iconCases     = validNodes.map(n => `WHEN id = '${n.id}' THEN '${(n.data.icon || '').replace(/'/g, "''")}'`).join(' ');
     const shapeCases    = validNodes.map(n => `WHEN id = '${n.id}' THEN '${(n.data.shape || 'hexagon').replace(/'/g, "''")}'`).join(' ');
 

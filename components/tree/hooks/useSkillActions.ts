@@ -185,7 +185,13 @@ export function useSkillActions() {
           positionY: node.position.y,
         });
 
-        if (result.success && result.skill) {
+        if (!result.success) {
+          const msg = (result as any).error || 'Erro ao criar nó.';
+          alert(msg);
+          return false;
+        }
+
+        if (result.skill) {
           tempToReal[node.id] = result.skill.id;
         }
       }
