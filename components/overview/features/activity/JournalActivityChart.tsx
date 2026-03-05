@@ -8,7 +8,7 @@ function CustomTooltip({ active, payload }: any) {
   const d = payload[0].payload;
   return (
     <div className="bg-[#0a0a0a] border border-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-wider">
-      <p className="text-[#c8b89a]">{d.label}</p>
+      <p className="text-[#2dd4bf]">{d.label}</p>
       <p className="text-white">{d.count} {d.count === 1 ? 'entrada' : 'entradas'}</p>
     </div>
   );
@@ -44,9 +44,9 @@ export default function JournalActivityChart() {
 
   return (
     <div className="border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c8b89a]/20 to-transparent" />
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#c8b89a] mb-1 flex items-center gap-2">
-        <span className="w-1 h-3 bg-[#c8b89a] inline-block" />
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/20 to-transparent" />
+      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#2dd4bf] mb-1 flex items-center gap-2">
+        <span className="w-1 h-3 bg-[#2dd4bf] inline-block" />
         Atividade no Diário
       </p>
       <p className="text-[9px] text-zinc-600 mb-6 ml-3">entradas por mês — últimos 8 meses</p>
@@ -59,7 +59,7 @@ export default function JournalActivityChart() {
             {data.map((d, i) => (
               <Cell
                 key={i}
-                fill="#c8b89a"
+                fill="#2dd4bf"
                 fillOpacity={d.count === 0 ? 0.08 : 0.2 + (d.count / maxCount) * 0.7}
               />
             ))}

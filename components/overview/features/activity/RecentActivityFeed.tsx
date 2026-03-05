@@ -47,9 +47,9 @@ export default function RecentActivityFeed({ nodes }: Props) {
 
   return (
     <div className="border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c8b89a]/20 to-transparent" />
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#c8b89a] mb-1 flex items-center gap-2">
-        <span className="w-1 h-3 bg-[#c8b89a] inline-block" />
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/20 to-transparent" />
+      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#2dd4bf] mb-1 flex items-center gap-2">
+        <span className="w-1 h-3 bg-[#2dd4bf] inline-block" />
         Atividade Recente
       </p>
       <p className="text-[9px] text-zinc-600 mb-6 ml-3">journal e skills desbloqueados</p>
@@ -62,7 +62,7 @@ export default function RecentActivityFeed({ nodes }: Props) {
             <div key={item.id} className="flex items-center gap-3 py-2 border-b border-white/[0.03] last:border-0 group">
               <div className="w-6 h-6 flex items-center justify-center shrink-0">
                 {item.type === 'journal'
-                  ? <BookOpen size={11} className="text-[#c8b89a] opacity-60" />
+                  ? <BookOpen size={11} className="text-[#2dd4bf] opacity-60" />
                   : <span className="text-sm">{(item as any).icon}</span>
                 }
               </div>

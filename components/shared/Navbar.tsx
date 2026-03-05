@@ -67,10 +67,10 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
             onClick={(e) => handleSafeNavigation(e, "/overview")}
             className="flex items-center gap-3 group"
           >
-            <div className="h-9 w-9 rounded-full border border-[#c8b89a]/30 bg-[#c8b89a]/10 flex items-center justify-center transition-colors group-hover:border-[#c8b89a]/60">
-              <span className="text-[#c8b89a] text-sm font-black">F</span>
+            <div className="h-9 w-9 rounded-full border border-[#2dd4bf]/30 bg-[#2dd4bf]/10 flex items-center justify-center transition-colors group-hover:border-[#2dd4bf]/60">
+              <span className="text-[#2dd4bf] text-sm font-black">F</span>
             </div>
-            <span className="text-zinc-200 text-[11px] font-black uppercase tracking-[0.2em] group-hover:text-[#c8b89a] transition-colors">
+            <span className="text-zinc-200 text-[11px] font-black uppercase tracking-[0.2em] group-hover:text-[#2dd4bf] transition-colors">
               Francisco
             </span>
           </Link>
@@ -85,11 +85,11 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
                 href={link.href}
                 onClick={(e) => handleSafeNavigation(e, link.href)}
                 className={`relative text-[10px] lg:text-[11px] font-black uppercase tracking-[0.2em] transition-colors group py-1 ${
-                  isActive ? 'text-[#c8b89a]' : 'text-zinc-400 hover:text-[#c8b89a]'
+                  isActive ? 'text-[#2dd4bf]' : 'text-zinc-400 hover:text-[#2dd4bf]'
                 }`}
               >
                 {link.name}
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#c8b89a] transition-all duration-300 shadow-[0_0_10px_rgba(200,184,154,0.5)] ${
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#2dd4bf] transition-all duration-300 shadow-[0_0_10px_rgba(45,212,191,0.5)] ${
                   isActive ? 'w-full' : 'w-0 group-hover:w-full'
                 }`} />
               </Link>
@@ -122,7 +122,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleSafeNavigation(e, link.href)}
-                className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-[#c8b89a]"
+                className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-[#2dd4bf]"
               >
                 {link.name}
               </Link>

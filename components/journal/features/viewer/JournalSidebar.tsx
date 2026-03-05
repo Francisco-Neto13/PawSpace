@@ -28,7 +28,7 @@ export function JournalSidebar({ entries, skills, selectedId, onSelect }: Journa
       }}
     >
       <div className="flex items-center gap-2">
-        <div className="w-1 h-3 bg-[#c8b89a]/40" />
+        <div className="w-1 h-3 bg-[#2dd4bf]/40" />
         <p className="text-[9px] text-zinc-600 uppercase font-black tracking-[0.3em] antialiased">
           Arquivo de Notas
         </p>
@@ -41,7 +41,7 @@ export function JournalSidebar({ entries, skills, selectedId, onSelect }: Journa
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar entrada..."
-          className="w-full bg-white/[0.02] border border-white/[0.06] pl-8 pr-3 py-2.5 text-[10px] text-zinc-300 placeholder:text-zinc-700 font-mono outline-none focus:border-[#c8b89a]/20 transition-colors"
+          className="w-full bg-white/[0.02] border border-white/[0.06] pl-8 pr-3 py-2.5 text-[10px] text-zinc-300 placeholder:text-zinc-700 font-mono outline-none focus:border-[#2dd4bf]/20 transition-colors"
         />
       </div>
 
@@ -49,7 +49,7 @@ export function JournalSidebar({ entries, skills, selectedId, onSelect }: Journa
         className="flex flex-col gap-[2px] overflow-y-auto flex-1 pb-4"
         style={{
           scrollbarWidth: 'thin',
-          scrollbarColor: 'rgba(200,184,154,0.1) transparent',
+          scrollbarColor: 'rgba(45,212,191,0.1) transparent',
         }}
       >
         {entries.length === 0 ? (

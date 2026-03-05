@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { Achievement } from '../../types';
 import { CATEGORY_LABELS } from '../../lib/achievements';
 
@@ -27,7 +27,7 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
   return (
     <div
       className="relative p-[1.5px]"
-      style={{ clipPath: poly, backgroundColor: isUnlocked ? '#c8b89a' : '#27272a' }}
+      style={{ clipPath: poly, backgroundColor: isUnlocked ? '#2dd4bf' : '#27272a' }}
     >
       <div className="w-full h-full" style={{ clipPath: poly, backgroundColor: '#000' }}>
         <div
@@ -42,13 +42,13 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
           <div className="relative z-10 flex items-center justify-between px-5 pt-5 pb-4">
             <span
               className="text-[8px] font-black uppercase tracking-[0.35em]"
-              style={{ color: isUnlocked ? '#c8b89a' : '#3f3f46' }}
+              style={{ color: isUnlocked ? '#2dd4bf' : '#3f3f46' }}
             >
               {CATEGORY_LABELS[category]}
             </span>
             <span
               className="text-[8px] font-black uppercase tracking-[0.25em]"
-              style={{ color: isUnlocked ? '#c8b89a' : '#3f3f46' }}
+              style={{ color: isUnlocked ? '#2dd4bf' : '#3f3f46' }}
             >
               {isUnlocked ? 'Obtida' : 'Bloqueada'}
             </span>
@@ -56,7 +56,7 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
 
           <div
             className="mx-5 h-[1px]"
-            style={{ background: `linear-gradient(to right, transparent, ${isUnlocked ? 'rgba(200,184,154,0.3)' : '#27272a'}, transparent)` }}
+            style={{ background: `linear-gradient(to right, transparent, ${isUnlocked ? 'rgba(45,212,191,0.3)' : '#27272a'}, transparent)` }}
           />
 
           <div
@@ -76,7 +76,7 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
 
           <div
             className="mx-5 mb-5 h-[1px]"
-            style={{ background: `linear-gradient(to right, transparent, ${isUnlocked ? 'rgba(200,184,154,0.2)' : '#27272a'}, transparent)` }}
+            style={{ background: `linear-gradient(to right, transparent, ${isUnlocked ? 'rgba(45,212,191,0.2)' : '#27272a'}, transparent)` }}
           />
 
           <div className="relative z-10 px-5 pb-4">
@@ -99,13 +99,13 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
               <div className="flex items-center justify-between mb-1.5">
                 <span
                   className="text-[7px] font-black uppercase tracking-wider"
-                  style={{ color: isUnlocked ? 'rgba(200,184,154,0.5)' : '#27272a' }}
+                  style={{ color: isUnlocked ? 'rgba(45,212,191,0.5)' : '#27272a' }}
                 >
                   Progresso
                 </span>
                 <span
                   className="text-[8px] font-mono font-bold tabular-nums"
-                  style={{ color: isUnlocked ? '#c8b89a' : '#3f3f46' }}
+                  style={{ color: isUnlocked ? '#2dd4bf' : '#3f3f46' }}
                 >
                   {progress.current}/{progress.total}
                 </span>
@@ -113,7 +113,7 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
               <div className="h-[1px] w-full bg-white/[0.04]">
                 <div
                   className="h-full transition-all duration-700"
-                  style={{ width: `${progressPct}%`, backgroundColor: isUnlocked ? '#c8b89a' : '#27272a' }}
+                  style={{ width: `${progressPct}%`, backgroundColor: isUnlocked ? '#2dd4bf' : '#27272a' }}
                 />
               </div>
             </div>
@@ -124,7 +124,7 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
               <div
                 key={i}
                 className="w-1 h-1 rotate-45 border opacity-25"
-                style={{ borderColor: isUnlocked ? '#c8b89a' : '#3f3f46' }}
+                style={{ borderColor: isUnlocked ? '#2dd4bf' : '#3f3f46' }}
               />
             ))}
           </div>

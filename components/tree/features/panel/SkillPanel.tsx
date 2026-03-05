@@ -11,7 +11,7 @@ interface SkillPanelProps {
   isAvailable: boolean;
 }
 
-const DEFAULT_SYSTEM_COLOR = '#c8b89a';
+const DEFAULT_SYSTEM_COLOR = '#2dd4bf';
 
 const poly = `polygon(
   10px 0,
@@ -163,7 +163,7 @@ function SkillPanelComponent({ data, onClose, onToggleStatus, isAvailable }: Ski
               <div className="mt-6 relative z-10">
                 <button
                   onClick={handleViewLibrary}
-                  className="w-full py-3 border border-white/[0.06] text-zinc-500 text-[9px] font-black uppercase tracking-[0.3em] hover:border-[#c8b89a]/20 hover:text-[#c8b89a] hover:bg-[#c8b89a]/[0.03] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3 border border-white/[0.06] text-zinc-500 text-[9px] font-black uppercase tracking-[0.3em] hover:border-[#2dd4bf]/20 hover:text-[#2dd4bf] hover:bg-[#2dd4bf]/[0.03] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <BookOpen size={12} />
                   Visualizar na Biblioteca

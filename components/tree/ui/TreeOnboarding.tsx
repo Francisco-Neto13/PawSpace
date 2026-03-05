@@ -59,8 +59,8 @@ export function TreeOnboarding() {
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-2 px-3 py-2 border transition-all duration-300 backdrop-blur-md cursor-pointer
           ${isOpen
-            ? 'border-[#c8b89a]/40 bg-[#c8b89a]/10 text-[#c8b89a]'
-            : 'border-white/[0.06] bg-[#030304]/80 text-zinc-500 hover:text-[#c8b89a] hover:border-[#c8b89a]/30'
+            ? 'border-[#2dd4bf]/40 bg-[#2dd4bf]/10 text-[#2dd4bf]'
+            : 'border-white/[0.06] bg-[#06090f]/80 text-zinc-500 hover:text-[#2dd4bf] hover:border-[#2dd4bf]/30'
           }`}
       >
         <Info size={13} />
@@ -70,7 +70,7 @@ export function TreeOnboarding() {
       {isOpen && (
         <div
           className="w-72 p-[1.5px] animate-in fade-in zoom-in-95 duration-200 origin-top-right"
-          style={{ clipPath: polySmall, backgroundColor: '#c8b89a22' }}
+          style={{ clipPath: polySmall, backgroundColor: '#2dd4bf22' }}
         >
           <div style={{ clipPath: polySmall, backgroundColor: '#000' }}>
             <div
@@ -88,12 +88,12 @@ export function TreeOnboarding() {
 
                 <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/[0.04]">
                   <div className="flex items-center gap-3">
-                    <div className="w-1 h-5 bg-[#c8b89a]" />
+                    <div className="w-1 h-5 bg-[#2dd4bf]" />
                     <div>
                       <p className="text-[8px] text-zinc-600 uppercase font-black tracking-[0.3em] mb-0.5">
                         Documentação
                       </p>
-                      <h3 className="text-[#c8b89a] text-[11px] font-black uppercase tracking-[0.3em]">
+                      <h3 className="text-[#2dd4bf] text-[11px] font-black uppercase tracking-[0.3em]">
                         Manual Nexus
                       </h3>
                     </div>
@@ -106,16 +106,16 @@ export function TreeOnboarding() {
                   </button>
                 </div>
 
-                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(200,184,154,0.2) transparent' }}>
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(45,212,191,0.2) transparent' }}>
                   {steps.map((step, i) => (
                     <div key={i} className="flex gap-3 items-start group">
                       <div
-                        className="shrink-0 p-1.5 border border-white/[0.06] bg-white/[0.02] text-[#c8b89a]/60 group-hover:text-[#c8b89a] group-hover:border-[#c8b89a]/20 transition-all duration-300"
+                        className="shrink-0 p-1.5 border border-white/[0.06] bg-white/[0.02] text-[#2dd4bf]/60 group-hover:text-[#2dd4bf] group-hover:border-[#2dd4bf]/20 transition-all duration-300"
                       >
                         {step.icon}
                       </div>
                       <div>
-                        <h4 className="text-[10px] font-black text-[#c8b89a] uppercase tracking-[0.2em] mb-1">
+                        <h4 className="text-[10px] font-black text-[#2dd4bf] uppercase tracking-[0.2em] mb-1">
                           {step.title}
                         </h4>
                         <p className="text-[10px] text-zinc-300 font-normal leading-relaxed tracking-wide">

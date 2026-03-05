@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ReactFlow, ConnectionMode, type NodeTypes, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Save, Loader2, AlertCircle } from 'lucide-react';
@@ -11,6 +11,7 @@ import { StarField } from './ui/StarField';
 import { EditSkillModal } from './features/editor/EditSkillModal';
 import { NodeContextMenu } from './ui/NodeContextMenu';
 import { TreeOnboarding } from './ui/TreeOnboarding';
+import { TreeEmptyState } from './ui/TreeEmptyState';
 
 import { useNexus } from '@/contexts/NexusContext';
 import { useSkillTree, SkillTreeProvider } from '@/contexts/SkillTreeContext';
@@ -68,6 +69,7 @@ function SkillTreeInner() {
   const [hasStructuralChanges, setHasStructuralChanges] = useState(false);
 
   const canSave = isDirty || hasDragChanges || hasStructuralChanges;
+  const isEmpty = !isLoadingTree && nodes.length === 0;
 
   useEffect(() => {
     refreshNexus(true);
@@ -99,6 +101,11 @@ function SkillTreeInner() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [canSave]);
+
+  const handleCreateRoot = useCallback(() => {
+    handleCreateQuickSkill(null);
+    setHasStructuralChanges(true);
+  }, [handleCreateQuickSkill]);
 
   const onSaveAll = async () => {
     setIsSaving(true);
@@ -136,17 +143,17 @@ function SkillTreeInner() {
 
   return (
     <div
-      className="relative w-full bg-[#030304] overflow-hidden select-none font-sans"
+      className="relative w-full bg-[#06090f] overflow-hidden select-none font-sans"
       style={{ height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))' }}
     >
       {isLoadingTree && nodes.length === 0 && (
-        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#030304]">
+        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#06090f]">
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#2dd4bf06_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
           </div>
           <div className="relative flex flex-col items-center gap-4">
-            <div className="w-8 h-8 border-2 border-[#c8b89a]/20 border-t-[#c8b89a] rounded-full animate-spin" />
-            <p className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
+            <div className="w-8 h-8 border-2 border-[#2dd4bf]/20 border-t-[#2dd4bf] rounded-full animate-spin" />
+            <p className="text-[#2dd4bf] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
               Sincronizando Nexus...
             </p>
           </div>
@@ -156,11 +163,15 @@ function SkillTreeInner() {
       <SvgDefs />
       <StarField />
 
+      {isEmpty && (
+        <TreeEmptyState onCreate={handleCreateRoot} />
+      )}
+
       {canSave && (
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 animate-in slide-in-from-bottom-5 duration-500">
-          <div className="flex items-center gap-2 px-3 py-1 bg-black/80 border border-[#c8b89a]/20 backdrop-blur-md shadow-2xl">
-            <AlertCircle size={10} className="text-[#c8b89a] animate-pulse" />
-            <span className="text-[7px] text-[#c8b89a]/70 font-black uppercase tracking-[0.2em]">
+          <div className="flex items-center gap-2 px-3 py-1 bg-black/80 border border-[#2dd4bf]/20 backdrop-blur-md shadow-2xl">
+            <AlertCircle size={10} className="text-[#2dd4bf] animate-pulse" />
+            <span className="text-[7px] text-[#2dd4bf]/70 font-black uppercase tracking-[0.2em]">
               Protocolos pendentes de consolidação
             </span>
           </div>
@@ -170,8 +181,8 @@ function SkillTreeInner() {
             disabled={isSaving}
             className={`flex items-center gap-3 px-8 py-4 border transition-all backdrop-blur-md shadow-2xl group
               ${isSaving
-                ? 'border-[#c8b89a]/20 bg-[#030304]/60 text-[#c8b89a]/40 cursor-not-allowed'
-                : 'border-[#c8b89a]/40 bg-[#030304]/90 text-[#c8b89a] hover:bg-[#c8b89a]/10 hover:border-[#c8b89a] active:scale-95 cursor-pointer'
+                ? 'border-[#2dd4bf]/20 bg-[#06090f]/60 text-[#2dd4bf]/40 cursor-not-allowed'
+                : 'border-[#2dd4bf]/40 bg-[#06090f]/90 text-[#2dd4bf] hover:bg-[#2dd4bf]/10 hover:border-[#2dd4bf] active:scale-95 cursor-pointer'
               }`}
           >
             {isSaving

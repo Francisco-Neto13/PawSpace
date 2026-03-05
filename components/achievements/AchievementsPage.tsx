@@ -33,14 +33,14 @@ export function AchievementsPage() {
 
   return (
     <div
-      className="relative min-h-screen w-full bg-[#030304] overflow-x-hidden"
+      className="relative min-h-screen w-full bg-[#06090f] overflow-x-hidden"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(6px)',
         transition: 'opacity 0.5s ease, transform 0.5s ease',
       }}
     >
-      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#c8b89a05_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_50%,transparent_100%)]" />
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#2dd4bf05_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_50%,transparent_100%)]" />
       <main className="relative z-10 py-8 space-y-6 pb-20">
         <AchievementStats achievements={achievements} />
         <AchievementFilters

@@ -10,7 +10,7 @@ function CustomTooltip({ active, payload }: any) {
   const d = payload[0].payload;
   return (
     <div className="bg-[#0a0a0a] border border-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-wider">
-      <p className="text-[#c8b89a]">{d.category}</p>
+      <p className="text-[#2dd4bf]">{d.category}</p>
       <p className="text-white">{d.unlocked} / {d.total} desbloqueados</p>
       <p className="text-zinc-500">{d.pct}% concluído</p>
     </div>
@@ -39,9 +39,9 @@ export default function CategoryChart({ nodes }: Props) {
 
   return (
     <div className="border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c8b89a]/20 to-transparent" />
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#c8b89a] mb-1 flex items-center gap-2">
-        <span className="w-1 h-3 bg-[#c8b89a] inline-block" />
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/20 to-transparent" />
+      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#2dd4bf] mb-1 flex items-center gap-2">
+        <span className="w-1 h-3 bg-[#2dd4bf] inline-block" />
         Progresso por Categoria
       </p>
       <p className="text-[9px] text-zinc-600 mb-6 ml-3">nós desbloqueados vs total</p>
@@ -52,12 +52,12 @@ export default function CategoryChart({ nodes }: Props) {
           <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
           <Bar dataKey="total" fill="rgba(255,255,255,0.05)" radius={[2, 2, 0, 0]} />
           <Bar dataKey="unlocked" radius={[2, 2, 0, 0]}>
-            {data.map((_, i) => <Cell key={i} fill="#c8b89a" fillOpacity={0.8} />)}
+            {data.map((_, i) => <Cell key={i} fill="#2dd4bf" fillOpacity={0.8} />)}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
       <div className="flex items-center gap-4 mt-4 ml-1">
-        {[['#c8b89a', 'Desbloqueados'], ['rgba(255,255,255,0.1)', 'Total']].map(([color, label]) => (
+        {[['#2dd4bf', 'Desbloqueados'], ['rgba(255,255,255,0.1)', 'Total']].map(([color, label]) => (
           <div key={label} className="flex items-center gap-1.5">
             <div className="w-2 h-2" style={{ backgroundColor: color }} />
             <span className="text-[8px] text-zinc-500 uppercase tracking-wider font-bold">{label}</span>

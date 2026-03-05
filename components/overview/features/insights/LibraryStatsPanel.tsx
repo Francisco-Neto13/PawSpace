@@ -8,18 +8,18 @@ function CustomTooltip({ active, payload }: any) {
   const d = payload[0].payload;
   return (
     <div className="bg-[#0a0a0a] border border-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-wider">
-      <p className="text-[#c8b89a]">{d.name}</p>
+      <p className="text-[#2dd4bf]">{d.name}</p>
       <p className="text-white">{d.value} itens</p>
     </div>
   );
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  video:    '#c8b89a',
-  article:  'rgba(200,184,154,0.6)',
-  pdf:      'rgba(200,184,154,0.4)',
-  link:     'rgba(200,184,154,0.25)',
-  note:     'rgba(200,184,154,0.15)',
+  video:    '#2dd4bf',
+  article:  'rgba(45,212,191,0.6)',
+  pdf:      'rgba(45,212,191,0.4)',
+  link:     'rgba(45,212,191,0.25)',
+  note:     'rgba(45,212,191,0.15)',
 };
 
 export default function LibraryStatsPanel() {
@@ -47,9 +47,9 @@ export default function LibraryStatsPanel() {
   if (totalContents === 0) {
     return (
       <div className="border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c8b89a]/20 to-transparent" />
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#c8b89a] mb-1 flex items-center gap-2">
-          <span className="w-1 h-3 bg-[#c8b89a] inline-block" />
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/20 to-transparent" />
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#2dd4bf] mb-1 flex items-center gap-2">
+          <span className="w-1 h-3 bg-[#2dd4bf] inline-block" />
           Biblioteca
         </p>
         <p className="text-[9px] text-zinc-700 mt-6 ml-3">Navegue pelos nós para carregar os dados da biblioteca.</p>
@@ -59,9 +59,9 @@ export default function LibraryStatsPanel() {
 
   return (
     <div className="border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#c8b89a]/20 to-transparent" />
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#c8b89a] mb-1 flex items-center gap-2">
-        <span className="w-1 h-3 bg-[#c8b89a] inline-block" />
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/20 to-transparent" />
+      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#2dd4bf] mb-1 flex items-center gap-2">
+        <span className="w-1 h-3 bg-[#2dd4bf] inline-block" />
         Biblioteca
       </p>
       <p className="text-[9px] text-zinc-600 mb-6 ml-3">conteúdos por tipo</p>
@@ -81,7 +81,7 @@ export default function LibraryStatsPanel() {
               {byType.map((_, i) => (
                 <Cell
                   key={i}
-                  fill={TYPE_COLORS[_.name] ?? 'rgba(200,184,154,0.2)'}
+                  fill={TYPE_COLORS[_.name] ?? 'rgba(45,212,191,0.2)'}
                   stroke="transparent"
                 />
               ))}
@@ -93,7 +93,7 @@ export default function LibraryStatsPanel() {
         <div className="flex-1 space-y-2">
           {byType.map(t => (
             <div key={t.name} className="flex items-center gap-2">
-              <div className="w-2 h-2 shrink-0" style={{ backgroundColor: TYPE_COLORS[t.name] ?? 'rgba(200,184,154,0.2)' }} />
+              <div className="w-2 h-2 shrink-0" style={{ backgroundColor: TYPE_COLORS[t.name] ?? 'rgba(45,212,191,0.2)' }} />
               <span className="text-[9px] text-zinc-400 uppercase tracking-wider font-bold flex-1">{t.name}</span>
               <span className="text-[9px] text-zinc-500 font-mono">{t.value}</span>
             </div>

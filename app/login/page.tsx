@@ -32,13 +32,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030304] flex items-center justify-center p-6 relative overflow-hidden text-zinc-200">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#c8b89a05_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a05_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+    <div className="min-h-screen bg-[#06090f] flex items-center justify-center p-6 relative overflow-hidden text-zinc-200">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#2dd4bf05_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf05_1px,transparent_1px)] bg-[size:4rem_4rem]" />
 
       <div className="relative z-10 w-full max-w-sm">
         <div className="mb-8 text-center">
-          <h2 className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.5em] mb-2">System Access</h2>
-          <h1 className="text-white text-2xl font-black uppercase tracking-tighter">Nexus <span className="text-[#c8b89a]">Login</span></h1>
+          <h2 className="text-[#2dd4bf] text-[10px] font-black uppercase tracking-[0.5em] mb-2">System Access</h2>
+          <h1 className="text-white text-2xl font-black uppercase tracking-tighter">Nexus <span className="text-[#2dd4bf]">Login</span></h1>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -48,7 +48,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 p-3 text-white text-sm focus:outline-none focus:border-[#c8b89a]/50 transition-colors rounded-sm"
+              className="w-full bg-white/5 border border-white/10 p-3 text-white text-sm focus:outline-none focus:border-[#2dd4bf]/50 transition-colors rounded-sm"
               placeholder="admin@nexus.com"
               required
             />
@@ -60,7 +60,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 p-3 text-white text-sm focus:outline-none focus:border-[#c8b89a]/50 transition-colors rounded-sm"
+              className="w-full bg-white/5 border border-white/10 p-3 text-white text-sm focus:outline-none focus:border-[#2dd4bf]/50 transition-colors rounded-sm"
               placeholder="••••••••"
               required
             />
@@ -75,7 +75,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#c8b89a] text-black font-black uppercase text-xs p-4 mt-4 hover:bg-[#d9cbb2] transition-colors disabled:opacity-50"
+            className="w-full bg-[#2dd4bf] text-black font-black uppercase text-xs p-4 mt-4 hover:bg-[#d9cbb2] transition-colors disabled:opacity-50"
           >
             {loading ? 'Autenticando...' : 'Iniciar Sincronização'}
           </button>

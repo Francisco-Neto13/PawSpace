@@ -11,6 +11,7 @@ interface LibraryContentListProps {
   isUnlocked: boolean;
   search: string;
   onDelete?: (id: string) => void;
+  onAdd?: () => void;
 }
 
 export function LibraryContentList({
@@ -19,11 +20,12 @@ export function LibraryContentList({
   isUnlocked,
   search,
   onDelete,
+  onAdd,
 }: LibraryContentListProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <Loader2 size={20} className="text-[#c8b89a]/40 animate-spin" />
+        <Loader2 size={20} className="text-[#2dd4bf]/40 animate-spin" />
         <p className="text-zinc-700 text-[9px] font-black uppercase tracking-widest">
           Carregando conteúdos...
         </p>
@@ -32,7 +34,7 @@ export function LibraryContentList({
   }
 
   if (!isUnlocked || contents.length === 0) {
-    return <EmptyState nodeUnlocked={isUnlocked} />;
+    return <EmptyState nodeUnlocked={isUnlocked} onAdd={onAdd} />;
   }
 
   return (

@@ -24,21 +24,21 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
               href="https://github.com/Francisco-Neto13"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#c8b89a] ml-2 hover:text-white transition-colors cursor-pointer"
+              className="text-[#2dd4bf] ml-2 hover:text-white transition-colors cursor-pointer"
             >
               Francisco
             </a>
           </div>
           <div className="text-[11px] font-black uppercase tracking-[0.2em] order-1 md:order-2 md:absolute md:left-1/2 md:-translate-x-1/2 whitespace-nowrap">
             <span className="text-white">© {currentYear} • </span>
-            <span className="text-[#c8b89a]">Francisco Neto</span>
+            <span className="text-[#2dd4bf]">Francisco Neto</span>
           </div>
           <div className="flex items-center gap-6 order-3">
             <a
               href="https://github.com/Francisco-Neto13"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white hover:text-[#c8b89a] transition-all duration-300 hover:scale-110"
+              className="text-white hover:text-[#2dd4bf] transition-all duration-300 hover:scale-110"
             >
               <Github size={18} />
             </a>
@@ -46,7 +46,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
               href="https://www.instagram.com/cisscoo_"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white hover:text-[#c8b89a] transition-all duration-300 hover:scale-110"
+              className="text-white hover:text-[#2dd4bf] transition-all duration-300 hover:scale-110"
             >
               <Instagram size={18} />
             </a>

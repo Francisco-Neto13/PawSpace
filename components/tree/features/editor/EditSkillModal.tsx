@@ -76,7 +76,7 @@ export function EditSkillModal({
 
       <div
         className="relative w-full max-w-md animate-in zoom-in-95 fade-in duration-300 p-[1.5px] z-10 pointer-events-auto"
-        style={{ clipPath: poly, backgroundColor: '#c8b89a33' }}
+        style={{ clipPath: poly, backgroundColor: '#2dd4bf33' }}
       >
         <div className="w-full h-full" style={{ clipPath: poly, backgroundColor: '#000' }}>
           <div
@@ -97,12 +97,12 @@ export function EditSkillModal({
             <div className="relative z-10 mb-8">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-1 h-5 bg-[#c8b89a]" />
+                  <div className="w-1 h-5 bg-[#2dd4bf]" />
                   <div>
                     <p className="text-[8px] text-zinc-600 uppercase tracking-[0.3em] font-black mb-0.5">
                       Configuração de Unidade
                     </p>
-                    <h2 className="text-[#c8b89a] text-[13px] font-black uppercase tracking-[0.3em]">
+                    <h2 className="text-[#2dd4bf] text-[13px] font-black uppercase tracking-[0.3em]">
                       Ajustar Protocolo
                     </h2>
                   </div>
@@ -116,7 +116,7 @@ export function EditSkillModal({
               </div>
               <div
                 className="h-[1px] w-full"
-                style={{ background: 'linear-gradient(to right, #c8b89a22, transparent)' }}
+                style={{ background: 'linear-gradient(to right, #2dd4bf22, transparent)' }}
               />
             </div>
 
@@ -134,7 +134,7 @@ export function EditSkillModal({
               {[0, 1, 2].map(i => (
                 <div
                   key={i}
-                  className="w-1.5 h-1.5 rotate-45 border border-[#c8b89a]"
+                  className="w-1.5 h-1.5 rotate-45 border border-[#2dd4bf]"
                 />
               ))}
             </div>

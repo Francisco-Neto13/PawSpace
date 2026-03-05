@@ -26,7 +26,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
       }}
     >
       <div className="flex items-center gap-2">
-        <div className="w-1 h-3 bg-[#c8b89a]/40" />
+        <div className="w-1 h-3 bg-[#2dd4bf]/40" />
         <p className="text-[9px] text-zinc-600 uppercase font-black tracking-[0.3em]">
           Módulos da Árvore
         </p>
@@ -39,13 +39,13 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar módulo..."
-          className="w-full bg-white/[0.02] border border-white/[0.06] pl-8 pr-3 py-2.5 text-[10px] text-zinc-300 placeholder:text-zinc-700 font-mono outline-none focus:border-[#c8b89a]/20 transition-colors"
+          className="w-full bg-white/[0.02] border border-white/[0.06] pl-8 pr-3 py-2.5 text-[10px] text-zinc-300 placeholder:text-zinc-700 font-mono outline-none focus:border-[#2dd4bf]/20 transition-colors"
         />
       </div>
 
       <div
         className="flex flex-col gap-2 overflow-y-auto flex-1 pb-4"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(200,184,154,0.1) transparent' }}
+        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(45,212,191,0.1) transparent' }}
       >
         {filtered.length === 0 && (
           <p className="text-[10px] text-zinc-700 font-mono text-center py-8">Nenhum módulo encontrado</p>
@@ -59,7 +59,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
               disabled={!node.isUnlocked}
               className={`group relative flex items-center gap-4 px-5 py-4 border text-left transition-all duration-300
                 ${isSelected
-                  ? 'border-[#c8b89a]/20 bg-[#c8b89a]/[0.04] cursor-pointer'
+                  ? 'border-[#2dd4bf]/20 bg-[#2dd4bf]/[0.04] cursor-pointer'
                   : node.isUnlocked
                     ? 'border-white/[0.04] hover:border-white/[0.08] hover:bg-white/[0.02] cursor-pointer'
                     : 'border-white/[0.02] opacity-30 cursor-not-allowed'
@@ -86,14 +86,14 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
                 {node.isUnlocked ? node.icon : '🔒'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-[11px] font-bold truncate transition-colors duration-300 ${isSelected ? 'text-[#c8b89a]' : 'text-zinc-400 group-hover:text-zinc-200'}`}>
+                <p className={`text-[11px] font-bold truncate transition-colors duration-300 ${isSelected ? 'text-[#2dd4bf]' : 'text-zinc-400 group-hover:text-zinc-200'}`}>
                   {node.name}
                 </p>
                 <p className="text-[9px] text-zinc-700 font-mono mt-0.5">
                   {node.contents.length} {node.contents.length === 1 ? 'item' : 'itens'}
                 </p>
               </div>
-              {isSelected && <ChevronRight size={12} className="text-[#c8b89a]/40 shrink-0" />}
+              {isSelected && <ChevronRight size={12} className="text-[#2dd4bf]/40 shrink-0" />}
             </button>
           );
         })}

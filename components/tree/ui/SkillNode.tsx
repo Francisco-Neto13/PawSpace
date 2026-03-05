@@ -5,7 +5,7 @@ import { SkillData, SkillShape, SHAPE_SIZE } from '../types';
 
 type CompatibleSkillNode = Node<SkillData>;
 
-const DEFAULT_NODE_COLOR = '#c8b89a';
+const DEFAULT_NODE_COLOR = '#2dd4bf';
 
 export function SvgDefs() {
   return (
@@ -87,7 +87,7 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
         />
 
         <div
-          className="absolute pointer-events-none bg-[#030304]"
+          className="absolute pointer-events-none bg-[#06090f]"
           style={{
             inset: '2px',
             clipPath,

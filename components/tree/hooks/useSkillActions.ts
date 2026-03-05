@@ -104,7 +104,7 @@ export function useSkillActions() {
       label: 'Novo Protocolo',
       description: 'Defina as diretrizes deste nó.',
       icon: '⚡',
-      color: '#c8b89a',
+      color: '#2dd4bf',
       shape: 'hexagon' as SkillShape,
       category: 'keystone' as any,
       isUnlocked: false,

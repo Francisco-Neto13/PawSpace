@@ -60,7 +60,7 @@ export function NodeContextMenu({
     >
       <div
         className="min-w-[220px] p-[1.5px]"
-        style={{ clipPath: polySmall, backgroundColor: '#c8b89a22' }}
+        style={{ clipPath: polySmall, backgroundColor: '#2dd4bf22' }}
       >
         <div style={{ clipPath: polySmall, backgroundColor: '#000' }}>
           <div
@@ -76,28 +76,28 @@ export function NodeContextMenu({
 
             <div className="px-4 pt-4 pb-3 border-b border-white/[0.04] relative z-10">
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-1 h-3 bg-[#c8b89a]/40" />
+                <div className="w-1 h-3 bg-[#2dd4bf]/40" />
                 <p className="text-[8px] text-zinc-600 uppercase font-black tracking-[0.25em]">
                   Módulo Selecionado
                 </p>
               </div>
-              <p className="text-[#c8b89a] text-[11px] font-bold truncate pl-3">{nodeName}</p>
+              <p className="text-[#2dd4bf] text-[11px] font-bold truncate pl-3">{nodeName}</p>
             </div>
 
             <div className="py-1.5 relative z-10">
               <button
                 onClick={() => { onEdit(); onClose(); }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-300 hover:bg-white/[0.04] hover:text-[#c8b89a] transition-all duration-200 group cursor-pointer"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-300 hover:bg-white/[0.04] hover:text-[#2dd4bf] transition-all duration-200 group cursor-pointer"
               >
-                <Edit3 size={13} className="text-[#c8b89a]/60 group-hover:text-[#c8b89a] transition-colors shrink-0" />
+                <Edit3 size={13} className="text-[#2dd4bf]/60 group-hover:text-[#2dd4bf] transition-colors shrink-0" />
                 <span className="text-[9px] font-black uppercase tracking-widest">Configurar Protocolo</span>
               </button>
 
               <button
                 onClick={() => { onAddChild(); onClose(); }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-400 hover:bg-white/[0.04] hover:text-[#c8b89a] transition-all duration-200 group cursor-pointer"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-400 hover:bg-white/[0.04] hover:text-[#2dd4bf] transition-all duration-200 group cursor-pointer"
               >
-                <Plus size={13} className="text-[#c8b89a]/60 group-hover:text-[#c8b89a] transition-colors shrink-0" />
+                <Plus size={13} className="text-[#2dd4bf]/60 group-hover:text-[#2dd4bf] transition-colors shrink-0" />
                 <span className="text-[9px] font-black uppercase tracking-widest">Expandir Nexus</span>
               </button>
 

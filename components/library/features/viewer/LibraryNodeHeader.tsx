@@ -51,7 +51,7 @@ export function LibraryNodeHeader({
         {node.isUnlocked && (
           <button
             onClick={onAddContent}
-            className="flex items-center gap-3 px-6 py-3.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] hover:bg-[#c8b89a]/10 hover:border-[#c8b89a]/50 transition-all duration-300 cursor-pointer"
+            className="flex items-center gap-3 px-6 py-3.5 border border-[#2dd4bf]/30 bg-[#2dd4bf]/[0.06] text-[#2dd4bf] hover:bg-[#2dd4bf]/10 hover:border-[#2dd4bf]/50 transition-all duration-300 cursor-pointer"
           >
             <Plus size={14} />
             <span className="text-[10px] font-black uppercase tracking-widest">Adicionar Conteúdo</span>

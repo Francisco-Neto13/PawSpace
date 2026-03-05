@@ -80,7 +80,7 @@ export function SkillForm({
   };
 
   const labelClass = "text-[8px] text-zinc-600 uppercase font-black tracking-[0.25em]";
-  const inputClass = "w-full bg-white/[0.02] border border-white/[0.06] p-3.5 text-white text-sm outline-none focus:border-[#c8b89a]/30 transition-colors font-light placeholder:text-zinc-700 cursor-text";
+  const inputClass = "w-full bg-white/[0.02] border border-white/[0.06] p-3.5 text-white text-sm outline-none focus:border-[#2dd4bf]/30 transition-colors font-light placeholder:text-zinc-700 cursor-text";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -135,7 +135,7 @@ export function SkillForm({
               onClick={() => setFormData({ ...formData, shape: s.value })}
               className={`group flex flex-col items-center gap-2.5 p-3 border transition-all duration-300 cursor-pointer ${
                 formData.shape === s.value
-                  ? 'border-[#c8b89a]/40 bg-[#c8b89a]/[0.06]'
+                  ? 'border-[#2dd4bf]/40 bg-[#2dd4bf]/[0.06]'
                   : 'border-white/[0.04] bg-white/[0.01] hover:border-white/10 hover:bg-white/[0.03]'
               }`}
             >
@@ -147,7 +147,7 @@ export function SkillForm({
                 }}
               />
               <span className={`text-[7px] font-black uppercase tracking-wider transition-colors duration-300 ${
-                formData.shape === s.value ? 'text-[#c8b89a]' : 'text-zinc-600 group-hover:text-zinc-500'
+                formData.shape === s.value ? 'text-[#2dd4bf]' : 'text-zinc-600 group-hover:text-zinc-500'
               }`}>
                 {s.label}
               </span>
@@ -200,7 +200,7 @@ export function SkillForm({
         <button
           type="submit"
           disabled={isLoading || !formData.label.trim()}
-          className="flex-1 py-3.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[10px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 hover:border-[#c8b89a]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
+          className="flex-1 py-3.5 border border-[#2dd4bf]/30 bg-[#2dd4bf]/[0.06] text-[#2dd4bf] text-[10px] font-black uppercase tracking-widest hover:bg-[#2dd4bf]/10 hover:border-[#2dd4bf]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
         >
           {isLoading ? 'Sincronizando...' : isEditing ? 'Salvar Nexus' : 'Confirmar'}
         </button>

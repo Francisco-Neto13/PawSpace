@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`
           font-sans
           antialiased
-          bg-[#030304]
+          bg-[#06090f]
           min-h-screen
           text-white
           font-medium

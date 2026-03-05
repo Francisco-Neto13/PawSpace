@@ -126,7 +126,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                   >
                     Nenhum vínculo
                   </button>
-                  <div className="max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(200,184,154,0.1) transparent' }}>
+                  <div className="max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(45,212,191,0.1) transparent' }}>
                     {unlockedSkills.map(s => (
                       <button
                         key={s.id}
@@ -147,7 +147,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
           <div className="flex items-center gap-2 ml-auto">
             <div className="flex items-center gap-2 mr-4">
               {isSaving ? (
-                <span className="flex items-center gap-1.5 text-[8px] text-[#c8b89a] font-black uppercase animate-pulse">
+                <span className="flex items-center gap-1.5 text-[8px] text-[#2dd4bf] font-black uppercase animate-pulse">
                   <Loader2 size={10} className="animate-spin" />
                   Sincronizando...
                 </span>
@@ -179,7 +179,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             onInput={handleBodyInput}
             onBlur={save}
             className="h-full overflow-y-auto px-8 py-10 text-zinc-200 text-sm font-light leading-relaxed outline-none prose prose-invert max-w-none antialiased"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(200,184,154,0.1) transparent' }}
+            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(45,212,191,0.1) transparent' }}
           />
 
           {showBodyCounter && (

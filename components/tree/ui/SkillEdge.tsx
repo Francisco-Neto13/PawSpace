@@ -6,7 +6,7 @@ import { SkillEdgeData } from '../types';
 type CompatibleSkillEdge = Edge<SkillEdgeData & { [key: string]: unknown }>;
 type SkillEdgeProps = EdgeProps<CompatibleSkillEdge>;
 
-const DEFAULT_EDGE_COLOR = '#c8b89a';
+const DEFAULT_EDGE_COLOR = '#2dd4bf';
 const LOCKED_EDGE_COLOR = '#1a1a1f';
 
 function SkillEdgeComponent({

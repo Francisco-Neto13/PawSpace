@@ -20,7 +20,7 @@ export function AchievementFilters({ active, onChange, resultCount }: Achievemen
           onClick={() => onChange(cat)}
           className={`px-4 py-2 text-[9px] font-black uppercase tracking-widest border transition-all duration-200 cursor-pointer ${
             active === cat
-              ? 'border-[#c8b89a]/40 bg-[#c8b89a]/[0.06] text-[#c8b89a]'
+              ? 'border-[#2dd4bf]/40 bg-[#2dd4bf]/[0.06] text-[#2dd4bf]'
               : 'border-white/[0.04] text-zinc-600 hover:text-zinc-300 hover:border-white/10'
           }`}
         >

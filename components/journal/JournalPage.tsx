@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { BookOpen, Plus, Loader2 } from 'lucide-react';
 import { JournalSidebar } from './features/viewer/JournalSidebar';
@@ -27,7 +27,7 @@ export default function JournalPage() {
     id: n.id,
     name: n.data.label || n.data.name || 'Sem Nome',
     icon: n.data.icon || 'âœ¦',
-    color: n.data.color || '#c8b89a',
+    color: n.data.color || '#2dd4bf',
     isUnlocked: !!n.data.isUnlocked,
   })), [nodes]);
 
@@ -98,9 +98,9 @@ export default function JournalPage() {
 
   if (isLoadingNexus && nodes.length === 0) {
     return (
-      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#030304]">
-        <div className="w-8 h-8 border-2 border-[#c8b89a]/20 border-t-[#c8b89a] rounded-full animate-spin" />
-        <p className="text-[#c8b89a] text-[10px] font-black uppercase tracking-[0.4em] mt-4 animate-pulse">
+      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#06090f]">
+        <div className="w-8 h-8 border-2 border-[#2dd4bf]/20 border-t-[#2dd4bf] rounded-full animate-spin" />
+        <p className="text-[#2dd4bf] text-[10px] font-black uppercase tracking-[0.4em] mt-4 animate-pulse">
           Sincronizando Nexus...
         </p>
       </div>
@@ -109,22 +109,22 @@ export default function JournalPage() {
 
   return (
     <div
-      className="relative min-h-screen w-full bg-[#030304]"
+      className="relative min-h-screen w-full bg-[#06090f]"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(6px)',
         transition: 'opacity 0.5s ease, transform 0.5s ease',
       }}
     >
-      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#c8b89a06_1px,transparent_1px),linear-gradient(to_bottom,#c8b89a06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#2dd4bf06_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
 
       <div className="relative z-10 w-full py-8 pb-20 space-y-4">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-1 h-4 bg-[#c8b89a]" />
-          <span className="text-[#c8b89a] text-[9px] font-black uppercase tracking-[0.4em]">
+          <div className="w-1 h-4 bg-[#2dd4bf]" />
+          <span className="text-[#2dd4bf] text-[9px] font-black uppercase tracking-[0.4em]">
             Nexus / Diário
           </span>
-          <div className="h-[1px] flex-1 bg-gradient-to-r from-[#c8b89a]/15 to-transparent" />
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-[#2dd4bf]/15 to-transparent" />
         </div>
 
         <header>
@@ -139,7 +139,7 @@ export default function JournalPage() {
               <button
                 onClick={handleNewEntry}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-4 py-2.5 border border-[#c8b89a]/30 bg-[#c8b89a]/[0.06] text-[#c8b89a] text-[9px] font-black uppercase tracking-widest hover:bg-[#c8b89a]/10 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2.5 border border-[#2dd4bf]/30 bg-[#2dd4bf]/[0.06] text-[#2dd4bf] text-[9px] font-black uppercase tracking-widest hover:bg-[#2dd4bf]/10 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus size={11} />
                 Nova Entrada
@@ -159,7 +159,7 @@ export default function JournalPage() {
           <main className="flex-1 min-w-0 border border-white/[0.04] bg-white/[0.01] flex flex-col relative rounded-sm shadow-2xl">
             {isLoadingEntries ? (
               <div className="flex-1 flex items-center justify-center">
-                <Loader2 className="text-[#c8b89a]/20 animate-spin" size={24} />
+                <Loader2 className="text-[#2dd4bf]/20 animate-spin" size={24} />
               </div>
             ) : selectedEntry ? (
               <JournalEditor
