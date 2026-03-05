@@ -18,19 +18,15 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
 
   const loadNodeContents = useCallback(async (nodeId: string) => {
     if (nodeContents[nodeId] !== undefined) return;
-
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-
     const controller = new AbortController();
     abortControllerRef.current = controller;
     setLoadingNodeId(nodeId);
-
     try {
       const { getContentsBySkill } = await import('@/app/actions/library');
       const updated = await getContentsBySkill(nodeId);
-
       if (!controller.signal.aborted) {
         setNodeContents(prev => ({
           ...prev,
@@ -42,7 +38,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
         }));
       }
     } catch (e: any) {
-      if (e.name !== 'AbortError') console.error('? [Library] Erro ao carregar conteúdos:', e);
+      if (e.name !== 'AbortError') console.error('❌ [Library] Erro ao carregar conteúdos:', e);
     } finally {
       if (!controller.signal.aborted) setLoadingNodeId(null);
     }

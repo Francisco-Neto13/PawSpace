@@ -7,13 +7,11 @@ export async function getContentsBySkill(skillId: string) {
   try {
     const userId = await getAuthUser();
     if (!userId) return [];
-
     const dbStart = Date.now();
     const contents = await prisma.libraryContent.findMany({
       where: { skillId, userId },
       orderBy: { createdAt: 'asc' },
     });
-    
     console.log(`⏱️  [Library DB] Fetch Contents: ${Date.now() - dbStart}ms`);
     return contents;
   } catch (error) {
@@ -25,7 +23,6 @@ export async function getContentsBySkill(skillId: string) {
 export async function getSkillsForLibrary() {
   const userId = await getAuthUser();
   if (!userId) return [];
-
   try {
     const skills = await prisma.skill.findMany({
       where: { userId },
