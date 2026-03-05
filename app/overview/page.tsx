@@ -1,4 +1,4 @@
-import OverviewContent from "@/components/overview/OverviewContent";
+import OverviewContent from "@/components/overview/OverviewPage";
 
 export default function OverviewPage() {
   const emptyData = {

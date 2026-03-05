@@ -34,6 +34,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
     { name: "Skill Tree",    href: "/tree"      },
     { name: "Biblioteca",    href: "/library"   },
     { name: "Diário",        href: "/journal"   },
+    { name: "Conquistas",    href: "/achievements" },
     { name: "Configurações", href: "/settings"  },
   ];
 

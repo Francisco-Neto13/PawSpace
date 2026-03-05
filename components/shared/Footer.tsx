@@ -3,7 +3,7 @@ import React, { forwardRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { Github, Instagram } from 'lucide-react';
 
-const HIDDEN_PATHS = ['/journal', '/library', '/tree'];
+const HIDDEN_PATHS = ['/journal', '/library', '/tree', '/achievements'];
 
 const Footer = forwardRef<HTMLElement>((_, ref) => {
   const pathname = usePathname();

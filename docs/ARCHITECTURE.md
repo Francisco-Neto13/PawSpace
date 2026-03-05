@@ -1,50 +1,94 @@
 # Skilltree Architecture
 
-## Current direction
+## Overview
 
-This project is a Next.js monolith (`app/` router) with frontend and backend code in the same repo.  
-For this codebase, this is a good fit and does not need a `backend/` + `frontend/` split right now.
+Skilltree continua como um monolito Next.js (App Router), com frontend e backend no mesmo repo.
+Nao houve separacao em `backend/` e `frontend/`.
 
-## Folder strategy
+## Before (legacy layout)
 
-- Keep route entrypoints in `app/` thin.
-- Keep domain logic grouped by feature.
-- Keep reusable cross-domain code in `shared/`.
+Antes da reorganizacao, a base era mais centralizada em pastas globais:
 
-## Adopted aliases in this phase
+```txt
+app/
+components/
+contexts/
+hooks/
+utils/
+lib/
+prisma/
+public/
+```
 
-- `@/shared/contexts/*`
-- `@/shared/supabase/*`
-- `@/shared/hooks/*`
-- `@/features/tree/lib/*`
+Padrao principal:
+- `app/` para rotas e actions
+- `components/` por dominio visual
+- `contexts/`, `hooks/`, `utils/`, `lib/` como pastas globais compartilhadas
 
-Compatibility is preserved with existing paths (`contexts/*`, `utils/*`, `hooks/*`), so migration can be gradual.
+## Now (current layout)
 
-## Suggested target structure
+A arquitetura atual introduz camadas mais explicitas:
 
 ```txt
 app/
   actions/
   (routes...)
+components/
 features/
   tree/
     lib/
-  library/
-  journal/
-  overview/
 shared/
   contexts/
   hooks/
   lib/
   supabase/
-lib/
+contexts/   # wrappers de compatibilidade
+hooks/      # wrappers de compatibilidade
+utils/      # wrappers de compatibilidade
+lib/        # wrappers de compatibilidade
 prisma/
 public/
 docs/
 ```
 
-## Next migration steps
+## What changed
 
-1. Keep migrating imports to `@/shared/*` and `@/features/*` (old paths remain wrappers for now).
-2. After migration is stable, remove legacy folders (`contexts/`, `hooks/`, `utils/`) or keep only explicit compatibility shims.
-3. Remove legacy folder wrappers only when no external reference depends on old paths.
+- Novas fontes principais em `shared/*` e `features/*`.
+- Pastas antigas (`contexts`, `hooks`, `utils`, `lib`) permanecem como wrappers para manter compatibilidade.
+- Imports podem ser migrados gradualmente sem quebrar o app.
+
+## Import strategy
+
+Aliases adotados:
+- `@/shared/contexts/*`
+- `@/shared/hooks/*`
+- `@/shared/lib/*`
+- `@/shared/supabase/*`
+- `@/features/tree/lib/*`
+
+Compatibilidade legada:
+- `@/contexts/*`
+- `@/hooks/*`
+- `@/utils/*`
+- `@/lib/*`
+
+## Why this direction
+
+- Mantem o projeto simples (um monolito Next.js).
+- Melhora separacao de responsabilidades.
+- Permite evolucao por dominio sem migracao "big bang".
+- Reduz risco porque wrappers preservam caminhos antigos.
+
+## How to explain this change
+
+Use este resumo:
+
+"Antes, o projeto funcionava com pastas globais (`contexts`, `hooks`, `utils`, `lib`).  
+Agora, a fonte principal foi organizada em `shared` (cross-domain) e `features` (dominio).  
+Mantivemos wrappers legados para nao quebrar imports antigos e permitir migracao gradual."
+
+## Next steps
+
+1. Continuar migrando imports para `@/shared/*` e `@/features/*`.
+2. Quando nao houver mais dependencia legada, remover wrappers antigos.
+3. Manter novas features (ex.: achievements/settings) no padrao `features/*` + `shared/*`.
