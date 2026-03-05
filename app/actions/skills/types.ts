@@ -7,7 +7,6 @@ export type SkillRow = {
   color: string | null;
   category: string;
   shape: string;
-  isUnlocked: boolean;
   parentId: string | null;
   positionX: number;
   positionY: number;

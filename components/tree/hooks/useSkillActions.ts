@@ -2,8 +2,8 @@
 import { useCallback, useEffect } from 'react';
 import { useNexus, SkillNode } from '@/contexts/NexusContext';
 import { SkillData } from '@/components/tree/types';
-import { toggleSkillStatus, updateSkill, saveNexusChanges, deleteSkill, addSkill } from '@/app/actions/skills';
-import { calculateRecursiveProgress, getNewChildPosition } from '@/utils/treeUtils';
+import { updateSkill, saveNexusChanges, deleteSkill, addSkill } from '@/app/actions/skills';
+import { getNewChildPosition } from '@/utils/treeUtils';
 import { SkillShape } from '../types';
 import { Edge } from '@xyflow/react';
 
@@ -34,53 +34,8 @@ export function useSkillActions() {
     return () => window.removeEventListener('skill-preview', handlePreview);
   }, [setNodes]);
 
-  const handleToggleStatus = useCallback(async (nodeId: string) => {
-    const target = nodes.find(n => n.id === nodeId);
-    if (!target) return;
-
-    const currentlyUnlocked = target.data.isUnlocked;
-
-    if (currentlyUnlocked) {
-      const childIds = edges.filter(e => e.source === nodeId).map(e => e.target);
-      const hasActiveChildren = nodes.some(n => childIds.includes(n.id) && n.data.isUnlocked);
-      if (hasActiveChildren) {
-        alert('ACCESS DENIED: Dependências ativas detectadas.');
-        return;
-      }
-    }
-
-    const nextUnlocked = !currentlyUnlocked;
-
-    setNodes((prev) => {
-      const nextNodes = prev.map(n =>
-        n.id === nodeId ? ({ ...n, data: { ...n.data, isUnlocked: nextUnlocked } } as SkillNode) : n
-      );
-
-      const finalNodes = calculateRecursiveProgress(nextNodes as any, edges);
-
-      setEdges((prevEdges: Edge[]) =>
-        prevEdges.map(edge => ({
-          ...edge,
-          data: {
-            ...edge.data,
-            unlocked: !!(finalNodes as any[]).find(n => n.id === edge.target)?.data.isUnlocked,
-          },
-        }))
-      );
-
-      return finalNodes as SkillNode[];
-    });
-
-    if (nodeId.startsWith('temp-')) return;
-
-    const result = await toggleSkillStatus(nodeId, nextUnlocked);
-    if (!result.success) {
-      await refreshNexus();
-    }
-  }, [nodes, edges, setNodes, setEdges, refreshNexus]);
-
   const handleDelete = useCallback((nodeId: string) => {
-    if (!confirm('Eliminar este nó e todos os protocolos dependentes?')) return;
+    if (!confirm('Eliminar este no e todos os protocolos dependentes?')) return;
     setNodes((prev) => prev.filter(n => n.id !== nodeId));
     setEdges((prev) => prev.filter(e => e.source !== nodeId && e.target !== nodeId));
   }, [setNodes, setEdges]);
@@ -102,12 +57,11 @@ export function useSkillActions() {
       id: tempId,
       name: 'Novo Protocolo',
       label: 'Novo Protocolo',
-      description: 'Defina as diretrizes deste nó.',
-      icon: '⚡',
+      description: 'Defina as diretrizes deste no.',
+      icon: '*' ,
       color: '#2dd4bf',
       shape: 'hexagon' as SkillShape,
       category: 'keystone' as any,
-      isUnlocked: false,
       parentId: parentId ?? undefined,
       positionX,
       positionY,
@@ -131,7 +85,6 @@ export function useSkillActions() {
         target: tempId,
         type: 'skill',
         data: {
-          unlocked: false,
           category: parentNode?.data.category ?? 'keystone',
         },
       }] as Edge[]);
@@ -158,7 +111,7 @@ export function useSkillActions() {
 
     const result = await updateSkill(skillId, data);
     if (!result.success) {
-      console.error('❌ [SkillActions] Erro ao atualizar skill, recarregando...');
+      console.error('[SkillActions] Erro ao atualizar skill, recarregando...');
       await refreshNexus();
     }
   }, [setNodes, refreshNexus]);
@@ -186,7 +139,7 @@ export function useSkillActions() {
         });
 
         if (!result.success) {
-          const msg = (result as any).error || 'Erro ao criar nó.';
+          const msg = (result as any).error || 'Erro ao criar no.';
           alert(msg);
           return false;
         }
@@ -220,17 +173,17 @@ export function useSkillActions() {
 
       return true;
     } catch (error) {
-      console.error('❌ [SkillActions] Erro no save global:', error);
-      alert('Erro ao sincronizar mudanças.');
+      console.error('[SkillActions] Erro no save global:', error);
+      alert('Erro ao sincronizar mudancas.');
       return false;
     }
-  }, [nodes, setNodes, setEdges, refreshNexus]);
+  }, [nodes, setNodes, setEdges, originalNodeIds]);
 
   return {
-    handleToggleStatus,
     handleDelete,
     handleCreateQuickSkill,
     handleUpdateSkill,
     handleGlobalSave,
   };
 }
+

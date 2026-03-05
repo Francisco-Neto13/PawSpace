@@ -62,9 +62,8 @@ export default function LibraryPage() {
   const mappedNodes = useMemo(() => nodes.map(n => ({
     ...n,
     name: n.data.name || n.data.label || 'Sem Nome',
-    icon: n.data.icon || '✦',
+    icon: n.data.icon || '*',
     color: n.data.color || '#2dd4bf',
-    isUnlocked: !!n.data.isUnlocked,
     contents: nodeContents[n.id] ?? [],
   })) as SkillNode[], [nodes, nodeContents]);
 
@@ -116,7 +115,6 @@ export default function LibraryPage() {
     );
   }
 
-  // Banco vazio — nenhum nó cadastrado ainda
   if (!isLoadingNexus && nodes.length === 0) {
     return (
       <div
@@ -176,7 +174,7 @@ export default function LibraryPage() {
               {[
                 { label: 'Módulos',       value: nodes.length },
                 { label: 'Conteúdos',     value: totalContents },
-                { label: 'Desbloqueados', value: nodes.filter(n => n.data.isUnlocked).length },
+                { label: 'Disponiveis', value: nodes.length },
               ].map((s, i, arr) => (
                 <div key={i} className="flex items-center gap-8">
                   <div className="text-right">
@@ -189,8 +187,8 @@ export default function LibraryPage() {
                 </div>
               ))}
               <button
-                onClick={() => selectedNode?.isUnlocked && setShowAddContent(true)}
-                disabled={!selectedNode?.isUnlocked}
+                onClick={() => setShowAddContent(true)}
+                disabled={!selectedNode}
                 className="flex items-center gap-2 px-4 py-2.5 border border-[#2dd4bf]/30 bg-[#2dd4bf]/[0.06] text-[#2dd4bf] text-[9px] font-black uppercase tracking-widest hover:bg-[#2dd4bf]/10 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus size={11} />
@@ -231,21 +229,14 @@ export default function LibraryPage() {
                     </p>
                   </div>
                 </div>
-                {selectedNode && !selectedNode.isUnlocked && (
-                  <span className="text-[9px] text-zinc-600 font-black uppercase tracking-widest border border-white/[0.04] px-3 py-1">
-                    🔒 Bloqueado
-                  </span>
-                )}
               </div>
 
-              {selectedNode?.isUnlocked && (
-                <LibraryFilters
-                  search={search}
-                  typeFilter={typeFilter}
-                  onSearchChange={setSearch}
-                  onTypeChange={setTypeFilter}
-                />
-              )}
+              <LibraryFilters
+                search={search}
+                typeFilter={typeFilter}
+                onSearchChange={setSearch}
+                onTypeChange={setTypeFilter}
+              />
             </div>
 
             <div
@@ -255,10 +246,8 @@ export default function LibraryPage() {
               <LibraryContentList
                 contents={filteredContents}
                 isLoading={isLoadingContents}
-                isUnlocked={selectedNode?.isUnlocked ?? false}
-                search={search}
                 onDelete={handleDelete}
-                onAdd={() => selectedNode?.isUnlocked && setShowAddContent(true)}
+                onAdd={() => setShowAddContent(true)}
               />
             </div>
           </main>

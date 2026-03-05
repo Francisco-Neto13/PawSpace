@@ -7,7 +7,6 @@ type CompatibleSkillEdge = Edge<SkillEdgeData & { [key: string]: unknown }>;
 type SkillEdgeProps = EdgeProps<CompatibleSkillEdge>;
 
 const DEFAULT_EDGE_COLOR = '#2dd4bf';
-const LOCKED_EDGE_COLOR = '#1a1a1f';
 
 function SkillEdgeComponent({
   id,
@@ -15,12 +14,7 @@ function SkillEdgeComponent({
   data,
 }: SkillEdgeProps) {
   const [path] = getStraightPath({ sourceX, sourceY, targetX, targetY });
-
-  const unlocked = data?.unlocked ?? false;
-
-  const strokeColor = unlocked 
-    ? (data?.color || DEFAULT_EDGE_COLOR) 
-    : LOCKED_EDGE_COLOR;
+  const strokeColor = data?.color || DEFAULT_EDGE_COLOR;
 
   return (
     <>
@@ -29,7 +23,7 @@ function SkillEdgeComponent({
         path={path}
         style={{
           stroke: '#000',
-          strokeWidth: unlocked ? 5 : 3,
+          strokeWidth: 5,
           opacity: 0.9,
           transition: 'stroke-width 0.3s ease',
         }}
@@ -39,27 +33,25 @@ function SkillEdgeComponent({
         d={path}
         fill="none"
         stroke={strokeColor}
-        strokeWidth={unlocked ? 2.5 : 1.5}
+        strokeWidth={2.5}
         strokeLinecap="butt"
-        opacity={unlocked ? 1 : 0.6}
+        opacity={1}
         className="pointer-events-none"
-        style={{ 
-          transition: 'stroke 0.5s ease, stroke-width 0.3s ease, opacity 0.3s ease' 
+        style={{
+          transition: 'stroke 0.5s ease, stroke-width 0.3s ease, opacity 0.3s ease',
         }}
       />
 
-      {unlocked && (
-        <path
-          d={path}
-          fill="none"
-          stroke="#fff"
-          strokeWidth={1}
-          strokeLinecap="butt"
-          strokeDasharray="4 60"
-          opacity={0.5}
-          className="edge-flow pointer-events-none"
-        />
-      )}
+      <path
+        d={path}
+        fill="none"
+        stroke="#fff"
+        strokeWidth={1}
+        strokeLinecap="butt"
+        strokeDasharray="4 60"
+        opacity={0.5}
+        className="edge-flow pointer-events-none"
+      />
     </>
   );
 }

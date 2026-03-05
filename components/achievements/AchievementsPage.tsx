@@ -18,8 +18,15 @@ export function AchievementsPage() {
   }, []);
 
   const achievements = useMemo(() => {
+    const activeNodes = nodes.filter(n => {
+      const data = n.data as any;
+      const linksCount = Array.isArray(data?.links) ? data.links.length : 0;
+      const contentsCount = Array.isArray(data?.contents) ? data.contents.length : 0;
+      return (linksCount + contentsCount) > 0;
+    }).length;
+
     return computeAchievements({
-      unlockedNodes:   nodes.filter(n => n.data.isUnlocked).length,
+      activeNodes,
       totalNodes:      nodes.length,
       journalEntries:  globalStats.totalJournalEntries,
       libraryContents: globalStats.totalLibraryContents,

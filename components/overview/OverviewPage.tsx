@@ -29,7 +29,12 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
 
   const stats = useMemo(() => {
     if (!nodes || nodes.length === 0) return initialData;
-    const unlocked = nodes.filter(n => n.data?.isUnlocked).length;
+    const unlocked = nodes.filter(n => {
+      const data = n.data as any;
+      const linksCount = Array.isArray(data?.links) ? data.links.length : 0;
+      const contentsCount = Array.isArray(data?.contents) ? data.contents.length : 0;
+      return (linksCount + contentsCount) > 0;
+    }).length;
     const total = nodes.length;
     return {
       total,
@@ -111,13 +116,12 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
             </p>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <p className="text-zinc-400 text-sm leading-relaxed font-light max-w-sm">
-                Você domina{' '}
-                <span className="text-white font-bold">{stats.unlocked} módulos</span>,
+                Voce tem conteudo em{' '}
+                <span className="text-white font-bold">{stats.unlocked} modulos</span>,
                 representando{' '}
                 <span className="text-[#2dd4bf] font-black">{stats.progress}%</span>{' '}
-                do planejamento. Faltam{' '}
-                <span className="text-zinc-200 font-semibold">{stats.total - stats.unlocked} tecnologias</span>{' '}
-                para maestria total.
+                da sua arvore. Ainda sem conteudo:{' '}
+                <span className="text-zinc-200 font-semibold">{stats.total - stats.unlocked} modulos</span>.
               </p>
               <div className="flex gap-6 shrink-0 font-mono">
                 <div className="text-right">
@@ -126,7 +130,7 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
                 </div>
                 <div className="w-[1px] bg-white/[0.06]" />
                 <div className="text-right">
-                  <p className="text-[8px] text-zinc-600 uppercase tracking-widest mb-1">Concluídos</p>
+                  <p className="text-[8px] text-zinc-600 uppercase tracking-widest mb-1">Com Conteudo</p>
                   <p className="text-[#2dd4bf] text-3xl font-black tabular-nums">{stats.unlocked}</p>
                 </div>
               </div>
@@ -139,13 +143,13 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
             <div className="flex-1 flex flex-col items-start justify-center gap-3">
               <div className="border border-[#2dd4bf]/20 px-3 py-1.5 bg-black/40">
                 <p className="text-[#2dd4bf] text-[10px] font-black uppercase tracking-wider">
-                  {stats.progress < 100 ? 'Expandir Árvore' : 'Sistema Completo'}
+                  {stats.progress < 100 ? 'Enriquecer Biblioteca' : 'Cobertura Completa'}
                 </p>
               </div>
               <p className="text-[10px] text-zinc-600 font-mono leading-snug">
                 {stats.total - stats.unlocked > 0
-                  ? `${stats.total - stats.unlocked} passos pendentes`
-                  : 'Protocolo finalizado.'}
+                  ? `${stats.total - stats.unlocked} modulos sem conteudo`
+                  : 'Todos os modulos possuem conteudo.'}
               </p>
             </div>
             <div className="absolute top-2 left-2 w-2 h-2 border-t border-l border-[#2dd4bf]/15" />

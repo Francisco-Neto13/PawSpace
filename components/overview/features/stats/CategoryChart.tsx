@@ -11,27 +11,32 @@ function CustomTooltip({ active, payload }: any) {
   return (
     <div className="bg-[#0a0a0a] border border-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-wider">
       <p className="text-[#2dd4bf]">{d.category}</p>
-      <p className="text-white">{d.unlocked} / {d.total} desbloqueados</p>
-      <p className="text-zinc-500">{d.pct}% concluído</p>
+      <p className="text-white">{d.withContent} / {d.total} com conteudo</p>
+      <p className="text-zinc-500">{d.pct}% de cobertura</p>
     </div>
   );
 }
 
 export default function CategoryChart({ nodes }: Props) {
   const data = useMemo(() => {
-    const map: Record<string, { total: number; unlocked: number }> = {};
+    const map: Record<string, { total: number; withContent: number }> = {};
     nodes.forEach(n => {
       const cat = (n.data.category as string) || 'outros';
-      if (!map[cat]) map[cat] = { total: 0, unlocked: 0 };
+      if (!map[cat]) map[cat] = { total: 0, withContent: 0 };
       map[cat].total++;
-      if (n.data.isUnlocked) map[cat].unlocked++;
+
+      const nodeData = n.data as any;
+      const linksCount = Array.isArray(nodeData?.links) ? nodeData.links.length : 0;
+      const contentsCount = Array.isArray(nodeData?.contents) ? nodeData.contents.length : 0;
+      if ((linksCount + contentsCount) > 0) map[cat].withContent++;
     });
+
     return Object.entries(map).map(([category, v]) => ({
       category,
       total: v.total,
-      unlocked: v.unlocked,
-      pending: v.total - v.unlocked,
-      pct: v.total > 0 ? Math.round((v.unlocked / v.total) * 100) : 0,
+      withContent: v.withContent,
+      pending: v.total - v.withContent,
+      pct: v.total > 0 ? Math.round((v.withContent / v.total) * 100) : 0,
     }));
   }, [nodes]);
 
@@ -44,20 +49,20 @@ export default function CategoryChart({ nodes }: Props) {
         <span className="w-1 h-3 bg-[#2dd4bf] inline-block" />
         Progresso por Categoria
       </p>
-      <p className="text-[9px] text-zinc-600 mb-6 ml-3">nós desbloqueados vs total</p>
+      <p className="text-[9px] text-zinc-600 mb-6 ml-3">modulos com conteudo vs total</p>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={data} barGap={4} barSize={28}>
           <XAxis dataKey="category" tick={{ fill: '#52525b', fontSize: 9, fontWeight: 700 }} axisLine={false} tickLine={false} />
           <YAxis hide />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
           <Bar dataKey="total" fill="rgba(255,255,255,0.05)" radius={[2, 2, 0, 0]} />
-          <Bar dataKey="unlocked" radius={[2, 2, 0, 0]}>
+          <Bar dataKey="withContent" radius={[2, 2, 0, 0]}>
             {data.map((_, i) => <Cell key={i} fill="#2dd4bf" fillOpacity={0.8} />)}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
       <div className="flex items-center gap-4 mt-4 ml-1">
-        {[['#2dd4bf', 'Desbloqueados'], ['rgba(255,255,255,0.1)', 'Total']].map(([color, label]) => (
+        {[['#2dd4bf', 'Com Conteudo'], ['rgba(255,255,255,0.1)', 'Total']].map(([color, label]) => (
           <div key={label} className="flex items-center gap-1.5">
             <div className="w-2 h-2" style={{ backgroundColor: color }} />
             <span className="text-[8px] text-zinc-500 uppercase tracking-wider font-bold">{label}</span>

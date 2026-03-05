@@ -31,7 +31,6 @@ export async function getSkillsForLibrary() {
         name: true,
         icon: true,
         color: true,
-        isUnlocked: true,
       },
       orderBy: { createdAt: 'asc' },
     });

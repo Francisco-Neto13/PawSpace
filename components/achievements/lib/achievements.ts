@@ -1,7 +1,7 @@
 import { Achievement } from '../types';
 
 interface AchievementInput {
-  unlockedNodes: number;
+  activeNodes: number;
   totalNodes: number;
   journalEntries: number;
   libraryContents: number;
@@ -21,35 +21,35 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'first_node',
     title: 'Primeiro Passo',
-    description: 'Desbloqueie seu primeiro nó na Skill Tree.',
+    description: 'Adicione conteudo ao primeiro modulo da Skill Tree.',
     icon: '⚡',
     category: 'tree',
-    check: ({ unlockedNodes }) => unlockedNodes >= 1,
-    progress: ({ unlockedNodes }) => ({ current: Math.min(unlockedNodes, 1), total: 1 }),
+    check: ({ activeNodes }) => activeNodes >= 1,
+    progress: ({ activeNodes }) => ({ current: Math.min(activeNodes, 1), total: 1 }),
   },
   {
     id: 'architect',
     title: 'Arquiteto',
-    description: 'Desbloqueie 10 nós na Skill Tree.',
+    description: 'Adicione conteudo em 10 modulos da Skill Tree.',
     icon: '🏗️',
     category: 'tree',
-    check: ({ unlockedNodes }) => unlockedNodes >= 10,
-    progress: ({ unlockedNodes }) => ({ current: Math.min(unlockedNodes, 10), total: 10 }),
+    check: ({ activeNodes }) => activeNodes >= 10,
+    progress: ({ activeNodes }) => ({ current: Math.min(activeNodes, 10), total: 10 }),
   },
   {
     id: 'nexus_master',
     title: 'Mestre do Nexus',
-    description: 'Desbloqueie 25 nós na Skill Tree.',
+    description: 'Adicione conteudo em 25 modulos da Skill Tree.',
     icon: '🧠',
     category: 'tree',
-    check: ({ unlockedNodes }) => unlockedNodes >= 25,
-    progress: ({ unlockedNodes }) => ({ current: Math.min(unlockedNodes, 25), total: 25 }),
+    check: ({ activeNodes }) => activeNodes >= 25,
+    progress: ({ activeNodes }) => ({ current: Math.min(activeNodes, 25), total: 25 }),
   },
 
   {
     id: 'first_entry',
     title: 'Primeira Entrada',
-    description: 'Registre sua primeira entrada no Diário.',
+    description: 'Registre sua primeira entrada no Diario.',
     icon: '📓',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 1,
@@ -58,7 +58,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'chronicler',
     title: 'Cronista',
-    description: 'Registre 10 entradas no Diário de Bordo.',
+    description: 'Registre 10 entradas no Diario de Bordo.',
     icon: '📜',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 10,
@@ -67,7 +67,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'archivist',
     title: 'Arquivista',
-    description: 'Registre 20 entradas no Diário de Bordo.',
+    description: 'Registre 20 entradas no Diario de Bordo.',
     icon: '🗂️',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 20,
@@ -77,7 +77,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'first_content',
     title: 'Primeiro Conhecimento',
-    description: 'Adicione seu primeiro conteúdo à Biblioteca.',
+    description: 'Adicione seu primeiro conteudo a Biblioteca.',
     icon: '📚',
     category: 'library',
     check: ({ libraryContents }) => libraryContents >= 1,
@@ -85,8 +85,8 @@ const DEFINITIONS: AchievementDefinition[] = [
   },
   {
     id: 'librarian',
-    title: 'Bibliotecário',
-    description: 'Adicione 20 conteúdos à Biblioteca.',
+    title: 'Bibliotecario',
+    description: 'Adicione 20 conteudos a Biblioteca.',
     icon: '🏛️',
     category: 'library',
     check: ({ libraryContents }) => libraryContents >= 20,
@@ -96,36 +96,36 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'initiated',
     title: 'Iniciado',
-    description: 'Atinja 25% de progresso geral na Skill Tree.',
+    description: 'Atinja 25% de cobertura da Skill Tree.',
     icon: '🌱',
     category: 'progress',
-    check: ({ unlockedNodes, totalNodes }) => totalNodes > 0 && (unlockedNodes / totalNodes) >= 0.25,
-    progress: ({ unlockedNodes, totalNodes }) => ({
-      current: Math.round((unlockedNodes / Math.max(totalNodes, 1)) * 100),
+    check: ({ activeNodes, totalNodes }) => totalNodes > 0 && (activeNodes / totalNodes) >= 0.25,
+    progress: ({ activeNodes, totalNodes }) => ({
+      current: Math.round((activeNodes / Math.max(totalNodes, 1)) * 100),
       total: 25,
     }),
   },
   {
     id: 'advanced',
-    title: 'Avançado',
-    description: 'Atinja 50% de progresso geral na Skill Tree.',
+    title: 'Avancado',
+    description: 'Atinja 50% de cobertura da Skill Tree.',
     icon: '🔥',
     category: 'progress',
-    check: ({ unlockedNodes, totalNodes }) => totalNodes > 0 && (unlockedNodes / totalNodes) >= 0.5,
-    progress: ({ unlockedNodes, totalNodes }) => ({
-      current: Math.round((unlockedNodes / Math.max(totalNodes, 1)) * 100),
+    check: ({ activeNodes, totalNodes }) => totalNodes > 0 && (activeNodes / totalNodes) >= 0.5,
+    progress: ({ activeNodes, totalNodes }) => ({
+      current: Math.round((activeNodes / Math.max(totalNodes, 1)) * 100),
       total: 50,
     }),
   },
   {
     id: 'nexus_complete',
     title: 'Nexus Completo',
-    description: 'Desbloqueie todos os nós da Skill Tree.',
+    description: 'Tenha conteudo em todos os modulos da Skill Tree.',
     icon: '🏆',
     category: 'progress',
-    check: ({ unlockedNodes, totalNodes }) => totalNodes > 0 && unlockedNodes >= totalNodes,
-    progress: ({ unlockedNodes, totalNodes }) => ({
-      current: Math.round((unlockedNodes / Math.max(totalNodes, 1)) * 100),
+    check: ({ activeNodes, totalNodes }) => totalNodes > 0 && activeNodes >= totalNodes,
+    progress: ({ activeNodes, totalNodes }) => ({
+      current: Math.round((activeNodes / Math.max(totalNodes, 1)) * 100),
       total: 100,
     }),
   },
@@ -144,8 +144,8 @@ export function computeAchievements(input: AchievementInput): Achievement[] {
 }
 
 export const CATEGORY_LABELS: Record<Achievement['category'], string> = {
-  tree:     'Skill Tree',
-  journal:  'Diário',
-  library:  'Biblioteca',
+  tree: 'Skill Tree',
+  journal: 'Diario',
+  library: 'Biblioteca',
   progress: 'Progresso',
 };

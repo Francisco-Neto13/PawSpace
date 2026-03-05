@@ -29,7 +29,6 @@ model Skill {
   parent              Skill?  @relation("SkillHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   children            Skill[] @relation("SkillHierarchy")
   requiredParentLevel Int     @default(0)
-  isUnlocked          Boolean @default(false)
 
   contents LibraryContent[]
   journalEntries JournalEntry[]

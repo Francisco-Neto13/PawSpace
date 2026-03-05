@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { useJournal } from '@/contexts/JournalContext';
 import { SkillNode } from '@/contexts/NexusContext';
-import { BookOpen, Zap } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 
 interface Props { nodes: SkillNode[] }
 
@@ -11,9 +11,9 @@ function timeAgo(date: string | Date): string {
   const mins = Math.floor(diff / 60000);
   const hours = Math.floor(mins / 60);
   const days = Math.floor(hours / 24);
-  if (days > 0) return `${days}d atrás`;
-  if (hours > 0) return `${hours}h atrás`;
-  if (mins > 0) return `${mins}m atrás`;
+  if (days > 0) return `${days}d atras`;
+  if (hours > 0) return `${hours}h atras`;
+  if (mins > 0) return `${mins}m atras`;
   return 'agora';
 }
 
@@ -24,23 +24,23 @@ export default function RecentActivityFeed({ nodes }: Props) {
     const journalItems = entries.slice(0, 4).map(e => ({
       type: 'journal' as const,
       id: e.id,
-      title: e.title || 'Sem título',
+      title: e.title || 'Sem titulo',
       date: e.createdAt,
     }));
 
-    const unlockedNodes = nodes
-      .filter(n => n.data.isUnlocked && n.data.updatedAt)
+    const recentSkills = nodes
+      .filter(n => n.data.updatedAt)
       .sort((a, b) => new Date(b.data.updatedAt as string).getTime() - new Date(a.data.updatedAt as string).getTime())
       .slice(0, 4)
       .map(n => ({
         type: 'skill' as const,
         id: n.id,
         title: n.data.label || n.data.name,
-        icon: n.data.icon ?? '🔹',
+        icon: n.data.icon ?? '*',
         date: n.data.updatedAt as string,
       }));
 
-    return [...journalItems, ...unlockedNodes]
+    return [...journalItems, ...recentSkills]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 8);
   }, [entries, nodes]);
@@ -52,7 +52,7 @@ export default function RecentActivityFeed({ nodes }: Props) {
         <span className="w-1 h-3 bg-[#2dd4bf] inline-block" />
         Atividade Recente
       </p>
-      <p className="text-[9px] text-zinc-600 mb-6 ml-3">journal e skills desbloqueados</p>
+      <p className="text-[9px] text-zinc-600 mb-6 ml-3">journal e skills atualizadas</p>
 
       {items.length === 0 ? (
         <p className="text-[9px] text-zinc-700 ml-3">Nenhuma atividade registrada ainda.</p>

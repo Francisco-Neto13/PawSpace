@@ -82,7 +82,6 @@ export function generateTreeLayout(
         description: skill.description,
         category: skill.category,
         shape: shape,
-        isUnlocked: skill.isUnlocked,
         parentId: skill.parentId,
         positionX: finalX,
         positionY: finalY,
@@ -99,7 +98,6 @@ export function generateTreeLayout(
         target: skill.id,
         type: 'skill',
         data: {
-          unlocked: skill.isUnlocked,
           color: skill.color ?? undefined,
         },
       });
@@ -121,6 +119,13 @@ export function calculateRecursiveProgress(
   nodes: Node<SkillData>[],
   edges: Edge[]
 ): Node<SkillData>[] {
+  const hasContent = (node: Node<SkillData>) => {
+    const data = node.data as any;
+    const linksCount = Array.isArray(data?.links) ? data.links.length : 0;
+    const contentsCount = Array.isArray(data?.contents) ? data.contents.length : 0;
+    return (linksCount + contentsCount) > 0;
+  };
+
   const sourceToTargets = new Map<string, string[]>();
   edges.forEach(e => {
     const existing = sourceToTargets.get(e.source) ?? [];
@@ -151,25 +156,31 @@ export function calculateRecursiveProgress(
     }
 
     let total = 0;
-    let unlocked = 0;
+    let withContent = 0;
 
     for (const id of descendantIds) {
       const n = nodeMap.get(id);
       if (n) {
         total++;
-        if (n.data.isUnlocked) unlocked++;
+        if (hasContent(n as Node<SkillData>)) withContent++;
       }
     }
 
     return {
       ...node,
-      data: { ...node.data, progress: total > 0 ? unlocked / total : 0 },
+      data: { ...node.data, progress: total > 0 ? withContent / total : 0 },
     };
   });
 }
 
 export function calculateGlobalProgress(nodes: Node<SkillData>[]): number {
   if (nodes.length === 0) return 0;
-  const unlocked = nodes.filter(n => n.data.isUnlocked).length;
-  return Math.round((unlocked / nodes.length) * 100);
+  const withContent = nodes.filter(n => {
+    const data = n.data as any;
+    const linksCount = Array.isArray(data?.links) ? data.links.length : 0;
+    const contentsCount = Array.isArray(data?.contents) ? data.contents.length : 0;
+    return (linksCount + contentsCount) > 0;
+  }).length;
+  return Math.round((withContent / nodes.length) * 100);
 }
+

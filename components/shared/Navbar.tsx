@@ -31,7 +31,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
 
   const links = [
     { name: "Resumo",        href: "/overview"  },
-    { name: "Skill Tree",    href: "/tree"      },
+    { name: "Árvore",        href: "/tree"      },
     { name: "Biblioteca",    href: "/library"   },
     { name: "Diário",        href: "/journal"   },
     { name: "Conquistas",    href: "/achievements" },

@@ -31,14 +31,13 @@ function getClipPath(shape: SkillShape): string {
 }
 
 function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) {
-  const { 
-    isUnlocked, 
-    icon, 
-    name, 
+  const {
+    icon,
+    name,
     label,
-    shape = 'hexagon', 
-    color, 
-    parentId 
+    shape = 'hexagon',
+    color,
+    parentId,
   } = data;
 
   const nodeColor = useMemo(() => color || DEFAULT_NODE_COLOR, [color]);
@@ -62,7 +61,7 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
   };
 
   return (
-    <div 
+    <div
       className={`group relative flex items-center justify-center ${selected ? 'z-50' : 'z-10'}`}
       style={{ width: size, height: size }}
     >
@@ -78,11 +77,10 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
         <div
           className="absolute inset-0 transition-all duration-500 pointer-events-none"
           style={{
-            backgroundColor: isUnlocked ? nodeColor : '#1a1a1e',
+            backgroundColor: nodeColor,
             clipPath,
-            filter: isUnlocked ? (isRoot ? 'url(#glow-keystone)' : `drop-shadow(0 0 5px ${nodeColor}66)`) : 'none',
-            opacity: isUnlocked ? 1 : 0.4,
-            border: !isUnlocked ? `1px solid ${nodeColor}22` : 'none'
+            filter: isRoot ? 'url(#glow-keystone)' : `drop-shadow(0 0 5px ${nodeColor}66)`,
+            opacity: 1,
           }}
         />
 
@@ -97,11 +95,11 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
         <span
           className={`relative z-10 select-none transition-all duration-300 pointer-events-none
             ${isRoot ? 'text-3xl' : 'text-xl'}
-            ${isUnlocked ? 'grayscale-0 opacity-100' : 'grayscale opacity-20'}
+            grayscale-0 opacity-100
           `}
-          style={{ color: isUnlocked ? '#fff' : nodeColor }}
+          style={{ color: '#fff' }}
         >
-          {icon || '✦'}
+          {icon || '*'}
         </span>
 
         {selected && (
@@ -112,33 +110,31 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
         )}
       </div>
 
-      <div 
+      <div
         className="absolute flex flex-col items-center pointer-events-none z-30"
-        style={{ 
+        style={{
           top: size + 8,
           width: 200,
           left: '50%',
-          transform: 'translateX(-50%)'
+          transform: 'translateX(-50%)',
         }}
       >
         <span
-          className={`font-sans text-center uppercase transition-all duration-300 px-1 tracking-[0.12em] w-full
-            ${isUnlocked ? 'font-bold' : 'font-semibold'}
-          `}
-          style={{ 
-            fontSize: isRoot ? '12px' : '11px', 
+          className="font-sans text-center uppercase transition-all duration-300 px-1 tracking-[0.12em] w-full font-bold"
+          style={{
+            fontSize: isRoot ? '12px' : '11px',
             lineHeight: 1.2,
-            color: isUnlocked ? '#f0ede6' : '#4a4a55',
-            textShadow: isUnlocked ? `0 0 8px ${nodeColor}66` : 'none'
+            color: '#f0ede6',
+            textShadow: `0 0 8px ${nodeColor}66`,
           }}
         >
           {name || label}
         </span>
 
         {selected && (
-          <div 
-            className="w-8 h-[1px] mt-1.5 opacity-60" 
-            style={{ backgroundColor: nodeColor, boxShadow: `0 0 4px ${nodeColor}` }} 
+          <div
+            className="w-8 h-[1px] mt-1.5 opacity-60"
+            style={{ backgroundColor: nodeColor, boxShadow: `0 0 4px ${nodeColor}` }}
           />
         )}
       </div>

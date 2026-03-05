@@ -15,6 +15,5 @@ export interface SkillNode {
   name: string;
   icon: string;
   color: string;
-  isUnlocked: boolean;
   contents: Content[];
 }

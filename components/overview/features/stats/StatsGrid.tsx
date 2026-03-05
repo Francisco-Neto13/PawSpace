@@ -27,27 +27,27 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
   const stats = useMemo<StatItem[]>(() => {
     const pending = totalCount - unlockedCount;
     const progressSafe = totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
-    const pendingSafe  = totalCount > 0 ? (pending / totalCount) * 100 : 0;
+    const pendingSafe = totalCount > 0 ? (pending / totalCount) * 100 : 0;
 
     return [
       {
-        label: 'Nós Concluídos',
+        label: 'Modulos com Conteudo',
         value: unlockedCount,
         sub: `de ${totalCount} no roadmap`,
         icon: Zap,
         barWidth: progressSafe,
       },
       {
-        label: 'Aproveitamento',
+        label: 'Cobertura',
         value: `${progress}%`,
-        sub: 'total dominado',
+        sub: 'cobertura da arvore',
         icon: Target,
         barWidth: progress,
       },
       {
-        label: 'Nós Pendentes',
+        label: 'Sem Conteudo',
         value: pending,
-        sub: 'aguardando evolução',
+        sub: 'ainda nao alimentados',
         icon: Layout,
         barWidth: pendingSafe,
       },
@@ -64,11 +64,10 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
           <div className="absolute top-0 left-0 right-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-[#2dd4bf]/30 to-transparent" />
 
           <div className="p-7 flex flex-col justify-between h-full">
-
             <div className="flex justify-between items-start mb-6">
               <item.icon size={18} className="text-[#2dd4bf] opacity-70" />
               <div className="flex gap-1.5">
-                {[0,1,2].map(d => (
+                {[0, 1, 2].map(d => (
                   <div key={d} className="w-1 h-1 rounded-full bg-white/15 group-hover:bg-white/30 transition-colors duration-300" />
                 ))}
               </div>

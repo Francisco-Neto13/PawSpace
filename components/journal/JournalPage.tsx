@@ -26,9 +26,8 @@ export default function JournalPage() {
   const skillList = useMemo<SkillBase[]>(() => nodes.map(n => ({
     id: n.id,
     name: n.data.label || n.data.name || 'Sem Nome',
-    icon: n.data.icon || 'âœ¦',
+    icon: n.data.icon || '*',
     color: n.data.color || '#2dd4bf',
-    isUnlocked: !!n.data.isUnlocked,
   })), [nodes]);
 
   const selectedEntry = useMemo(() =>

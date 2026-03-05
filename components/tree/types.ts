@@ -8,20 +8,20 @@ export interface SkillData {
   description?: string | null;
   category?: string; 
   shape: SkillShape;
-  isUnlocked: boolean;
   parentId?: string | null;
   positionX: number;
   positionY: number;
   icon?: string;
   color?: string | null; 
   links?: { id: string; title: string; url: string | null }[];
+  contents?: { id: string }[];
   createdAt?: string | Date;
   updatedAt?: string | Date;
   [key: string]: unknown;
 }
 
 export interface SkillEdgeData {
-  unlocked: boolean;
+  category?: string;
   color?: string; 
 }
 

@@ -18,7 +18,6 @@ export interface SkillBase {
   name: string;
   icon: string | null;
   color: string | null;
-  isUnlocked: boolean;
 }
 
 export function getSkill(skillId: string | null, skills: SkillBase[]) {

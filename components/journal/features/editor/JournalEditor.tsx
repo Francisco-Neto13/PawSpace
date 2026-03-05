@@ -22,7 +22,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
   const [bodyLength, setBodyLength] = useState(0);
 
   const skill = getSkill(skillId, skills);
-  const unlockedSkills = skills.filter(s => s.isUnlocked);
+  const availableSkills = skills;
 
   useEffect(() => {
     const el = bodyRef.current;
@@ -127,7 +127,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                     Nenhum vínculo
                   </button>
                   <div className="max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(45,212,191,0.1) transparent' }}>
-                    {unlockedSkills.map(s => (
+                    {availableSkills.map(s => (
                       <button
                         key={s.id}
                         onClick={() => { setSkillId(s.id); setShowSkillPicker(false); }}

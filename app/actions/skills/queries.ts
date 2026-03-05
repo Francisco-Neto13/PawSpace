@@ -24,23 +24,19 @@ export async function getSkillsFull() {
       },
       data: {
         ...skill,
-        label: skill.name, 
+        label: skill.name,
       },
     }));
 
     const edges = skills
       .filter((s) => s.parentId)
       .map((s) => {
-        const parent = skills.find(p => p.id === s.parentId);
-        const isPathActive = s.isUnlocked && (parent?.isUnlocked ?? false);
-
         return {
           id: `e-${s.parentId}-${s.id}`,
           source: s.parentId!,
           target: s.id,
           type: 'skill', 
           data: {
-            unlocked: isPathActive, 
             category: s.category,
           },
         };
@@ -61,11 +57,14 @@ export async function getSkillsSummary() {
   try {
     const skills = await prisma.skill.findMany({
       where: { userId },
-      select: { isUnlocked: true }
+      select: {
+        id: true,
+        contents: { select: { id: true } },
+      },
     });
 
     const total = skills.length;
-    const unlocked = skills.filter(s => s.isUnlocked).length;
+    const unlocked = skills.filter(s => (s.contents?.length ?? 0) > 0).length;
     const progress = total > 0 ? Math.round((unlocked / total) * 100) : 0;
 
     return { total, unlocked, progress };

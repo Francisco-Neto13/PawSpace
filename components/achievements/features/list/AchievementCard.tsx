@@ -50,7 +50,7 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
               className="text-[8px] font-black uppercase tracking-[0.25em]"
               style={{ color: isUnlocked ? '#2dd4bf' : '#3f3f46' }}
             >
-              {isUnlocked ? 'Obtida' : 'Bloqueada'}
+              {isUnlocked ? 'Obtida' : 'Pendente'}
             </span>
           </div>
 

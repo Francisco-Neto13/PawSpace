@@ -56,7 +56,6 @@ function SkillTreeInner() {
 
   const { onNodesChange, hasUnsavedChanges: hasDragChanges, isSaving, setIsSaving, resetDirty } = useSkillDrag();
   const {
-    handleToggleStatus,
     handleDelete,
     handleCreateQuickSkill,
     handleUpdateSkill,
@@ -118,7 +117,7 @@ function SkillTreeInner() {
         await refreshNexus(false);
       }
     } catch (error) {
-      console.error('❌ [SkillTree] Erro crítico na sincronização:', error);
+      console.error('[SkillTree] Erro critico na sincronizacao:', error);
     } finally {
       setIsSaving(false);
     }
@@ -133,13 +132,6 @@ function SkillTreeInner() {
     if (!selectedNode) return null;
     return { ...selectedNode.data, id: selectedNode.id } as any;
   }, [selectedNode]);
-
-  const isPanelAvailable = useMemo(() => {
-    if (!selectedNode) return false;
-    const parentId = selectedNode.data.parentId;
-    if (!parentId) return true;
-    return !!nodes.find(n => n.id === parentId)?.data.isUnlocked;
-  }, [selectedNode, nodes]);
 
   return (
     <div
@@ -172,7 +164,7 @@ function SkillTreeInner() {
           <div className="flex items-center gap-2 px-3 py-1 bg-black/80 border border-[#2dd4bf]/20 backdrop-blur-md shadow-2xl">
             <AlertCircle size={10} className="text-[#2dd4bf] animate-pulse" />
             <span className="text-[7px] text-[#2dd4bf]/70 font-black uppercase tracking-[0.2em]">
-              Protocolos pendentes de consolidação
+              Protocolos pendentes de consolidacao
             </span>
           </div>
 
@@ -256,8 +248,6 @@ function SkillTreeInner() {
       <SkillPanel
         data={panelData}
         onClose={() => setSelectedSkillId(null)}
-        onToggleStatus={handleToggleStatus}
-        isAvailable={isPanelAvailable}
       />
 
       <EditSkillModal

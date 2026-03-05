@@ -27,7 +27,7 @@ export async function addSkill(data: any) {
   try {
     const { label, name: _name, ...rest } = data;
     const newSkill = await prisma.skill.create({
-      data: { ...rest, userId, name, isUnlocked: false },
+      data: { ...rest, userId, name },
     });
     return { success: true, skill: newSkill };
   } catch (error) {
@@ -114,15 +114,6 @@ export async function updateManySkillPositions(positions: { skillId: string; x: 
       SET "positionX" = CASE ${casesX} END, "positionY" = CASE ${casesY} END
       WHERE id IN (${ids}) AND "userId" = '${userId}'
     `);
-    return { success: true };
-  } catch { return { success: false }; }
-}
-
-export async function toggleSkillStatus(skillId: string, isUnlocked: boolean) {
-  const userId = await getAuthUser();
-  if (!userId) return { success: false };
-  try {
-    await prisma.skill.update({ where: { id: skillId, userId }, data: { isUnlocked } });
     return { success: true };
   } catch { return { success: false }; }
 }

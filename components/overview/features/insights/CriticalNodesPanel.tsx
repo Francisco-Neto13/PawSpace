@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { SkillNode } from '@/shared/contexts/NexusContext';
 import { Edge } from '@xyflow/react';
-import { Lock, Unlock } from 'lucide-react';
+import { Circle, CircleCheck } from 'lucide-react';
 
 interface Props { nodes: SkillNode[]; edges: Edge[] }
 
@@ -15,14 +15,21 @@ export default function CriticalNodesPanel({ nodes, edges }: Props) {
 
     return nodes
       .filter(n => (childCount.get(n.id) ?? 0) > 0)
-      .map(n => ({
-        id: n.id,
-        name: n.data.label || n.data.name,
-        icon: n.data.icon ?? '🔹',
-        color: n.data.color ?? '#2dd4bf',
-        isUnlocked: n.data.isUnlocked,
-        dependents: childCount.get(n.id) ?? 0,
-      }))
+      .map(n => {
+        const data = n.data as any;
+        const linksCount = Array.isArray(data?.links) ? data.links.length : 0;
+        const contentsCount = Array.isArray(data?.contents) ? data.contents.length : 0;
+        const hasContent = (linksCount + contentsCount) > 0;
+
+        return {
+          id: n.id,
+          name: n.data.label || n.data.name,
+          icon: n.data.icon ?? '*',
+          color: n.data.color ?? '#2dd4bf',
+          hasContent,
+          dependents: childCount.get(n.id) ?? 0,
+        };
+      })
       .sort((a, b) => b.dependents - a.dependents)
       .slice(0, 6);
   }, [nodes, edges]);
@@ -34,9 +41,9 @@ export default function CriticalNodesPanel({ nodes, edges }: Props) {
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/20 to-transparent" />
       <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#2dd4bf] mb-1 flex items-center gap-2">
         <span className="w-1 h-3 bg-[#2dd4bf] inline-block" />
-        Nós Críticos
+        Nos Criticos
       </p>
-      <p className="text-[9px] text-zinc-600 mb-6 ml-3">bloqueando mais dependências</p>
+      <p className="text-[9px] text-zinc-600 mb-6 ml-3">modulos que sustentam mais dependencias</p>
 
       <div className="space-y-2">
         {critical.map((n, i) => (
@@ -48,9 +55,9 @@ export default function CriticalNodesPanel({ nodes, edges }: Props) {
             </span>
             <span className="text-[9px] text-zinc-600 font-mono">{n.dependents} deps</span>
             <div className="w-4">
-              {n.isUnlocked
-                ? <Unlock size={10} className="text-[#2dd4bf]" />
-                : <Lock size={10} className="text-zinc-600" />
+              {n.hasContent
+                ? <CircleCheck size={10} className="text-[#2dd4bf]" />
+                : <Circle size={10} className="text-zinc-600" />
               }
             </div>
             <div className="w-16 h-[2px] bg-white/[0.04] overflow-hidden">
@@ -58,7 +65,7 @@ export default function CriticalNodesPanel({ nodes, edges }: Props) {
                 className="h-full"
                 style={{
                   width: `${Math.min((n.dependents / critical[0].dependents) * 100, 100)}%`,
-                  backgroundColor: n.isUnlocked ? '#2dd4bf' : '#3f3f46',
+                  backgroundColor: n.hasContent ? '#2dd4bf' : '#3f3f46',
                   transition: 'width 0.8s cubic-bezier(0.16,1,0.3,1)',
                 }}
               />

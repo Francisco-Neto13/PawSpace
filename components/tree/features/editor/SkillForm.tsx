@@ -173,7 +173,7 @@ export function SkillForm({
 
       {!isEditing && initialParentId === undefined && (
         <div>
-          <label className={`${labelClass} block mb-2`}>Requisito de Desbloqueio</label>
+          <label className={`${labelClass} block mb-2`}>Modulo pai (opcional)</label>
           <select
             value={formData.parentId}
             onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}

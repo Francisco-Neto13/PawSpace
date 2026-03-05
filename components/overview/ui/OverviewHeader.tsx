@@ -79,7 +79,7 @@ export default function OverviewHeader({
             <div className="flex justify-between items-center">
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-2">
                 <Cpu size={11} className="text-[#2dd4bf]/50" />
-                {unlockedCount} / {totalCount} Módulos Concluídos
+                {unlockedCount} / {totalCount} Modulos com Conteudo
               </span>
               <span className="font-mono text-xl text-[#2dd4bf] font-black leading-none">
                 {progress}<span className="text-xs ml-0.5 opacity-50">%</span>

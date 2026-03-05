@@ -1,0 +1,2 @@
+ALTER TABLE "Skill"
+DROP COLUMN IF EXISTS "isUnlocked";

@@ -8,8 +8,6 @@ import { EmptyState } from '../../ui/EmptyState';
 interface LibraryContentListProps {
   contents: Content[];
   isLoading: boolean;
-  isUnlocked: boolean;
-  search: string;
   onDelete?: (id: string) => void;
   onAdd?: () => void;
 }
@@ -17,8 +15,6 @@ interface LibraryContentListProps {
 export function LibraryContentList({
   contents,
   isLoading,
-  isUnlocked,
-  search,
   onDelete,
   onAdd,
 }: LibraryContentListProps) {
@@ -27,14 +23,14 @@ export function LibraryContentList({
       <div className="flex flex-col items-center justify-center py-24 gap-4">
         <Loader2 size={20} className="text-[#2dd4bf]/40 animate-spin" />
         <p className="text-zinc-700 text-[9px] font-black uppercase tracking-widest">
-          Carregando conteúdos...
+          Carregando conteudos...
         </p>
       </div>
     );
   }
 
-  if (!isUnlocked || contents.length === 0) {
-    return <EmptyState nodeUnlocked={isUnlocked} onAdd={onAdd} />;
+  if (contents.length === 0) {
+    return <EmptyState onAdd={onAdd} />;
   }
 
   return (

@@ -28,7 +28,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
       <div className="flex items-center gap-2">
         <div className="w-1 h-3 bg-[#2dd4bf]/40" />
         <p className="text-[9px] text-zinc-600 uppercase font-black tracking-[0.3em]">
-          Módulos da Árvore
+          Modulos da Arvore
         </p>
       </div>
 
@@ -38,7 +38,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar módulo..."
+          placeholder="Buscar modulo..."
           className="w-full bg-white/[0.02] border border-white/[0.06] pl-8 pr-3 py-2.5 text-[10px] text-zinc-300 placeholder:text-zinc-700 font-mono outline-none focus:border-[#2dd4bf]/20 transition-colors"
         />
       </div>
@@ -48,7 +48,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(45,212,191,0.1) transparent' }}
       >
         {filtered.length === 0 && (
-          <p className="text-[10px] text-zinc-700 font-mono text-center py-8">Nenhum módulo encontrado</p>
+          <p className="text-[10px] text-zinc-700 font-mono text-center py-8">Nenhum modulo encontrado</p>
         )}
         {filtered.map(node => {
           const isSelected = node.id === selectedNodeId;
@@ -56,13 +56,10 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
             <button
               key={node.id}
               onClick={() => onSelect(node.id)}
-              disabled={!node.isUnlocked}
               className={`group relative flex items-center gap-4 px-5 py-4 border text-left transition-all duration-300
                 ${isSelected
                   ? 'border-[#2dd4bf]/20 bg-[#2dd4bf]/[0.04] cursor-pointer'
-                  : node.isUnlocked
-                    ? 'border-white/[0.04] hover:border-white/[0.08] hover:bg-white/[0.02] cursor-pointer'
-                    : 'border-white/[0.02] opacity-30 cursor-not-allowed'
+                  : 'border-white/[0.04] hover:border-white/[0.08] hover:bg-white/[0.02] cursor-pointer'
                 }`}
             >
               {isSelected && (
@@ -83,7 +80,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
                   backgroundColor: isSelected ? `${node.color}0d` : 'transparent',
                 }}
               >
-                {node.isUnlocked ? node.icon : '🔒'}
+                {node.icon}
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-[11px] font-bold truncate transition-colors duration-300 ${isSelected ? 'text-[#2dd4bf]' : 'text-zinc-400 group-hover:text-zinc-200'}`}>
