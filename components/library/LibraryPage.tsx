@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Plus, Loader2 } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
+import { PageBackground } from '@/components/shared/PageBackground';
 
 import { ContentType, SkillNode } from './types';
 import { LibraryContentList } from './features/viewer/LibraryContentList';
@@ -103,9 +104,6 @@ export default function LibraryPage() {
   if (isLoadingNexus && nodes.length === 0) {
     return (
       <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0a0a0a]">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
-        </div>
         <div className="relative flex flex-col items-center gap-4">
           <div className="w-8 h-8 border-2 border-[#ffffff]/20 border-t-[#ffffff] rounded-full animate-spin" />
           <p className="text-[#ffffff] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
@@ -126,7 +124,6 @@ export default function LibraryPage() {
           transition: 'opacity 0.5s ease',
         }}
       >
-        <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 text-center pointer-events-none">
           <div className="space-y-2">
             <p className="text-zinc-300 text-[11px] font-black uppercase tracking-[0.4em]">
@@ -149,17 +146,17 @@ export default function LibraryPage() {
   }
 
   return (
-    <div
-      className="relative min-h-screen w-full bg-[#0a0a0a]"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(6px)',
-        transition: 'opacity 0.5s ease, transform 0.5s ease',
-      }}
-    >
-      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
+    <div className="relative min-h-screen w-full bg-[#0a0a0a]">
+      <PageBackground src="/cat3.webp" />
 
-      <div className="relative z-10 w-full py-8 pb-20 space-y-4">
+      <div
+        className="relative z-10 w-full py-8 pb-20 space-y-4"
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'translateY(0)' : 'translateY(6px)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        }}
+      >
 
         <div className="flex items-center gap-3 mb-6">
           <PawIcon className="w-3 h-3 text-white/60 shrink-0" />

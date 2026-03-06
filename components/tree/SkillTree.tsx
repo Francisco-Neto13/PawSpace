@@ -7,7 +7,6 @@ import { Save, Loader2, AlertCircle } from 'lucide-react';
 import { SkillNode as SkillNodeComponent, SvgDefs } from './ui/SkillNode';
 import { SkillEdge } from './ui/SkillEdge';
 import { SkillPanel } from './features/panel/SkillPanel';
-import { StarField } from './ui/StarField';
 import { EditSkillModal } from './features/editor/EditSkillModal';
 import { NodeContextMenu } from './ui/NodeContextMenu';
 import { TreeOnboarding } from './ui/TreeOnboarding';
@@ -17,6 +16,7 @@ import { useNexus } from '@/contexts/NexusContext';
 import { useSkillTree, SkillTreeProvider } from '@/contexts/SkillTreeContext';
 import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
+import { PageBackground } from '../shared/PageBackground';
 
 interface ContextMenu {
   x: number;
@@ -138,11 +138,10 @@ function SkillTreeInner() {
       className="relative w-full bg-[#0a0a0a] overflow-hidden select-none font-sans"
       style={{ height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))' }}
     >
+      <PageBackground src="/cat2.webp" />
+
       {isLoadingTree && nodes.length === 0 && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0a0a0a]">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
-          </div>
           <div className="relative flex flex-col items-center gap-4">
             <div className="w-8 h-8 border-2 border-[#ffffff]/20 border-t-[#ffffff] rounded-full animate-spin" />
             <p className="text-[#ffffff] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
@@ -153,7 +152,6 @@ function SkillTreeInner() {
       )}
 
       <SvgDefs />
-      <StarField />
 
       {isEmpty && (
         <TreeEmptyState onCreate={handleCreateRoot} />

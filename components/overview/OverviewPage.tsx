@@ -10,6 +10,7 @@ import JournalActivityChart from './features/activity/JournalActivityChart';
 import LibraryStatsPanel from './features/insights/LibraryStatsPanel';
 import RecentActivityFeed from './features/activity/RecentActivityFeed';
 import { PawIcon } from '@/components/shared/PawIcon';
+import { PageBackground } from '@/components/shared/PageBackground';
 
 interface OverviewContentProps {
   initialData: {
@@ -59,17 +60,17 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
   }
 
   return (
-    <div
-      className="relative min-h-screen w-full bg-[#0a0a0a] overflow-x-hidden"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(6px)',
-        transition: 'opacity 0.5s ease, transform 0.5s ease',
-      }}
-    >
-      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_50%,transparent_100%)]" />
+    <div className="relative min-h-screen w-full overflow-x-hidden">
+      <PageBackground src="/cat.webp" />
 
-      <main className="relative z-10 py-8 space-y-4 pb-20">
+      <main
+        className="relative z-10 py-8 space-y-4 pb-20"
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'translateY(0)' : 'translateY(6px)',
+          transition: 'opacity 0.5s ease, transform 0.5s ease',
+        }}
+      >
 
         <div className="flex items-center gap-3 mb-6">
           <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
