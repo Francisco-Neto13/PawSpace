@@ -1,7 +1,8 @@
-'use client';
+﻿'use client';
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Plus, Loader2 } from 'lucide-react';
+import { PawIcon } from '@/components/shared/PawIcon';
 
 import { ContentType, SkillNode } from './types';
 import { LibraryContentList } from './features/viewer/LibraryContentList';
@@ -63,7 +64,7 @@ export default function LibraryPage() {
     ...n,
     name: n.data.name || n.data.label || 'Sem Nome',
     icon: n.data.icon || '*',
-    color: n.data.color || '#2dd4bf',
+    color: n.data.color || '#ffffff',
     contents: nodeContents[n.id] ?? [],
   })) as SkillNode[], [nodes, nodeContents]);
 
@@ -101,14 +102,14 @@ export default function LibraryPage() {
 
   if (isLoadingNexus && nodes.length === 0) {
     return (
-      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#06090f]">
+      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0a0a0a]">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#2dd4bf06_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
         </div>
         <div className="relative flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-[#2dd4bf]/20 border-t-[#2dd4bf] rounded-full animate-spin" />
-          <p className="text-[#2dd4bf] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
-            Sincronizando Nexus...
+          <div className="w-8 h-8 border-2 border-[#ffffff]/20 border-t-[#ffffff] rounded-full animate-spin" />
+          <p className="text-[#ffffff] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
+            Sincronizando Pawspace...
           </p>
         </div>
       </div>
@@ -118,28 +119,28 @@ export default function LibraryPage() {
   if (!isLoadingNexus && nodes.length === 0) {
     return (
       <div
-        className="relative w-full bg-[#06090f] overflow-hidden"
+        className="relative w-full bg-[#0a0a0a] overflow-hidden"
         style={{
           height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))',
           opacity: visible ? 1 : 0,
           transition: 'opacity 0.5s ease',
         }}
       >
-        <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#2dd4bf06_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
+        <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 text-center pointer-events-none">
           <div className="space-y-2">
             <p className="text-zinc-300 text-[11px] font-black uppercase tracking-[0.4em]">
-              Skill Tree Vazia
+              Árvore Vazia
             </p>
             <p className="text-zinc-600 text-[11px] font-normal max-w-[260px] leading-relaxed">
-              Crie sua Skill Tree primeiro para começar a organizar conteúdos por módulo.
+              Crie sua Árvore primeiro para começar a organizar conteúdos por módulo.
             </p>
           </div>
           <a
             href="/tree"
-            className="pointer-events-auto flex items-center gap-2 px-6 py-3 border border-[#2dd4bf]/30 bg-[#2dd4bf]/[0.06] text-[#2dd4bf] text-[9px] font-black uppercase tracking-widest hover:bg-[#2dd4bf]/10 hover:border-[#2dd4bf]/50 transition-all duration-200 active:scale-95"
+            className="pointer-events-auto flex items-center gap-2 px-6 py-3 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[9px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 hover:border-[#ffffff]/50 transition-all duration-200 active:scale-95"
           >
-            Ir para Skill Tree
+            Ir para Árvore
           </a>
           <div className="w-8 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </div>
@@ -149,23 +150,23 @@ export default function LibraryPage() {
 
   return (
     <div
-      className="relative min-h-screen w-full bg-[#06090f]"
+      className="relative min-h-screen w-full bg-[#0a0a0a]"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(6px)',
         transition: 'opacity 0.5s ease, transform 0.5s ease',
       }}
     >
-      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#2dd4bf06_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
 
       <div className="relative z-10 w-full py-8 pb-20 space-y-4">
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-1 h-4 bg-[#2dd4bf]" />
-          <span className="text-[#2dd4bf] text-[9px] font-black uppercase tracking-[0.4em]">
-            Nexus / Biblioteca
+          <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
+          <span className="text-[#ffffff] text-[9px] font-black uppercase tracking-[0.4em]">
+            Pawspace / Biblioteca
           </span>
-          <div className="h-[1px] flex-1 bg-gradient-to-r from-[#2dd4bf]/15 to-transparent" />
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-[#ffffff]/15 to-transparent" />
         </div>
 
         <header>
@@ -189,7 +190,7 @@ export default function LibraryPage() {
               <button
                 onClick={() => setShowAddContent(true)}
                 disabled={!selectedNode}
-                className="flex items-center gap-2 px-4 py-2.5 border border-[#2dd4bf]/30 bg-[#2dd4bf]/[0.06] text-[#2dd4bf] text-[9px] font-black uppercase tracking-widest hover:bg-[#2dd4bf]/10 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2.5 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[9px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus size={11} />
                 Novo Conteúdo
@@ -211,13 +212,15 @@ export default function LibraryPage() {
           />
 
           <main
-            className="flex-1 min-w-0 border border-white/[0.04] bg-white/[0.01] flex flex-col relative rounded-sm shadow-2xl"
+            className="flex-1 min-w-0 border border-white/[0.06] bg-white/[0.02] flex flex-col relative rounded-2xl overflow-hidden shadow-2xl"
             style={{
               height: 'calc(100dvh - var(--navbar-height) - 120px)',
               position: 'sticky',
               top: 'calc(var(--navbar-height) + 24px)',
             }}
           >
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-white opacity-[0.04] pointer-events-none" />
             <div className="shrink-0 px-8 pt-8 pb-6 border-b border-white/[0.04] flex flex-col gap-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -241,7 +244,7 @@ export default function LibraryPage() {
 
             <div
               className="flex-1 overflow-y-auto px-8 py-6"
-              style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(45,212,191,0.1) transparent' }}
+              style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
             >
               <LibraryContentList
                 contents={filteredContents}
@@ -270,3 +273,4 @@ export default function LibraryPage() {
     </div>
   );
 }
+

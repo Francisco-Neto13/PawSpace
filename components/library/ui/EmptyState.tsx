@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { BookOpen, Plus } from 'lucide-react';
 
 interface EmptyStateProps {
@@ -23,7 +23,7 @@ export function EmptyState({ onAdd }: EmptyStateProps) {
       {onAdd && (
         <button
           onClick={onAdd}
-          className="mt-8 flex items-center gap-2 px-5 py-2.5 border border-[#2dd4bf]/30 bg-[#2dd4bf]/[0.06] text-[#2dd4bf] text-[9px] font-black uppercase tracking-widest hover:bg-[#2dd4bf]/10 hover:border-[#2dd4bf]/50 transition-all duration-200 active:scale-95 cursor-pointer"
+          className="mt-8 flex items-center gap-2 px-5 py-2.5 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[9px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 hover:border-[#ffffff]/50 transition-all duration-200 active:scale-95 cursor-pointer"
         >
           <Plus size={10} />
           Adicionar Conteudo
@@ -34,3 +34,4 @@ export function EmptyState({ onAdd }: EmptyStateProps) {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect } from 'react';
 import { ColorPicker } from './ColorPicker';
 import { EmojiPicker } from './EmojiPicker';
@@ -29,7 +29,7 @@ function CharCounter({ current, max }: { current: number; max: number }) {
   const remaining = max - current;
   if (current < max * 0.8) return null;
   return (
-    <span className={`text-[9px] font-mono font-bold tabular-nums ${remaining <= 5 ? 'text-red-400' : 'text-zinc-500'}`}>
+    <span className={`text-[9px] font-mono font-bold tabular-nums ${remaining <= 5 ? 'text-white' : 'text-zinc-500'}`}>
       {remaining}
     </span>
   );
@@ -48,7 +48,7 @@ export function SkillForm({
     label:       '',
     description: '',
     icon:        '✦',
-    color:       '#3b82f6',
+    color:       '#ffffff',
     shape:       'hexagon' as SkillShape,
     parentId:    initialParentId ?? '',
   });
@@ -59,7 +59,7 @@ export function SkillForm({
         label:       initialData.label || initialData.name || '',
         description: initialData.description || '',
         icon:        initialData.icon || '✦',
-        color:       initialData.color || '#3b82f6',
+        color:       initialData.color || '#ffffff',
         shape:       (initialData.shape as SkillShape) || 'hexagon',
         parentId:    initialData.parentId || initialParentId || '',
       });
@@ -80,7 +80,7 @@ export function SkillForm({
   };
 
   const labelClass = "text-[8px] text-zinc-600 uppercase font-black tracking-[0.25em]";
-  const inputClass = "w-full bg-white/[0.02] border border-white/[0.06] p-3.5 text-white text-sm outline-none focus:border-[#2dd4bf]/30 transition-colors font-light placeholder:text-zinc-700 cursor-text";
+  const inputClass = "w-full bg-white/[0.02] border border-white/[0.06] p-3.5 text-white text-sm outline-none focus:border-[#ffffff]/30 transition-colors font-light placeholder:text-zinc-700 cursor-text";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -135,7 +135,7 @@ export function SkillForm({
               onClick={() => setFormData({ ...formData, shape: s.value })}
               className={`group flex flex-col items-center gap-2.5 p-3 border transition-all duration-300 cursor-pointer ${
                 formData.shape === s.value
-                  ? 'border-[#2dd4bf]/40 bg-[#2dd4bf]/[0.06]'
+                  ? 'border-[#ffffff]/40 bg-[#ffffff]/[0.06]'
                   : 'border-white/[0.04] bg-white/[0.01] hover:border-white/10 hover:bg-white/[0.03]'
               }`}
             >
@@ -147,7 +147,7 @@ export function SkillForm({
                 }}
               />
               <span className={`text-[7px] font-black uppercase tracking-wider transition-colors duration-300 ${
-                formData.shape === s.value ? 'text-[#2dd4bf]' : 'text-zinc-600 group-hover:text-zinc-500'
+                formData.shape === s.value ? 'text-[#ffffff]' : 'text-zinc-600 group-hover:text-zinc-500'
               }`}>
                 {s.label}
               </span>
@@ -179,7 +179,7 @@ export function SkillForm({
             onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
             className={`${inputClass} appearance-none cursor-pointer uppercase text-[10px]`}
           >
-            <option value="">Raiz (Protocolo Primário)</option>
+            <option value="">Raiz</option>
             {existingSkills.map(skill => (
               <option key={skill.id} value={skill.id}>{skill.name}</option>
             ))}
@@ -200,11 +200,12 @@ export function SkillForm({
         <button
           type="submit"
           disabled={isLoading || !formData.label.trim()}
-          className="flex-1 py-3.5 border border-[#2dd4bf]/30 bg-[#2dd4bf]/[0.06] text-[#2dd4bf] text-[10px] font-black uppercase tracking-widest hover:bg-[#2dd4bf]/10 hover:border-[#2dd4bf]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
+          className="flex-1 py-3.5 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[10px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 hover:border-[#ffffff]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
         >
-          {isLoading ? 'Sincronizando...' : isEditing ? 'Salvar Nexus' : 'Confirmar'}
+          {isLoading ? 'Sincronizando...' : isEditing ? 'Salvar Pawspace' : 'Confirmar'}
         </button>
       </div>
     </form>
   );
 }
+

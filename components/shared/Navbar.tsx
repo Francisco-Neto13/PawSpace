@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { forwardRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -20,7 +20,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
     e.preventDefault();
     if (isDirty) {
       const confirmExit = window.confirm(
-        "Você tem alterações não salvas na sua Skill Tree. Se sair agora, elas serão perdidas. Deseja sair mesmo assim?"
+        "Você tem alterações não salvas na sua Árvore. Se sair agora, elas serão perdidas. Deseja sair mesmo assim?"
       );
       if (!confirmExit) return;
       setIsDirty(false);
@@ -67,10 +67,10 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
             onClick={(e) => handleSafeNavigation(e, "/overview")}
             className="flex items-center gap-3 group"
           >
-            <div className="h-9 w-9 rounded-full border border-[#2dd4bf]/30 bg-[#2dd4bf]/10 flex items-center justify-center transition-colors group-hover:border-[#2dd4bf]/60">
-              <span className="text-[#2dd4bf] text-sm font-black">F</span>
+            <div className="h-9 w-9 rounded-full border border-[#ffffff]/30 bg-[#ffffff]/10 flex items-center justify-center transition-colors group-hover:border-[#ffffff]/60">
+              <span className="text-[#ffffff] text-sm font-black">F</span>
             </div>
-            <span className="text-zinc-200 text-[11px] font-black uppercase tracking-[0.2em] group-hover:text-[#2dd4bf] transition-colors">
+            <span className="text-zinc-200 text-[11px] font-black uppercase tracking-[0.2em] group-hover:text-[#ffffff] transition-colors">
               Francisco
             </span>
           </Link>
@@ -85,11 +85,11 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
                 href={link.href}
                 onClick={(e) => handleSafeNavigation(e, link.href)}
                 className={`relative text-[10px] lg:text-[11px] font-black uppercase tracking-[0.2em] transition-colors group py-1 ${
-                  isActive ? 'text-[#2dd4bf]' : 'text-zinc-400 hover:text-[#2dd4bf]'
+                  isActive ? 'text-[#ffffff]' : 'text-zinc-400 hover:text-[#ffffff]'
                 }`}
               >
                 {link.name}
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#2dd4bf] transition-all duration-300 shadow-[0_0_10px_rgba(45,212,191,0.5)] ${
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#ffffff] transition-all duration-300 shadow-[0_0_10px_rgba(255,255,255,0.5)] ${
                   isActive ? 'w-full' : 'w-0 group-hover:w-full'
                 }`} />
               </Link>
@@ -100,7 +100,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
         <div className="flex items-center justify-end justify-self-end gap-4">
           <button
             onClick={handleLogout}
-            className="hidden sm:block px-5 py-2 border border-white/10 bg-white/5 text-zinc-400 hover:bg-red-600 hover:border-red-500 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-500 cursor-pointer"
+            className="hidden sm:block px-5 py-2 border border-white/10 bg-white/5 text-zinc-400 hover:bg-white/10 hover:border-white/30 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-500 cursor-pointer"
           >
             Logout
           </button>
@@ -122,7 +122,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleSafeNavigation(e, link.href)}
-                className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-[#2dd4bf]"
+                className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-[#ffffff]"
               >
                 {link.name}
               </Link>
@@ -130,7 +130,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
             <div className="h-px w-full bg-white/5" />
             <button
               onClick={handleLogout}
-              className="text-red-400 text-left text-[11px] font-black uppercase tracking-widest"
+              className="text-zinc-300 text-left text-[11px] font-black uppercase tracking-widest"
             >
               Logout
             </button>
@@ -143,3 +143,4 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
 
 Navbar.displayName = 'Navbar';
 export default Navbar;
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { memo } from 'react';
 import { EdgeProps, BaseEdge, getStraightPath, type Edge } from '@xyflow/react';
 import { SkillEdgeData } from '../types';
@@ -6,7 +6,7 @@ import { SkillEdgeData } from '../types';
 type CompatibleSkillEdge = Edge<SkillEdgeData & { [key: string]: unknown }>;
 type SkillEdgeProps = EdgeProps<CompatibleSkillEdge>;
 
-const DEFAULT_EDGE_COLOR = '#2dd4bf';
+const DEFAULT_EDGE_COLOR = '#ffffff';
 
 function SkillEdgeComponent({
   id,
@@ -57,3 +57,4 @@ function SkillEdgeComponent({
 }
 
 export const SkillEdge = memo(SkillEdgeComponent);
+

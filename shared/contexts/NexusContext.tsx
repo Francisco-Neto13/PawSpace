@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { Node, Edge } from '@xyflow/react';
 import { SkillData } from '@/components/tree/types';
@@ -56,10 +56,10 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
 
   const refreshNexus = useCallback(async (silent = false) => {
     if (hasLoadedRef.current && silent) {
-      console.log('✅ [Nexus] Dados já em memória, ignorando refresh silencioso.');
+      console.log('[Pawspace] Dados já em memória, ignorando refresh silencioso.');
       return;
     }
-    console.log(`🔄 [Nexus] Refresh ${silent ? 'SILENCIOSO' : 'COMPLETO'} iniciado...`);
+    console.log(`[Pawspace] Refresh ${silent ? 'SILENCIOSO' : 'COMPLETO'} iniciado...`);
     if (!silent) setIsLoading(true);
     try {
       const [data, stats] = await Promise.all([
@@ -74,7 +74,7 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
         const incomingEdges = (data.edges as Edge[]) || [];
         setNodes(prevNodes => {
           if (isDirtyRef.current && silent) {
-            console.log('⚠️ [Nexus] Mantendo alterações locais (Silent mode + Dirty).');
+            console.log('[Pawspace] Mantendo alterações locais (Silent mode + Dirty).');
             return prevNodes;
           }
           return incomingNodes;
@@ -86,15 +86,15 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
         if (!isDirtyRef.current) {
           setIsDirty(false);
           originalNodeIds.current = new Set(incomingNodes.map(n => n.id));
-          console.log(`📋 [Nexus] ${originalNodeIds.current.size} ids originais registrados.`);
+          console.log(`[Pawspace] ${originalNodeIds.current.size} ids originais registrados.`);
         }
         hasLoadedRef.current = true;
       }
     } catch (error) {
-      console.error('❌ [Nexus] Erro na sincronização:', error);
+      console.error('[Pawspace] Erro na sincronização:', error);
     } finally {
       setIsLoading(false);
-      console.log('✅ [Nexus] Refresh finalizado.');
+      console.log('[Pawspace] Refresh finalizado.');
     }
   }, []);
 
@@ -119,6 +119,6 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
 
 export function useNexus() {
   const context = useContext(NexusContext);
-  if (!context) throw new Error('useNexus deve ser usado dentro de um NexusProvider');
+  if (!context) throw new Error('useNexus deve ser usado dentro do contexto Pawspace');
   return context;
 }

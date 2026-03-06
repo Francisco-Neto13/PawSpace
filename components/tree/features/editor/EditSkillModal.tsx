@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { SkillForm } from './SkillForm';
@@ -76,7 +76,7 @@ export function EditSkillModal({
 
       <div
         className="relative w-full max-w-md animate-in zoom-in-95 fade-in duration-300 p-[1.5px] z-10 pointer-events-auto"
-        style={{ clipPath: poly, backgroundColor: '#2dd4bf33' }}
+        style={{ clipPath: poly, backgroundColor: '#ffffff33' }}
       >
         <div className="w-full h-full" style={{ clipPath: poly, backgroundColor: '#000' }}>
           <div
@@ -97,13 +97,13 @@ export function EditSkillModal({
             <div className="relative z-10 mb-8">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-1 h-5 bg-[#2dd4bf]" />
+                  <div className="w-1 h-5 bg-[#ffffff]" />
                   <div>
                     <p className="text-[8px] text-zinc-600 uppercase tracking-[0.3em] font-black mb-0.5">
                       Configuração de Unidade
                     </p>
-                    <h2 className="text-[#2dd4bf] text-[13px] font-black uppercase tracking-[0.3em]">
-                      Ajustar Protocolo
+                    <h2 className="text-[#ffffff] text-[13px] font-black uppercase tracking-[0.3em]">
+                      Ajustar Árvore
                     </h2>
                   </div>
                 </div>
@@ -116,7 +116,7 @@ export function EditSkillModal({
               </div>
               <div
                 className="h-[1px] w-full"
-                style={{ background: 'linear-gradient(to right, #2dd4bf22, transparent)' }}
+                style={{ background: 'linear-gradient(to right, #ffffff22, transparent)' }}
               />
             </div>
 
@@ -134,7 +134,7 @@ export function EditSkillModal({
               {[0, 1, 2].map(i => (
                 <div
                   key={i}
-                  className="w-1.5 h-1.5 rotate-45 border border-[#2dd4bf]"
+                  className="w-1.5 h-1.5 rotate-45 border border-[#ffffff]"
                 />
               ))}
             </div>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { Loader2 } from 'lucide-react';
 import { Content, ContentType } from '../../types';
 import { TYPE_CONFIG } from '../../constants';
@@ -21,7 +21,7 @@ export function LibraryContentList({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <Loader2 size={20} className="text-[#2dd4bf]/40 animate-spin" />
+        <Loader2 size={20} className="text-[#ffffff]/40 animate-spin" />
         <p className="text-zinc-700 text-[9px] font-black uppercase tracking-widest">
           Carregando conteudos...
         </p>
@@ -63,3 +63,4 @@ export function LibraryContentList({
     </div>
   );
 }
+

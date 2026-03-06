@@ -1,4 +1,4 @@
-import { SkillTree } from '@/components/tree/SkillTree';
+﻿import { SkillTree } from '@/components/tree/SkillTree';
 
 export default function TreePage() {
   return <SkillTree />;

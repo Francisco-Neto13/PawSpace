@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link2, Video, FileText, StickyNote, X } from 'lucide-react';
@@ -35,7 +35,7 @@ const poly = `polygon(
 )`;
 
 const labelClass = "text-[9px] text-zinc-500 uppercase font-black tracking-[0.25em] block mb-2.5";
-const inputClass = "w-full bg-white/[0.02] border border-white/[0.08] p-3.5 text-white text-sm outline-none focus:border-[#2dd4bf]/40 transition-colors font-normal placeholder:text-zinc-600 cursor-text";
+const inputClass = "w-full bg-white/[0.02] border border-white/[0.08] p-3.5 text-white text-sm outline-none focus:border-[#ffffff]/40 transition-colors font-normal placeholder:text-zinc-600 cursor-text";
 
 interface AddContentModalProps {
   isOpen: boolean;
@@ -49,7 +49,7 @@ function CharCounter({ current, max }: { current: number; max: number }) {
   const warn = current >= max * 0.8;
   if (!warn) return null;
   return (
-    <span className={`text-[9px] font-mono font-bold tabular-nums ${remaining <= 10 ? 'text-red-400' : 'text-zinc-500'}`}>
+    <span className={`text-[9px] font-mono font-bold tabular-nums ${remaining <= 10 ? 'text-white' : 'text-zinc-500'}`}>
       {remaining}
     </span>
   );
@@ -123,7 +123,7 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
 
       <div
         className="relative w-full max-w-md animate-in zoom-in-95 fade-in duration-300 p-[1.5px] z-10"
-        style={{ clipPath: poly, backgroundColor: '#2dd4bf33' }}
+        style={{ clipPath: poly, backgroundColor: '#ffffff33' }}
       >
         <div className="w-full h-full" style={{ clipPath: poly, backgroundColor: '#000' }}>
           <div
@@ -138,12 +138,12 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
             <div className="relative z-10 mb-8">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-1 h-5 bg-[#2dd4bf]" />
+                  <div className="w-1 h-5 bg-[#ffffff]" />
                   <div>
                     <p className="text-[9px] text-zinc-500 uppercase tracking-[0.3em] font-black mb-0.5">
                       Repositório de Conhecimento
                     </p>
-                    <h2 className="text-[#2dd4bf] text-[13px] font-black uppercase tracking-[0.3em]">
+                    <h2 className="text-[#ffffff] text-[13px] font-black uppercase tracking-[0.3em]">
                       Adicionar Conteúdo
                     </h2>
                   </div>
@@ -155,7 +155,7 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
                   <X size={12} />
                 </button>
               </div>
-              <div className="h-[1px] w-full" style={{ background: 'linear-gradient(to right, #2dd4bf22, transparent)' }} />
+              <div className="h-[1px] w-full" style={{ background: 'linear-gradient(to right, #ffffff22, transparent)' }} />
             </div>
 
             <div className="relative z-10 grid grid-cols-4 gap-1.5 mb-6">
@@ -165,11 +165,11 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
                   onClick={() => { setActiveTab(tab.type); setForm({ title: '', url: '', body: '' }); setPdfFile(null); }}
                   className={`flex flex-col items-center gap-2 py-3.5 border text-[9px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer
                     ${activeTab === tab.type
-                      ? 'border-[#2dd4bf]/40 bg-[#2dd4bf]/[0.06] text-[#2dd4bf]'
+                      ? 'border-[#ffffff]/40 bg-[#ffffff]/[0.06] text-[#ffffff]'
                       : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.02]'
                     }`}
                 >
-                  <div className={activeTab === tab.type ? 'text-[#2dd4bf]' : 'text-zinc-500'}>{tab.icon}</div>
+                  <div className={activeTab === tab.type ? 'text-[#ffffff]' : 'text-zinc-500'}>{tab.icon}</div>
                   {tab.label}
                 </button>
               ))}
@@ -258,7 +258,7 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
                 type="button"
                 onClick={handleSubmit}
                 disabled={!isValid() || isLoading}
-                className="flex-1 py-4 border border-[#2dd4bf]/30 bg-[#2dd4bf]/[0.06] text-[#2dd4bf] text-[10px] font-black uppercase tracking-widest hover:bg-[#2dd4bf]/10 hover:border-[#2dd4bf]/50 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
+                className="flex-1 py-4 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[10px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 hover:border-[#ffffff]/50 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
               >
                 {isLoading ? 'Sincronizando...' : 'Confirmar Registro'}
               </button>
@@ -270,3 +270,4 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
     document.body
   );
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { Calendar } from 'lucide-react';
 import { JournalEntry, SkillBase, getSkill, formatDate } from '../types';
 
@@ -19,24 +19,24 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
   return (
     <button
       onClick={onSelect}
-      className={`group relative w-full flex flex-col gap-2 px-4 py-4 border text-left transition-all duration-300
+      className={`group relative w-full flex flex-col gap-2 px-4 py-4 border rounded-xl text-left transition-all duration-300
         ${isSelected
-          ? 'border-[#2dd4bf]/20 bg-[#2dd4bf]/[0.04]'
-          : 'border-white/[0.04] hover:border-white/[0.08] hover:bg-white/[0.02]'
+          ? 'border-white/20 bg-white/[0.06]'
+          : 'border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.03]'
         }`}
     >
       {isSelected && (
         <>
-          <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#2dd4bf]" />
+          <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-white" />
           <div
             className="absolute top-0 left-0 right-0 h-[1px]"
-            style={{ background: 'linear-gradient(to right, #2dd4bf33, transparent)' }}
+            style={{ background: 'linear-gradient(to right, #ffffff33, transparent)' }}
           />
         </>
       )}
 
       <p className={`text-[11px] font-bold truncate transition-colors ${
-        isSelected ? 'text-[#2dd4bf]' : 'text-zinc-300 group-hover:text-zinc-100'
+        isSelected ? 'text-white' : 'text-zinc-300 group-hover:text-zinc-100'
       }`}>
         {entry.title || 'Sem Título'}
       </p>
@@ -51,9 +51,9 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
             <span
               className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border flex items-center gap-1.5"
               style={{ 
-                color: skill.color || '#2dd4bf', 
-                borderColor: `${skill.color || '#2dd4bf'}30`, 
-                backgroundColor: `${skill.color || '#2dd4bf'}0d` 
+                color: skill.color || '#ffffff',
+                borderColor: `${skill.color || '#ffffff'}30`,
+                backgroundColor: `${skill.color || '#ffffff'}0d`
               }}
             >
               <span className="opacity-80 text-[10px]">{skill.icon}</span>

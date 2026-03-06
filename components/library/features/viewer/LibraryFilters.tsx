@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { Search, Filter, X } from 'lucide-react';
 import { ContentType } from '../../types';
 import { FILTER_OPTIONS } from '../../constants';
@@ -25,7 +25,7 @@ export function LibraryFilters({
           value={search}
           onChange={e => onSearchChange(e.target.value)}
           placeholder="Buscar conteúdo..."
-          className="w-full bg-white/[0.02] border border-white/[0.06] pl-11 pr-4 py-3.5 text-white text-sm font-medium outline-none focus:border-[#2dd4bf]/30 transition-colors placeholder:text-zinc-700 cursor-text"
+          className="w-full bg-white/[0.02] border border-white/[0.06] pl-11 pr-4 py-3.5 text-white text-sm font-medium outline-none focus:border-[#ffffff]/30 transition-colors placeholder:text-zinc-700 cursor-text"
         />
         {search && (
           <button
@@ -45,7 +45,7 @@ export function LibraryFilters({
             onClick={() => onTypeChange(f.value)}
             className={`px-4 py-3.5 text-[9px] font-black uppercase tracking-widest border transition-all duration-200 cursor-pointer
               ${typeFilter === f.value
-                ? 'border-[#2dd4bf]/40 bg-[#2dd4bf]/[0.08] text-[#2dd4bf]'
+                ? 'border-[#ffffff]/40 bg-[#ffffff]/[0.08] text-[#ffffff]'
                 : 'border-white/[0.04] text-zinc-600 hover:text-zinc-400 hover:border-white/[0.08]'
               }`}
           >
@@ -56,3 +56,4 @@ export function LibraryFilters({
     </div>
   );
 }
+

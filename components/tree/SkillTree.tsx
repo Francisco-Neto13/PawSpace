@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ReactFlow, ConnectionMode, type NodeTypes, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -117,7 +117,7 @@ function SkillTreeInner() {
         await refreshNexus(false);
       }
     } catch (error) {
-      console.error('[SkillTree] Erro critico na sincronizacao:', error);
+      console.error('[Árvore] Erro critico na sincronizacao:', error);
     } finally {
       setIsSaving(false);
     }
@@ -135,18 +135,18 @@ function SkillTreeInner() {
 
   return (
     <div
-      className="relative w-full bg-[#06090f] overflow-hidden select-none font-sans"
+      className="relative w-full bg-[#0a0a0a] overflow-hidden select-none font-sans"
       style={{ height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))' }}
     >
       {isLoadingTree && nodes.length === 0 && (
-        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#06090f]">
+        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0a0a0a]">
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#2dd4bf06_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
           </div>
           <div className="relative flex flex-col items-center gap-4">
-            <div className="w-8 h-8 border-2 border-[#2dd4bf]/20 border-t-[#2dd4bf] rounded-full animate-spin" />
-            <p className="text-[#2dd4bf] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
-              Sincronizando Nexus...
+            <div className="w-8 h-8 border-2 border-[#ffffff]/20 border-t-[#ffffff] rounded-full animate-spin" />
+            <p className="text-[#ffffff] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
+              Sincronizando Pawspace...
             </p>
           </div>
         </div>
@@ -161,10 +161,10 @@ function SkillTreeInner() {
 
       {canSave && (
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 animate-in slide-in-from-bottom-5 duration-500">
-          <div className="flex items-center gap-2 px-3 py-1 bg-black/80 border border-[#2dd4bf]/20 backdrop-blur-md shadow-2xl">
-            <AlertCircle size={10} className="text-[#2dd4bf] animate-pulse" />
-            <span className="text-[7px] text-[#2dd4bf]/70 font-black uppercase tracking-[0.2em]">
-              Protocolos pendentes de consolidacao
+          <div className="flex items-center gap-2 px-3 py-1 bg-black/80 border border-[#ffffff]/20 backdrop-blur-md shadow-2xl">
+            <AlertCircle size={10} className="text-[#ffffff] animate-pulse" />
+            <span className="text-[7px] text-[#ffffff]/70 font-black uppercase tracking-[0.2em]">
+              Alterações Pendentes
             </span>
           </div>
 
@@ -173,8 +173,8 @@ function SkillTreeInner() {
             disabled={isSaving}
             className={`flex items-center gap-3 px-8 py-4 border transition-all backdrop-blur-md shadow-2xl group
               ${isSaving
-                ? 'border-[#2dd4bf]/20 bg-[#06090f]/60 text-[#2dd4bf]/40 cursor-not-allowed'
-                : 'border-[#2dd4bf]/40 bg-[#06090f]/90 text-[#2dd4bf] hover:bg-[#2dd4bf]/10 hover:border-[#2dd4bf] active:scale-95 cursor-pointer'
+                ? 'border-[#ffffff]/20 bg-[#0a0a0a]/60 text-[#ffffff]/40 cursor-not-allowed'
+                : 'border-[#ffffff]/40 bg-[#0a0a0a]/90 text-[#ffffff] hover:bg-[#ffffff]/10 hover:border-[#ffffff] active:scale-95 cursor-pointer'
               }`}
           >
             {isSaving
@@ -182,7 +182,7 @@ function SkillTreeInner() {
               : <Save size={14} className="group-hover:scale-110 transition-transform" />
             }
             <span className="text-[10px] font-black uppercase tracking-widest">
-              {isSaving ? 'Consolidando...' : 'Consolidar Protocolos'}
+              {isSaving ? 'Salvando...' : 'Salvar Alterações'}
             </span>
           </button>
         </div>
@@ -277,3 +277,4 @@ export function SkillTree() {
     </SkillTreeProvider>
   );
 }
+

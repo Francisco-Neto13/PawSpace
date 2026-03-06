@@ -1,4 +1,4 @@
-'use server';
+﻿'use server';
 
 import prisma from '@/shared/lib/prisma';
 import { getAuthUser } from './auth-helper';
@@ -42,10 +42,10 @@ export async function getSkillsFull() {
         };
       });
 
-    console.log(`⏱️  [Nexus Query] Fetch: ${Date.now() - start}ms | Nodes: ${nodes.length}`);
+    console.log(`⏱️  [Pawspace Query] Fetch: ${Date.now() - start}ms | Nodes: ${nodes.length}`);
     return { nodes, edges };
   } catch (error) {
-    console.error('❌ [Nexus Query] Erro Crítico:', error);
+    console.error('❌ [Pawspace Query] Erro Crítico:', error);
     return { nodes: [], edges: [] };
   }
 }

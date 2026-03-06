@@ -1,12 +1,12 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 :root {
-  --background: #06090f;
+  --background: #0a0a0a;
   --foreground: #ededed;
-  --rpg-gold: #2dd4bf;
-  --rpg-gold-bright: #f0ede6; 
+  --rpg-gold: #ffffff;
+  --rpg-gold-bright: #ffffff;
   --rpg-muted: #3a3830;
-  --rpg-glow: rgba(45,212,191, 0.3);
+  --rpg-glow: rgba(255,255,255,0.3);
   
   --font-main: var(--font-geist-sans), sans-serif;
   --font-mono: var(--font-geist-mono), monospace;

@@ -16,7 +16,7 @@ export function LibraryNodeHeader({
   onAddContent,
 }: LibraryNodeHeaderProps) {
   return (
-    <div className="p-8 border border-white/[0.04] bg-white/[0.01] relative overflow-hidden group">
+    <div className="p-8 border border-white/[0.06] rounded-2xl bg-white/[0.02] relative overflow-hidden group">
       <div
         className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
         style={{ background: `linear-gradient(to right, transparent, ${node.color}44, transparent)` }}
@@ -50,7 +50,7 @@ export function LibraryNodeHeader({
 
         <button
           onClick={onAddContent}
-          className="flex items-center gap-3 px-6 py-3.5 border border-[#2dd4bf]/30 bg-[#2dd4bf]/[0.06] text-[#2dd4bf] hover:bg-[#2dd4bf]/10 hover:border-[#2dd4bf]/50 transition-all duration-300 cursor-pointer"
+          className="flex items-center gap-3 px-6 py-3.5 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] hover:bg-[#ffffff]/10 hover:border-[#ffffff]/50 transition-all duration-300 cursor-pointer"
         >
           <Plus size={14} />
           <span className="text-[10px] font-black uppercase tracking-widest">Adicionar Conteudo</span>
@@ -59,3 +59,4 @@ export function LibraryNodeHeader({
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useMemo, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { BookOpen } from 'lucide-react';
@@ -9,7 +9,7 @@ interface SkillPanelProps {
   onClose: () => void;
 }
 
-const DEFAULT_SYSTEM_COLOR = '#2dd4bf';
+const DEFAULT_SYSTEM_COLOR = '#ffffff';
 
 const poly = `polygon(
   10px 0,
@@ -111,11 +111,11 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
                 <div
                   className="w-1.5 h-1.5 rounded-full"
                   style={{
-                    backgroundColor: '#34d399',
-                    boxShadow: '0 0 6px #34d399',
+                    backgroundColor: 'rgba(255,255,255,0.65)',
+                    boxShadow: '0 0 6px rgba(255,255,255,0.45)',
                   }}
                 />
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#34d399]">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/80">
                   Disponivel
                 </span>
               </div>
@@ -128,7 +128,7 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
             <div className="mt-6 relative z-10">
               <button
                 onClick={handleViewLibrary}
-                className="w-full py-3 border border-white/[0.06] text-zinc-500 text-[9px] font-black uppercase tracking-[0.3em] hover:border-[#2dd4bf]/20 hover:text-[#2dd4bf] hover:bg-[#2dd4bf]/[0.03] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3 border border-white/[0.06] text-zinc-500 text-[9px] font-black uppercase tracking-[0.3em] hover:border-[#ffffff]/20 hover:text-[#ffffff] hover:bg-[#ffffff]/[0.03] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <BookOpen size={12} />
                 Visualizar na Biblioteca
@@ -152,3 +152,4 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
 }
 
 export const SkillPanel = memo(SkillPanelComponent);
+

@@ -17,7 +17,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
   };
 
   return (
-    <div className="group flex items-start gap-5 p-6 border border-white/[0.04] bg-white/[0.01] hover:border-white/[0.08] hover:bg-white/[0.025] transition-all duration-300 relative overflow-hidden">
+    <div className="group flex items-start gap-5 p-6 border border-white/[0.06] rounded-2xl bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-300 relative overflow-hidden">
       <div
         className="absolute left-0 top-0 bottom-0 w-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ backgroundColor: cfg.color }}
@@ -49,7 +49,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
             {onDelete && (
               <button
                 onClick={handleDelete}
-                className="text-zinc-700 hover:text-red-400/80 transition-colors cursor-pointer"
+                className="text-zinc-700 hover:text-white transition-colors cursor-pointer"
               >
                 <Trash2 size={13} />
               </button>

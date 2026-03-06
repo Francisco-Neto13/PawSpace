@@ -1,4 +1,4 @@
-'use server';
+﻿'use server';
 
 import prisma from '@/lib/prisma';
 import { getAuthUser } from './auth-helper';
@@ -31,7 +31,7 @@ export async function addSkill(data: any) {
     });
     return { success: true, skill: newSkill };
   } catch (error) {
-    console.error('❌ [Nexus Mutation] Erro ao criar skill:', error);
+    console.error('❌ [Pawspace Mutation] Erro ao criar skill:', error);
     return { success: false };
   }
 }
@@ -56,7 +56,7 @@ export async function updateSkill(skillId: string, data: any) {
     });
     return { success: true, skill: updated };
   } catch (error) {
-    console.error(`❌ [Nexus Mutation] Erro ao atualizar skill ${skillId}:`, error);
+    console.error(`❌ [Pawspace Mutation] Erro ao atualizar skill ${skillId}:`, error);
     return { success: false };
   }
 }
@@ -94,10 +94,10 @@ export async function saveNexusChanges(nodes: any[]) {
       WHERE id IN (${ids}) AND "userId" = '${userId}'
     `);
 
-    console.log(`✅ [Nexus Mutation] Sincronização: ${Date.now() - start}ms`);
+    console.log(`✅ [Pawspace Mutation] Sincronização: ${Date.now() - start}ms`);
     return { success: true };
   } catch (error) {
-    console.error('❌ [Nexus Mutation] Erro no salvamento global:', error);
+    console.error('❌ [Pawspace Mutation] Erro no salvamento global:', error);
     return { success: false };
   }
 }

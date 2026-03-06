@@ -11,7 +11,7 @@ const BODY_MAX    = LIMITS.journal.body;
 
 export async function saveJournalEntry(data: JournalInput) {
   const totalStart = Date.now();
-  console.log(`🚀 [Journal] Iniciando POST: ${data.id ? 'UPDATE' : 'CREATE'}`);
+  console.log(`[Journal] Iniciando POST: ${data.id ? 'UPDATE' : 'CREATE'}`);
 
   const userId = await getAuthUser();
   if (!userId) return { success: false, error: 'Não autorizado' };
@@ -45,12 +45,12 @@ export async function saveJournalEntry(data: JournalInput) {
       });
     }
 
-    console.log(`⏱️  [DB] Persistência Prisma: ${Date.now() - dbStart}ms`);
+    console.log(`[DB] Persistência Prisma: ${Date.now() - dbStart}ms`);
     revalidatePath('/journal');
-    console.log(`✅ [Journal] Operação TOTAL finalizada em: ${Date.now() - totalStart}ms`);
+    console.log(`[Journal] Operação TOTAL finalizada em: ${Date.now() - totalStart}ms`);
     return { success: true, entry };
   } catch (error) {
-    console.error('❌ [Journal Mutation] Erro ao salvar entrada:', error);
+    console.error('[Journal Mutation] Erro ao salvar entrada:', error);
     return { success: false };
   }
 }
@@ -62,10 +62,10 @@ export async function deleteJournalEntry(id: string) {
     const start = Date.now();
     await prisma.journalEntry.delete({ where: { id, userId } });
     revalidatePath('/journal');
-    console.log(`⏱️  [DB] Delete Journal: ${Date.now() - start}ms`);
+    console.log(`[DB] Delete Journal: ${Date.now() - start}ms`);
     return { success: true };
   } catch (error) {
-    console.error('❌ [Journal Mutation] Erro ao deletar entrada:', error);
+    console.error('[Journal Mutation] Erro ao deletar entrada:', error);
     return { success: false };
   }
 }

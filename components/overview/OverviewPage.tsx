@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useMemo, useState, useEffect } from 'react';
 import { useNexus } from '@/shared/contexts/NexusContext';
 import OverviewHeader from './ui/OverviewHeader';
@@ -9,6 +9,7 @@ import CriticalNodesPanel from './features/insights/CriticalNodesPanel';
 import JournalActivityChart from './features/activity/JournalActivityChart';
 import LibraryStatsPanel from './features/insights/LibraryStatsPanel';
 import RecentActivityFeed from './features/activity/RecentActivityFeed';
+import { PawIcon } from '@/components/shared/PawIcon';
 
 interface OverviewContentProps {
   initialData: {
@@ -30,8 +31,8 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
   const stats = useMemo(() => {
     if (!nodes || nodes.length === 0) return initialData;
     const unlocked = nodes.filter(n => {
-      const data = n.data as any;
-      const linksCount = Array.isArray(data?.links) ? data.links.length : 0;
+      const data          = n.data as any;
+      const linksCount    = Array.isArray(data?.links)    ? data.links.length    : 0;
       const contentsCount = Array.isArray(data?.contents) ? data.contents.length : 0;
       return (linksCount + contentsCount) > 0;
     }).length;
@@ -45,12 +46,12 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
 
   if (isLoading && nodes.length === 0) {
     return (
-      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#06090f]">
-        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,#2dd4bf06_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_60%,transparent_100%)]" />
+      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0a0a0a]">
+        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_60%,transparent_100%)]" />
         <div className="relative flex flex-col items-center gap-4">
-          <div className="w-7 h-7 border-2 border-[#2dd4bf]/20 border-t-[#2dd4bf] rounded-full animate-spin" />
-          <p className="text-[#2dd4bf] text-[9px] font-black uppercase tracking-[0.5em] animate-pulse">
-            Sincronizando Nexus...
+          <div className="w-7 h-7 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+          <p className="text-white text-[9px] font-black uppercase tracking-[0.5em] animate-pulse">
+            Sincronizando Pawspace...
           </p>
         </div>
       </div>
@@ -59,23 +60,23 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
 
   return (
     <div
-      className="relative min-h-screen w-full bg-[#06090f] overflow-x-hidden"
+      className="relative min-h-screen w-full bg-[#0a0a0a] overflow-x-hidden"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(6px)',
         transition: 'opacity 0.5s ease, transform 0.5s ease',
       }}
     >
-      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#2dd4bf05_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_50%,transparent_100%)]" />
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_50%,transparent_100%)]" />
 
       <main className="relative z-10 py-8 space-y-4 pb-20">
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-1 h-4 bg-[#2dd4bf]" />
-          <span className="text-[#2dd4bf] text-[9px] font-black uppercase tracking-[0.4em]">
-            Nexus / Overview
+          <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
+          <span className="text-white text-[9px] font-black uppercase tracking-[0.4em]">
+            Pawspace / Visão Geral
           </span>
-          <div className="h-[1px] flex-1 bg-gradient-to-r from-[#2dd4bf]/15 to-transparent" />
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
         </div>
 
         <OverviewHeader
@@ -108,20 +109,21 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2">
-          <div className="lg:col-span-2 border border-white/[0.06] bg-white/[0.02] p-8 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/20 to-transparent" />
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#2dd4bf] mb-6 flex items-center gap-2">
-              <span className="w-1 h-3 bg-[#2dd4bf] inline-block" />
+
+          <div className="lg:col-span-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white mb-6 flex items-center gap-2">
+              <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
               Resumo do Currículo
             </p>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <p className="text-zinc-400 text-sm leading-relaxed font-light max-w-sm">
-                Voce tem conteudo em{' '}
-                <span className="text-white font-bold">{stats.unlocked} modulos</span>,
+                Você tem conteúdo em{' '}
+                <span className="text-white font-bold">{stats.unlocked} módulos</span>,
                 representando{' '}
-                <span className="text-[#2dd4bf] font-black">{stats.progress}%</span>{' '}
-                da sua arvore. Ainda sem conteudo:{' '}
-                <span className="text-zinc-200 font-semibold">{stats.total - stats.unlocked} modulos</span>.
+                <span className="text-white font-black">{stats.progress}%</span>{' '}
+                da sua árvore. Ainda sem conteúdo:{' '}
+                <span className="text-zinc-200 font-semibold">{stats.total - stats.unlocked} módulos</span>.
               </p>
               <div className="flex gap-6 shrink-0 font-mono">
                 <div className="text-right">
@@ -130,31 +132,32 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
                 </div>
                 <div className="w-[1px] bg-white/[0.06]" />
                 <div className="text-right">
-                  <p className="text-[8px] text-zinc-600 uppercase tracking-widest mb-1">Com Conteudo</p>
-                  <p className="text-[#2dd4bf] text-3xl font-black tabular-nums">{stats.unlocked}</p>
+                  <p className="text-[8px] text-zinc-600 uppercase tracking-widest mb-1">Com Conteúdo</p>
+                  <p className="text-white text-3xl font-black tabular-nums">{stats.unlocked}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="border border-[#2dd4bf]/15 bg-[#2dd4bf]/[0.02] p-6 flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/25 to-transparent" />
-            <p className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.4em] mb-4">Próxima Meta</p>
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+            <p className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.4em] mb-4">
+              Próxima Meta
+            </p>
             <div className="flex-1 flex flex-col items-start justify-center gap-3">
-              <div className="border border-[#2dd4bf]/20 px-3 py-1.5 bg-black/40">
-                <p className="text-[#2dd4bf] text-[10px] font-black uppercase tracking-wider">
-                  {stats.progress < 100 ? 'Enriquecer Biblioteca' : 'Cobertura Completa'}
+              <div className="rounded-lg border border-white/15 px-3 py-1.5 bg-black/40">
+                <p className="text-white text-[10px] font-black uppercase tracking-wider">
+                  {stats.progress < 100 ? 'Adicionar Conteúdo' : 'Cobertura Completa'}
                 </p>
               </div>
               <p className="text-[10px] text-zinc-600 font-mono leading-snug">
                 {stats.total - stats.unlocked > 0
-                  ? `${stats.total - stats.unlocked} modulos sem conteudo`
-                  : 'Todos os modulos possuem conteudo.'}
+                  ? `${stats.total - stats.unlocked} módulos sem conteúdo`
+                  : 'Todos os módulos têm conteúdo!'}
               </p>
             </div>
-            <div className="absolute top-2 left-2 w-2 h-2 border-t border-l border-[#2dd4bf]/15" />
-            <div className="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-[#2dd4bf]/15" />
           </div>
+
         </div>
       </main>
     </div>

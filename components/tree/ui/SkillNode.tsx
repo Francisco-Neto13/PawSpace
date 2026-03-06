@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 import React, { memo, useMemo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { SkillData, SkillShape, SHAPE_SIZE } from '../types';
 
 type CompatibleSkillNode = Node<SkillData>;
 
-const DEFAULT_NODE_COLOR = '#2dd4bf';
+const DEFAULT_NODE_COLOR = '#ffffff';
 
 export function SvgDefs() {
   return (
@@ -85,7 +85,7 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
         />
 
         <div
-          className="absolute pointer-events-none bg-[#06090f]"
+          className="absolute pointer-events-none bg-[#0a0a0a]"
           style={{
             inset: '2px',
             clipPath,
@@ -124,7 +124,7 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
           style={{
             fontSize: isRoot ? '12px' : '11px',
             lineHeight: 1.2,
-            color: '#f0ede6',
+            color: '#ffffff',
             textShadow: `0 0 8px ${nodeColor}66`,
           }}
         >
@@ -143,3 +143,4 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
 }
 
 export const SkillNode = memo(SkillNodeComponent);
+

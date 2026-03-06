@@ -1,4 +1,4 @@
-import { Achievement } from '../types';
+﻿import { Achievement } from '../types';
 
 interface AchievementInput {
   activeNodes: number;
@@ -21,8 +21,8 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'first_node',
     title: 'Primeiro Passo',
-    description: 'Adicione conteudo ao primeiro modulo da Skill Tree.',
-    icon: '⚡',
+    description: 'Adicione conteudo ao primeiro modulo da Árvore.',
+    icon: 'P1',
     category: 'tree',
     check: ({ activeNodes }) => activeNodes >= 1,
     progress: ({ activeNodes }) => ({ current: Math.min(activeNodes, 1), total: 1 }),
@@ -30,17 +30,17 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'architect',
     title: 'Arquiteto',
-    description: 'Adicione conteudo em 10 modulos da Skill Tree.',
-    icon: '🏗️',
+    description: 'Adicione conteudo em 10 modulos da Árvore.',
+    icon: 'A10',
     category: 'tree',
     check: ({ activeNodes }) => activeNodes >= 10,
     progress: ({ activeNodes }) => ({ current: Math.min(activeNodes, 10), total: 10 }),
   },
   {
     id: 'nexus_master',
-    title: 'Mestre do Nexus',
-    description: 'Adicione conteudo em 25 modulos da Skill Tree.',
-    icon: '🧠',
+    title: 'Mestre do Pawspace',
+    description: 'Adicione conteudo em 25 modulos da Árvore.',
+    icon: 'N25',
     category: 'tree',
     check: ({ activeNodes }) => activeNodes >= 25,
     progress: ({ activeNodes }) => ({ current: Math.min(activeNodes, 25), total: 25 }),
@@ -50,7 +50,7 @@ const DEFINITIONS: AchievementDefinition[] = [
     id: 'first_entry',
     title: 'Primeira Entrada',
     description: 'Registre sua primeira entrada no Diario.',
-    icon: '📓',
+    icon: 'E1',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 1,
     progress: ({ journalEntries }) => ({ current: Math.min(journalEntries, 1), total: 1 }),
@@ -59,7 +59,7 @@ const DEFINITIONS: AchievementDefinition[] = [
     id: 'chronicler',
     title: 'Cronista',
     description: 'Registre 10 entradas no Diario de Bordo.',
-    icon: '📜',
+    icon: 'C10',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 10,
     progress: ({ journalEntries }) => ({ current: Math.min(journalEntries, 10), total: 10 }),
@@ -68,7 +68,7 @@ const DEFINITIONS: AchievementDefinition[] = [
     id: 'archivist',
     title: 'Arquivista',
     description: 'Registre 20 entradas no Diario de Bordo.',
-    icon: '🗂️',
+    icon: 'A20',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 20,
     progress: ({ journalEntries }) => ({ current: Math.min(journalEntries, 20), total: 20 }),
@@ -78,7 +78,7 @@ const DEFINITIONS: AchievementDefinition[] = [
     id: 'first_content',
     title: 'Primeiro Conhecimento',
     description: 'Adicione seu primeiro conteudo a Biblioteca.',
-    icon: '📚',
+    icon: 'B1',
     category: 'library',
     check: ({ libraryContents }) => libraryContents >= 1,
     progress: ({ libraryContents }) => ({ current: Math.min(libraryContents, 1), total: 1 }),
@@ -87,7 +87,7 @@ const DEFINITIONS: AchievementDefinition[] = [
     id: 'librarian',
     title: 'Bibliotecario',
     description: 'Adicione 20 conteudos a Biblioteca.',
-    icon: '🏛️',
+    icon: 'L20',
     category: 'library',
     check: ({ libraryContents }) => libraryContents >= 20,
     progress: ({ libraryContents }) => ({ current: Math.min(libraryContents, 20), total: 20 }),
@@ -96,8 +96,8 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'initiated',
     title: 'Iniciado',
-    description: 'Atinja 25% de cobertura da Skill Tree.',
-    icon: '🌱',
+    description: 'Atinja 25% de cobertura da Árvore.',
+    icon: '25%',
     category: 'progress',
     check: ({ activeNodes, totalNodes }) => totalNodes > 0 && (activeNodes / totalNodes) >= 0.25,
     progress: ({ activeNodes, totalNodes }) => ({
@@ -108,8 +108,8 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'advanced',
     title: 'Avancado',
-    description: 'Atinja 50% de cobertura da Skill Tree.',
-    icon: '🔥',
+    description: 'Atinja 50% de cobertura da Árvore.',
+    icon: '50%',
     category: 'progress',
     check: ({ activeNodes, totalNodes }) => totalNodes > 0 && (activeNodes / totalNodes) >= 0.5,
     progress: ({ activeNodes, totalNodes }) => ({
@@ -119,9 +119,9 @@ const DEFINITIONS: AchievementDefinition[] = [
   },
   {
     id: 'nexus_complete',
-    title: 'Nexus Completo',
-    description: 'Tenha conteudo em todos os modulos da Skill Tree.',
-    icon: '🏆',
+    title: 'Pawspace Completo',
+    description: 'Tenha conteudo em todos os modulos da Árvore.',
+    icon: '100%',
     category: 'progress',
     check: ({ activeNodes, totalNodes }) => totalNodes > 0 && activeNodes >= totalNodes,
     progress: ({ activeNodes, totalNodes }) => ({
@@ -144,7 +144,7 @@ export function computeAchievements(input: AchievementInput): Achievement[] {
 }
 
 export const CATEGORY_LABELS: Record<Achievement['category'], string> = {
-  tree: 'Skill Tree',
+  tree: 'Árvore',
   journal: 'Diario',
   library: 'Biblioteca',
   progress: 'Progresso',

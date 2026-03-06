@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useCallback, useEffect } from 'react';
 import { useNexus, SkillNode } from '@/contexts/NexusContext';
 import { SkillData } from '@/components/tree/types';
@@ -35,7 +35,7 @@ export function useSkillActions() {
   }, [setNodes]);
 
   const handleDelete = useCallback((nodeId: string) => {
-    if (!confirm('Eliminar este no e todos os protocolos dependentes?')) return;
+    if (!confirm('Eliminar este no e todos os dependencias??')) return;
     setNodes((prev) => prev.filter(n => n.id !== nodeId));
     setEdges((prev) => prev.filter(e => e.source !== nodeId && e.target !== nodeId));
   }, [setNodes, setEdges]);
@@ -59,7 +59,7 @@ export function useSkillActions() {
       label: 'Novo Protocolo',
       description: 'Defina as diretrizes deste no.',
       icon: '*' ,
-      color: '#2dd4bf',
+      color: '#ffffff',
       shape: 'hexagon' as SkillShape,
       category: 'keystone' as any,
       parentId: parentId ?? undefined,
@@ -186,4 +186,5 @@ export function useSkillActions() {
     handleGlobalSave,
   };
 }
+
 

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect } from 'react';
 import { Calendar, Tag, Trash2, CloudCheck, Loader2, ChevronDown } from 'lucide-react';
 import { EditorToolbar } from './EditorToolbar';
@@ -67,7 +67,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
 
   return (
     <div
-      className="flex flex-col bg-white/[0.01] border border-white/[0.04] rounded-sm shadow-2xl"
+      className="flex flex-col bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-hidden shadow-2xl"
       style={{
         height: 'calc(100dvh - var(--navbar-height) - 120px)',
         position: 'sticky',
@@ -86,7 +86,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             className="w-full bg-transparent text-white text-xl font-black outline-none placeholder:text-zinc-700 tracking-wide antialiased pr-16"
           />
           {showTitleWarn && (
-            <span className={`absolute right-0 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold tabular-nums ${titleRemaining <= 5 ? 'text-red-400' : 'text-zinc-500'}`}>
+            <span className={`absolute right-0 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold tabular-nums ${titleRemaining <= 5 ? 'text-white' : 'text-zinc-500'}`}>
               {titleRemaining}
             </span>
           )}
@@ -126,7 +126,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                   >
                     Nenhum vínculo
                   </button>
-                  <div className="max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(45,212,191,0.1) transparent' }}>
+                  <div className="max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
                     {availableSkills.map(s => (
                       <button
                         key={s.id}
@@ -147,7 +147,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
           <div className="flex items-center gap-2 ml-auto">
             <div className="flex items-center gap-2 mr-4">
               {isSaving ? (
-                <span className="flex items-center gap-1.5 text-[8px] text-[#2dd4bf] font-black uppercase animate-pulse">
+                <span className="flex items-center gap-1.5 text-[8px] text-[#ffffff] font-black uppercase animate-pulse">
                   <Loader2 size={10} className="animate-spin" />
                   Sincronizando...
                 </span>
@@ -160,7 +160,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             </div>
             <button
               onClick={onDelete}
-              className="flex items-center gap-1.5 text-zinc-500 hover:text-red-400/80 text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer antialiased"
+              className="flex items-center gap-1.5 text-zinc-500 hover:text-white text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer antialiased"
             >
               <Trash2 size={10} />
               Excluir
@@ -179,12 +179,12 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             onInput={handleBodyInput}
             onBlur={save}
             className="h-full overflow-y-auto px-8 py-10 text-zinc-200 text-sm font-light leading-relaxed outline-none prose prose-invert max-w-none antialiased"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(45,212,191,0.1) transparent' }}
+            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
           />
 
           {showBodyCounter && (
             <div className="absolute bottom-4 right-6 pointer-events-none">
-              <span className={`text-[9px] font-mono font-bold tabular-nums ${bodyRemaining <= 200 ? 'text-red-400' : 'text-zinc-600'}`}>
+              <span className={`text-[9px] font-mono font-bold tabular-nums ${bodyRemaining <= 200 ? 'text-white' : 'text-zinc-600'}`}>
                 {bodyRemaining.toLocaleString()} restantes
               </span>
             </div>
@@ -194,3 +194,4 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
     </div>
   );
 }
+
