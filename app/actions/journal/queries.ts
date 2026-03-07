@@ -11,10 +11,13 @@ export async function getJournalEntries() {
     const start = Date.now();
     const entries = await prisma.journalEntry.findMany({
       where: { userId },
-      include: {
-        skill: {
-          select: { name: true, color: true, icon: true }
-        }
+      select: {
+        id: true,
+        title: true,
+        body: true,
+        skillId: true,
+        createdAt: true,
+        updatedAt: true,
       },
       orderBy: { createdAt: 'desc' },
     });

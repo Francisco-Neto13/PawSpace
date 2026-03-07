@@ -1,5 +1,5 @@
 ﻿'use client';
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Node, Edge } from '@xyflow/react';
 import { SkillData } from '@/components/tree/types';
 import { getSkillsFull } from '@/app/actions/skills';
@@ -102,16 +102,28 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
     refreshNexus();
   }, [refreshNexus]);
 
+  const contextValue = useMemo(
+    () => ({
+      nodes, edges, setNodes, setEdges,
+      isLoading, isDirty, setIsDirty,
+      isSaving, setIsSaving,
+      originalNodeIds, refreshNexus,
+      globalStats, refreshGlobalStats,
+    }),
+    [
+      nodes,
+      edges,
+      isLoading,
+      isDirty,
+      isSaving,
+      refreshNexus,
+      globalStats,
+      refreshGlobalStats,
+    ]
+  );
+
   return (
-    <NexusContext.Provider
-      value={{
-        nodes, edges, setNodes, setEdges,
-        isLoading, isDirty, setIsDirty,
-        isSaving, setIsSaving,
-        originalNodeIds, refreshNexus,
-        globalStats, refreshGlobalStats,
-      }}
-    >
+    <NexusContext.Provider value={contextValue}>
       {children}
     </NexusContext.Provider>
   );

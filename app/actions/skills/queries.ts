@@ -11,7 +11,24 @@ export async function getSkillsFull() {
     const start = Date.now();
     const skills = await prisma.skill.findMany({
       where: { userId },
-      include: { contents: true },
+      select: {
+        id: true,
+        userId: true,
+        name: true,
+        description: true,
+        icon: true,
+        category: true,
+        shape: true,
+        color: true,
+        parentId: true,
+        positionX: true,
+        positionY: true,
+        createdAt: true,
+        updatedAt: true,
+        contents: {
+          select: { id: true },
+        },
+      },
       orderBy: { createdAt: 'asc' },
     });
 

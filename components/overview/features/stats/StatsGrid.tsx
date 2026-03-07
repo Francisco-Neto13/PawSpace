@@ -1,5 +1,5 @@
 ﻿'use client';
-import { useMemo, useState, useEffect } from 'react';
+import { memo, useMemo } from 'react';
 import { Zap, Target, Layout, LucideIcon } from 'lucide-react';
 
 interface StatsGridProps {
@@ -16,38 +16,31 @@ interface StatItem {
   barWidth: number;
 }
 
-export default function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 120);
-    return () => clearTimeout(t);
-  }, []);
-
+function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
   const stats = useMemo<StatItem[]>(() => {
     const pending      = totalCount - unlockedCount;
     const progressSafe = totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
     const pendingSafe  = totalCount > 0 ? (pending / totalCount) * 100 : 0;
     return [
       {
-        label: 'Patas com Conteúdo',
-        value: unlockedCount,
-        sub: `de ${totalCount} no roadmap`,
-        icon: Zap,
+        label:    'Patas com Conteúdo',
+        value:    unlockedCount,
+        sub:      `de ${totalCount} no roadmap`,
+        icon:     Zap,
         barWidth: progressSafe,
       },
       {
-        label: 'Cobertura',
-        value: `${progress}%`,
-        sub: 'da árvore de conhecimento',
-        icon: Target,
+        label:    'Cobertura',
+        value:    `${progress}%`,
+        sub:      'da árvore de conhecimento',
+        icon:     Target,
         barWidth: progress,
       },
       {
-        label: 'Sem Conteúdo',
-        value: pending,
-        sub: 'módulos ainda vazios',
-        icon: Layout,
+        label:    'Sem Conteúdo',
+        value:    pending,
+        sub:      'módulos ainda vazios',
+        icon:     Layout,
         barWidth: pendingSafe,
       },
     ];
@@ -55,7 +48,7 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {stats.map((item, i) => (
+      {stats.map((item) => (
         <div
           key={item.label}
           className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden group"
@@ -63,9 +56,8 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
           <div className="absolute top-0 left-0 right-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
           <div className="p-7 flex flex-col justify-between h-full">
-
             <div className="flex justify-between items-start mb-6">
-              <item.icon size={18} className="text-white opacity-40" />
+              <item.icon size={18} className="text-white opacity-30 group-hover:opacity-60 transition-opacity duration-300" />
               <div className="flex gap-1.5">
                 {[0, 1, 2].map(d => (
                   <div key={d} className="w-1 h-1 rounded-full bg-white/15 group-hover:bg-white/30 transition-colors duration-300" />
@@ -89,10 +81,9 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
               <div className="h-[2px] w-full bg-white/[0.06] overflow-hidden">
                 <div
                   style={{
-                    width: mounted ? `${item.barWidth}%` : '0%',
+                    width: `${item.barWidth}%`,
                     backgroundColor: '#ffffff',
                     height: '100%',
-                    transition: `width 1s cubic-bezier(0.16,1,0.3,1) ${i * 80}ms`,
                   }}
                 />
               </div>
@@ -103,7 +94,6 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
                 </span>
               </div>
             </div>
-
           </div>
 
           <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-white/[0.08] group-hover:border-white/20 transition-colors duration-300" />
@@ -112,3 +102,5 @@ export default function StatsGrid({ unlockedCount, totalCount, progress }: Stats
     </section>
   );
 }
+
+export default memo(StatsGrid);

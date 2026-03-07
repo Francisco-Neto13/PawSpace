@@ -1,5 +1,5 @@
 ﻿'use client';
-import { useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { useLibrary } from '@/contexts/LibraryContext';
 import { PawIcon } from '@/components/shared/PawIcon';
@@ -23,8 +23,9 @@ const TYPE_COLORS: Record<string, string> = {
   note:    'rgba(255,255,255,0.12)',
 };
 
-export default function LibraryStatsPanel() {
+function LibraryStatsPanel() {
   const { nodeContents } = useLibrary();
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const { byType, totalContents, totalNodes } = useMemo(() => {
     const typeMap: Record<string, number> = {};
@@ -41,7 +42,10 @@ export default function LibraryStatsPanel() {
       });
     });
 
-    const byType = Object.entries(typeMap).map(([name, value]) => ({ name, value }));
+    const byType = Object.entries(typeMap)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+
     return { byType, totalContents: total, totalNodes: nodes };
   }, [nodeContents]);
 
@@ -60,6 +64,8 @@ export default function LibraryStatsPanel() {
     );
   }
 
+  const activeType = activeIndex !== null ? byType[activeIndex] : null;
+
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
@@ -71,42 +77,83 @@ export default function LibraryStatsPanel() {
       <p className="text-[9px] text-zinc-600 mb-6 ml-3">conteúdos por tipo</p>
 
       <div className="flex items-center gap-6">
-        <ResponsiveContainer width={120} height={120}>
-          <PieChart>
-            <Pie
-              data={byType}
-              cx="50%"
-              cy="50%"
-              innerRadius={35}
-              outerRadius={55}
-              paddingAngle={3}
-              dataKey="value"
-            >
-              {byType.map((entry, i) => (
-                <Cell
-                  key={i}
-                  fill={TYPE_COLORS[entry.name] ?? 'rgba(255,255,255,0.1)'}
-                  stroke="transparent"
-                />
-              ))}
-            </Pie>
-            <Tooltip content={<CustomTooltip />} />
-          </PieChart>
-        </ResponsiveContainer>
+        <div className="relative shrink-0" style={{ width: 120, height: 120 }}>
+          <ResponsiveContainer width={120} height={120}>
+            <PieChart>
+              <Pie
+                data={byType}
+                cx="50%"
+                cy="50%"
+                innerRadius={35}
+                outerRadius={55}
+                paddingAngle={3}
+                dataKey="value"
+                onMouseEnter={(_, index) => setActiveIndex(index)}
+                onMouseLeave={() => setActiveIndex(null)}
+                isAnimationActive={false}
+              >
+                {byType.map((entry, i) => (
+                  <Cell
+                    key={i}
+                    fill={TYPE_COLORS[entry.name] ?? 'rgba(255,255,255,0.1)'}
+                    stroke="transparent"
+                    style={{ cursor: 'pointer' }}
+                    opacity={activeIndex === null || activeIndex === i ? 1 : 0.35}
+                  />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+            </PieChart>
+          </ResponsiveContainer>
+
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span className="text-white font-mono font-black text-sm leading-none">
+              {activeType ? activeType.value : totalContents}
+            </span>
+            <span className="text-zinc-600 text-[7px] uppercase tracking-wider font-bold mt-0.5">
+              {activeType ? activeType.name : 'itens'}
+            </span>
+          </div>
+        </div>
 
         <div className="flex-1 space-y-2">
-          {byType.map(t => (
-            <div key={t.name} className="flex items-center gap-2">
+          {byType.map((t, i) => {
+            const pct      = totalContents > 0 ? Math.round((t.value / totalContents) * 100) : 0;
+            const isActive = activeIndex === i;
+            return (
               <div
-                className="w-2 h-2 shrink-0"
-                style={{ backgroundColor: TYPE_COLORS[t.name] ?? 'rgba(255,255,255,0.1)' }}
-              />
-              <span className="text-[9px] text-zinc-400 uppercase tracking-wider font-bold flex-1">
-                {t.name}
-              </span>
-              <span className="text-[9px] text-zinc-500 font-mono">{t.value}</span>
-            </div>
-          ))}
+                key={t.name}
+                className="flex items-center gap-2 cursor-default"
+                style={{
+                  opacity: activeIndex === null || isActive ? 1 : 0.35,
+                  transition: 'opacity 0.15s ease',
+                }}
+                onMouseEnter={() => setActiveIndex(i)}
+                onMouseLeave={() => setActiveIndex(null)}
+              >
+                <div
+                  className="w-2 h-2 shrink-0"
+                  style={{
+                    backgroundColor: TYPE_COLORS[t.name] ?? 'rgba(255,255,255,0.1)',
+                    transform: isActive ? 'scale(1.4)' : 'scale(1)',
+                    transition: 'transform 0.15s ease',
+                  }}
+                />
+                <span
+                  className="text-[9px] uppercase tracking-wider font-bold flex-1"
+                  style={{
+                    color: isActive ? 'rgba(255,255,255,0.8)' : '#a1a1aa',
+                    transition: 'color 0.15s ease',
+                  }}
+                >
+                  {t.name}
+                </span>
+                <span className="text-[9px] text-zinc-600 font-mono w-5 text-right">{pct}%</span>
+                <span className="text-[9px] text-zinc-500 font-mono w-4 text-right">{t.value}</span>
+              </div>
+            );
+          })}
+
           <div className="pt-2 border-t border-white/[0.04]">
             <span className="text-[8px] text-zinc-600 uppercase tracking-wider font-bold">
               {totalContents} itens em {totalNodes} módulos
@@ -117,3 +164,5 @@ export default function LibraryStatsPanel() {
     </div>
   );
 }
+
+export default memo(LibraryStatsPanel);

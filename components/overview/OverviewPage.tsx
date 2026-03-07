@@ -1,5 +1,5 @@
 ﻿'use client';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useNexus } from '@/shared/contexts/NexusContext';
 import OverviewHeader from './ui/OverviewHeader';
 import StatsGrid from './features/stats/StatsGrid';
@@ -11,6 +11,13 @@ import LibraryStatsPanel from './features/insights/LibraryStatsPanel';
 import RecentActivityFeed from './features/activity/RecentActivityFeed';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { PageBackground } from '@/components/shared/PageBackground';
+import LazyMount from './ui/LazyMount';
+import { buildOverviewSnapshot } from './lib/overviewMetrics';
+
+const deferredSectionStyle = {
+  contentVisibility: 'auto' as const,
+  containIntrinsicSize: '1px 700px',
+};
 
 interface OverviewContentProps {
   initialData: {
@@ -22,28 +29,12 @@ interface OverviewContentProps {
 
 export default function OverviewContent({ initialData }: OverviewContentProps) {
   const { nodes, edges, isLoading } = useNexus();
-  const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 80);
-    return () => clearTimeout(t);
-  }, []);
-
-  const stats = useMemo(() => {
-    if (!nodes || nodes.length === 0) return initialData;
-    const unlocked = nodes.filter(n => {
-      const data          = n.data as any;
-      const linksCount    = Array.isArray(data?.links)    ? data.links.length    : 0;
-      const contentsCount = Array.isArray(data?.contents) ? data.contents.length : 0;
-      return (linksCount + contentsCount) > 0;
-    }).length;
-    const total = nodes.length;
-    return {
-      total,
-      unlocked,
-      progress: total > 0 ? Math.round((unlocked / total) * 100) : 0,
-    };
-  }, [nodes, initialData]);
+  const snapshot = useMemo(
+    () => buildOverviewSnapshot(nodes, edges, initialData),
+    [nodes, edges, initialData]
+  );
+  const stats = snapshot.stats;
 
   if (isLoading && nodes.length === 0) {
     return (
@@ -63,14 +54,7 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
     <div className="relative min-h-screen w-full overflow-x-hidden">
       <PageBackground src="/cat.webp" />
 
-      <main
-        className="relative z-10 py-8 space-y-4 pb-20"
-        style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0)' : 'translateY(6px)',
-          transition: 'opacity 0.5s ease, transform 0.5s ease',
-        }}
-      >
+      <main className="relative z-10 py-8 space-y-4 pb-20">
 
         <div className="flex items-center gap-3 mb-6">
           <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
@@ -92,24 +76,32 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
           progress={stats.progress}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <CategoryChart nodes={nodes} />
-          <TreeDepthChart nodes={nodes} edges={edges} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={deferredSectionStyle}>
+          <LazyMount minHeight={330}>
+            <CategoryChart data={snapshot.categoryData} />
+          </LazyMount>
+          <LazyMount minHeight={330}>
+            <TreeDepthChart data={snapshot.depthData} maxGapLevel={snapshot.maxGapLevel} />
+          </LazyMount>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4" style={deferredSectionStyle}>
           <div className="lg:col-span-2">
-            <JournalActivityChart />
+            <LazyMount minHeight={290}>
+              <JournalActivityChart />
+            </LazyMount>
           </div>
-          <LibraryStatsPanel />
+          <LazyMount minHeight={290}>
+            <LibraryStatsPanel />
+          </LazyMount>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <CriticalNodesPanel nodes={nodes} edges={edges} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={deferredSectionStyle}>
+          <CriticalNodesPanel critical={snapshot.criticalNodes} />
           <RecentActivityFeed nodes={nodes} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2" style={deferredSectionStyle}>
 
           <div className="lg:col-span-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
