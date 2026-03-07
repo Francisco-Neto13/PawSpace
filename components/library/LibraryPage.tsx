@@ -1,7 +1,7 @@
 ﻿'use client';
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { PageBackground } from '@/components/shared/PageBackground';
 
@@ -20,19 +20,16 @@ export default function LibraryPage() {
   const searchParams = useSearchParams();
   const nodeIdFromUrl = searchParams.get('nodeId');
 
-  const { nodes, isLoading: isLoadingNexus } = useNexus();
+  const { nodes, isLoading: isLoadingNexus, refreshGlobalStats } = useNexus();
   const { invalidateOverview } = useOverview();
-  const library = useLibrary();
-  const preloadAllContents =
-    (library as { preloadAllContents?: (focusNodeId?: string) => Promise<void> }).preloadAllContents
-    ?? (async () => {});
   const {
     nodeContents,
     loadingNodeId,
     loadNodeContents,
+    preloadAllContents,
     addNodeContent,
     removeNodeContent,
-  } = library;
+  } = useLibrary();
 
   const [visible, setVisible] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -62,22 +59,29 @@ export default function LibraryPage() {
     };
   }, [isLoadingNexus, nodes.length]);
 
-  useEffect(() => {
-    if (isLoadingNexus || nodes.length === 0) return;
-    const targetId = (nodeIdFromUrl && nodes.find(n => n.id === nodeIdFromUrl))
-      ? nodeIdFromUrl
-      : (selectedNodeId || nodes[0].id);
-    if (targetId !== selectedNodeId) {
-      setSelectedNodeId(targetId);
-      loadNodeContents(targetId);
+  const resolvedSelectedNodeId = useMemo(() => {
+    if (isLoadingNexus || nodes.length === 0) return null;
+
+    if (nodeIdFromUrl && nodes.some((node) => node.id === nodeIdFromUrl)) {
+      return nodeIdFromUrl;
     }
-  }, [nodes, isLoadingNexus, nodeIdFromUrl, selectedNodeId, loadNodeContents]);
+
+    if (selectedNodeId && nodes.some((node) => node.id === selectedNodeId)) {
+      return selectedNodeId;
+    }
+
+    return nodes[0]?.id ?? null;
+  }, [isLoadingNexus, nodes, nodeIdFromUrl, selectedNodeId]);
 
   useEffect(() => {
-    if (isLoadingNexus || nodes.length === 0) return;
-    const warmNodeId = selectedNodeId || nodeIdFromUrl || nodes[0].id;
-    preloadAllContents(warmNodeId || undefined);
-  }, [isLoadingNexus, nodes, selectedNodeId, nodeIdFromUrl, preloadAllContents]);
+    if (!resolvedSelectedNodeId) return;
+    void loadNodeContents(resolvedSelectedNodeId);
+  }, [resolvedSelectedNodeId, loadNodeContents]);
+
+  useEffect(() => {
+    if (!resolvedSelectedNodeId) return;
+    void preloadAllContents(resolvedSelectedNodeId);
+  }, [resolvedSelectedNodeId, preloadAllContents]);
 
   const mappedNodes = useMemo(() => nodes.map(n => ({
     ...n,
@@ -88,12 +92,12 @@ export default function LibraryPage() {
   })) as SkillNode[], [nodes, nodeContents]);
 
   const selectedNode = useMemo(() =>
-    mappedNodes.find(n => n.id === selectedNodeId) ?? mappedNodes[0],
-  [mappedNodes, selectedNodeId]);
+    mappedNodes.find(n => n.id === resolvedSelectedNodeId) ?? mappedNodes[0],
+  [mappedNodes, resolvedSelectedNodeId]);
 
   const currentContents = useMemo(
-    () => (selectedNodeId ? nodeContents[selectedNodeId] : []) ?? [],
-    [nodeContents, selectedNodeId]
+    () => (resolvedSelectedNodeId ? nodeContents[resolvedSelectedNodeId] : []) ?? [],
+    [nodeContents, resolvedSelectedNodeId]
   );
 
   const filteredContents = useMemo(() => currentContents.filter(c => {
@@ -107,13 +111,14 @@ export default function LibraryPage() {
     [nodeContents]
   );
 
-  const isLoadingContents = loadingNodeId === selectedNodeId;
+  const isLoadingContents = loadingNodeId === resolvedSelectedNodeId;
 
   const handleDelete = async (id: string) => {
     const result = await deleteContent(id);
-    if (result.success && selectedNodeId) {
-      removeNodeContent(selectedNodeId, id);
+    if (result.success && resolvedSelectedNodeId) {
+      removeNodeContent(resolvedSelectedNodeId, id);
       invalidateOverview();
+      void refreshGlobalStats();
     }
   };
 
@@ -215,7 +220,7 @@ export default function LibraryPage() {
         <div className="flex gap-8" style={{ minHeight: 'calc(100dvh - var(--navbar-height) - 120px)' }}>
           <LibrarySidebar
             nodes={mappedNodes}
-            selectedNodeId={selectedNodeId || ''}
+            selectedNodeId={resolvedSelectedNodeId || ''}
             onSelect={id => {
               setSelectedNodeId(id);
               setSearch('');
@@ -274,14 +279,15 @@ export default function LibraryPage() {
         isOpen={showAddContent}
         onClose={() => setShowAddContent(false)}
         onSuccess={(createdContent) => {
-          if (selectedNodeId) {
+          if (resolvedSelectedNodeId) {
             if (createdContent) {
-              addNodeContent(selectedNodeId, createdContent);
+              addNodeContent(resolvedSelectedNodeId, createdContent);
               invalidateOverview();
+              void refreshGlobalStats();
             }
           }
         }}
-        skillId={selectedNodeId || ''}
+        skillId={resolvedSelectedNodeId || ''}
       />
     </div>
   );

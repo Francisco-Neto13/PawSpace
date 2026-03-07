@@ -6,9 +6,13 @@ interface EmojiPickerProps {
   currentEmoji: string;
 }
 
+interface EmojiHubItem {
+  htmlCode: string[];
+}
+
 export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [emojis, setEmojis] = useState<any[]>([]);
+  const [emojis, setEmojis] = useState<EmojiHubItem[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchEmojis = useCallback(async () => {
@@ -20,8 +24,17 @@ export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
     setLoading(true);
     try {
       const res = await fetch('https://emojihub.yurace.pro/api/all/category/objects');
-      const data = await res.json();
-      setEmojis(data.slice(0, 50)); 
+      const data: unknown = await res.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Formato de resposta inválido para emojis');
+      }
+      const parsed = data.filter((item): item is EmojiHubItem =>
+        typeof item === 'object' &&
+        item !== null &&
+        'htmlCode' in item &&
+        Array.isArray((item as { htmlCode: unknown }).htmlCode)
+      );
+      setEmojis(parsed.slice(0, 50));
       setIsOpen(true);
     } catch (error) {
       console.error("Falha ao acessar banco de emojis:", error);

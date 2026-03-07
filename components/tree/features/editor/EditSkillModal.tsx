@@ -1,14 +1,14 @@
 ﻿'use client';
-import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { SkillForm } from './SkillForm';
+import { SkillForm, type SkillFormData } from './SkillForm';
 import { useNexus } from '@/contexts/NexusContext';
+import type { SkillData } from '../../types';
 
 interface EditSkillModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: (skillId: string, data: any) => Promise<void>;
-  skillData?: any;
+  onUpdate: (skillId: string, data: Partial<SkillData>) => Promise<void>;
+  skillData?: (SkillData & { id: string }) | null;
   existingSkills: { id: string; name: string }[];
 }
 
@@ -34,25 +34,21 @@ export function EditSkillModal({
   existingSkills,
 }: EditSkillModalProps) {
   const { setNodes } = useNexus();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  if (!isOpen || !skillData || typeof document === 'undefined') return null;
 
-  if (!isOpen || !skillData || !mounted) return null;
-
-  const handleFormSubmit = async (formData: any) => {
+  const handleFormSubmit = async (formData: SkillFormData) => {
     setNodes((nds) =>
       nds.map((node) =>
         node.id === skillData.id
-          ? { 
-              ...node, 
-              data: { 
-                ...node.data, 
-                ...formData, 
-                label: formData.name || formData.label 
-              } 
+          ? {
+              ...node,
+              data: {
+                ...node.data,
+                ...formData,
+                label: formData.label,
+                name: formData.label,
+              },
             }
           : node
       )
@@ -61,17 +57,20 @@ export function EditSkillModal({
     onClose();
 
     try {
-      await onUpdate(skillData.id, formData);
+      await onUpdate(skillData.id, {
+        ...formData,
+        name: formData.label,
+      });
     } catch (error) {
-      console.error("Erro ao sincronizar com o servidor:", error);
+      console.error('Erro ao sincronizar com o servidor:', error);
     }
   };
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 isolate">
-      <div 
-        className="absolute inset-0 bg-black/90 backdrop-blur-md cursor-pointer" 
-        onClick={onClose} 
+      <div
+        className="absolute inset-0 bg-black/90 backdrop-blur-md cursor-pointer"
+        onClick={onClose}
       />
 
       <div
@@ -122,6 +121,7 @@ export function EditSkillModal({
 
             <div className="relative z-10 pointer-events-auto">
               <SkillForm
+                key={skillData.id}
                 onSubmit={handleFormSubmit}
                 onCancel={onClose}
                 isEditing={true}
@@ -131,7 +131,7 @@ export function EditSkillModal({
             </div>
 
             <div className="mt-8 flex justify-center gap-3 opacity-20 relative z-10">
-              {[0, 1, 2].map(i => (
+              {[0, 1, 2].map((i) => (
                 <div
                   key={i}
                   className="w-1.5 h-1.5 rotate-45 border border-[#ffffff]"

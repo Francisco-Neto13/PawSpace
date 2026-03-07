@@ -8,7 +8,7 @@ import { AchievementGrid } from './features/list/AchievementGrid';
 import { PageBackground } from '@/components/shared/PageBackground';
 
 export function AchievementsPage() {
-  const { nodes, globalStats } = useNexus();
+  const { nodes, globalStats, refreshGlobalStats } = useNexus();
 
   const [visible, setVisible] = useState(false);
   const [filter, setFilter] = useState<FilterCategory>('all');
@@ -18,12 +18,19 @@ export function AchievementsPage() {
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    void refreshGlobalStats();
+  }, [refreshGlobalStats]);
+
   const achievements = useMemo(() => {
+    const getContentCount = (nodeData: { links?: unknown; contents?: unknown }) => {
+      const linksCount = Array.isArray(nodeData.links) ? nodeData.links.length : 0;
+      const contentsCount = Array.isArray(nodeData.contents) ? nodeData.contents.length : 0;
+      return linksCount + contentsCount;
+    };
+
     const activeNodes = nodes.filter(n => {
-      const data = n.data as any;
-      const linksCount = Array.isArray(data?.links) ? data.links.length : 0;
-      const contentsCount = Array.isArray(data?.contents) ? data.contents.length : 0;
-      return (linksCount + contentsCount) > 0;
+      return getContentCount(n.data) > 0;
     }).length;
 
     return computeAchievements({

@@ -87,7 +87,7 @@ export function generateTreeLayout(
         positionY: finalY,
         icon: skill.icon ?? '??',
         color: skill.color,
-        links: (skill as any).contents ?? (skill as any).links ?? [],
+        links: skill.contents ?? [],
       },
     });
 
@@ -120,9 +120,8 @@ export function calculateRecursiveProgress(
   edges: Edge[]
 ): Node<SkillData>[] {
   const hasContent = (node: Node<SkillData>) => {
-    const data = node.data as any;
-    const linksCount = Array.isArray(data?.links) ? data.links.length : 0;
-    const contentsCount = Array.isArray(data?.contents) ? data.contents.length : 0;
+    const linksCount = Array.isArray(node.data.links) ? node.data.links.length : 0;
+    const contentsCount = Array.isArray(node.data.contents) ? node.data.contents.length : 0;
     return (linksCount + contentsCount) > 0;
   };
 
@@ -176,9 +175,8 @@ export function calculateRecursiveProgress(
 export function calculateGlobalProgress(nodes: Node<SkillData>[]): number {
   if (nodes.length === 0) return 0;
   const withContent = nodes.filter(n => {
-    const data = n.data as any;
-    const linksCount = Array.isArray(data?.links) ? data.links.length : 0;
-    const contentsCount = Array.isArray(data?.contents) ? data.contents.length : 0;
+    const linksCount = Array.isArray(n.data.links) ? n.data.links.length : 0;
+    const contentsCount = Array.isArray(n.data.contents) ? n.data.contents.length : 0;
     return (linksCount + contentsCount) > 0;
   }).length;
   return Math.round((withContent / nodes.length) * 100);

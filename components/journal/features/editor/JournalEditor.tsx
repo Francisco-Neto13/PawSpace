@@ -20,6 +20,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
   const { bodyRef, title, setTitle, skillId, setSkillId, isSaving, save, scheduleBodySave } = useJournalSinc(entry, onUpdate);
   const [showSkillPicker, setShowSkillPicker] = useState(false);
   const [bodyLength, setBodyLength] = useState(0);
+  const isTemporaryEntry = entry.id.startsWith('temp-');
 
   const skill = getSkill(skillId, skills);
   const availableSkills = skills;
@@ -80,10 +81,13 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
           <input
             type="text"
             value={title}
+            disabled={isTemporaryEntry}
             onChange={e => setTitle(e.target.value.slice(0, TITLE_MAX))}
             placeholder="Título da entrada..."
             maxLength={TITLE_MAX}
-            className="w-full bg-transparent text-white text-xl font-black outline-none placeholder:text-zinc-500 tracking-wide antialiased pr-16"
+            className={`w-full bg-transparent text-white text-xl font-black outline-none placeholder:text-zinc-500 tracking-wide antialiased pr-16 ${
+              isTemporaryEntry ? 'opacity-60 cursor-not-allowed' : ''
+            }`}
           />
           {showTitleWarn && (
             <span className={`absolute right-0 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold tabular-nums ${titleRemaining <= 5 ? 'text-white' : 'text-zinc-400'}`}>
@@ -102,8 +106,11 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
 
           <div className="relative">
             <button
+              disabled={isTemporaryEntry}
               onClick={() => setShowSkillPicker(!showSkillPicker)}
-              className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer hover:opacity-80 antialiased"
+              className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest transition-colors antialiased ${
+                isTemporaryEntry ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:opacity-80'
+              }`}
               style={{ color: skill?.color ?? '#a1a1aa' }}
             >
               <Tag size={9} />
@@ -146,7 +153,12 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
 
           <div className="flex items-center gap-2 ml-auto">
             <div className="flex items-center gap-2 mr-4">
-              {isSaving ? (
+              {isTemporaryEntry ? (
+                <span className="flex items-center gap-1.5 text-[8px] text-[#ffffff] font-black uppercase animate-pulse">
+                  <Loader2 size={10} className="animate-spin" />
+                  Criando entrada...
+                </span>
+              ) : isSaving ? (
                 <span className="flex items-center gap-1.5 text-[8px] text-[#ffffff] font-black uppercase animate-pulse">
                   <Loader2 size={10} className="animate-spin" />
                   Sincronizando...
@@ -174,11 +186,13 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
         <div className="relative flex-1 min-h-0">
           <div
             ref={bodyRef}
-            contentEditable
+            contentEditable={!isTemporaryEntry}
             suppressContentEditableWarning
-            onInput={handleBodyInput}
-            onBlur={save}
-            className="h-full overflow-y-auto px-8 py-10 text-zinc-200 text-sm font-light leading-relaxed outline-none prose prose-invert max-w-none antialiased"
+            onInput={isTemporaryEntry ? undefined : handleBodyInput}
+            onBlur={isTemporaryEntry ? undefined : save}
+            className={`h-full overflow-y-auto px-8 py-10 text-zinc-200 text-sm font-light leading-relaxed outline-none prose prose-invert max-w-none antialiased ${
+              isTemporaryEntry ? 'opacity-70 cursor-wait' : ''
+            }`}
             style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
           />
 

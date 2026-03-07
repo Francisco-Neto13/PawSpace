@@ -4,7 +4,19 @@ import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'rechar
 import { useJournal } from '@/contexts/JournalContext';
 import { PawIcon } from '@/components/shared/PawIcon';
 
-function CustomTooltip({ active, payload }: any) {
+type JournalActivityDatum = {
+  label: string;
+  count: number;
+  isCurrentMonth: boolean;
+  isPeak: boolean;
+};
+
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: JournalActivityDatum }>;
+}
+
+function CustomTooltip({ active, payload }: TooltipProps) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (

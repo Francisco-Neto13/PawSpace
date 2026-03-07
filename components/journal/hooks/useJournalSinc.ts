@@ -6,6 +6,7 @@ import { useJournal } from '@/shared/contexts/JournalContext';
 
 export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalEntry) => void) {
   const { setPending } = useJournal();
+  const isTemporaryEntry = entry.id.startsWith('temp-');
 
   const [isSaving, setIsSaving] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -25,6 +26,11 @@ export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalE
   useEffect(() => { onUpdateRef.current = onUpdate; }, [onUpdate]);
 
   const updatePending = useCallback(() => {
+    if (isTemporaryEntry) {
+      setPending(null);
+      return;
+    }
+
     if (!bodyRef.current) return;
     const currentBody = bodyRef.current.innerHTML;
     const currentEntry = entryRef.current;
@@ -45,9 +51,10 @@ export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalE
       body: currentBody,
       skillId: skillIdRef.current,
     });
-  }, [setPending]);
+  }, [isTemporaryEntry, setPending]);
 
   const save = useCallback(async () => {
+    if (isTemporaryEntry) return;
     if (!bodyRef.current) return;
     if (isSavingRef.current) return;
 
@@ -65,7 +72,6 @@ export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalE
 
     isSavingRef.current = true;
     setIsSaving(true);
-    setPending(null); 
 
     try {
       const result = await saveJournalEntry({
@@ -75,6 +81,7 @@ export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalE
         skillId: currentSkillId,
       });
       if (result.success && result.entry) {
+        setPending(null);
         onUpdateRef.current(result.entry as unknown as JournalEntry);
       }
     } catch (e) {
@@ -83,22 +90,24 @@ export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalE
       isSavingRef.current = false;
       setIsSaving(false);
     }
-  }, [setPending]);
+  }, [isTemporaryEntry, setPending]);
 
   useEffect(() => {
+    if (isTemporaryEntry) return;
     updatePending();
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(save, 300);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [title, skillId, save, updatePending]);
+  }, [title, skillId, save, updatePending, isTemporaryEntry]);
 
   const scheduleBodySave = useCallback(() => {
+    if (isTemporaryEntry) return;
     updatePending();
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(save, 300);
-  }, [save, updatePending]);
+  }, [save, updatePending, isTemporaryEntry]);
 
   useEffect(() => {
     setPending(null);

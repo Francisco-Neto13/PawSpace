@@ -6,7 +6,12 @@ import { CategoryCoverageDatum } from '@/components/overview/lib/overviewMetrics
 
 interface Props { data: CategoryCoverageDatum[] }
 
-function CustomTooltip({ active, payload }: any) {
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: CategoryCoverageDatum }>;
+}
+
+function CustomTooltip({ active, payload }: TooltipProps) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (

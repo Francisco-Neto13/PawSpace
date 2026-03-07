@@ -154,8 +154,9 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
                   >
                     {t.name}
                   </span>
-                  <span className="text-[9px] text-zinc-400 font-mono w-5 text-right">{pct}%</span>
-                  <span className="text-[9px] text-zinc-500 font-mono w-4 text-right">{t.value}</span>
+                  <span className="text-[9px] text-zinc-400 font-mono min-w-[64px] text-right">
+                    {pct}% ({t.value})
+                  </span>
                 </div>
               );
             })}

@@ -12,8 +12,8 @@ import { useOverview } from '@/shared/contexts/OverviewContext';
 import { saveJournalEntry, deleteJournalEntry } from '@/app/actions/journal';
 
 export default function JournalPage() {
-  const { nodes, isLoading: isLoadingNexus } = useNexus();
-  const { entries, setEntries, isLoading: isLoadingEntries } = useJournal();
+  const { nodes, isLoading: isLoadingNexus, refreshGlobalStats } = useNexus();
+  const { entries, setEntries, isLoading: isLoadingEntries, flushPending } = useJournal();
   const { invalidateOverview } = useOverview();
 
   const [visible, setVisible] = useState(false);
@@ -69,6 +69,7 @@ export default function JournalPage() {
         setEntries(prev => prev.map(e => e.id === tempId ? realEntry : e));
         setSelectedId(realEntry.id);
         invalidateOverview();
+        void refreshGlobalStats();
       } else {
         throw new Error();
       }
@@ -96,6 +97,7 @@ export default function JournalPage() {
       const result = await deleteJournalEntry(id);
       if (!result.success) throw new Error();
       invalidateOverview();
+      void refreshGlobalStats();
     } catch {
       setEntries(previousEntries);
       setSelectedId(id);
@@ -103,6 +105,17 @@ export default function JournalPage() {
       setIsSaving(false);
     }
   };
+
+  const handleSelectEntry = (id: string) => {
+    void flushPending();
+    setSelectedId(id);
+  };
+
+  useEffect(() => {
+    return () => {
+      void flushPending();
+    };
+  }, [flushPending]);
 
   if (isLoadingNexus && nodes.length === 0) {
     return (
@@ -161,7 +174,7 @@ export default function JournalPage() {
             entries={entries}
             skills={skillList}
             selectedId={selectedId || ''}
-            onSelect={setSelectedId}
+            onSelect={handleSelectEntry}
           />
 
           <main className="flex-1 min-w-0 border border-white/[0.06] bg-white/[0.02] flex flex-col relative rounded-2xl overflow-hidden shadow-2xl">

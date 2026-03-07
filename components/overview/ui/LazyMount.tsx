@@ -14,18 +14,15 @@ export default function LazyMount({
   rootMargin = '200px 0px',
 }: LazyMountProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const supportsIntersectionObserver = typeof IntersectionObserver !== 'undefined';
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    if (!supportsIntersectionObserver) return;
     if (isVisible) return;
 
     const el = containerRef.current;
     if (!el) return;
-
-    if (typeof IntersectionObserver === 'undefined') {
-      setIsVisible(true);
-      return;
-    }
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -41,11 +38,11 @@ export default function LazyMount({
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [isVisible, rootMargin]);
+  }, [isVisible, rootMargin, supportsIntersectionObserver]);
 
   return (
     <div ref={containerRef} className="h-full" style={{ minHeight }}>
-      {isVisible ? (
+      {isVisible || !supportsIntersectionObserver ? (
         children
       ) : (
         <div

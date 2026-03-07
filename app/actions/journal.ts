@@ -2,8 +2,9 @@
 
 import * as mutations from './journal/mutations';
 import * as queries from './journal/queries';
+import type { JournalInput } from './journal/types';
 
-export async function saveJournalEntry(data: any) { 
+export async function saveJournalEntry(data: JournalInput) { 
   return mutations.saveJournalEntry(data); 
 }
 

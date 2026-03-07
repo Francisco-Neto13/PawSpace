@@ -12,12 +12,13 @@ import { NodeContextMenu } from './ui/NodeContextMenu';
 import { TreeOnboarding } from './ui/TreeOnboarding';
 import { TreeEmptyState } from './ui/TreeEmptyState';
 
-import { useNexus } from '@/contexts/NexusContext';
+import { useNexus, type SkillNode } from '@/contexts/NexusContext';
 import { useOverview } from '@/contexts/OverviewContext';
 import { useSkillTree, SkillTreeProvider } from '@/contexts/SkillTreeContext';
 import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
 import { PageBackground } from '../shared/PageBackground';
+import type { SkillData } from './types';
 
 interface ContextMenu {
   x: number;
@@ -33,7 +34,7 @@ const defaultEdgeOptions = {
   style: { strokeWidth: 2, transition: 'stroke 0.5s ease' },
 };
 
-function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }) {
+function CenterOnRoot({ nodes, isLoading }: { nodes: SkillNode[]; isLoading: boolean }) {
   const { fitView } = useReactFlow();
   const [hasCentered, setHasCentered] = useState(false);
 
@@ -133,8 +134,14 @@ function SkillTreeInner() {
 
   const panelData = useMemo(() => {
     if (!selectedNode) return null;
-    return { ...selectedNode.data, id: selectedNode.id } as any;
+    return { ...selectedNode.data, id: selectedNode.id } as SkillData & { id: string };
   }, [selectedNode]);
+
+  const editingSkillData = useMemo(() => {
+    const node = nodes.find((n) => n.id === editingSkillId);
+    if (!node) return null;
+    return { ...node.data, id: node.id } as SkillData & { id: string };
+  }, [nodes, editingSkillId]);
 
   return (
     <div
@@ -191,7 +198,7 @@ function SkillTreeInner() {
 
       <div style={{ width: '100%', height: '100%' }} className="relative">
         <ReactFlow
-          nodes={nodes as any}
+          nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
@@ -207,7 +214,7 @@ function SkillTreeInner() {
               x: e.clientX,
               y: e.clientY,
               nodeId: node.id,
-              nodeName: (node.data as any).label || (node.data as any).name || '',
+              nodeName: node.data.label || node.data.name || '',
             });
           }}
           onPaneClick={() => {
@@ -257,10 +264,10 @@ function SkillTreeInner() {
         onUpdate={async (id, data) => {
           await handleUpdateSkill(id, data);
         }}
-        skillData={nodes.find(n => n.id === editingSkillId)?.data as any}
+        skillData={editingSkillData}
         existingSkills={nodes.map(n => ({
           id: n.id,
-          name: (n.data as any).label || (n.data as any).name || '',
+          name: n.data.label || n.data.name || '',
         }))}
       />
 

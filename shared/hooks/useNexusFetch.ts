@@ -33,8 +33,10 @@ export function useNexusFetch<T>(
       if (!controller.signal.aborted) {
         setData(result);
       }
-    } catch (e: any) {
-      if (e.name !== 'AbortError') console.error(e);
+    } catch (e: unknown) {
+      if (!(e instanceof Error && e.name === 'AbortError')) {
+        console.error(e);
+      }
     } finally {
       if (!controller.signal.aborted) setIsLoading(false);
     }

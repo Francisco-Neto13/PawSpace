@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link2, Video, FileText, StickyNote, X } from 'lucide-react';
 import { addContent, uploadPdf } from '@/app/actions/library';
+import type { ContentInput } from '@/app/actions/library/types';
 import { ContentType } from '../../types';
 import { LinkForm, VideoForm } from './UrlForms';
 import { PdfForm } from './PdfForm';
@@ -84,7 +85,7 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
     setIsLoading(true);
 
     try {
-      let payload: any = { skillId, type: activeTab, title: form.title.trim() };
+      const payload: ContentInput = { skillId, type: activeTab, title: form.title.trim() };
 
       if (activeTab === 'link' || activeTab === 'video') payload.url = form.url.trim();
 

@@ -9,7 +9,12 @@ interface Props {
   maxGapLevel: string | null;
 }
 
-function CustomTooltip({ active, payload }: any) {
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: DepthDistributionDatum }>;
+}
+
+function CustomTooltip({ active, payload }: TooltipProps) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   const gap = d.total - d.withContent;

@@ -124,11 +124,16 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
 
       if (result.success) {
         pendingRef.current = null;
-        setEntries(prev => prev.map(e =>
-          e.id === snapshot.id
-            ? { ...e, title: snapshot.title, body: snapshot.body, skillId: snapshot.skillId }
-            : e
-        ));
+        if (result.entry && snapshot.id.startsWith('temp-')) {
+          const realEntry = result.entry as unknown as JournalEntry;
+          setEntries(prev => prev.map(e => (e.id === snapshot.id ? realEntry : e)));
+        } else {
+          setEntries(prev => prev.map(e =>
+            e.id === snapshot.id
+              ? { ...e, title: snapshot.title, body: snapshot.body, skillId: snapshot.skillId }
+              : e
+          ));
+        }
       }
     } catch (error) {
       console.error('[Journal] Flush failed:', error);

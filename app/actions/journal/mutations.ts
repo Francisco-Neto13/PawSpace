@@ -1,4 +1,4 @@
-'use server';
+﻿'use server';
 import prisma from '@/shared/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { JournalInput } from './types';
@@ -6,48 +6,50 @@ import { getAuthUser } from './auth-helper';
 import { LIMITS } from '@/shared/lib/limits';
 
 const MAX_ENTRIES = LIMITS.quantity.journalEntries;
-const TITLE_MAX   = LIMITS.journal.title;
-const BODY_MAX    = LIMITS.journal.body;
+const TITLE_MAX = LIMITS.journal.title;
+const BODY_MAX = LIMITS.journal.body;
 
 export async function saveJournalEntry(data: JournalInput) {
   const totalStart = Date.now();
-  console.log(`[Journal] Iniciando POST: ${data.id ? 'UPDATE' : 'CREATE'}`);
+  const isTemporaryId = Boolean(data.id && data.id.startsWith('temp-'));
+  const shouldUpdate = Boolean(data.id && !isTemporaryId);
+
+  console.log(`[Journal] Iniciando POST: ${shouldUpdate ? 'UPDATE' : 'CREATE'}`);
 
   const userId = await getAuthUser();
-  if (!userId) return { success: false, error: 'Não autorizado' };
+  if (!userId) return { success: false, error: 'Nao autorizado' };
 
   const title = (data.title || '').trim();
-  const body  = (data.body  || '').trim();
+  const body = (data.body || '').trim();
 
-  if (title.length > TITLE_MAX)
-    return { success: false, error: `Título pode ter no máximo ${TITLE_MAX} caracteres.` };
-  if (body.length > BODY_MAX)
-    return { success: false, error: `Conteúdo pode ter no máximo ${BODY_MAX} caracteres.` };
+  if (title.length > TITLE_MAX) {
+    return { success: false, error: `Titulo pode ter no maximo ${TITLE_MAX} caracteres.` };
+  }
+  if (body.length > BODY_MAX) {
+    return { success: false, error: `Conteudo pode ter no maximo ${BODY_MAX} caracteres.` };
+  }
 
-  if (!data.id) {
+  if (!shouldUpdate) {
     const count = await prisma.journalEntry.count({ where: { userId } });
-    if (count >= MAX_ENTRIES)
-      return { success: false, error: `Limite de ${MAX_ENTRIES} entradas no diário atingido.` };
+    if (count >= MAX_ENTRIES) {
+      return { success: false, error: `Limite de ${MAX_ENTRIES} entradas no diario atingido.` };
+    }
   }
 
   try {
     const dbStart = Date.now();
-    let entry;
+    const entry = shouldUpdate
+      ? await prisma.journalEntry.update({
+          where: { id: data.id, userId },
+          data: { title, body, skillId: data.skillId || null },
+        })
+      : await prisma.journalEntry.create({
+          data: { title, body, userId, skillId: data.skillId || null },
+        });
 
-    if (data.id) {
-      entry = await prisma.journalEntry.update({
-        where: { id: data.id, userId },
-        data: { title, body, skillId: data.skillId || null },
-      });
-    } else {
-      entry = await prisma.journalEntry.create({
-        data: { title, body, userId, skillId: data.skillId || null },
-      });
-    }
-
-    console.log(`[DB] Persistência Prisma: ${Date.now() - dbStart}ms`);
+    console.log(`[DB] Persistencia Prisma: ${Date.now() - dbStart}ms`);
     revalidatePath('/journal');
-    console.log(`[Journal] Operação TOTAL finalizada em: ${Date.now() - totalStart}ms`);
+    console.log(`[Journal] Operacao TOTAL finalizada em: ${Date.now() - totalStart}ms`);
     return { success: true, entry };
   } catch (error) {
     console.error('[Journal Mutation] Erro ao salvar entrada:', error);
@@ -64,7 +66,7 @@ export async function deleteJournalEntry(id: string) {
     revalidatePath('/journal');
     console.log(`[DB] Delete Journal: ${Date.now() - start}ms`);
     if (result.count === 0) {
-      console.warn(`[Journal Mutation] Entrada não encontrada para delete (id=${id}).`);
+      console.warn(`[Journal Mutation] Entrada nao encontrada para delete (id=${id}).`);
       return { success: true, alreadyDeleted: true };
     }
     return { success: true };

@@ -1,29 +1,37 @@
 ﻿'use client';
 import { useCallback, useEffect } from 'react';
-import { useNexus, SkillNode } from '@/contexts/NexusContext';
-import { SkillData } from '@/components/tree/types';
+import type { Edge } from '@xyflow/react';
+import { useNexus, type SkillNode } from '@/contexts/NexusContext';
+import type { SkillData, SkillShape } from '@/components/tree/types';
 import { updateSkill, saveNexusChanges, deleteSkill, addSkill } from '@/app/actions/skills';
 import { getNewChildPosition } from '@/utils/treeUtils';
-import { SkillShape } from '../types';
-import { Edge } from '@xyflow/react';
+
+interface SkillPreviewDetail {
+  skillId: string;
+  label?: string;
+  color?: string;
+  icon?: string;
+}
 
 export function useSkillActions() {
   const { nodes, edges, setNodes, setEdges, refreshNexus, originalNodeIds } = useNexus();
 
   useEffect(() => {
     const handlePreview = (e: Event) => {
-      const { skillId, label, color, icon } = (e as CustomEvent).detail;
-      if (!skillId) return;
+      const detail = (e as CustomEvent<SkillPreviewDetail>).detail;
+      if (!detail?.skillId) return;
 
-      setNodes((prev) => prev.map(n =>
+      const { skillId, label, color, icon } = detail;
+
+      setNodes((prev) => prev.map((n) =>
         n.id === skillId
           ? ({
               ...n,
               data: {
                 ...n.data,
-                ...(label !== undefined && { label, name: label }),
-                ...(color !== undefined && { color }),
-                ...(icon  !== undefined && { icon }),
+                ...(label !== undefined ? { label, name: label } : {}),
+                ...(color !== undefined ? { color } : {}),
+                ...(icon !== undefined ? { icon } : {}),
               },
             } as SkillNode)
           : n
@@ -36,16 +44,17 @@ export function useSkillActions() {
 
   const handleDelete = useCallback((nodeId: string) => {
     if (!confirm('Remover este módulo e todas as conexões?')) return;
-    setNodes((prev) => prev.filter(n => n.id !== nodeId));
-    setEdges((prev) => prev.filter(e => e.source !== nodeId && e.target !== nodeId));
+    setNodes((prev) => prev.filter((n) => n.id !== nodeId));
+    setEdges((prev) => prev.filter((e) => e.source !== nodeId && e.target !== nodeId));
   }, [setNodes, setEdges]);
 
   const handleCreateQuickSkill = useCallback((parentId: string | null) => {
-    let positionX = 0, positionY = 0;
-    const parentNode = parentId ? nodes.find(n => n.id === parentId) : null;
+    let positionX = 0;
+    let positionY = 0;
+    const parentNode = parentId ? nodes.find((n) => n.id === parentId) : null;
 
     if (parentNode) {
-      const siblingCount = edges.filter(e => e.source === parentId).length;
+      const siblingCount = edges.filter((e) => e.source === parentId).length;
       const pos = getNewChildPosition(parentNode.position.x, parentNode.position.y, siblingCount);
       positionX = pos.x;
       positionY = pos.y;
@@ -58,10 +67,10 @@ export function useSkillActions() {
       name: 'Novo Módulo',
       label: 'Novo Módulo',
       description: 'Defina os objetivos deste módulo.',
-      icon: '*' ,
+      icon: '*',
       color: '#ffffff',
       shape: 'hexagon' as SkillShape,
-      category: 'keystone' as any,
+      category: 'keystone',
       parentId: parentId ?? undefined,
       positionX,
       positionY,
@@ -79,7 +88,7 @@ export function useSkillActions() {
     setNodes((nds) => [...nds, tempNode]);
 
     if (parentId) {
-      setEdges((eds) => [...eds, {
+      const edge: Edge = {
         id: `e-${parentId}-${tempId}`,
         source: parentId,
         target: tempId,
@@ -87,14 +96,15 @@ export function useSkillActions() {
         data: {
           category: parentNode?.data.category ?? 'keystone',
         },
-      }] as Edge[]);
+      };
+      setEdges((eds) => [...eds, edge]);
     }
 
     return tempId;
   }, [nodes, edges, setNodes, setEdges]);
 
   const handleUpdateSkill = useCallback(async (skillId: string, data: Partial<SkillData>) => {
-    setNodes((prev) => prev.map(n =>
+    setNodes((prev) => prev.map((n) =>
       n.id === skillId
         ? ({
             ...n,
@@ -118,11 +128,11 @@ export function useSkillActions() {
 
   const handleGlobalSave = useCallback(async () => {
     try {
-      const currentIds = new Set(nodes.map(n => n.id));
+      const currentIds = new Set(nodes.map((n) => n.id));
 
-      const toCreate = nodes.filter(n => n.id.startsWith('temp-'));
-      const toDelete = [...originalNodeIds.current].filter(id => !currentIds.has(id));
-      const toUpdate = nodes.filter(n => !n.id.startsWith('temp-'));
+      const toCreate = nodes.filter((n) => n.id.startsWith('temp-'));
+      const toDelete = [...originalNodeIds.current].filter((id) => !currentIds.has(id));
+      const toUpdate = nodes.filter((n) => !n.id.startsWith('temp-'));
 
       const tempToReal: Record<string, string> = {};
       for (const node of toCreate) {
@@ -131,15 +141,17 @@ export function useSkillActions() {
           description: node.data.description || '',
           icon: node.data.icon,
           color: node.data.color,
-          shape: node.data.shape as string,
-          category: node.data.category as string,
+          shape: node.data.shape,
+          category: typeof node.data.category === 'string' ? node.data.category : 'keystone',
           parentId: node.data.parentId || null,
           positionX: node.position.x,
           positionY: node.position.y,
         });
 
         if (!result.success) {
-          const msg = (result as any).error || 'Erro ao criar módulo.';
+          const msg = 'error' in result && typeof result.error === 'string'
+            ? result.error
+            : 'Erro ao criar módulo.';
           alert(msg);
           return false;
         }
@@ -154,16 +166,16 @@ export function useSkillActions() {
       }
 
       if (toUpdate.length > 0) {
-        await saveNexusChanges(toUpdate as any);
+        await saveNexusChanges(toUpdate);
       }
 
       if (Object.keys(tempToReal).length > 0) {
-        setNodes(prev => prev.map(n => {
+        setNodes((prev) => prev.map((n) => {
           const realId = tempToReal[n.id];
           if (!realId) return n;
           return { ...n, id: realId, data: { ...n.data, id: realId } } as SkillNode;
         }));
-        setEdges(prev => prev.map(e => ({
+        setEdges((prev) => prev.map((e) => ({
           ...e,
           id: tempToReal[e.target] ? `e-${e.source}-${tempToReal[e.target]}` : e.id,
           target: tempToReal[e.target] || e.target,
@@ -186,4 +198,3 @@ export function useSkillActions() {
     handleGlobalSave,
   };
 }
-

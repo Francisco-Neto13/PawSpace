@@ -3,6 +3,28 @@ import { createContext, useContext, useState, useCallback, useEffect, useRef } f
 import { usePathname } from 'next/navigation';
 import { Content } from '@/components/library/types';
 
+type LibraryContentRow = {
+  id: string;
+  skillId: string;
+  type: Content['type'] | string;
+  title: string;
+  url?: string | null;
+  fileKey?: string | null;
+  body?: string | null;
+  createdAt: Date | string;
+};
+
+function isLibraryContentRow(value: unknown): value is LibraryContentRow {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<LibraryContentRow>;
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.skillId === 'string' &&
+    typeof candidate.title === 'string' &&
+    candidate.createdAt !== undefined
+  );
+}
+
 interface LibraryContextType {
   nodeContents: Record<string, Content[]>;
   loadingNodeId: string | null;
@@ -34,13 +56,13 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     skipHydrationRef.current = skipHydration;
   }, [skipHydration]);
 
-  const normalizeContent = useCallback((c: any): Content => ({
+  const normalizeContent = useCallback((c: LibraryContentRow): Content => ({
     ...c,
     type: c.type as Content['type'],
     createdAt: new Date(c.createdAt).toISOString().slice(0, 10),
   }), []);
 
-  const groupBySkillId = useCallback((rows: any[]) => (
+  const groupBySkillId = useCallback((rows: LibraryContentRow[]) => (
     rows.reduce<Record<string, Content[]>>((acc, c) => {
       const key = c.skillId;
       if (!acc[key]) acc[key] = [];
@@ -57,7 +79,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       const { getAllContentsForLibrary } = await import('@/app/actions/library');
       const allContents = await getAllContentsForLibrary();
       if (skipHydrationRef.current) return;
-      const grouped = groupBySkillId(allContents as any[]);
+      const grouped = groupBySkillId(allContents as LibraryContentRow[]);
       setNodeContents(prev => ({ ...prev, ...grouped }));
       hasLoadedAllRef.current = true;
     } catch (e) {
@@ -85,22 +107,22 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       const allContents = await getAllContentsForLibrary();
       if (controller.signal.aborted || skipHydrationRef.current) return;
 
-      const grouped = groupBySkillId(allContents as any[]);
+      const grouped = groupBySkillId(allContents as LibraryContentRow[]);
       setNodeContents(prev => ({
         ...prev,
         ...grouped,
         [nodeId]: grouped[nodeId] ?? [],
       }));
       hasLoadedAllRef.current = true;
-    } catch (e: any) {
-      if (e?.name === 'AbortError') return;
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name === 'AbortError') return;
       try {
         const { getContentsBySkill } = await import('@/app/actions/library');
         const updated = await getContentsBySkill(nodeId);
         if (!controller.signal.aborted && !skipHydrationRef.current) {
           setNodeContents(prev => ({
             ...prev,
-            [nodeId]: (updated as any[]).map(normalizeContent),
+            [nodeId]: (updated as LibraryContentRow[]).map(normalizeContent),
           }));
         }
       } catch (fallbackError) {
@@ -120,7 +142,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       if (skipHydrationRef.current) return;
       setNodeContents(prev => ({
         ...prev,
-        [nodeId]: (updated as any[]).map(normalizeContent),
+        [nodeId]: (updated as LibraryContentRow[]).map(normalizeContent),
       }));
     } finally {
       setLoadingNodeId(null);
@@ -128,6 +150,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
   }, [normalizeContent]);
 
   const addNodeContent = useCallback((nodeId: string, content: unknown) => {
+    if (!isLibraryContentRow(content)) return;
     const normalized = normalizeContent(content);
     setNodeContents(prev => {
       const current = prev[nodeId] ?? [];

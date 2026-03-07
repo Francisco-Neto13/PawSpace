@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { createClient } from '@/shared/supabase/client';
 import { useNexus } from '@/shared/contexts/NexusContext';
+import { useJournal } from '@/shared/contexts/JournalContext';
 
 const Navbar = forwardRef<HTMLElement>((_, ref) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,10 +14,11 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
   const supabase = createClient();
 
   const { isDirty, setIsDirty, discardLocalChanges } = useNexus();
+  const { flushPending } = useJournal();
 
   if (pathname === '/login') return null;
 
-  const handleSafeNavigation = (e: React.MouseEvent, href: string) => {
+  const handleSafeNavigation = async (e: React.MouseEvent, href: string) => {
     e.preventDefault();
     if (href === pathname) {
       setIsOpen(false);
@@ -31,6 +33,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
       discardLocalChanges();
       setIsDirty(false);
     }
+    await flushPending();
     setIsOpen(false);
     router.push(href);
   };
@@ -52,6 +55,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
       setIsDirty(false);
     }
     try {
+      await flushPending();
       await supabase.auth.signOut();
       router.push('/login');
       router.refresh();
