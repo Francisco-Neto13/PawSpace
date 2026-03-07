@@ -60,9 +60,13 @@ export async function deleteJournalEntry(id: string) {
   if (!userId) return { success: false };
   try {
     const start = Date.now();
-    await prisma.journalEntry.delete({ where: { id, userId } });
+    const result = await prisma.journalEntry.deleteMany({ where: { id, userId } });
     revalidatePath('/journal');
     console.log(`[DB] Delete Journal: ${Date.now() - start}ms`);
+    if (result.count === 0) {
+      console.warn(`[Journal Mutation] Entrada não encontrada para delete (id=${id}).`);
+      return { success: true, alreadyDeleted: true };
+    }
     return { success: true };
   } catch (error) {
     console.error('[Journal Mutation] Erro ao deletar entrada:', error);

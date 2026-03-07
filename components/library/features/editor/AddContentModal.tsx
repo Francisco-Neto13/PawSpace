@@ -40,7 +40,7 @@ const inputClass = "w-full bg-white/[0.02] border border-white/[0.08] p-3.5 text
 interface AddContentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (createdContent?: unknown) => void;
   skillId: string;
 }
 
@@ -106,7 +106,7 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
       const result = await addContent(payload);
       if (!result.success) throw new Error('Falha ao salvar');
 
-      onSuccess();
+      onSuccess(result.content);
       handleClose();
     } catch (err) {
       console.error('❌ [AddContentModal] Erro:', err);

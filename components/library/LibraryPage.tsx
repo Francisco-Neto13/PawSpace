@@ -19,8 +19,18 @@ export default function LibraryPage() {
   const searchParams = useSearchParams();
   const nodeIdFromUrl = searchParams.get('nodeId');
 
-  const { nodes, isLoading: isLoadingNexus, refreshNexus } = useNexus();
-  const { nodeContents, loadingNodeId, loadNodeContents, refreshNodeContents } = useLibrary();
+  const { nodes, isLoading: isLoadingNexus } = useNexus();
+  const library = useLibrary();
+  const preloadAllContents =
+    (library as { preloadAllContents?: (focusNodeId?: string) => Promise<void> }).preloadAllContents
+    ?? (async () => {});
+  const {
+    nodeContents,
+    loadingNodeId,
+    loadNodeContents,
+    addNodeContent,
+    removeNodeContent,
+  } = library;
 
   const [visible, setVisible] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -61,6 +71,12 @@ export default function LibraryPage() {
     }
   }, [nodes, isLoadingNexus, nodeIdFromUrl, selectedNodeId, loadNodeContents]);
 
+  useEffect(() => {
+    if (isLoadingNexus || nodes.length === 0) return;
+    const warmNodeId = selectedNodeId || nodeIdFromUrl || nodes[0].id;
+    preloadAllContents(warmNodeId || undefined);
+  }, [isLoadingNexus, nodes, selectedNodeId, nodeIdFromUrl, preloadAllContents]);
+
   const mappedNodes = useMemo(() => nodes.map(n => ({
     ...n,
     name: n.data.name || n.data.label || 'Sem Nome',
@@ -94,10 +110,7 @@ export default function LibraryPage() {
   const handleDelete = async (id: string) => {
     const result = await deleteContent(id);
     if (result.success && selectedNodeId) {
-      await Promise.all([
-        refreshNodeContents(selectedNodeId),
-        refreshNexus(),
-      ]);
+      removeNodeContent(selectedNodeId, id);
     }
   };
 
@@ -257,12 +270,11 @@ export default function LibraryPage() {
       <AddContentModal
         isOpen={showAddContent}
         onClose={() => setShowAddContent(false)}
-        onSuccess={async () => {
+        onSuccess={(createdContent) => {
           if (selectedNodeId) {
-            await Promise.all([
-              refreshNodeContents(selectedNodeId),
-              refreshNexus(),
-            ]);
+            if (createdContent) {
+              addNodeContent(selectedNodeId, createdContent);
+            }
           }
         }}
         skillId={selectedNodeId || ''}

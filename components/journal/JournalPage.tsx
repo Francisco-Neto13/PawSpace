@@ -79,11 +79,14 @@ export default function JournalPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Deseja deletar esta entrada?')) return;
+    if (isSaving) return;
 
     const previousEntries = [...entries];
     const remaining = entries.filter(e => e.id !== id);
     setEntries(remaining);
     setSelectedId(remaining[0]?.id ?? null);
+
+    if (id.startsWith('temp-')) return;
 
     setIsSaving(true);
     try {
