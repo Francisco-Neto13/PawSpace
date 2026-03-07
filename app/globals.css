@@ -1,59 +1,112 @@
 ﻿@import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --rpg-gold: #ffffff;
-  --rpg-gold-bright: #ffffff;
-  --rpg-muted: #3a3830;
-  --rpg-glow: rgba(255,255,255,0.3);
-  
-  --font-main: var(--font-geist-sans), sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --bg-base:          #0a0a0a;   
+  --bg-surface:       rgba(255,255,255,0.02); 
+  --bg-elevated:      rgba(255,255,255,0.04); 
+  --bg-input:         rgba(0,0,0,0.40);      
+
+  --border-subtle:    rgba(255,255,255,0.06); 
+  --border-muted:     rgba(255,255,255,0.08);  
+  --border-visible:   rgba(255,255,255,0.15);  
+
+  --text-primary:     rgba(255,255,255,0.95);  
+  --text-secondary:   rgba(255,255,255,0.60);  
+  --text-muted:       #71717a;                  
+  --text-faint:       #3f3f46;                 
+
+  --shimmer-via:      rgba(255,255,255,0.15);
+
+  --background:       var(--bg-base);
+  --foreground:       var(--text-primary);
+  --rpg-gold:         #ffffff;
+  --rpg-gold-bright:  #ffffff;
+  --rpg-muted:        #3a3830;
+  --rpg-glow:         rgba(255,255,255,0.3);
+  --font-main:        var(--font-geist-sans), sans-serif;
+  --font-mono:        var(--font-geist-mono), monospace;
 
   color-scheme: dark;
 }
 
+.light {
+  --bg-base:          #f4f4f5;
+  --bg-surface:       rgba(0,0,0,0.02);
+  --bg-elevated:      rgba(0,0,0,0.05);
+  --bg-input:         rgba(255,255,255,0.80);
+
+  --border-subtle:    rgba(0,0,0,0.07);
+  --border-muted:     rgba(0,0,0,0.10);
+  --border-visible:   rgba(0,0,0,0.18);
+
+  --text-primary:     rgba(0,0,0,0.90);
+  --text-secondary:   rgba(0,0,0,0.55);
+  --text-muted:       #71717a;
+  --text-faint:       #a1a1aa;
+
+  --shimmer-via:      rgba(0,0,0,0.08);
+
+  --background:       var(--bg-base);
+  --foreground:       var(--text-primary);
+  --rpg-gold:         #18181b;
+  --rpg-gold-bright:  #18181b;
+  --rpg-muted:        #d4d4d8;
+  --rpg-glow:         rgba(0,0,0,0.15);
+
+  color-scheme: light;
+}
+
+/* ============================================================
+   BACKGROUNDS:
+   bg-[#0a0a0a]              → bg-[var(--bg-base)]
+   bg-white/[0.02]           → bg-[var(--bg-surface)]
+   bg-white/[0.04]           → bg-[var(--bg-elevated)]
+   bg-black/40               → bg-[var(--bg-input)]
+
+   BORDERS:
+   border-white/[0.06]       → border-[var(--border-subtle)]
+   border-white/[0.08]       → border-[var(--border-muted)]
+   border-white/[0.15]       → border-[var(--border-visible)]
+
+   TEXT:
+   text-white                → text-[var(--text-primary)]
+   text-white/60             → text-[var(--text-secondary)]
+   text-zinc-500 / zinc-600  → text-[var(--text-muted)]
+   text-zinc-700 / zinc-800  → text-[var(--text-faint)]
+
+   SHIMMER (gradiente topo dos cards):
+   via-white/15              → via-[var(--shimmer-via)]
+
+   ============================================================ */
+
 @layer base {
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: var(--background);
-  }
-
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-base); }
   ::-webkit-scrollbar-thumb {
     background: var(--rpg-muted);
     border-radius: 10px;
-    border: 1px solid var(--background);
+    border: 1px solid var(--bg-base);
   }
-
   ::-webkit-scrollbar-thumb:hover {
     background: var(--rpg-gold);
     box-shadow: 0 0 8px var(--rpg-glow);
   }
-
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--rpg-muted) var(--background);
-  }
+  * { scrollbar-width: thin; scrollbar-color: var(--rpg-muted) var(--bg-base); }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-rpg-gold: var(--rpg-gold);
-  --color-rpg-muted: var(--rpg-muted);
+  --color-rpg-gold:   var(--rpg-gold);
+  --color-rpg-muted:  var(--rpg-muted);
 }
 
 body {
-  background: var(--background);
-  color: #e4e4e4;      
+  background: var(--bg-base);
+  color: var(--text-primary);
   font-family: var(--font-main);
   font-size: 16px;
-  font-weight: 500;     
+  font-weight: 500;
   line-height: 1.6;
   letter-spacing: 0.01em;
   margin: 0;
@@ -65,122 +118,67 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   scrollbar-gutter: stable;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-h1, h2, h3, h4, h5, h6,
-button,
-.skill-label-text {
+h1, h2, h3, h4, h5, h6, button, .skill-label-text {
   font-family: var(--font-main);
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: 0.02em;
 }
-
-.skill-label-text {
-  font-size: 0.75rem;
-}
-
+.skill-label-text { font-size: 0.75rem; }
 .text-technical, .font-mono {
   font-family: var(--font-mono);
   font-size: 0.95em;
   letter-spacing: 0.05em;
   color: var(--rpg-gold);
 }
-
 .text-glow-gold {
   color: var(--rpg-gold-bright);
   text-shadow: 0 0 12px var(--rpg-glow);
 }
-
-.glass-reflection {
-  position: relative;
-  overflow: hidden;
-}
-
+.glass-reflection { position: relative; overflow: hidden; }
 .glass-reflection::after {
   content: "";
   position: absolute;
-  top: -150%;
-  left: -150%;
-  width: 300%;
-  height: 300%;
-  background: linear-gradient(
-    45deg,
-    transparent 45%,
-    rgba(255, 255, 255, 0.03) 50%,
-    transparent 55%
-  );
-  animation: shine 12s infinite; 
+  top: -150%; left: -150%;
+  width: 300%; height: 300%;
+  background: linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.03) 50%, transparent 55%);
+  animation: shine 12s infinite;
 }
-
 @keyframes shine {
   0% { transform: translateX(0) translateY(0); }
   20%, 100% { transform: translateX(50%) translateY(50%); }
 }
-
 @keyframes flow {
   from { stroke-dashoffset: 24; }
   to   { stroke-dashoffset: 0; }
 }
-
 .edge-flow { animation: flow 3s linear infinite; }
-
 .react-flow__edge { z-index: 0 !important; }
-.react-flow__node {
-  z-index: 10;
-  will-change: transform;
-}
+.react-flow__node { z-index: 10; will-change: transform; }
 .react-flow__node.selected { z-index: 100 !important; }
 .react-flow__attribution { display: none !important; }
-
-.react-flow__handle {
-  pointer-events: none !important;
-  opacity: 0 !important;
-}
-
+.react-flow__handle { pointer-events: none !important; opacity: 0 !important; }
 @media (prefers-reduced-motion: reduce) {
-  .edge-flow, .glass-reflection::after {
-    animation: none !important;
-    transition: none !important;
-  }
+  .edge-flow, .glass-reflection::after { animation: none !important; transition: none !important; }
 }
-
 @keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes reveal-fade {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
 @keyframes reveal-line {
   from { transform: scaleX(0); }
   to   { transform: scaleX(1); }
 }
-
-.reveal-up {
-  opacity: 0;
-  animation: reveal-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.reveal-fade {
-  opacity: 0;
-  animation: reveal-fade 0.8s ease forwards;
-}
-
-.reveal-line {
-  transform-origin: left;
-  animation: reveal-line 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
+.reveal-up   { opacity: 0; animation: reveal-up   0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.reveal-fade { opacity: 0; animation: reveal-fade  0.8s ease forwards; }
+.reveal-line { transform-origin: left; animation: reveal-line 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .delay-0   { animation-delay: 0ms; }
 .delay-100 { animation-delay: 150ms; }
 .delay-200 { animation-delay: 300ms; }
