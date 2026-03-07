@@ -13,6 +13,7 @@ import { TreeOnboarding } from './ui/TreeOnboarding';
 import { TreeEmptyState } from './ui/TreeEmptyState';
 
 import { useNexus } from '@/contexts/NexusContext';
+import { useOverview } from '@/contexts/OverviewContext';
 import { useSkillTree, SkillTreeProvider } from '@/contexts/SkillTreeContext';
 import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
@@ -53,6 +54,7 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: any[]; isLoading: boolean }
 function SkillTreeInner() {
   const { nodes, edges, isLoading: isLoadingTree } = useSkillTree();
   const { refreshNexus, setIsDirty, isDirty, setNodes, setEdges } = useNexus();
+  const { invalidateOverview } = useOverview();
 
   const { onNodesChange, hasUnsavedChanges: hasDragChanges, isSaving, setIsSaving, resetDirty } = useSkillDrag();
   const {
@@ -115,6 +117,7 @@ function SkillTreeInner() {
         setHasStructuralChanges(false);
         setIsDirty(false);
         await refreshNexus(false);
+        invalidateOverview();
       }
     } catch (error) {
       console.error('[Árvore] Erro critico na sincronizacao:', error);

@@ -13,6 +13,7 @@ import { LibrarySidebar } from './ui/LibrarySideBar';
 
 import { useNexus } from '@/contexts/NexusContext';
 import { useLibrary } from '@/contexts/LibraryContext';
+import { useOverview } from '@/contexts/OverviewContext';
 import { deleteContent } from '@/app/actions/library';
 
 export default function LibraryPage() {
@@ -20,6 +21,7 @@ export default function LibraryPage() {
   const nodeIdFromUrl = searchParams.get('nodeId');
 
   const { nodes, isLoading: isLoadingNexus } = useNexus();
+  const { invalidateOverview } = useOverview();
   const library = useLibrary();
   const preloadAllContents =
     (library as { preloadAllContents?: (focusNodeId?: string) => Promise<void> }).preloadAllContents
@@ -111,6 +113,7 @@ export default function LibraryPage() {
     const result = await deleteContent(id);
     if (result.success && selectedNodeId) {
       removeNodeContent(selectedNodeId, id);
+      invalidateOverview();
     }
   };
 
@@ -274,6 +277,7 @@ export default function LibraryPage() {
           if (selectedNodeId) {
             if (createdContent) {
               addNodeContent(selectedNodeId, createdContent);
+              invalidateOverview();
             }
           }
         }}

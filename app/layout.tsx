@@ -3,6 +3,7 @@ import "./globals.css";
 import { NexusProvider } from "@/shared/contexts/NexusContext";
 import { LibraryProvider } from "@/shared/contexts/LibraryContext";
 import { JournalProvider } from "@/shared/contexts/JournalContext";
+import { OverviewProvider } from "@/shared/contexts/OverviewContext";
 import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
@@ -26,7 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <NexusProvider>
           <LibraryProvider>
             <JournalProvider>
-              <ClientLayout>{children}</ClientLayout>
+              <OverviewProvider>
+                <ClientLayout>{children}</ClientLayout>
+              </OverviewProvider>
             </JournalProvider>
           </LibraryProvider>
         </NexusProvider>
@@ -34,4 +37,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-

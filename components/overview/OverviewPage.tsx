@@ -1,6 +1,8 @@
-﻿'use client';
-import { useMemo } from 'react';
+'use client';
+
+import { useEffect, useMemo } from 'react';
 import { useNexus } from '@/shared/contexts/NexusContext';
+import { useOverview } from '@/shared/contexts/OverviewContext';
 import OverviewHeader from './ui/OverviewHeader';
 import StatsGrid from './features/stats/StatsGrid';
 import CategoryChart from './features/stats/CategoryChart';
@@ -19,20 +21,26 @@ const deferredSectionStyle = {
   containIntrinsicSize: '1px 700px',
 };
 
-interface OverviewContentProps {
-  initialData: {
-    total: number;
-    unlocked: number;
-    progress: number;
-  };
-}
+const EMPTY_OVERVIEW_SUMMARY = {
+  total: 0,
+  unlocked: 0,
+  progress: 0,
+};
 
-export default function OverviewContent({ initialData }: OverviewContentProps) {
+export default function OverviewContent() {
   const { nodes, edges, isLoading } = useNexus();
+  const { bootstrap, isLoading: isBootstrapLoading, refreshOverview } = useOverview();
+
+  useEffect(() => {
+    void refreshOverview();
+  }, [refreshOverview]);
+
+  const libraryStats = bootstrap?.libraryStats ?? null;
+  const recentActivity = bootstrap?.recentActivity ?? null;
 
   const snapshot = useMemo(
-    () => buildOverviewSnapshot(nodes, edges, initialData),
-    [nodes, edges, initialData]
+    () => buildOverviewSnapshot(nodes, edges, EMPTY_OVERVIEW_SUMMARY),
+    [nodes, edges]
   );
   const stats = snapshot.stats;
 
@@ -92,13 +100,13 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
             </LazyMount>
           </div>
           <LazyMount minHeight={290}>
-            <LibraryStatsPanel />
+            <LibraryStatsPanel stats={libraryStats} isBootstrapLoading={isBootstrapLoading} />
           </LazyMount>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={deferredSectionStyle}>
           <CriticalNodesPanel critical={snapshot.criticalNodes} />
-          <RecentActivityFeed nodes={nodes} />
+          <RecentActivityFeed initialPage={recentActivity} isBootstrapLoading={isBootstrapLoading} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2" style={deferredSectionStyle}>

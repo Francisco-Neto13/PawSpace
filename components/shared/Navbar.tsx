@@ -12,17 +12,23 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
   const router = useRouter();
   const supabase = createClient();
 
-  const { isDirty, setIsDirty } = useNexus();
+  const { isDirty, setIsDirty, discardLocalChanges } = useNexus();
 
   if (pathname === '/login') return null;
 
   const handleSafeNavigation = (e: React.MouseEvent, href: string) => {
     e.preventDefault();
+    if (href === pathname) {
+      setIsOpen(false);
+      return;
+    }
+
     if (isDirty) {
       const confirmExit = window.confirm(
         "Você tem alterações não salvas na sua Árvore. Se sair agora, elas serão perdidas. Deseja sair mesmo assim?"
       );
       if (!confirmExit) return;
+      discardLocalChanges();
       setIsDirty(false);
     }
     setIsOpen(false);

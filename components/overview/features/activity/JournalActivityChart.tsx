@@ -71,9 +71,10 @@ function JournalActivityChart() {
   }, [trend, totalEntries, peakMonth, maxCount]);
 
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden group">
+    <div className="h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden group flex flex-col">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
+      {/* Header */}
       <div className="flex items-start justify-between mb-1">
         <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
@@ -94,43 +95,40 @@ function JournalActivityChart() {
       </div>
       <p className="text-[9px] text-zinc-400 mb-6 ml-3">entradas por mês — últimos 6 meses</p>
 
-      <ResponsiveContainer width="100%" height={160}>
-        <BarChart
-          data={data}
-          barSize={20}
-        >
-          <XAxis
-            dataKey="label"
-            tick={{ fill: '#71717a', fontSize: 9, fontWeight: 700 }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-          <Bar
-            dataKey="count"
-            radius={[2, 2, 0, 0]}
-            isAnimationActive={false}
-          >
-            {data.map((d, i) => (
-              <Cell
-                key={i}
-                fill={d.isCurrentMonth ? 'rgba(255,255,255,0.9)' : d.isPeak ? 'rgba(255,255,255,0.75)' : '#ffffff'}
-                fillOpacity={
-                  d.count === 0
-                    ? 0.05
-                    : d.isCurrentMonth
-                    ? 0.7
-                    : d.isPeak
-                    ? 0.55
-                    : 0.15 + (d.count / maxCount) * 0.4
-                }
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      {/* Gráfico cresce para preencher o espaço disponível */}
+      <div className="flex-1 min-h-0">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} barSize={20}>
+            <XAxis
+              dataKey="label"
+              tick={{ fill: '#71717a', fontSize: 9, fontWeight: 700 }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+            <Bar dataKey="count" radius={[2, 2, 0, 0]} isAnimationActive={false}>
+              {data.map((d, i) => (
+                <Cell
+                  key={i}
+                  fill={d.isCurrentMonth ? 'rgba(255,255,255,0.9)' : d.isPeak ? 'rgba(255,255,255,0.75)' : '#ffffff'}
+                  fillOpacity={
+                    d.count === 0
+                      ? 0.05
+                      : d.isCurrentMonth
+                      ? 0.7
+                      : d.isPeak
+                      ? 0.55
+                      : 0.15 + (d.count / maxCount) * 0.4
+                  }
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/[0.04]">
+      {/* Footer fixo na base */}
+      <div className="mt-4 pt-3 border-t border-white/[0.04] flex items-center justify-between">
         <span className="text-[8px] text-zinc-400 uppercase tracking-wider font-bold">
           Total: {totalEntries} entradas
         </span>

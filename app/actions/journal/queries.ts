@@ -3,9 +3,23 @@
 import prisma from '@/shared/lib/prisma';
 import { getAuthUser } from './auth-helper';
 
+type JournalEntryRow = {
+  id: string;
+  title: string;
+  body: string;
+  skillId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type JournalEntriesResult =
+  | { status: 'ok'; entries: JournalEntryRow[] }
+  | { status: 'unauthorized'; entries: [] }
+  | { status: 'error'; entries: [] };
+
 export async function getJournalEntries() {
   const userId = await getAuthUser();
-  if (!userId) return [];
+  if (!userId) return { status: 'unauthorized', entries: [] } as const;
 
   try {
     const start = Date.now();
@@ -22,10 +36,10 @@ export async function getJournalEntries() {
       orderBy: { createdAt: 'desc' },
     });
     console.log(`⏱️  [DB] Fetch Many Journal: ${Date.now() - start}ms`);
-    return entries;
+    return { status: 'ok', entries } as const;
   } catch (error) {
     console.error('❌ [Journal Query] Erro ao buscar entradas:', error);
-    return [];
+    return { status: 'error', entries: [] } as const;
   }
 }
 

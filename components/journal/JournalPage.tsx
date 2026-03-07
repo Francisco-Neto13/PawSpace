@@ -8,11 +8,13 @@ import { JournalEditor } from './features/editor/JournalEditor';
 import { JournalEntry, SkillBase } from './types';
 import { useNexus } from '@/shared/contexts/NexusContext';
 import { useJournal } from '@/shared/contexts/JournalContext';
+import { useOverview } from '@/shared/contexts/OverviewContext';
 import { saveJournalEntry, deleteJournalEntry } from '@/app/actions/journal';
 
 export default function JournalPage() {
   const { nodes, isLoading: isLoadingNexus } = useNexus();
   const { entries, setEntries, isLoading: isLoadingEntries } = useJournal();
+  const { invalidateOverview } = useOverview();
 
   const [visible, setVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -66,6 +68,7 @@ export default function JournalPage() {
         const realEntry = result.entry as unknown as JournalEntry;
         setEntries(prev => prev.map(e => e.id === tempId ? realEntry : e));
         setSelectedId(realEntry.id);
+        invalidateOverview();
       } else {
         throw new Error();
       }
@@ -92,6 +95,7 @@ export default function JournalPage() {
     try {
       const result = await deleteJournalEntry(id);
       if (!result.success) throw new Error();
+      invalidateOverview();
     } catch {
       setEntries(previousEntries);
       setSelectedId(id);

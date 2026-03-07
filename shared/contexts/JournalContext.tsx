@@ -1,7 +1,12 @@
 'use client';
+
 import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { getJournalEntries, saveJournalEntry } from '@/app/actions/journal';
 import { JournalEntry } from '@/components/journal/types';
+
+const AUTH_RETRY_LIMIT = 3;
+const AUTH_RETRY_BASE_DELAY_MS = 350;
 
 interface PendingSync {
   id: string;
@@ -21,30 +26,83 @@ interface JournalContextType {
 
 const JournalContext = createContext<JournalContextType | undefined>(undefined);
 
+function isPublicRoute(pathname: string | null) {
+  if (!pathname) return false;
+  return pathname.startsWith('/login');
+}
+
 export function JournalProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const skipHydration = isPublicRoute(pathname);
+
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const hasLoadedRef = useRef(false);
   const pendingRef = useRef<PendingSync | null>(null);
   const isSyncingRef = useRef(false);
+  const authRetryCountRef = useRef(0);
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipHydrationRef = useRef(skipHydration);
+
+  useEffect(() => {
+    skipHydrationRef.current = skipHydration;
+  }, [skipHydration]);
 
   const refreshJournal = useCallback(async (force = false) => {
-    if (hasLoadedRef.current && !force) {
-      console.log('? [Journal] Entradas já em memória, ignorando fetch.');
+    if (skipHydration) {
+      setIsLoading(false);
       return;
     }
-    console.log(`?? [Journal] Fetch ${force ? 'FORÇADO' : 'INICIAL'}...`);
+
+    if (hasLoadedRef.current && !force) {
+      console.log('[Journal] Entries already in memory, skipping fetch.');
+      return;
+    }
+
     setIsLoading(true);
+
     try {
-      const data = await getJournalEntries();
-      setEntries(data as unknown as JournalEntry[]);
-      hasLoadedRef.current = true;
+      const result = await getJournalEntries();
+      if (skipHydrationRef.current) return;
+
+      if (result.status === 'ok') {
+        setEntries(result.entries as unknown as JournalEntry[]);
+        hasLoadedRef.current = true;
+        authRetryCountRef.current = 0;
+        return;
+      }
+
+      if (result.status === 'unauthorized') {
+        hasLoadedRef.current = false;
+
+        if (authRetryCountRef.current < AUTH_RETRY_LIMIT) {
+          const nextTry = authRetryCountRef.current + 1;
+          const delay = AUTH_RETRY_BASE_DELAY_MS * nextTry;
+          authRetryCountRef.current = nextTry;
+
+          if (retryTimeoutRef.current) {
+            clearTimeout(retryTimeoutRef.current);
+          }
+
+          retryTimeoutRef.current = setTimeout(() => {
+            void refreshJournal(true);
+          }, delay);
+
+          console.warn(`[Journal] Session unavailable, retry in ${delay}ms (${nextTry}/${AUTH_RETRY_LIMIT}).`);
+        } else {
+          console.warn('[Journal] Session unavailable after max retries.');
+        }
+
+        return;
+      }
+
+      console.error('[Journal] Failed to fetch entries (status=error).');
     } catch (error) {
-      console.error('? [Journal] Erro ao buscar entradas:', error);
+      console.error('[Journal] Fetch failed with exception:', error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [skipHydration]);
 
   const setPending = useCallback((pending: PendingSync | null) => {
     pendingRef.current = pending;
@@ -52,8 +110,10 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
 
   const flushPending = useCallback(async () => {
     if (!pendingRef.current || isSyncingRef.current) return;
+
     const snapshot = { ...pendingRef.current };
     isSyncingRef.current = true;
+
     try {
       const result = await saveJournalEntry({
         id: snapshot.id,
@@ -61,6 +121,7 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
         body: snapshot.body,
         skillId: snapshot.skillId,
       });
+
       if (result.success) {
         pendingRef.current = null;
         setEntries(prev => prev.map(e =>
@@ -68,10 +129,9 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
             ? { ...e, title: snapshot.title, body: snapshot.body, skillId: snapshot.skillId }
             : e
         ));
-        console.log('? [Journal] Flush concluído.');
       }
-    } catch (e) {
-      console.error('? [Journal] Erro no flush:', e);
+    } catch (error) {
+      console.error('[Journal] Flush failed:', error);
     } finally {
       isSyncingRef.current = false;
     }
@@ -80,16 +140,45 @@ export function JournalProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
-        flushPending();
+        void flushPending();
       }
     };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [flushPending]);
 
   useEffect(() => {
-    refreshJournal();
-  }, [refreshJournal]);
+    if (skipHydration) {
+      setIsLoading(false);
+      return;
+    }
+
+    void refreshJournal();
+  }, [refreshJournal, skipHydration]);
+
+  useEffect(() => {
+    if (!skipHydration) return;
+
+    hasLoadedRef.current = false;
+    pendingRef.current = null;
+    isSyncingRef.current = false;
+    authRetryCountRef.current = 0;
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+    setEntries([]);
+    setIsLoading(false);
+  }, [skipHydration]);
+
+  useEffect(() => {
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <JournalContext.Provider value={{ entries, setEntries, isLoading, refreshJournal, setPending, flushPending }}>

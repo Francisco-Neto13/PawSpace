@@ -1,5 +1,6 @@
 'use client';
-import { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { Content } from '@/components/library/types';
 
 interface LibraryContextType {
@@ -14,11 +15,24 @@ interface LibraryContextType {
 
 const LibraryContext = createContext<LibraryContextType | undefined>(undefined);
 
+function isPublicRoute(pathname: string | null) {
+  if (!pathname) return false;
+  return pathname.startsWith('/login');
+}
+
 export function LibraryProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const skipHydration = isPublicRoute(pathname);
+
   const [nodeContents, setNodeContents] = useState<Record<string, Content[]>>({});
   const [loadingNodeId, setLoadingNodeId] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const hasLoadedAllRef = useRef(false);
+  const skipHydrationRef = useRef(skipHydration);
+
+  useEffect(() => {
+    skipHydrationRef.current = skipHydration;
+  }, [skipHydration]);
 
   const normalizeContent = useCallback((c: any): Content => ({
     ...c,
@@ -36,11 +50,13 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
   ), [normalizeContent]);
 
   const preloadAllContents = useCallback(async (focusNodeId?: string) => {
+    if (skipHydrationRef.current) return;
     if (hasLoadedAllRef.current) return;
     if (focusNodeId) setLoadingNodeId(focusNodeId);
     try {
       const { getAllContentsForLibrary } = await import('@/app/actions/library');
       const allContents = await getAllContentsForLibrary();
+      if (skipHydrationRef.current) return;
       const grouped = groupBySkillId(allContents as any[]);
       setNodeContents(prev => ({ ...prev, ...grouped }));
       hasLoadedAllRef.current = true;
@@ -52,6 +68,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
   }, [groupBySkillId]);
 
   const loadNodeContents = useCallback(async (nodeId: string) => {
+    if (skipHydrationRef.current) return;
     if (nodeContents[nodeId] !== undefined) return;
     if (hasLoadedAllRef.current) {
       setNodeContents(prev => ({ ...prev, [nodeId]: prev[nodeId] ?? [] }));
@@ -66,7 +83,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     try {
       const { getAllContentsForLibrary } = await import('@/app/actions/library');
       const allContents = await getAllContentsForLibrary();
-      if (controller.signal.aborted) return;
+      if (controller.signal.aborted || skipHydrationRef.current) return;
 
       const grouped = groupBySkillId(allContents as any[]);
       setNodeContents(prev => ({
@@ -80,7 +97,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       try {
         const { getContentsBySkill } = await import('@/app/actions/library');
         const updated = await getContentsBySkill(nodeId);
-        if (!controller.signal.aborted) {
+        if (!controller.signal.aborted && !skipHydrationRef.current) {
           setNodeContents(prev => ({
             ...prev,
             [nodeId]: (updated as any[]).map(normalizeContent),
@@ -95,10 +112,12 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
   }, [nodeContents, normalizeContent, groupBySkillId]);
 
   const refreshNodeContents = useCallback(async (nodeId: string) => {
+    if (skipHydrationRef.current) return;
     setLoadingNodeId(nodeId);
     try {
       const { getContentsBySkill } = await import('@/app/actions/library');
       const updated = await getContentsBySkill(nodeId);
+      if (skipHydrationRef.current) return;
       setNodeContents(prev => ({
         ...prev,
         [nodeId]: (updated as any[]).map(normalizeContent),
@@ -129,6 +148,16 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       };
     });
   }, []);
+
+  useEffect(() => {
+    if (!skipHydration) return;
+
+    hasLoadedAllRef.current = false;
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
+    setNodeContents({});
+    setLoadingNodeId(null);
+  }, [skipHydration]);
 
   return (
     <LibraryContext.Provider value={{

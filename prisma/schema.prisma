@@ -37,6 +37,7 @@ model Skill {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([userId, updatedAt])
 }
 
 model LibraryContent {
@@ -55,6 +56,7 @@ model LibraryContent {
 
   @@index([skillId])
   @@index([userId])
+  @@index([userId, updatedAt])
 }
 
 model JournalEntry {
@@ -71,4 +73,5 @@ model JournalEntry {
 
   @@index([userId])
   @@index([skillId])
+  @@index([userId, updatedAt])
 }
