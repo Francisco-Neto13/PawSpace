@@ -41,7 +41,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
                 href={content.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-700 hover:text-zinc-300 transition-colors cursor-pointer"
+                className="text-zinc-500 hover:text-zinc-200 transition-colors cursor-pointer"
               >
                 <ExternalLink size={13} />
               </a>
@@ -49,7 +49,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
             {onDelete && (
               <button
                 onClick={handleDelete}
-                className="text-zinc-700 hover:text-white transition-colors cursor-pointer"
+                className="text-zinc-500 hover:text-white transition-colors cursor-pointer"
               >
                 <Trash2 size={13} />
               </button>
@@ -57,7 +57,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
           </div>
         </div>
         {content.body && (
-          <p className="text-zinc-500 text-xs font-medium leading-relaxed mb-3 line-clamp-2">
+          <p className="text-zinc-400 text-xs font-medium leading-relaxed mb-3 line-clamp-2">
             {content.body}
           </p>
         )}
@@ -68,7 +68,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
           >
             {cfg.label}
           </span>
-          <span className="text-[9px] text-zinc-700 font-mono flex items-center gap-1.5">
+          <span className="text-[9px] text-zinc-500 font-mono flex items-center gap-1.5">
             <Clock size={9} />
             {content.createdAt}
           </span>

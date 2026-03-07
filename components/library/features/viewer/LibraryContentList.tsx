@@ -22,8 +22,8 @@ export function LibraryContentList({
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
         <Loader2 size={20} className="text-[#ffffff]/40 animate-spin" />
-        <p className="text-zinc-700 text-[9px] font-black uppercase tracking-widest">
-          Carregando conteudos...
+        <p className="text-zinc-500 text-[9px] font-black uppercase tracking-widest">
+          Carregando conteúdos...
         </p>
       </div>
     );
@@ -50,7 +50,7 @@ export function LibraryContentList({
                 className="h-[1px] flex-1"
                 style={{ background: `linear-gradient(to right, ${cfg.color}25, transparent)` }}
               />
-              <span className="text-[9px] text-zinc-700 font-mono">{items.length}</span>
+              <span className="text-[9px] text-zinc-500 font-mono">{items.length}</span>
             </div>
             <div className="flex flex-col gap-3">
               {items.map(c => (

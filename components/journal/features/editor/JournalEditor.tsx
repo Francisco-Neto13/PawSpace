@@ -83,10 +83,10 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             onChange={e => setTitle(e.target.value.slice(0, TITLE_MAX))}
             placeholder="Título da entrada..."
             maxLength={TITLE_MAX}
-            className="w-full bg-transparent text-white text-xl font-black outline-none placeholder:text-zinc-700 tracking-wide antialiased pr-16"
+            className="w-full bg-transparent text-white text-xl font-black outline-none placeholder:text-zinc-500 tracking-wide antialiased pr-16"
           />
           {showTitleWarn && (
-            <span className={`absolute right-0 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold tabular-nums ${titleRemaining <= 5 ? 'text-white' : 'text-zinc-500'}`}>
+            <span className={`absolute right-0 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold tabular-nums ${titleRemaining <= 5 ? 'text-white' : 'text-zinc-400'}`}>
               {titleRemaining}
             </span>
           )}
@@ -104,10 +104,10 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             <button
               onClick={() => setShowSkillPicker(!showSkillPicker)}
               className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer hover:opacity-80 antialiased"
-              style={{ color: skill?.color ?? '#71717a' }}
+              style={{ color: skill?.color ?? '#a1a1aa' }}
             >
               <Tag size={9} />
-              {skill ? `${skill.icon} ${skill.name}` : 'Vincular skill'}
+              {skill ? `${skill.icon} ${skill.name}` : 'Vincular módulo'}
               <ChevronDown size={8} className={`transition-transform duration-300 ${showSkillPicker ? 'rotate-180' : ''}`} />
             </button>
 
@@ -116,13 +116,13 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                 <div className="fixed inset-0 z-40" onClick={() => setShowSkillPicker(false)} />
                 <div className="absolute top-full left-0 mt-2 w-56 bg-[#0a0a0a] border border-white/[0.1] z-50 flex flex-col py-1 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in duration-150">
                   <div className="px-3 py-1.5 border-b border-white/[0.05] mb-1">
-                    <span className="text-[7px] text-zinc-500 font-black uppercase tracking-[0.2em]">
-                      Protocolos Disponíveis
+                    <span className="text-[7px] text-zinc-400 font-black uppercase tracking-[0.2em]">
+                      Módulos disponíveis
                     </span>
                   </div>
                   <button
                     onClick={() => { setSkillId(null); setShowSkillPicker(false); }}
-                    className="px-3 py-2 text-[10px] text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.03] text-left transition-colors font-bold uppercase"
+                    className="px-3 py-2 text-[10px] text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.03] text-left transition-colors font-bold uppercase"
                   >
                     Nenhum vínculo
                   </button>
@@ -152,15 +152,15 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                   Sincronizando...
                 </span>
               ) : (
-                <span className="flex items-center gap-1.5 text-[8px] text-zinc-500 font-black uppercase antialiased">
-                  <CloudCheck size={10} className="text-zinc-600" />
+                <span className="flex items-center gap-1.5 text-[8px] text-zinc-400 font-black uppercase antialiased">
+                  <CloudCheck size={10} className="text-zinc-500" />
                   Sincronizado
                 </span>
               )}
             </div>
             <button
               onClick={onDelete}
-              className="flex items-center gap-1.5 text-zinc-500 hover:text-white text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer antialiased"
+              className="flex items-center gap-1.5 text-zinc-400 hover:text-white text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer antialiased"
             >
               <Trash2 size={10} />
               Excluir
@@ -184,7 +184,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
 
           {showBodyCounter && (
             <div className="absolute bottom-4 right-6 pointer-events-none">
-              <span className={`text-[9px] font-mono font-bold tabular-nums ${bodyRemaining <= 200 ? 'text-white' : 'text-zinc-600'}`}>
+              <span className={`text-[9px] font-mono font-bold tabular-nums ${bodyRemaining <= 200 ? 'text-white' : 'text-zinc-400'}`}>
                 {bodyRemaining.toLocaleString()} restantes
               </span>
             </div>

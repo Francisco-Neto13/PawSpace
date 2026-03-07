@@ -77,7 +77,7 @@ export function NodeContextMenu({
             <div className="px-4 pt-4 pb-3 border-b border-white/[0.04] relative z-10">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-1 h-3 bg-[#ffffff]/40" />
-                <p className="text-[8px] text-zinc-600 uppercase font-black tracking-[0.25em]">
+                <p className="text-[8px] text-zinc-400 uppercase font-black tracking-[0.25em]">
                   Módulo Selecionado
                 </p>
               </div>
@@ -90,7 +90,7 @@ export function NodeContextMenu({
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-300 hover:bg-white/[0.04] hover:text-[#ffffff] transition-all duration-200 group cursor-pointer"
               >
                 <Edit3 size={13} className="text-[#ffffff]/60 group-hover:text-[#ffffff] transition-colors shrink-0" />
-                <span className="text-[9px] font-black uppercase tracking-widest">Configurar Árvore</span>
+                <span className="text-[9px] font-black uppercase tracking-widest">Configurar Módulo</span>
               </button>
 
               <button
@@ -98,7 +98,7 @@ export function NodeContextMenu({
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-400 hover:bg-white/[0.04] hover:text-[#ffffff] transition-all duration-200 group cursor-pointer"
               >
                 <Plus size={13} className="text-[#ffffff]/60 group-hover:text-[#ffffff] transition-colors shrink-0" />
-                <span className="text-[9px] font-black uppercase tracking-widest">Expandir Árvore</span>
+                <span className="text-[9px] font-black uppercase tracking-widest">Adicionar Submódulo</span>
               </button>
 
               {onDelete && (
@@ -106,10 +106,10 @@ export function NodeContextMenu({
                   <div className="h-px bg-white/[0.04] mx-4 my-1" />
                   <button
                     onClick={() => { onDelete(); onClose(); }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-600 hover:bg-white/[0.06] hover:text-white transition-all duration-200 group cursor-pointer"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-zinc-400 hover:bg-white/[0.06] hover:text-white transition-all duration-200 group cursor-pointer"
                   >
                     <Trash2 size={13} className="shrink-0 group-hover:text-white transition-colors" />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Remover Unidade</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">Remover Módulo</span>
                   </button>
                 </>
               )}

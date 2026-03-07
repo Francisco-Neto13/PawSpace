@@ -99,17 +99,17 @@ export function EditSkillModal({
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-5 bg-[#ffffff]" />
                   <div>
-                    <p className="text-[8px] text-zinc-600 uppercase tracking-[0.3em] font-black mb-0.5">
-                      Configuração de Unidade
+                    <p className="text-[8px] text-zinc-400 uppercase tracking-[0.3em] font-black mb-0.5">
+                      Configuração de Módulo
                     </p>
                     <h2 className="text-[#ffffff] text-[13px] font-black uppercase tracking-[0.3em]">
-                      Ajustar Árvore
+                      Ajustar Módulo
                     </h2>
                   </div>
                 </div>
                 <button
                   onClick={onClose}
-                  className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-600 hover:text-zinc-300 hover:border-white/20 transition-all duration-300 text-xs cursor-pointer bg-white/5"
+                  className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-500 hover:text-zinc-200 hover:border-white/20 transition-all duration-300 text-xs cursor-pointer bg-white/5"
                 >
                   ✕
                 </button>

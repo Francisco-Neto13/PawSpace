@@ -120,12 +120,12 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
               </p>
               <div className="flex gap-6 shrink-0 font-mono">
                 <div className="text-right">
-                  <p className="text-[8px] text-zinc-600 uppercase tracking-widest mb-1">Total</p>
+                  <p className="text-[8px] text-zinc-400 uppercase tracking-widest mb-1">Total</p>
                   <p className="text-white text-3xl font-black tabular-nums">{stats.total}</p>
                 </div>
                 <div className="w-[1px] bg-white/[0.06]" />
                 <div className="text-right">
-                  <p className="text-[8px] text-zinc-600 uppercase tracking-widest mb-1">Com Conteúdo</p>
+                  <p className="text-[8px] text-zinc-400 uppercase tracking-widest mb-1">Com Conteúdo</p>
                   <p className="text-white text-3xl font-black tabular-nums">{stats.unlocked}</p>
                 </div>
               </div>
@@ -134,7 +134,7 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
 
           <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-            <p className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.4em] mb-4">
+            <p className="text-[8px] text-zinc-400 font-black uppercase tracking-[0.4em] mb-4">
               Próxima Meta
             </p>
             <div className="flex-1 flex flex-col items-start justify-center gap-3">
@@ -143,7 +143,7 @@ export default function OverviewContent({ initialData }: OverviewContentProps) {
                   {stats.progress < 100 ? 'Adicionar Conteúdo' : 'Cobertura Completa'}
                 </p>
               </div>
-              <p className="text-[10px] text-zinc-600 font-mono leading-snug">
+              <p className="text-[10px] text-zinc-400 font-mono leading-snug">
                 {stats.total - stats.unlocked > 0
                   ? `${stats.total - stats.unlocked} módulos sem conteúdo`
                   : 'Todos os módulos têm conteúdo!'}

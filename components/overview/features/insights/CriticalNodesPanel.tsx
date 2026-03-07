@@ -30,13 +30,13 @@ function CriticalNodesPanel({ critical }: Props) {
             </span>
           )}
           {uncovered > 0 && (
-            <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 bg-white/[0.02] border border-white/[0.04] text-zinc-600">
+            <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 bg-white/[0.02] border border-white/[0.04] text-zinc-400">
               ○ {uncovered}
             </span>
           )}
         </div>
       </div>
-      <p className="text-[9px] text-zinc-600 mb-6 ml-3">módulos que sustentam mais dependências</p>
+      <p className="text-[9px] text-zinc-400 mb-6 ml-3">módulos que sustentam mais dependências</p>
 
       <div className="space-y-1">
         {critical.map((n, i) => {
@@ -52,23 +52,23 @@ function CriticalNodesPanel({ critical }: Props) {
                 }}
                 onClick={() => setExpandedId(isExpanded ? null : n.id)}
               >
-                <span className="text-[9px] text-zinc-700 font-mono w-4 shrink-0">{i + 1}</span>
+                <span className="text-[9px] text-zinc-500 font-mono w-4 shrink-0">{i + 1}</span>
 
                 <span className="text-base shrink-0">{n.icon}</span>
 
                 <span
                   className="text-[10px] font-bold flex-1 truncate transition-colors duration-200"
-                  style={{ color: isExpanded ? '#ffffff' : n.hasContent ? 'rgba(255,255,255,0.75)' : '#71717a' }}
+                  style={{ color: isExpanded ? '#ffffff' : n.hasContent ? 'rgba(255,255,255,0.82)' : '#a1a1aa' }}
                 >
                   {n.name}
                 </span>
 
-                <span className="text-[9px] text-zinc-600 font-mono shrink-0">{n.dependents} deps</span>
+                <span className="text-[9px] text-zinc-400 font-mono shrink-0">{n.dependents} deps</span>
 
                 <div className="w-4 shrink-0 flex items-center justify-center">
                   {n.hasContent
                     ? <CircleCheck size={11} className="text-white/60" />
-                    : <Circle     size={11} className="text-zinc-700" />
+                    : <Circle     size={11} className="text-zinc-500" />
                   }
                 </div>
 
@@ -84,7 +84,7 @@ function CriticalNodesPanel({ critical }: Props) {
 
                 <ChevronRight
                   size={10}
-                  className="shrink-0 transition-transform duration-200 text-zinc-700"
+                  className="shrink-0 transition-transform duration-200 text-zinc-500"
                   style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
                 />
               </button>
@@ -98,15 +98,15 @@ function CriticalNodesPanel({ critical }: Props) {
                 >
                   <div className="flex items-center gap-6">
                     <div>
-                      <p className="text-[8px] text-zinc-600 uppercase tracking-wider font-bold mb-0.5">Links</p>
+                      <p className="text-[8px] text-zinc-400 uppercase tracking-wider font-bold mb-0.5">Links</p>
                       <p className="text-white font-mono font-black text-lg">{n.linksCount}</p>
                     </div>
                     <div>
-                      <p className="text-[8px] text-zinc-600 uppercase tracking-wider font-bold mb-0.5">Conteúdos</p>
+                      <p className="text-[8px] text-zinc-400 uppercase tracking-wider font-bold mb-0.5">Conteúdos</p>
                       <p className="text-white font-mono font-black text-lg">{n.contentsCount}</p>
                     </div>
                     <div>
-                      <p className="text-[8px] text-zinc-600 uppercase tracking-wider font-bold mb-0.5">Dependentes</p>
+                      <p className="text-[8px] text-zinc-400 uppercase tracking-wider font-bold mb-0.5">Dependentes</p>
                       <p className="text-white font-mono font-black text-lg">{n.dependents}</p>
                     </div>
                     <div className="flex-1 flex items-center justify-end">
@@ -114,7 +114,7 @@ function CriticalNodesPanel({ critical }: Props) {
                         className="text-[9px] font-black uppercase tracking-wider px-2 py-1 border"
                         style={{
                           borderColor: n.hasContent ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)',
-                          color: n.hasContent ? 'rgba(255,255,255,0.7)' : '#52525b',
+                          color: n.hasContent ? 'rgba(255,255,255,0.8)' : '#a1a1aa',
                         }}
                       >
                         {n.hasContent ? 'Coberto' : 'Sem conteúdo'}
@@ -130,8 +130,8 @@ function CriticalNodesPanel({ critical }: Props) {
 
       {uncovered > 0 && (
         <div className="mt-4 pt-3 border-t border-white/[0.04] flex items-center gap-2">
-          <Circle size={8} className="text-zinc-600 shrink-0" />
-          <p className="text-[8px] text-zinc-600 font-bold uppercase tracking-wider">
+          <Circle size={8} className="text-zinc-400 shrink-0" />
+          <p className="text-[8px] text-zinc-400 font-bold uppercase tracking-wider">
             {uncovered} pata{uncovered > 1 ? 's' : ''} crítica{uncovered > 1 ? 's' : ''} sem conteúdo — prioridade alta
           </p>
         </div>

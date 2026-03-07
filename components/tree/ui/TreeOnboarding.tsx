@@ -11,13 +11,13 @@ const steps = [
   },
   {
     icon: <MousePointer2 size={13} />,
-    title: 'Expandir Árvore',
-    desc: "Botão direito em um nó > 'Expandir Árvore' para ramificar seus conhecimentos.",
+    title: 'Adicionar Submódulo',
+    desc: "Botão direito em um nó > 'Adicionar Submódulo' para ramificar seus conhecimentos.",
   },
   {
     icon: <Edit3 size={13} />,
     title: 'Customização',
-    desc: "Botão direito > 'Configurar Protocolo' para alterar ícones, cores e forma do nó.",
+    desc: "Botão direito > 'Configurar Módulo' para alterar ícones, cores e forma do nó.",
   },
   {
     icon: <Move size={13} />,
@@ -92,7 +92,7 @@ export function TreeOnboarding() {
                   <div className="flex items-center gap-3">
                     <div className="w-1 h-5 bg-[#ffffff]" />
                     <div>
-                      <p className="text-[8px] text-zinc-600 uppercase font-black tracking-[0.3em] mb-0.5">
+                      <p className="text-[8px] text-zinc-400 uppercase font-black tracking-[0.3em] mb-0.5">
                         Documentação
                       </p>
                       <div className="flex items-center gap-2">
@@ -105,7 +105,7 @@ export function TreeOnboarding() {
                   </div>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-600 hover:text-zinc-300 hover:border-white/20 transition-all duration-300 text-xs cursor-pointer"
+                    className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-500 hover:text-zinc-200 hover:border-white/20 transition-all duration-300 text-xs cursor-pointer"
                   >
                     <X size={12} />
                   </button>
@@ -134,8 +134,8 @@ export function TreeOnboarding() {
                 <div
                   className="mt-5 pt-3 border-t border-white/[0.04] flex justify-between items-center"
                 >
-                  <span className="text-[8px] text-zinc-700 uppercase tracking-widest font-mono">
-                    Protocol
+                  <span className="text-[8px] text-zinc-500 uppercase tracking-widest font-mono">
+                    Pawspace
                   </span>
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse" />

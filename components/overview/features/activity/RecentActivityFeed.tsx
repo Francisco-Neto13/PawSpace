@@ -78,7 +78,7 @@ function RecentActivityFeed({ nodes }: Props) {
         <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
         Atividade Recente
       </p>
-      <p className="text-[9px] text-zinc-600 mb-4 ml-3">diário e módulos atualizados</p>
+      <p className="text-[9px] text-zinc-400 mb-4 ml-3">diário e módulos atualizados</p>
 
       <div className="flex gap-1 mb-4 ml-3">
         {([
@@ -92,7 +92,7 @@ function RecentActivityFeed({ nodes }: Props) {
             className="text-[8px] font-black uppercase tracking-wider px-2 py-1 border transition-all duration-200"
             style={{
               borderColor:     filter === key ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)',
-              color:           filter === key ? 'rgba(255,255,255,0.8)' : '#52525b',
+              color:           filter === key ? 'rgba(255,255,255,0.8)' : '#a1a1aa',
               backgroundColor: filter === key ? 'rgba(255,255,255,0.04)' : 'transparent',
             }}
           >
@@ -102,7 +102,7 @@ function RecentActivityFeed({ nodes }: Props) {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-[9px] text-zinc-700 ml-3">Nenhuma patinha por aqui ainda.</p>
+        <p className="text-[9px] text-zinc-500 ml-3">Nenhuma patinha por aqui ainda.</p>
       ) : (
         <div>
           {filtered.map((item, i) => {
@@ -125,7 +125,7 @@ function RecentActivityFeed({ nodes }: Props) {
                   }}
                 >
                   {isJournal
-                    ? <BookOpen size={10} className="text-white/40 group-hover:text-white/70 transition-colors" />
+                    ? <BookOpen size={10} className="text-white/60 group-hover:text-white/80 transition-colors" />
                     : <span className="text-xs leading-none">{(item as any).icon}</span>
                   }
                 </div>
@@ -134,7 +134,7 @@ function RecentActivityFeed({ nodes }: Props) {
                   <div className="flex items-center gap-1.5 mb-0.5">
                     <span
                       className="text-[7px] font-black uppercase tracking-wider"
-                      style={{ color: isJournal ? 'rgba(255,255,255,0.35)' : '#52525b' }}
+                      style={{ color: isJournal ? 'rgba(255,255,255,0.6)' : '#a1a1aa' }}
                     >
                       {isJournal ? 'Diário' : 'Módulo'}
                     </span>
@@ -144,7 +144,7 @@ function RecentActivityFeed({ nodes }: Props) {
                   </span>
                 </div>
 
-                <span className="text-[8px] text-zinc-700 font-mono shrink-0 group-hover:text-zinc-500 transition-colors">
+                <span className="text-[8px] text-zinc-500 font-mono shrink-0 group-hover:text-zinc-300 transition-colors">
                   {timeAgo(item.date)}
                 </span>
               </div>

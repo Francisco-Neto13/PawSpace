@@ -88,7 +88,7 @@ function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
                 />
               </div>
               <div className="flex justify-between">
-                <span className="text-[9px] text-zinc-600 font-mono font-bold">0%</span>
+                <span className="text-[9px] text-zinc-400 font-mono font-bold">0%</span>
                 <span className="text-[9px] text-white/60 font-mono font-black">
                   {Math.round(item.barWidth)}%
                 </span>

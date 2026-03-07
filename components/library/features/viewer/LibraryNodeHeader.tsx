@@ -33,16 +33,16 @@ export function LibraryNodeHeader({
             {node.icon}
           </div>
           <div>
-            <p className="text-zinc-600 text-[9px] font-black uppercase tracking-[0.3em] mb-1">
-              Modulo Selecionado
+            <p className="text-zinc-400 text-[9px] font-black uppercase tracking-[0.3em] mb-1">
+              Módulo Selecionado
             </p>
             <h2 className="text-white text-xl font-black uppercase tracking-[0.15em] leading-none">
               {node.name}
             </h2>
-            <p className="text-zinc-600 text-[10px] font-medium mt-2">
+            <p className="text-zinc-400 text-[10px] font-medium mt-2">
               {isLoading
                 ? 'Carregando...'
-                : `${contentsCount} conteudo${contentsCount !== 1 ? 's' : ''} registrado${contentsCount !== 1 ? 's' : ''}`
+                : `${contentsCount} conteúdo${contentsCount !== 1 ? 's' : ''} registrado${contentsCount !== 1 ? 's' : ''}`
               }
             </p>
           </div>
@@ -53,7 +53,7 @@ export function LibraryNodeHeader({
           className="flex items-center gap-3 px-6 py-3.5 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] hover:bg-[#ffffff]/10 hover:border-[#ffffff]/50 transition-all duration-300 cursor-pointer"
         >
           <Plus size={14} />
-          <span className="text-[10px] font-black uppercase tracking-widest">Adicionar Conteudo</span>
+          <span className="text-[10px] font-black uppercase tracking-widest">Adicionar Conteúdo</span>
         </button>
       </div>
     </div>

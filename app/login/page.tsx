@@ -88,7 +88,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-8 text-center text-zinc-600 text-[10px] uppercase tracking-widest">
+        <p className="mt-8 text-center text-zinc-500 text-[10px] uppercase tracking-widest">
           v1.0.5 // Restricted Area
         </p>
       </div>

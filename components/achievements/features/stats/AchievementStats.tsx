@@ -21,7 +21,7 @@ export function AchievementStats({ achievements }: AchievementStatsProps) {
         <div className="h-[1px] flex-1 bg-gradient-to-r from-[#ffffff]/15 to-transparent" />
         <span className="text-[9px] font-mono font-bold text-zinc-500 tabular-nums shrink-0">
           {String(unlockedCount).padStart(2, '0')}
-          <span className="text-zinc-700">/{String(totalCount).padStart(2, '0')}</span>
+          <span className="text-zinc-400">/{String(totalCount).padStart(2, '0')}</span>
         </span>
       </div>
     </div>

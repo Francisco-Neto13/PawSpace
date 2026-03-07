@@ -35,7 +35,7 @@ export function useSkillActions() {
   }, [setNodes]);
 
   const handleDelete = useCallback((nodeId: string) => {
-    if (!confirm('Eliminar este no e todos os dependencias??')) return;
+    if (!confirm('Remover este módulo e todas as conexões?')) return;
     setNodes((prev) => prev.filter(n => n.id !== nodeId));
     setEdges((prev) => prev.filter(e => e.source !== nodeId && e.target !== nodeId));
   }, [setNodes, setEdges]);
@@ -55,9 +55,9 @@ export function useSkillActions() {
 
     const newData: SkillData = {
       id: tempId,
-      name: 'Novo Protocolo',
-      label: 'Novo Protocolo',
-      description: 'Defina as diretrizes deste no.',
+      name: 'Novo Módulo',
+      label: 'Novo Módulo',
+      description: 'Defina os objetivos deste módulo.',
       icon: '*' ,
       color: '#ffffff',
       shape: 'hexagon' as SkillShape,
@@ -139,7 +139,7 @@ export function useSkillActions() {
         });
 
         if (!result.success) {
-          const msg = (result as any).error || 'Erro ao criar no.';
+          const msg = (result as any).error || 'Erro ao criar módulo.';
           alert(msg);
           return false;
         }
@@ -186,5 +186,4 @@ export function useSkillActions() {
     handleGlobalSave,
   };
 }
-
 

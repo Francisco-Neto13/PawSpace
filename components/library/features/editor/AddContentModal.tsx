@@ -34,8 +34,8 @@ const poly = `polygon(
   0 10px
 )`;
 
-const labelClass = "text-[9px] text-zinc-500 uppercase font-black tracking-[0.25em] block mb-2.5";
-const inputClass = "w-full bg-white/[0.02] border border-white/[0.08] p-3.5 text-white text-sm outline-none focus:border-[#ffffff]/40 transition-colors font-normal placeholder:text-zinc-600 cursor-text";
+const labelClass = "text-[9px] text-zinc-400 uppercase font-black tracking-[0.25em] block mb-2.5";
+const inputClass = "w-full bg-white/[0.02] border border-white/[0.08] p-3.5 text-white text-sm outline-none focus:border-[#ffffff]/40 transition-colors font-normal placeholder:text-zinc-500 cursor-text";
 
 interface AddContentModalProps {
   isOpen: boolean;
@@ -49,7 +49,7 @@ function CharCounter({ current, max }: { current: number; max: number }) {
   const warn = current >= max * 0.8;
   if (!warn) return null;
   return (
-    <span className={`text-[9px] font-mono font-bold tabular-nums ${remaining <= 10 ? 'text-white' : 'text-zinc-500'}`}>
+    <span className={`text-[9px] font-mono font-bold tabular-nums ${remaining <= 10 ? 'text-white' : 'text-zinc-400'}`}>
       {remaining}
     </span>
   );
@@ -140,7 +140,7 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-5 bg-[#ffffff]" />
                   <div>
-                    <p className="text-[9px] text-zinc-500 uppercase tracking-[0.3em] font-black mb-0.5">
+                    <p className="text-[9px] text-zinc-400 uppercase tracking-[0.3em] font-black mb-0.5">
                       Repositório de Conhecimento
                     </p>
                     <h2 className="text-[#ffffff] text-[13px] font-black uppercase tracking-[0.3em]">
@@ -150,7 +150,7 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
                 </div>
                 <button
                   onClick={handleClose}
-                  className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-500 hover:text-zinc-300 hover:border-white/20 transition-all duration-300 cursor-pointer"
+                  className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-400 hover:text-zinc-200 hover:border-white/20 transition-all duration-300 cursor-pointer"
                 >
                   <X size={12} />
                 </button>
@@ -166,10 +166,10 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
                   className={`flex flex-col items-center gap-2 py-3.5 border text-[9px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer
                     ${activeTab === tab.type
                       ? 'border-[#ffffff]/40 bg-[#ffffff]/[0.06] text-[#ffffff]'
-                      : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.02]'
+                      : 'border-white/[0.04] text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.02]'
                     }`}
                 >
-                  <div className={activeTab === tab.type ? 'text-[#ffffff]' : 'text-zinc-500'}>{tab.icon}</div>
+                  <div className={activeTab === tab.type ? 'text-[#ffffff]' : 'text-zinc-400'}>{tab.icon}</div>
                   {tab.label}
                 </button>
               ))}
@@ -179,7 +179,7 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
 
               <div>
                 <div className="flex items-center justify-between mb-2.5">
-                  <label className="text-[9px] text-zinc-500 uppercase font-black tracking-[0.25em]">
+                  <label className="text-[9px] text-zinc-400 uppercase font-black tracking-[0.25em]">
                     Título Identificador *
                   </label>
                   <CharCounter current={form.title.length} max={TITLE_MAX} />
@@ -250,7 +250,7 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
               <button
                 type="button"
                 onClick={handleClose}
-                className="flex-1 py-4 border border-white/[0.06] text-zinc-500 text-[10px] font-black uppercase tracking-widest hover:bg-white/[0.02] hover:text-zinc-300 hover:border-white/20 transition-all duration-300 cursor-pointer"
+                className="flex-1 py-4 border border-white/[0.06] text-zinc-400 text-[10px] font-black uppercase tracking-widest hover:bg-white/[0.02] hover:text-zinc-200 hover:border-white/20 transition-all duration-300 cursor-pointer"
               >
                 Cancelar
               </button>

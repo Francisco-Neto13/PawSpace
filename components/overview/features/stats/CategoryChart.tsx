@@ -41,7 +41,7 @@ function CategoryChart({ data }: Props) {
           Progresso por Categoria
         </p>
       </div>
-      <p className="text-[9px] text-zinc-600 mb-6 ml-3">cobertura de conteúdo por área</p>
+      <p className="text-[9px] text-zinc-400 mb-6 ml-3">cobertura de conteúdo por área</p>
 
       <ResponsiveContainer width="100%" height={200}>
         <BarChart
@@ -52,7 +52,7 @@ function CategoryChart({ data }: Props) {
         >
           <XAxis
             dataKey="category"
-            tick={{ fill: '#52525b', fontSize: 9, fontWeight: 700 }}
+            tick={{ fill: '#71717a', fontSize: 9, fontWeight: 700 }}
             axisLine={false}
             tickLine={false}
           />
@@ -107,11 +107,11 @@ function CategoryChart({ data }: Props) {
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <p className="text-[8px] text-zinc-600 uppercase tracking-wider">Cobertura</p>
+                <p className="text-[8px] text-zinc-400 uppercase tracking-wider">Cobertura</p>
                 <p className="text-white font-mono font-black text-lg">{cat.pct}%</p>
               </div>
               <div className="text-right">
-                <p className="text-[8px] text-zinc-600 uppercase tracking-wider">Total</p>
+                <p className="text-[8px] text-zinc-400 uppercase tracking-wider">Total</p>
                 <p className="text-white font-mono font-black text-lg">{cat.total}</p>
               </div>
             </div>
@@ -128,7 +128,7 @@ function CategoryChart({ data }: Props) {
             </div>
           ))}
         </div>
-        <span className="text-[8px] text-zinc-600 italic">
+        <span className="text-[8px] text-zinc-400 italic">
           Clique para detalhes
         </span>
       </div>
@@ -136,12 +136,12 @@ function CategoryChart({ data }: Props) {
       {data.length > 1 && (
         <div className="flex gap-3 mt-3">
           <div className="flex-1 border border-white/[0.04] rounded px-2 py-1.5">
-            <p className="text-[7px] text-zinc-600 uppercase tracking-wider font-bold mb-0.5">Melhor</p>
+            <p className="text-[7px] text-zinc-400 uppercase tracking-wider font-bold mb-0.5">Melhor</p>
             <p className="text-[9px] text-white font-bold truncate">{bestCategory.category}</p>
             <p className="text-[8px] text-zinc-500 font-mono">{bestCategory.pct}% cobertura</p>
           </div>
           <div className="flex-1 border border-white/[0.04] rounded px-2 py-1.5">
-            <p className="text-[7px] text-zinc-600 uppercase tracking-wider font-bold mb-0.5">Atenção</p>
+            <p className="text-[7px] text-zinc-400 uppercase tracking-wider font-bold mb-0.5">Atenção</p>
             <p className="text-[9px] text-white font-bold truncate">{worstCategory.category}</p>
             <p className="text-[8px] text-zinc-500 font-mono">{worstCategory.pct}% cobertura</p>
           </div>

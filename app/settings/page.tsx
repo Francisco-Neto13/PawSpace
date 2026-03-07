@@ -10,7 +10,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3 mb-6">
           <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
           <span className="text-white text-[9px] font-black uppercase tracking-[0.4em]">
-            Pawspace / Configuracoes
+            Pawspace / Configurações
           </span>
           <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
         </div>
@@ -19,7 +19,7 @@ export default function SettingsPage() {
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-white opacity-[0.04] pointer-events-none" />
           <p className="text-zinc-300 text-[11px] font-black uppercase tracking-[0.3em]">
-            Modulo em desenvolvimento
+            Módulo em desenvolvimento
           </p>
         </section>
       </main>

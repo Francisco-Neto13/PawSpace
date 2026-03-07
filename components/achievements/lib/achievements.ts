@@ -21,7 +21,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'first_node',
     title: 'Primeiro Passo',
-    description: 'Adicione conteudo ao primeiro modulo da Árvore.',
+    description: 'Adicione conteúdo ao primeiro módulo da Árvore.',
     icon: 'P1',
     category: 'tree',
     check: ({ activeNodes }) => activeNodes >= 1,
@@ -30,7 +30,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'architect',
     title: 'Arquiteto',
-    description: 'Adicione conteudo em 10 modulos da Árvore.',
+    description: 'Adicione conteúdo em 10 módulos da Árvore.',
     icon: 'A10',
     category: 'tree',
     check: ({ activeNodes }) => activeNodes >= 10,
@@ -39,7 +39,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'nexus_master',
     title: 'Mestre do Pawspace',
-    description: 'Adicione conteudo em 25 modulos da Árvore.',
+    description: 'Adicione conteúdo em 25 módulos da Árvore.',
     icon: 'N25',
     category: 'tree',
     check: ({ activeNodes }) => activeNodes >= 25,
@@ -49,7 +49,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'first_entry',
     title: 'Primeira Entrada',
-    description: 'Registre sua primeira entrada no Diario.',
+    description: 'Registre sua primeira entrada no Diário.',
     icon: 'E1',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 1,
@@ -58,7 +58,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'chronicler',
     title: 'Cronista',
-    description: 'Registre 10 entradas no Diario de Bordo.',
+    description: 'Registre 10 entradas no Diário de Bordo.',
     icon: 'C10',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 10,
@@ -67,7 +67,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'archivist',
     title: 'Arquivista',
-    description: 'Registre 20 entradas no Diario de Bordo.',
+    description: 'Registre 20 entradas no Diário de Bordo.',
     icon: 'A20',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 20,
@@ -77,7 +77,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'first_content',
     title: 'Primeiro Conhecimento',
-    description: 'Adicione seu primeiro conteudo a Biblioteca.',
+    description: 'Adicione seu primeiro conteúdo à Biblioteca.',
     icon: 'B1',
     category: 'library',
     check: ({ libraryContents }) => libraryContents >= 1,
@@ -85,8 +85,8 @@ const DEFINITIONS: AchievementDefinition[] = [
   },
   {
     id: 'librarian',
-    title: 'Bibliotecario',
-    description: 'Adicione 20 conteudos a Biblioteca.',
+    title: 'Bibliotecário',
+    description: 'Adicione 20 conteúdos à Biblioteca.',
     icon: 'L20',
     category: 'library',
     check: ({ libraryContents }) => libraryContents >= 20,
@@ -107,7 +107,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   },
   {
     id: 'advanced',
-    title: 'Avancado',
+    title: 'Avançado',
     description: 'Atinja 50% de cobertura da Árvore.',
     icon: '50%',
     category: 'progress',
@@ -120,7 +120,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'nexus_complete',
     title: 'Pawspace Completo',
-    description: 'Tenha conteudo em todos os modulos da Árvore.',
+    description: 'Tenha conteúdo em todos os módulos da Árvore.',
     icon: '100%',
     category: 'progress',
     check: ({ activeNodes, totalNodes }) => totalNodes > 0 && activeNodes >= totalNodes,
@@ -145,7 +145,7 @@ export function computeAchievements(input: AchievementInput): Achievement[] {
 
 export const CATEGORY_LABELS: Record<Achievement['category'], string> = {
   tree: 'Árvore',
-  journal: 'Diario',
+  journal: 'Diário',
   library: 'Biblioteca',
   progress: 'Progresso',
 };

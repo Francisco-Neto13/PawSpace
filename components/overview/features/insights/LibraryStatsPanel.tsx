@@ -57,7 +57,7 @@ function LibraryStatsPanel() {
           <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
           Caixinha de Areia
         </p>
-        <p className="text-[9px] text-zinc-700 mt-6 ml-3">
+        <p className="text-[9px] text-zinc-500 mt-6 ml-3">
           Navegue pelos módulos para carregar os dados da biblioteca.
         </p>
       </div>
@@ -74,7 +74,7 @@ function LibraryStatsPanel() {
         <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
         Caixinha de Areia
       </p>
-      <p className="text-[9px] text-zinc-600 mb-6 ml-3">conteúdos por tipo</p>
+      <p className="text-[9px] text-zinc-400 mb-6 ml-3">conteúdos por tipo</p>
 
       <div className="flex items-center gap-6">
         <div className="relative shrink-0" style={{ width: 120, height: 120 }}>
@@ -110,7 +110,7 @@ function LibraryStatsPanel() {
             <span className="text-white font-mono font-black text-sm leading-none">
               {activeType ? activeType.value : totalContents}
             </span>
-            <span className="text-zinc-600 text-[7px] uppercase tracking-wider font-bold mt-0.5">
+            <span className="text-zinc-400 text-[7px] uppercase tracking-wider font-bold mt-0.5">
               {activeType ? activeType.name : 'itens'}
             </span>
           </div>
@@ -148,14 +148,14 @@ function LibraryStatsPanel() {
                 >
                   {t.name}
                 </span>
-                <span className="text-[9px] text-zinc-600 font-mono w-5 text-right">{pct}%</span>
+                <span className="text-[9px] text-zinc-400 font-mono w-5 text-right">{pct}%</span>
                 <span className="text-[9px] text-zinc-500 font-mono w-4 text-right">{t.value}</span>
               </div>
             );
           })}
 
           <div className="pt-2 border-t border-white/[0.04]">
-            <span className="text-[8px] text-zinc-600 uppercase tracking-wider font-bold">
+            <span className="text-[8px] text-zinc-400 uppercase tracking-wider font-bold">
               {totalContents} itens em {totalNodes} módulos
             </span>
           </div>

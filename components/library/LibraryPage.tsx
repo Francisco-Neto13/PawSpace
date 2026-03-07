@@ -129,7 +129,7 @@ export default function LibraryPage() {
             <p className="text-zinc-300 text-[11px] font-black uppercase tracking-[0.4em]">
               Árvore Vazia
             </p>
-            <p className="text-zinc-600 text-[11px] font-normal max-w-[260px] leading-relaxed">
+            <p className="text-zinc-400 text-[11px] font-normal max-w-[260px] leading-relaxed">
               Crie sua Árvore primeiro para começar a organizar conteúdos por módulo.
             </p>
           </div>
@@ -172,7 +172,7 @@ export default function LibraryPage() {
               {[
                 { label: 'Módulos',       value: nodes.length },
                 { label: 'Conteúdos',     value: totalContents },
-                { label: 'Disponiveis', value: nodes.length },
+                { label: 'Disponíveis', value: nodes.length },
               ].map((s, i, arr) => (
                 <div key={i} className="flex items-center gap-8">
                   <div className="text-right">
@@ -224,7 +224,7 @@ export default function LibraryPage() {
                   <span className="text-xl">{selectedNode?.icon}</span>
                   <div>
                     <p className="text-white text-xl font-black tracking-wide">{selectedNode?.name}</p>
-                    <p className="text-zinc-600 text-[9px] font-mono mt-0.5">
+                    <p className="text-zinc-500 text-[9px] font-mono mt-0.5">
                       {currentContents.length} {currentContents.length === 1 ? 'item' : 'itens'} indexados
                     </p>
                   </div>

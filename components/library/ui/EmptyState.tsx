@@ -8,7 +8,7 @@ interface EmptyStateProps {
 export function EmptyState({ onAdd }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center animate-in fade-in duration-700">
-      <div className="w-16 h-16 border border-white/[0.08] bg-white/[0.01] flex items-center justify-center mb-6 text-zinc-600">
+      <div className="w-16 h-16 border border-white/[0.08] bg-white/[0.01] flex items-center justify-center mb-6 text-zinc-500">
         <BookOpen size={24} strokeWidth={1.5} />
       </div>
 
@@ -16,8 +16,8 @@ export function EmptyState({ onAdd }: EmptyStateProps) {
         Biblioteca Vazia
       </p>
 
-      <p className="text-zinc-600 text-[12px] font-normal max-w-[280px] leading-relaxed">
-        Nenhum conteudo indexado neste modulo ainda.
+      <p className="text-zinc-400 text-[12px] font-normal max-w-[280px] leading-relaxed">
+        Nenhum conteúdo indexado neste módulo ainda.
       </p>
 
       {onAdd && (
@@ -26,7 +26,7 @@ export function EmptyState({ onAdd }: EmptyStateProps) {
           className="mt-8 flex items-center gap-2 px-5 py-2.5 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[9px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 hover:border-[#ffffff]/50 transition-all duration-200 active:scale-95 cursor-pointer"
         >
           <Plus size={10} />
-          Adicionar Conteudo
+          Adicionar Conteúdo
         </button>
       )}
 

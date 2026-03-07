@@ -12,10 +12,10 @@ function CustomTooltip({ active, payload }: any) {
       <p className="text-white">{d.label}</p>
       <p className="text-white/80">{d.count} {d.count === 1 ? 'entrada' : 'entradas'}</p>
       {d.isCurrentMonth && (
-        <p className="text-white/40 text-[8px] mt-0.5">mês atual</p>
+        <p className="text-white/60 text-[8px] mt-0.5">mês atual</p>
       )}
       {d.isPeak && d.count > 0 && (
-        <p className="text-white/40 text-[8px] mt-0.5">🏆 pico</p>
+        <p className="text-white/60 text-[8px] mt-0.5">🏆 pico</p>
       )}
     </div>
   );
@@ -92,7 +92,7 @@ function JournalActivityChart() {
           </span>
         )}
       </div>
-      <p className="text-[9px] text-zinc-600 mb-6 ml-3">entradas por mês — últimos 6 meses</p>
+      <p className="text-[9px] text-zinc-400 mb-6 ml-3">entradas por mês — últimos 6 meses</p>
 
       <ResponsiveContainer width="100%" height={160}>
         <BarChart
@@ -101,7 +101,7 @@ function JournalActivityChart() {
         >
           <XAxis
             dataKey="label"
-            tick={{ fill: '#52525b', fontSize: 9, fontWeight: 700 }}
+            tick={{ fill: '#71717a', fontSize: 9, fontWeight: 700 }}
             axisLine={false}
             tickLine={false}
           />
@@ -131,22 +131,22 @@ function JournalActivityChart() {
       </ResponsiveContainer>
 
       <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/[0.04]">
-        <span className="text-[8px] text-zinc-600 uppercase tracking-wider font-bold">
+        <span className="text-[8px] text-zinc-400 uppercase tracking-wider font-bold">
           Total: {totalEntries} entradas
         </span>
-        <span className="text-[8px] text-zinc-500 uppercase tracking-wider font-bold italic">
+        <span className="text-[8px] text-zinc-300 uppercase tracking-wider font-bold italic">
           {insight}
         </span>
-        <span className="text-[8px] text-zinc-600 uppercase tracking-wider font-bold">
+        <span className="text-[8px] text-zinc-400 uppercase tracking-wider font-bold">
           Pico: {maxCount}/mês
         </span>
       </div>
 
       <div className="flex items-center gap-2 mt-2">
         <div className="w-2 h-2 bg-white/70" />
-        <span className="text-[8px] text-zinc-600 uppercase tracking-wider font-bold">mês atual</span>
+        <span className="text-[8px] text-zinc-400 uppercase tracking-wider font-bold">mês atual</span>
         <div className="w-2 h-2 bg-white/45 ml-2" />
-        <span className="text-[8px] text-zinc-600 uppercase tracking-wider font-bold">pico histórico</span>
+        <span className="text-[8px] text-zinc-400 uppercase tracking-wider font-bold">pico histórico</span>
       </div>
     </div>
   );

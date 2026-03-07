@@ -28,19 +28,19 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
       <div className="flex items-center gap-2">
         <div className="w-1 h-3 bg-[#ffffff]/40" />
-        <p className="text-[9px] text-zinc-600 uppercase font-black tracking-[0.3em]">
-          Modulos da Arvore
+        <p className="text-[9px] text-zinc-400 uppercase font-black tracking-[0.3em]">
+          Módulos da Árvore
         </p>
       </div>
 
       <div className="relative">
-        <Search size={11} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" />
+        <Search size={11} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
         <input
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar modulo..."
-          className="w-full bg-black/30 border border-white/[0.08] pl-8 pr-3 py-2.5 text-[10px] text-zinc-300 placeholder:text-zinc-700 font-mono outline-none focus:border-white/20 transition-colors"
+          placeholder="Buscar módulo..."
+          className="w-full bg-black/30 border border-white/[0.08] pl-8 pr-3 py-2.5 text-[10px] text-zinc-300 placeholder:text-zinc-500 font-mono outline-none focus:border-white/20 transition-colors"
         />
       </div>
 
@@ -49,7 +49,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
       >
         {filtered.length === 0 && (
-          <p className="text-[10px] text-zinc-700 font-mono text-center py-8">Nenhum modulo encontrado</p>
+          <p className="text-[10px] text-zinc-500 font-mono text-center py-8">Nenhum módulo encontrado</p>
         )}
         {filtered.map(node => {
           const isSelected = node.id === selectedNodeId;
@@ -87,7 +87,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
                 <p className={`text-[11px] font-bold truncate transition-colors duration-300 ${isSelected ? 'text-[#ffffff]' : 'text-zinc-400 group-hover:text-zinc-200'}`}>
                   {node.name}
                 </p>
-                <p className="text-[9px] text-zinc-700 font-mono mt-0.5">
+                <p className="text-[9px] text-zinc-500 font-mono mt-0.5">
                   {node.contents.length} {node.contents.length === 1 ? 'item' : 'itens'}
                 </p>
               </div>

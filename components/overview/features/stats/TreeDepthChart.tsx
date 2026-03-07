@@ -19,12 +19,12 @@ function CustomTooltip({ active, payload }: any) {
       <p className="text-white/50 text-[8px]">Nível {d.level}</p>
       <p className="text-white">{d.total} patas</p>
       <p className="text-zinc-400">{d.withContent} com conteúdo</p>
-      {gap > 0 && <p className="text-zinc-600">{gap} sem conteúdo</p>}
+      {gap > 0 && <p className="text-zinc-400">{gap} sem conteúdo</p>}
       <div className="flex items-center gap-2 mt-1">
         <div className="h-[2px] flex-1 bg-white/10 overflow-hidden">
           <div className="h-full bg-white/60 transition-all" style={{ width: `${pct}%` }} />
         </div>
-        <span className="text-zinc-500 text-[8px]">{pct}%</span>
+        <span className="text-zinc-400 text-[8px]">{pct}%</span>
       </div>
     </div>
   );
@@ -53,13 +53,13 @@ function TreeDepthChart({ data, maxGapLevel }: Props) {
           className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 border border-white/[0.08] transition-all"
           style={{
             backgroundColor: highlightGap ? 'rgba(255,255,255,0.08)' : 'transparent',
-            color: highlightGap ? 'rgba(255,255,255,0.7)' : '#52525b',
+            color: highlightGap ? 'rgba(255,255,255,0.8)' : '#a1a1aa',
           }}
         >
           {highlightGap ? 'Gap ativo' : 'Ver gaps'}
         </button>
       </div>
-      <p className="text-[9px] text-zinc-600 mb-6 ml-3">profundidade da árvore de conhecimento</p>
+      <p className="text-[9px] text-zinc-400 mb-6 ml-3">profundidade da árvore de conhecimento</p>
 
       <ResponsiveContainer width="100%" height={200}>
         <AreaChart data={data}>
@@ -79,7 +79,7 @@ function TreeDepthChart({ data, maxGapLevel }: Props) {
           </defs>
           <XAxis
             dataKey="level"
-            tick={{ fill: '#52525b', fontSize: 9, fontWeight: 700 }}
+            tick={{ fill: '#71717a', fontSize: 9, fontWeight: 700 }}
             axisLine={false}
             tickLine={false}
           />
@@ -157,7 +157,7 @@ function TreeDepthChart({ data, maxGapLevel }: Props) {
             </div>
           )}
         </div>
-        <span className="text-[8px] text-zinc-600 font-mono font-bold">{overallPct}% geral</span>
+        <span className="text-[8px] text-zinc-400 font-mono font-bold">{overallPct}% geral</span>
       </div>
     </div>
   );

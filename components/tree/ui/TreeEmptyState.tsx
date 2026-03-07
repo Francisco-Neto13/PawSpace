@@ -18,7 +18,7 @@ export function TreeEmptyState({ onCreate }: TreeEmptyStateProps) {
             Pawspace Vazio
           </p>
         </div>
-        <p className="text-zinc-600 text-[11px] font-normal max-w-[260px] leading-relaxed">
+        <p className="text-zinc-400 text-[11px] font-normal max-w-[260px] leading-relaxed">
           Nenhuma árvore registrada. Crie o nó raiz para iniciar sua Árvore.
         </p>
       </div>

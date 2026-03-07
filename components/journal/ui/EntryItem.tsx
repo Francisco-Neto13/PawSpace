@@ -41,7 +41,7 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
         {entry.title || 'Sem Título'}
       </p>
 
-      <p className="text-[10px] text-zinc-500 font-medium leading-relaxed line-clamp-2 min-h-[30px]">
+      <p className="text-[10px] text-zinc-400 font-medium leading-relaxed line-clamp-2 min-h-[30px]">
         {preview}…
       </p>
 
@@ -62,7 +62,7 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
           </div>
         )}
         
-        <span className="text-[9px] text-zinc-700 font-mono flex items-center gap-1 ml-auto">
+        <span className="text-[9px] text-zinc-500 font-mono flex items-center gap-1 ml-auto">
           <Calendar size={8} />
           {formatDate(entry.createdAt)}
         </span>

@@ -67,7 +67,7 @@ export default function OverviewHeader({
             </div>
 
             <div className="flex flex-col items-center gap-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Rank</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Rank</span>
               <div className="w-14 h-14 flex items-center justify-center border border-white/10 bg-white/[0.03] rounded-xl">
                 <span className="text-white text-2xl font-black font-mono">{rank.label}</span>
               </div>
@@ -77,11 +77,11 @@ export default function OverviewHeader({
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                <PawIcon className="w-3 h-3 text-white/40" />
+                <PawIcon className="w-3 h-3 text-white/60" />
                 {unlockedCount} / {totalCount} módulos com conteúdo
               </span>
               <span className="font-mono text-xl text-white font-black leading-none">
-                {progress}<span className="text-xs ml-0.5 text-zinc-600">%</span>
+                {progress}<span className="text-xs ml-0.5 text-zinc-400">%</span>
               </span>
             </div>
 

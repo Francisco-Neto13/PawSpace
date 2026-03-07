@@ -31,7 +31,7 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
 
   if (!data) return null;
 
-  const displayLabel = data.label || data.name || 'MODULO DESCONHECIDO';
+  const displayLabel = data.label || data.name || 'MÓDULO DESCONHECIDO';
   const skillId = data.id || '';
 
   const handleViewLibrary = () => {
@@ -68,12 +68,12 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
                   backgroundColor: `${activeColor}0d`,
                 }}
               >
-                {data.category?.toUpperCase() || 'PROTOCOLO'}
+                {data.category?.toUpperCase() || 'MÓDULO'}
               </div>
 
               <button
                 onClick={onClose}
-                className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-600 hover:text-zinc-300 hover:border-white/20 transition-all duration-300 text-xs cursor-pointer"
+                className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-500 hover:text-zinc-200 hover:border-white/20 transition-all duration-300 text-xs cursor-pointer"
               >
                 X
               </button>
@@ -116,19 +116,19 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
                   }}
                 />
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/80">
-                  Disponivel
+                  Disponível
                 </span>
               </div>
 
               <p className="text-zinc-400 text-sm font-medium leading-relaxed px-2 min-h-[60px]">
-                {data.description || 'Nenhuma descricao disponivel para este protocolo.'}
+                {data.description || 'Nenhuma descrição disponível para este módulo.'}
               </p>
             </div>
 
             <div className="mt-6 relative z-10">
               <button
                 onClick={handleViewLibrary}
-                className="w-full py-3 border border-white/[0.06] text-zinc-500 text-[9px] font-black uppercase tracking-[0.3em] hover:border-[#ffffff]/20 hover:text-[#ffffff] hover:bg-[#ffffff]/[0.03] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3 border border-white/[0.06] text-zinc-400 text-[9px] font-black uppercase tracking-[0.3em] hover:border-[#ffffff]/20 hover:text-[#ffffff] hover:bg-[#ffffff]/[0.03] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <BookOpen size={12} />
                 Visualizar na Biblioteca

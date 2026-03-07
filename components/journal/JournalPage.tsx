@@ -44,7 +44,7 @@ export default function JournalPage() {
     const tempId = `temp-${Date.now()}`;
     const placeholder: JournalEntry = {
       id: tempId,
-      title: 'Nova Entrada Protocolada',
+      title: 'Nova Entrada',
       body: '',
       skillId: null,
       createdAt: new Date().toISOString(),
@@ -174,8 +174,8 @@ export default function JournalPage() {
               />
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center gap-4 group py-20">
-                <BookOpen size={32} className="text-zinc-800 group-hover:text-zinc-700 transition-colors duration-500" />
-                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em]">
+                <BookOpen size={32} className="text-zinc-500 group-hover:text-zinc-400 transition-colors duration-500" />
+                <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.3em]">
                   Nenhum registro selecionado
                 </p>
               </div>

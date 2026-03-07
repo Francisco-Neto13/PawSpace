@@ -79,8 +79,8 @@ export function SkillForm({
     onSubmit(formData);
   };
 
-  const labelClass = "text-[8px] text-zinc-600 uppercase font-black tracking-[0.25em]";
-  const inputClass = "w-full bg-white/[0.02] border border-white/[0.06] p-3.5 text-white text-sm outline-none focus:border-[#ffffff]/30 transition-colors font-light placeholder:text-zinc-700 cursor-text";
+  const labelClass = "text-[8px] text-zinc-400 uppercase font-black tracking-[0.25em]";
+  const inputClass = "w-full bg-white/[0.02] border border-white/[0.06] p-3.5 text-white text-sm outline-none focus:border-[#ffffff]/30 transition-colors font-light placeholder:text-zinc-500 cursor-text";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -147,7 +147,7 @@ export function SkillForm({
                 }}
               />
               <span className={`text-[7px] font-black uppercase tracking-wider transition-colors duration-300 ${
-                formData.shape === s.value ? 'text-[#ffffff]' : 'text-zinc-600 group-hover:text-zinc-500'
+                formData.shape === s.value ? 'text-[#ffffff]' : 'text-zinc-500 group-hover:text-zinc-300'
               }`}>
                 {s.label}
               </span>
@@ -173,7 +173,7 @@ export function SkillForm({
 
       {!isEditing && initialParentId === undefined && (
         <div>
-          <label className={`${labelClass} block mb-2`}>Modulo pai (opcional)</label>
+          <label className={`${labelClass} block mb-2`}>Módulo pai (opcional)</label>
           <select
             value={formData.parentId}
             onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
@@ -193,7 +193,7 @@ export function SkillForm({
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 py-3.5 border border-white/[0.06] text-zinc-600 text-[10px] font-black uppercase tracking-widest hover:bg-white/[0.02] hover:text-zinc-400 hover:border-white/10 transition-all duration-300 cursor-pointer"
+          className="flex-1 py-3.5 border border-white/[0.06] text-zinc-400 text-[10px] font-black uppercase tracking-widest hover:bg-white/[0.02] hover:text-zinc-200 hover:border-white/10 transition-all duration-300 cursor-pointer"
         >
           Cancelar
         </button>
