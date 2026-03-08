@@ -4,7 +4,10 @@ interface PageBackgroundProps {
 
 export function PageBackground({ src }: PageBackgroundProps) {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none select-none">
+    <div
+      className="fixed inset-0 z-0 pointer-events-none select-none"
+      style={{ backgroundColor: 'var(--bg-image-canvas)' }}
+    >
       <img
         src={src}
         alt=""

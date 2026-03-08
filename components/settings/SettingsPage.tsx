@@ -19,7 +19,7 @@ export default function SettingsPage() {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
-      <PageBackground src="/cat.webp" />
+      <PageBackground src="/cat6.webp" />
 
       <main className="relative z-10 py-8 pb-20">
 
