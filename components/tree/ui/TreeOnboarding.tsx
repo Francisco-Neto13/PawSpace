@@ -60,8 +60,8 @@ export function TreeOnboarding() {
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-2 px-3 py-2 border transition-all duration-300 backdrop-blur-md cursor-pointer
           ${isOpen
-            ? 'border-[#ffffff]/40 bg-[#ffffff]/10 text-[#ffffff]'
-            : 'border-white/[0.06] bg-[#0a0a0a]/80 text-zinc-500 hover:text-[#ffffff] hover:border-[#ffffff]/30'
+            ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+            : 'border-[var(--border-subtle)] bg-[var(--bg-strong)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)]'
           }`}
       >
         <Info size={13} />
@@ -71,33 +71,33 @@ export function TreeOnboarding() {
       {isOpen && (
         <div
           className="w-72 p-[1.5px] animate-in fade-in zoom-in-95 duration-200 origin-top-right"
-          style={{ clipPath: polySmall, backgroundColor: '#ffffff22' }}
+          style={{ clipPath: polySmall, backgroundColor: 'var(--border-visible)' }}
         >
-          <div style={{ clipPath: polySmall, backgroundColor: '#000' }}>
+          <div style={{ clipPath: polySmall, backgroundColor: 'var(--bg-base)' }}>
             <div
               className="relative overflow-hidden"
-              style={{ clipPath: polySmall, backgroundColor: '#080808' }}
+              style={{ clipPath: polySmall, backgroundColor: 'var(--bg-strong)' }}
             >
               <div
                 className="absolute inset-0 opacity-[0.025] pointer-events-none"
                 style={{
-                  backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
+                  backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, var(--grid-line) 2px, var(--grid-line) 4px)',
                 }}
               />
 
               <div className="relative z-10 p-5">
-                <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-white opacity-[0.04] pointer-events-none" />
+                <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04] pointer-events-none" />
 
-                <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/[0.04]">
+                <div className="flex items-center justify-between mb-5 pb-3 border-b border-[var(--border-subtle)]">
                   <div className="flex items-center gap-3">
-                    <div className="w-1 h-5 bg-[#ffffff]" />
+                    <div className="w-1 h-5 bg-[var(--text-primary)]" />
                     <div>
-                      <p className="text-[8px] text-zinc-400 uppercase font-black tracking-[0.3em] mb-0.5">
+                      <p className="text-[8px] text-[var(--text-secondary)] uppercase font-black tracking-[0.3em] mb-0.5">
                         Documentação
                       </p>
                       <div className="flex items-center gap-2">
-                        <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
-                        <h3 className="text-[#ffffff] text-[11px] font-black uppercase tracking-[0.3em]">
+                        <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+                        <h3 className="text-[var(--text-primary)] text-[11px] font-black uppercase tracking-[0.3em]">
                           Manual Pawspace
                         </h3>
                       </div>
@@ -105,25 +105,25 @@ export function TreeOnboarding() {
                   </div>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-500 hover:text-zinc-200 hover:border-white/20 transition-all duration-300 text-xs cursor-pointer"
+                    className="w-7 h-7 flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-300 text-xs cursor-pointer"
                   >
                     <X size={12} />
                   </button>
                 </div>
 
-                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.2) transparent' }}>
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--border-visible) transparent' }}>
                   {steps.map((step, i) => (
                     <div key={i} className="flex gap-3 items-start group">
                       <div
-                        className="shrink-0 p-1.5 border border-white/[0.06] bg-white/[0.02] text-[#ffffff]/60 group-hover:text-[#ffffff] group-hover:border-[#ffffff]/20 transition-all duration-300"
+                        className="shrink-0 p-1.5 border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] group-hover:border-[var(--border-visible)] transition-all duration-300"
                       >
                         {step.icon}
                       </div>
                       <div>
-                        <h4 className="text-[10px] font-black text-[#ffffff] uppercase tracking-[0.2em] mb-1">
+                        <h4 className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-[0.2em] mb-1">
                           {step.title}
                         </h4>
-                        <p className="text-[10px] text-zinc-300 font-normal leading-relaxed tracking-wide">
+                        <p className="text-[10px] text-[var(--text-secondary)] font-normal leading-relaxed tracking-wide">
                           {step.desc}
                         </p>
                       </div>
@@ -132,14 +132,14 @@ export function TreeOnboarding() {
                 </div>
 
                 <div
-                  className="mt-5 pt-3 border-t border-white/[0.04] flex justify-between items-center"
+                  className="mt-5 pt-3 border-t border-[var(--border-subtle)] flex justify-between items-center"
                 >
-                  <span className="text-[8px] text-zinc-500 uppercase tracking-widest font-mono">
+                  <span className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest font-mono">
                     Pawspace
                   </span>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse" />
-                    <span className="text-[8px] text-white/80 uppercase tracking-widest font-mono">Online</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--text-primary)] animate-pulse" />
+                    <span className="text-[8px] text-[var(--text-primary)] uppercase tracking-widest font-mono">Online</span>
                   </div>
                 </div>
 

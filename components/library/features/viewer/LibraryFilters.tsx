@@ -19,18 +19,18 @@ export function LibraryFilters({
   return (
     <div className="flex items-center gap-4">
       <div className="relative flex-1">
-        <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
+        <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
         <input
           type="text"
           value={search}
           onChange={e => onSearchChange(e.target.value)}
           placeholder="Buscar conteúdo..."
-          className="w-full bg-white/[0.02] border border-white/[0.06] pl-11 pr-4 py-3.5 text-white text-sm font-medium outline-none focus:border-[#ffffff]/30 transition-colors placeholder:text-zinc-500 cursor-text"
+          className="w-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] pl-11 pr-4 py-3.5 text-[var(--text-primary)] text-sm font-medium outline-none focus:border-[var(--border-visible)] transition-colors placeholder:text-[var(--text-muted)] cursor-text"
         />
         {search && (
           <button
             onClick={() => onSearchChange('')}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 cursor-pointer"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
           >
             <X size={12} />
           </button>
@@ -38,15 +38,15 @@ export function LibraryFilters({
       </div>
 
       <div className="flex items-center gap-1.5">
-        <Filter size={12} className="text-zinc-500 mr-1" />
+        <Filter size={12} className="text-[var(--text-muted)] mr-1" />
         {FILTER_OPTIONS.map(f => (
           <button
             key={f.value}
             onClick={() => onTypeChange(f.value)}
             className={`px-4 py-3.5 text-[9px] font-black uppercase tracking-widest border transition-all duration-200 cursor-pointer
               ${typeFilter === f.value
-                ? 'border-[#ffffff]/40 bg-[#ffffff]/[0.08] text-[#ffffff]'
-                : 'border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:border-white/[0.08]'
+                ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                : 'border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)]'
               }`}
           >
             {f.label}

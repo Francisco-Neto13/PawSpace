@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo } from 'react';
 import { useNexus } from '@/shared/contexts/NexusContext';
@@ -46,11 +46,11 @@ export default function OverviewContent() {
 
   if (isLoading && nodes.length === 0) {
     return (
-      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0a0a0a]">
-        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_60%,transparent_100%)]" />
+      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
+        <div className="theme-grid-overlay absolute inset-0 pointer-events-none [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_60%,transparent_100%)]" />
         <div className="relative flex flex-col items-center gap-4">
-          <div className="w-7 h-7 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-          <p className="text-white text-[9px] font-black uppercase tracking-[0.5em] animate-pulse">
+          <div className="w-7 h-7 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
+          <p className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.5em] animate-pulse">
             Sincronizando Pawspace...
           </p>
         </div>
@@ -65,11 +65,11 @@ export default function OverviewContent() {
       <main className="relative z-10 py-8 space-y-4 pb-20">
 
         <div className="flex items-center gap-3 mb-6">
-          <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
-          <span className="text-white text-[9px] font-black uppercase tracking-[0.4em]">
-            Pawspace / Visão Geral
+          <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+          <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
+            Pawspace / Visao Geral
           </span>
-          <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--border-subtle)] to-transparent" />
         </div>
 
         <OverviewHeader
@@ -111,50 +111,50 @@ export default function OverviewContent() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2" style={deferredSectionStyle}>
 
-          <div className="lg:col-span-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white mb-6 flex items-center gap-2">
-              <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
-              Resumo do Currículo
+          <div className="lg:col-span-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-6 flex items-center gap-2">
+              <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+              Resumo do Curriculo
             </p>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <p className="text-zinc-400 text-sm leading-relaxed font-light max-w-sm">
-                Você tem conteúdo em{' '}
-                <span className="text-white font-bold">{stats.unlocked} módulos</span>,
+              <p className="text-[var(--text-muted)] text-sm leading-relaxed font-light max-w-sm">
+                Voce tem conteudo em{' '}
+                <span className="text-[var(--text-primary)] font-bold">{stats.unlocked} modulos</span>,
                 representando{' '}
-                <span className="text-white font-black">{stats.progress}%</span>{' '}
-                da sua árvore. Ainda sem conteúdo:{' '}
-                <span className="text-zinc-200 font-semibold">{stats.total - stats.unlocked} módulos</span>.
+                <span className="text-[var(--text-primary)] font-black">{stats.progress}%</span>{' '}
+                da sua arvore. Ainda sem conteudo:{' '}
+                <span className="text-[var(--text-secondary)] font-semibold">{stats.total - stats.unlocked} modulos</span>.
               </p>
               <div className="flex gap-6 shrink-0 font-mono">
                 <div className="text-right">
-                  <p className="text-[8px] text-zinc-400 uppercase tracking-widest mb-1">Total</p>
-                  <p className="text-white text-3xl font-black tabular-nums">{stats.total}</p>
+                  <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Total</p>
+                  <p className="text-[var(--text-primary)] text-3xl font-black tabular-nums">{stats.total}</p>
                 </div>
-                <div className="w-[1px] bg-white/[0.06]" />
+                <div className="w-[1px] bg-[var(--bg-elevated)]" />
                 <div className="text-right">
-                  <p className="text-[8px] text-zinc-400 uppercase tracking-widest mb-1">Com Conteúdo</p>
-                  <p className="text-white text-3xl font-black tabular-nums">{stats.unlocked}</p>
+                  <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Com Conteudo</p>
+                  <p className="text-[var(--text-primary)] text-3xl font-black tabular-nums">{stats.unlocked}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-            <p className="text-[8px] text-zinc-400 font-black uppercase tracking-[0.4em] mb-4">
-              Próxima Meta
+          <div className="rounded-2xl border border-[var(--border-muted)] bg-[var(--bg-surface)] p-6 flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+            <p className="text-[8px] text-[var(--text-muted)] font-black uppercase tracking-[0.4em] mb-4">
+              Proxima Meta
             </p>
             <div className="flex-1 flex flex-col items-start justify-center gap-3">
-              <div className="rounded-lg border border-white/15 px-3 py-1.5 bg-black/40">
-                <p className="text-white text-[10px] font-black uppercase tracking-wider">
-                  {stats.progress < 100 ? 'Adicionar Conteúdo' : 'Cobertura Completa'}
+              <div className="rounded-lg border border-[var(--border-visible)] px-3 py-1.5 bg-[var(--bg-input)]">
+                <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-wider">
+                  {stats.progress < 100 ? 'Adicionar Conteudo' : 'Cobertura Completa'}
                 </p>
               </div>
-              <p className="text-[10px] text-zinc-400 font-mono leading-snug">
+              <p className="text-[10px] text-[var(--text-muted)] font-mono leading-snug">
                 {stats.total - stats.unlocked > 0
-                  ? `${stats.total - stats.unlocked} módulos sem conteúdo`
-                  : 'Todos os módulos têm conteúdo!'}
+                  ? `${stats.total - stats.unlocked} modulos sem conteudo`
+                  : 'Todos os modulos tem conteudo!'}
               </p>
             </div>
           </div>
@@ -164,3 +164,4 @@ export default function OverviewContent() {
     </div>
   );
 }
+

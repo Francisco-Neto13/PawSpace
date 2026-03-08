@@ -8,12 +8,7 @@ export function PageBackground({ src }: PageBackgroundProps) {
       <img
         src={src}
         alt=""
-        className="w-full h-full object-contain object-center"
-        style={{
-          opacity: 0.12,
-          filter: 'invert(1)',
-          mixBlendMode: 'screen',
-        }}
+        className="page-background-img w-full h-full object-contain object-center"
         draggable={false}
       />
     </div>

@@ -9,7 +9,7 @@ interface SkillPanelProps {
   onClose: () => void;
 }
 
-const DEFAULT_SYSTEM_COLOR = '#ffffff';
+const DEFAULT_SYSTEM_COLOR = '#22d3ee';
 
 const poly = `polygon(
   10px 0,
@@ -27,7 +27,12 @@ const poly = `polygon(
 
 function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
   const router = useRouter();
-  const activeColor = useMemo(() => data?.color || DEFAULT_SYSTEM_COLOR, [data?.color]);
+  const activeColor = useMemo(() => {
+    const raw = (data?.color || '').trim().toLowerCase();
+    if (!raw) return DEFAULT_SYSTEM_COLOR;
+    if (raw === 'white' || raw === '#fff' || raw === '#ffffff') return 'var(--text-contrast)';
+    return data?.color || DEFAULT_SYSTEM_COLOR;
+  }, [data?.color]);
 
   if (!data) return null;
 
@@ -45,17 +50,17 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
 
       <div
         className="relative w-[340px] min-h-[520px] animate-in zoom-in-95 duration-500 p-[1.5px] z-10"
-        style={{ clipPath: poly, backgroundColor: activeColor, transition: 'background-color 0.5s ease' }}
+        style={{ clipPath: poly, backgroundColor: 'var(--border-muted)' }}
       >
-        <div className="w-full h-full" style={{ clipPath: poly, backgroundColor: '#000' }}>
+        <div className="w-full h-full" style={{ clipPath: poly, backgroundColor: 'var(--bg-base)' }}>
           <div
             className="flex-1 flex flex-col p-8 relative overflow-hidden h-full"
-            style={{ clipPath: poly, backgroundColor: '#080808' }}
+            style={{ clipPath: poly, backgroundColor: 'var(--bg-strong)' }}
           >
             <div
               className="absolute inset-0 opacity-[0.025] pointer-events-none"
               style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, var(--grid-line) 2px, var(--grid-line) 4px)',
               }}
             />
 
@@ -73,15 +78,15 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
 
               <button
                 onClick={onClose}
-                className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-500 hover:text-zinc-200 hover:border-white/20 transition-all duration-300 text-xs cursor-pointer"
+                className="w-7 h-7 flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-300 text-xs cursor-pointer"
               >
                 X
               </button>
             </div>
 
             <div
-              className="relative w-full h-40 flex items-center justify-center mb-8 overflow-hidden border border-white/[0.04]"
-              style={{ backgroundColor: 'rgba(255,255,255,0.01)' }}
+              className="relative w-full h-40 flex items-center justify-center mb-8 overflow-hidden border border-[var(--border-subtle)]"
+              style={{ backgroundColor: 'var(--bg-surface)' }}
             >
               <div
                 className="absolute inset-0 pointer-events-none opacity-10"
@@ -96,7 +101,7 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
             </div>
 
             <div className="flex-1 flex flex-col items-center text-center relative z-10">
-              <h2 className="text-white text-base font-black uppercase tracking-[0.3em] leading-tight mb-3">
+              <h2 className="text-[var(--text-primary)] text-base font-black uppercase tracking-[0.3em] leading-tight mb-3">
                 {displayLabel}
               </h2>
 
@@ -111,16 +116,16 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
                 <div
                   className="w-1.5 h-1.5 rounded-full"
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.65)',
-                    boxShadow: '0 0 6px rgba(255,255,255,0.45)',
+                    backgroundColor: 'var(--text-secondary)',
+                    boxShadow: '0 0 6px var(--text-secondary)',
                   }}
                 />
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/80">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--text-primary)]">
                   Disponível
                 </span>
               </div>
 
-              <p className="text-zinc-400 text-sm font-medium leading-relaxed px-2 min-h-[60px]">
+              <p className="text-[var(--text-secondary)] text-sm font-medium leading-relaxed px-2 min-h-[60px]">
                 {data.description || 'Nenhuma descrição disponível para este módulo.'}
               </p>
             </div>
@@ -128,7 +133,7 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
             <div className="mt-6 relative z-10">
               <button
                 onClick={handleViewLibrary}
-                className="w-full py-3 border border-white/[0.06] text-zinc-400 text-[9px] font-black uppercase tracking-[0.3em] hover:border-[#ffffff]/20 hover:text-[#ffffff] hover:bg-[#ffffff]/[0.03] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3 border border-[var(--border-subtle)] text-[var(--text-secondary)] text-[9px] font-black uppercase tracking-[0.3em] hover:border-[var(--border-visible)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <BookOpen size={12} />
                 Visualizar na Biblioteca
@@ -140,7 +145,7 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
                 <div
                   key={i}
                   className="w-1.5 h-1.5 rotate-45 border"
-                  style={{ borderColor: activeColor }}
+                  style={{ borderColor: 'var(--border-muted)' }}
                 />
               ))}
             </div>

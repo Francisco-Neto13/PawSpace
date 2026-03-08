@@ -36,7 +36,7 @@ export interface SkillFormData {
 
 function normalizeHexColor(color: string | null | undefined) {
   const candidate = (color || '').trim();
-  return /^#[0-9a-fA-F]{6}$/.test(candidate) ? candidate : '#ffffff';
+  return /^#[0-9a-fA-F]{6}$/.test(candidate) ? candidate : '#22d3ee';
 }
 
 function getInitialFormData(
@@ -47,7 +47,7 @@ function getInitialFormData(
     label: initialData?.label || initialData?.name || '',
     description: initialData?.description || '',
     icon: initialData?.icon || '✦',
-    color: normalizeHexColor(initialData?.color || '#ffffff'),
+    color: normalizeHexColor(initialData?.color || '#22d3ee'),
     shape: (initialData?.shape as SkillShape) || 'hexagon',
     parentId: initialData?.parentId || initialParentId || '',
   };
@@ -57,7 +57,7 @@ function CharCounter({ current, max }: { current: number; max: number }) {
   const remaining = max - current;
   if (current < max * 0.8) return null;
   return (
-    <span className={`text-[9px] font-mono font-bold tabular-nums ${remaining <= 5 ? 'text-white' : 'text-zinc-500'}`}>
+    <span className={`text-[9px] font-mono font-bold tabular-nums ${remaining <= 5 ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
       {remaining}
     </span>
   );
@@ -87,8 +87,8 @@ export function SkillForm({
     onSubmit(formData);
   };
 
-  const labelClass = 'text-[8px] text-zinc-400 uppercase font-black tracking-[0.25em]';
-  const inputClass = 'w-full bg-white/[0.02] border border-white/[0.06] p-3.5 text-white text-sm outline-none focus:border-[#ffffff]/30 transition-colors font-light placeholder:text-zinc-500 cursor-text';
+  const labelClass = 'text-[8px] text-[var(--text-secondary)] uppercase font-black tracking-[0.25em]';
+  const inputClass = 'w-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] p-3.5 text-[var(--text-primary)] text-sm outline-none focus:border-[var(--border-visible)] transition-colors font-light placeholder:text-[var(--text-muted)] cursor-text';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -143,19 +143,19 @@ export function SkillForm({
               onClick={() => setFormData((prev) => ({ ...prev, shape: s.value }))}
               className={`group flex flex-col items-center gap-2.5 p-3 border transition-all duration-300 cursor-pointer ${
                 formData.shape === s.value
-                  ? 'border-[#ffffff]/40 bg-[#ffffff]/[0.06]'
-                  : 'border-white/[0.04] bg-white/[0.01] hover:border-white/10 hover:bg-white/[0.03]'
+                  ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)]'
+                  : 'border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-muted)] hover:bg-[var(--bg-elevated)]'
               }`}
             >
               <div
                 className="w-5 h-5 transition-colors duration-300"
                 style={{
                   clipPath: s.preview,
-                  backgroundColor: formData.shape === s.value ? formData.color : '#3f3f46',
+                  backgroundColor: formData.shape === s.value ? formData.color : 'var(--text-faint)',
                 }}
               />
               <span className={`text-[7px] font-black uppercase tracking-wider transition-colors duration-300 ${
-                formData.shape === s.value ? 'text-[#ffffff]' : 'text-zinc-500 group-hover:text-zinc-300'
+                formData.shape === s.value ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'
               }`}>
                 {s.label}
               </span>
@@ -195,20 +195,20 @@ export function SkillForm({
         </div>
       )}
 
-      <div className="h-[1px]" style={{ background: 'linear-gradient(to right, transparent, #ffffff08, transparent)' }} />
+      <div className="h-[1px]" style={{ background: 'linear-gradient(to right, transparent, var(--border-subtle), transparent)' }} />
 
       <div className="flex gap-3 pt-1">
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 py-3.5 border border-white/[0.06] text-zinc-400 text-[10px] font-black uppercase tracking-widest hover:bg-white/[0.02] hover:text-zinc-200 hover:border-white/10 transition-all duration-300 cursor-pointer"
+          className="flex-1 py-3.5 border border-[var(--border-subtle)] text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)] transition-all duration-300 cursor-pointer"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isLoading || !formData.label.trim()}
-          className="flex-1 py-3.5 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[10px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 hover:border-[#ffffff]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
+          className="flex-1 py-3.5 border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
         >
           {isLoading ? 'Sincronizando...' : isEditing ? 'Salvar Pawspace' : 'Confirmar'}
         </button>

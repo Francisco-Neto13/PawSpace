@@ -8,13 +8,22 @@ type SkillEdgeProps = EdgeProps<CompatibleSkillEdge>;
 
 const DEFAULT_EDGE_COLOR = '#ffffff';
 
+function normalizeEdgeColor(raw: string | undefined): string {
+  const candidate = (raw || '').trim().toLowerCase();
+  if (!candidate) return DEFAULT_EDGE_COLOR;
+  if (candidate === 'white' || candidate === '#fff' || candidate === '#ffffff') {
+    return 'var(--text-contrast)';
+  }
+  return raw || DEFAULT_EDGE_COLOR;
+}
+
 function SkillEdgeComponent({
   id,
   sourceX, sourceY, targetX, targetY,
   data,
 }: SkillEdgeProps) {
   const [path] = getStraightPath({ sourceX, sourceY, targetX, targetY });
-  const strokeColor = data?.color || DEFAULT_EDGE_COLOR;
+  const strokeColor = normalizeEdgeColor(data?.color);
 
   return (
     <>
@@ -45,7 +54,7 @@ function SkillEdgeComponent({
       <path
         d={path}
         fill="none"
-        stroke="#fff"
+        stroke="var(--text-contrast)"
         strokeWidth={1}
         strokeLinecap="butt"
         strokeDasharray="4 60"

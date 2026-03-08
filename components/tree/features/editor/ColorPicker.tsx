@@ -16,7 +16,7 @@ const QUICK_SWATCHES = [
 
 function normalizeHexColor(color: string | null | undefined): string {
   const candidate = (color || '').trim();
-  return /^#[0-9a-fA-F]{6}$/.test(candidate) ? candidate : '#ffffff';
+  return /^#[0-9a-fA-F]{6}$/.test(candidate) ? candidate : '#22d3ee';
 }
 
 export function ColorPicker({ value, onChange }: ColorPickerProps) {
@@ -24,11 +24,11 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="font-mono text-[10px] tracking-[0.2em] text-zinc-500 uppercase">
+      <label className="font-mono text-[10px] tracking-[0.2em] text-[var(--text-muted)] uppercase">
         Cor
       </label>
-      <div className="flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-sm hover:border-white/20 transition-colors">
-        <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white/20">
+      <div className="flex items-center gap-3 p-2 bg-[var(--bg-elevated)] border border-[var(--border-muted)] rounded-sm hover:border-[var(--border-visible)] transition-colors">
+        <div className="relative w-8 h-8 rounded-full overflow-hidden border border-[var(--border-visible)]">
           <input
             type="color"
             value={safeValue}
@@ -37,7 +37,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
             className="block w-full h-full cursor-pointer bg-transparent border-none p-0"
           />
         </div>
-        <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest">
+        <span className="font-mono text-xs text-[var(--text-secondary)] uppercase tracking-widest">
           {safeValue}
         </span>
       </div>
@@ -48,10 +48,10 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
             key={swatch}
             type="button"
             onClick={() => onChange(swatch)}
-            className="h-5 border border-white/20 hover:border-white/50 transition-colors cursor-pointer"
+            className="h-5 border border-[var(--border-visible)] hover:border-[var(--text-primary)] transition-colors cursor-pointer"
             style={{
               backgroundColor: swatch,
-              boxShadow: safeValue === swatch ? '0 0 0 1px rgba(255,255,255,0.6) inset' : undefined,
+              boxShadow: safeValue === swatch ? '0 0 0 1px var(--text-primary) inset' : undefined,
             }}
             aria-label={`Selecionar cor ${swatch}`}
           />

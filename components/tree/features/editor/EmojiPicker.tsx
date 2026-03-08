@@ -51,13 +51,13 @@ export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
 
   return (
     <div className="relative">
-      <label className="font-mono text-[10px] tracking-[0.2em] text-zinc-500 uppercase block mb-2">
+      <label className="font-mono text-[10px] tracking-[0.2em] text-[var(--text-muted)] uppercase block mb-2">
         Emoji
       </label>
       <button
         type="button"
         onClick={fetchEmojis}
-        className="w-12 h-12 flex items-center justify-center border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all text-2xl shadow-inner"
+        className="w-12 h-12 flex items-center justify-center border border-[var(--border-muted)] bg-[var(--bg-elevated)] hover:bg-[var(--bg-input)] hover:border-[var(--border-visible)] transition-all text-2xl shadow-inner"
       >
         {loading ? <span className="animate-pulse text-xs">...</span> : currentEmoji}
       </button>
@@ -65,7 +65,7 @@ export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-[110]" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-14 left-0 z-[120] w-64 h-56 overflow-y-auto bg-black/90 border border-white/10 p-3 grid grid-cols-5 gap-2 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200">
+          <div className="absolute top-14 left-0 z-[120] w-64 h-56 overflow-y-auto bg-[var(--bg-strong)] border border-[var(--border-muted)] p-3 grid grid-cols-5 gap-2 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200">
             {emojis.map((e, i) => {
               const char = parseEmoji(e.htmlCode);
               return (
@@ -73,7 +73,7 @@ export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
                   key={i}
                   type="button"
                   onClick={() => { onSelect(char); setIsOpen(false); }}
-                  className="hover:bg-white/10 p-2 rounded transition-colors text-xl flex items-center justify-center"
+                  className="hover:bg-[var(--bg-elevated)] p-2 rounded transition-colors text-xl flex items-center justify-center"
                 >
                   {char}
                 </button>

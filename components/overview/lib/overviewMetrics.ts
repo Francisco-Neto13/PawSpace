@@ -178,7 +178,7 @@ export function buildOverviewSnapshot(
         id: n.id,
         name: n.data.label || n.data.name,
         icon: n.data.icon ?? '*',
-        color: n.data.color ?? '#ffffff',
+        color: n.data.color ?? 'var(--text-contrast)',
         hasContent: content.hasContent,
         totalContent: content.totalContent,
         linksCount: content.linksCount,
@@ -197,4 +197,3 @@ export function buildOverviewSnapshot(
     criticalNodes,
   };
 }
-

@@ -62,51 +62,51 @@ export default function OverviewHeader({
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-      <div className="lg:col-span-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+      <div className="lg:col-span-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
         <div className="relative z-10">
           <div className="flex justify-between items-start mb-8">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                <span className="text-white/50 text-[10px] font-black uppercase tracking-[0.4em]">
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--text-primary)] animate-pulse" />
+                <span className="text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-[0.4em]">
                   {rank.title}
                 </span>
               </div>
-              <h1 className="text-white text-3xl font-black uppercase tracking-tighter leading-none">
+              <h1 className="text-[var(--text-primary)] text-3xl font-black uppercase tracking-tighter leading-none">
                 {firstName}
-                {restName && <span className="text-white/60"> {restName}</span>}
+                {restName && <span className="text-[var(--text-secondary)]"> {restName}</span>}
               </h1>
             </div>
 
             <div className="flex flex-col items-center gap-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Rank</span>
-              <div className="w-14 h-14 flex items-center justify-center border border-white/10 bg-white/[0.03] rounded-xl">
-                <span className="text-white text-2xl font-black font-mono">{rank.label}</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Rank</span>
+              <div className="w-14 h-14 flex items-center justify-center border border-[var(--border-muted)] bg-[var(--bg-elevated)] rounded-xl">
+                <span className="text-[var(--text-primary)] text-2xl font-black font-mono">{rank.label}</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                <PawIcon className="w-3 h-3 text-white/60" />
+              <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] flex items-center gap-2">
+                <PawIcon className="w-3 h-3 text-[var(--text-secondary)]" />
                 {unlockedCount} / {totalCount} módulos com conteúdo
               </span>
-              <span className="font-mono text-xl text-white font-black leading-none">
+              <span className="font-mono text-xl text-[var(--text-primary)] font-black leading-none">
                 {progress}
-                <span className="text-xs ml-0.5 text-zinc-400">%</span>
+                <span className="text-xs ml-0.5 text-[var(--text-secondary)]">%</span>
               </span>
             </div>
 
-            <div className="h-2 w-full bg-black/50 border border-white/[0.06] rounded-full p-[1.5px] overflow-hidden">
+            <div className="h-2 w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-full p-[1.5px] overflow-hidden">
               <div
                 className="h-full rounded-full"
                 style={{
                   width: mounted ? `${progress}%` : '0%',
-                  backgroundColor: '#ffffff',
+                  backgroundColor: 'var(--chart-strong)',
                   transition: 'width 1s cubic-bezier(0.16, 1, 0.3, 1)',
-                  boxShadow: '0 0 10px rgba(255,255,255,0.15)',
+                  boxShadow: '0 0 10px var(--chart-faint)',
                 }}
               />
             </div>
@@ -118,12 +118,12 @@ export default function OverviewHeader({
                     className="w-[1px] h-2 transition-colors duration-500"
                     style={{
                       backgroundColor:
-                        progress >= mark ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.06)',
+                        progress >= mark ? 'var(--chart-soft)' : 'var(--chart-faint)',
                     }}
                   />
                   <span
                     className="text-[9px] font-mono font-bold transition-colors duration-500"
-                    style={{ color: progress >= mark ? 'rgba(255,255,255,0.5)' : '#3f3f46' }}
+                    style={{ color: progress >= mark ? 'var(--text-secondary)' : 'var(--text-faint)' }}
                   >
                     {mark}
                   </span>
@@ -134,36 +134,36 @@ export default function OverviewHeader({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+      <div className="rounded-2xl border border-[var(--border-muted)] bg-[var(--bg-surface)] p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-        <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-white opacity-[0.04]" />
+        <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04]" />
 
         <div className="space-y-6 w-full">
           <div>
-            <span className="text-zinc-500 text-[9px] font-black uppercase tracking-widest block mb-2">
+            <span className="text-[var(--text-muted)] text-[9px] font-black uppercase tracking-widest block mb-2">
               Versão do Pawspace
             </span>
-            <div className="text-white font-mono text-[11px] font-bold tracking-[0.2em] border border-white/10 rounded-lg px-4 py-2 bg-black/40 inline-block">
+            <div className="text-[var(--text-primary)] font-mono text-[11px] font-bold tracking-[0.2em] border border-[var(--border-muted)] rounded-lg px-4 py-2 bg-[var(--bg-input)] inline-block">
               v1.0.4
             </div>
           </div>
 
-          <div className="w-full h-px bg-white/[0.06]" />
+          <div className="w-full h-px bg-[var(--border-subtle)]" />
 
           <div>
-            <p className="text-zinc-500 text-[9px] font-black uppercase tracking-widest mb-2">Status</p>
+            <p className="text-[var(--text-muted)] text-[9px] font-black uppercase tracking-widest mb-2">Status</p>
             <div className="flex items-center justify-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse" />
-              <p className="text-white/80 text-[11px] font-black uppercase tracking-[0.2em]">Online</p>
+              <div className="w-1.5 h-1.5 rounded-full bg-[var(--text-primary)] animate-pulse" />
+              <p className="text-[var(--text-primary)] text-[11px] font-black uppercase tracking-[0.2em]">Online</p>
             </div>
           </div>
 
-          <div className="w-full h-px bg-white/[0.06]" />
+          <div className="w-full h-px bg-[var(--border-subtle)]" />
 
           <div>
-            <p className="text-zinc-500 text-[9px] font-black uppercase tracking-widest mb-1">Cobertura</p>
-            <p className="text-white text-3xl font-black font-mono tabular-nums leading-none">{progress}%</p>
+            <p className="text-[var(--text-muted)] text-[9px] font-black uppercase tracking-widest mb-1">Cobertura</p>
+            <p className="text-[var(--text-primary)] text-3xl font-black font-mono tabular-nums leading-none">{progress}%</p>
           </div>
         </div>
       </div>

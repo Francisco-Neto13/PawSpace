@@ -76,7 +76,7 @@ export default function AppearanceSection() {
               onClick={() => setTheme(opt.key)}
               className="text-left rounded-xl border p-4 transition-all duration-200"
               style={{
-                borderColor: isActive ? 'rgba(255,255,255,0.2)' : 'var(--border-subtle)',
+                borderColor: isActive ? 'var(--border-visible)' : 'var(--border-subtle)',
                 backgroundColor: isActive ? 'var(--bg-elevated)' : 'transparent',
               }}
             >

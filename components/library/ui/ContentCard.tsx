@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { ExternalLink, Clock, Trash2 } from 'lucide-react';
 import { Content } from '../types';
 import { TYPE_CONFIG } from '../constants';
@@ -12,12 +12,12 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
   const cfg = TYPE_CONFIG[content.type];
 
   const handleDelete = async () => {
-    if (!confirm('Deseja remover este conteúdo?')) return;
+    if (!confirm('Deseja remover este conteudo?')) return;
     onDelete?.(content.id);
   };
 
   return (
-    <div className="group flex items-start gap-5 p-6 border border-white/[0.06] rounded-2xl bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.03] transition-all duration-300 relative overflow-hidden">
+    <div className="group flex items-start gap-5 p-6 border border-[var(--border-subtle)] rounded-2xl bg-[var(--bg-surface)] hover:border-[var(--border-visible)] hover:bg-[var(--bg-elevated)] transition-all duration-300 relative overflow-hidden">
       <div
         className="absolute left-0 top-0 bottom-0 w-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ backgroundColor: cfg.color }}
@@ -34,14 +34,14 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-4 mb-2">
-          <p className="text-white text-sm font-bold leading-tight">{content.title}</p>
+          <p className="text-[var(--text-primary)] text-sm font-bold leading-tight">{content.title}</p>
           <div className="flex items-center gap-3 shrink-0 mt-0.5">
             {content.url && (
               <a
                 href={content.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-500 hover:text-zinc-200 transition-colors cursor-pointer"
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               >
                 <ExternalLink size={13} />
               </a>
@@ -49,7 +49,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
             {onDelete && (
               <button
                 onClick={handleDelete}
-                className="text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               >
                 <Trash2 size={13} />
               </button>
@@ -57,7 +57,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
           </div>
         </div>
         {content.body && (
-          <p className="text-zinc-400 text-xs font-medium leading-relaxed mb-3 line-clamp-2">
+          <p className="text-[var(--text-secondary)] text-xs font-medium leading-relaxed mb-3 line-clamp-2">
             {content.body}
           </p>
         )}
@@ -68,7 +68,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
           >
             {cfg.label}
           </span>
-          <span className="text-[9px] text-zinc-500 font-mono flex items-center gap-1.5">
+          <span className="text-[9px] text-[var(--text-muted)] font-mono flex items-center gap-1.5">
             <Clock size={9} />
             {content.createdAt}
           </span>

@@ -69,53 +69,53 @@ export function EditSkillModal({
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 isolate">
       <div
-        className="absolute inset-0 bg-black/90 backdrop-blur-md cursor-pointer"
+        className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer"
         onClick={onClose}
       />
 
       <div
         className="relative w-full max-w-md animate-in zoom-in-95 fade-in duration-300 p-[1.5px] z-10 pointer-events-auto"
-        style={{ clipPath: poly, backgroundColor: '#ffffff33' }}
+        style={{ clipPath: poly, backgroundColor: 'var(--border-muted)' }}
       >
-        <div className="w-full h-full" style={{ clipPath: poly, backgroundColor: '#000' }}>
+        <div className="w-full h-full" style={{ clipPath: poly, backgroundColor: 'var(--bg-base)' }}>
           <div
             className="flex flex-col p-8 relative overflow-hidden max-h-[90vh] overflow-y-auto"
             style={{
               clipPath: poly,
-              backgroundColor: '#080808',
+              backgroundColor: 'var(--bg-strong)',
               scrollbarWidth: 'none',
             }}
           >
             <div
               className="absolute inset-0 opacity-[0.025] pointer-events-none"
               style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, var(--grid-line) 2px, var(--grid-line) 4px)',
               }}
             />
 
             <div className="relative z-10 mb-8">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-1 h-5 bg-[#ffffff]" />
+                  <div className="w-1 h-5 bg-[var(--text-primary)]" />
                   <div>
-                    <p className="text-[8px] text-zinc-400 uppercase tracking-[0.3em] font-black mb-0.5">
+                    <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-[0.3em] font-black mb-0.5">
                       Configuração de Módulo
                     </p>
-                    <h2 className="text-[#ffffff] text-[13px] font-black uppercase tracking-[0.3em]">
+                    <h2 className="text-[var(--text-primary)] text-[13px] font-black uppercase tracking-[0.3em]">
                       Ajustar Módulo
                     </h2>
                   </div>
                 </div>
                 <button
                   onClick={onClose}
-                  className="w-7 h-7 flex items-center justify-center border border-white/10 text-zinc-500 hover:text-zinc-200 hover:border-white/20 transition-all duration-300 text-xs cursor-pointer bg-white/5"
+                  className="w-7 h-7 flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-300 text-xs cursor-pointer bg-[var(--bg-elevated)]"
                 >
                   ✕
                 </button>
               </div>
               <div
                 className="h-[1px] w-full"
-                style={{ background: 'linear-gradient(to right, #ffffff22, transparent)' }}
+                style={{ background: 'linear-gradient(to right, var(--shimmer-via), transparent)' }}
               />
             </div>
 
@@ -134,7 +134,7 @@ export function EditSkillModal({
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="w-1.5 h-1.5 rotate-45 border border-[#ffffff]"
+                  className="w-1.5 h-1.5 rotate-45 border border-[var(--border-muted)]"
                 />
               ))}
             </div>

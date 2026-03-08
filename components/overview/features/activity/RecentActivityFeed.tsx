@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BookOpen } from 'lucide-react';
@@ -158,14 +158,14 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
   const isLoading = (isBootstrapLoading || isLoadingInitial) && items.length === 0;
 
   return (
-    <div className="h-full max-h-[440px] rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden flex flex-col">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+    <div className="h-full max-h-[440px] rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden flex flex-col">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white mb-1 flex items-center gap-2">
-        <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
+      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+        <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Atividade Recente
       </p>
-      <p className="text-[9px] text-zinc-400 mb-4 ml-3">log das ultimas alteracoes</p>
+      <p className="text-[9px] text-[var(--text-secondary)] mb-4 ml-3">log das ultimas alteracoes</p>
 
       <div className="flex gap-1 mb-4 ml-3 shrink-0">
         {([
@@ -179,9 +179,9 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
             onClick={() => setFilter(key)}
             className="text-[8px] font-black uppercase tracking-wider px-2 py-1 border transition-all duration-200"
             style={{
-              borderColor: filter === key ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)',
-              color: filter === key ? 'rgba(255,255,255,0.8)' : '#a1a1aa',
-              backgroundColor: filter === key ? 'rgba(255,255,255,0.04)' : 'transparent',
+              borderColor: filter === key ? 'var(--border-visible)' : 'var(--border-subtle)',
+              color: filter === key ? 'var(--text-primary)' : 'var(--text-muted)',
+              backgroundColor: filter === key ? 'var(--bg-elevated)' : 'transparent',
             }}
           >
             {label} <span className="opacity-50">{count}</span>
@@ -190,9 +190,9 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
       </div>
 
       {isLoading ? (
-        <p className="text-[9px] text-zinc-500 ml-3">Carregando atividade...</p>
+        <p className="text-[9px] text-[var(--text-muted)] ml-3">Carregando atividade...</p>
       ) : items.length === 0 ? (
-        <p className="text-[9px] text-zinc-500 ml-3">Nenhuma patinha por aqui ainda.</p>
+        <p className="text-[9px] text-[var(--text-muted)] ml-3">Nenhuma patinha por aqui ainda.</p>
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto pr-1">
           {items.map((item, i) => {
@@ -200,7 +200,7 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
             return (
               <div
                 key={item.key}
-                className="flex items-center gap-3 py-2.5 border-b border-white/[0.03] last:border-0 group"
+                className="flex items-center gap-3 py-2.5 border-b border-[var(--border-subtle)] last:border-0 group"
                 style={{
                   opacity: mounted ? 1 : 0,
                   transform: mounted ? 'translateX(0)' : 'translateX(-6px)',
@@ -210,12 +210,12 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
                 <div
                   className="w-6 h-6 flex items-center justify-center shrink-0 border transition-colors duration-200"
                   style={{
-                    borderColor: isJournal ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.06)',
-                    backgroundColor: isJournal ? 'rgba(255,255,255,0.04)' : 'transparent',
+                    borderColor: isJournal ? 'var(--border-visible)' : 'var(--border-subtle)',
+                    backgroundColor: isJournal ? 'var(--bg-elevated)' : 'transparent',
                   }}
                 >
                   {isJournal
-                    ? <BookOpen size={10} className="text-white/60 group-hover:text-white/80 transition-colors" />
+                    ? <BookOpen size={10} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
                     : <span className="text-xs leading-none">{item.icon}</span>
                   }
                 </div>
@@ -224,17 +224,17 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
                   <div className="flex items-center gap-1.5 mb-0.5">
                     <span
                       className="text-[7px] font-black uppercase tracking-wider"
-                      style={{ color: isJournal ? 'rgba(255,255,255,0.6)' : '#a1a1aa' }}
+                      style={{ color: isJournal ? 'var(--text-secondary)' : 'var(--text-muted)' }}
                     >
                       {item.type === 'journal' ? 'Diario' : item.type === 'skill' ? 'Modulo' : 'Biblioteca'}
                     </span>
                   </div>
-                  <span className="text-[10px] text-zinc-400 font-medium truncate block group-hover:text-zinc-200 transition-colors duration-200">
+                  <span className="text-[10px] text-[var(--text-secondary)] font-medium truncate block group-hover:text-[var(--text-primary)] transition-colors duration-200">
                     {item.title}
                   </span>
                 </div>
 
-                <span className="text-[8px] text-zinc-500 font-mono shrink-0 group-hover:text-zinc-300 transition-colors">
+                <span className="text-[8px] text-[var(--text-muted)] font-mono shrink-0 group-hover:text-[var(--text-secondary)] transition-colors">
                   {timeAgo(item.date)}
                 </span>
               </div>
@@ -243,14 +243,14 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
         </div>
       )}
 
-      <div className="mt-4 pt-3 border-t border-white/[0.04] flex items-center justify-between shrink-0">
-        <span className="text-[8px] text-zinc-500 uppercase tracking-wider font-bold">
+      <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between shrink-0">
+        <span className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold">
           {items.length} eventos carregados
         </span>
         <button
           onClick={() => void loadMorePage()}
           disabled={!hasMore || isLoadingMore || isLoadingInitial || isBootstrapLoading}
-          className="text-[8px] font-black uppercase tracking-wider px-2 py-1 border border-white/[0.1] text-zinc-300 disabled:text-zinc-600 disabled:border-white/[0.04] disabled:cursor-not-allowed"
+          className="text-[8px] font-black uppercase tracking-wider px-2 py-1 border border-[var(--border-muted)] text-[var(--text-secondary)] disabled:text-[var(--text-faint)] disabled:border-[var(--border-subtle)] disabled:cursor-not-allowed"
         >
           {isLoadingMore ? 'Carregando...' : hasMore ? 'Ver mais' : 'Sem mais itens'}
         </button>

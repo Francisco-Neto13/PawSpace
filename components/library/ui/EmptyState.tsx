@@ -8,29 +8,29 @@ interface EmptyStateProps {
 export function EmptyState({ onAdd }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center animate-in fade-in duration-700">
-      <div className="w-16 h-16 border border-white/[0.08] bg-white/[0.01] flex items-center justify-center mb-6 text-zinc-500">
+      <div className="w-16 h-16 border border-[var(--border-muted)] bg-[var(--bg-surface)] flex items-center justify-center mb-6 text-[var(--text-muted)]">
         <BookOpen size={24} strokeWidth={1.5} />
       </div>
 
-      <p className="text-zinc-400 text-[11px] font-black uppercase tracking-[0.4em] mb-3">
+      <p className="text-[var(--text-secondary)] text-[11px] font-black uppercase tracking-[0.4em] mb-3">
         Biblioteca Vazia
       </p>
 
-      <p className="text-zinc-400 text-[12px] font-normal max-w-[280px] leading-relaxed">
+      <p className="text-[var(--text-secondary)] text-[12px] font-normal max-w-[280px] leading-relaxed">
         Nenhum conteúdo indexado neste módulo ainda.
       </p>
 
       {onAdd && (
         <button
           onClick={onAdd}
-          className="mt-8 flex items-center gap-2 px-5 py-2.5 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[9px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 hover:border-[#ffffff]/50 transition-all duration-200 active:scale-95 cursor-pointer"
+          className="mt-8 flex items-center gap-2 px-5 py-2.5 border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] transition-all duration-200 active:scale-95 cursor-pointer"
         >
           <Plus size={10} />
           Adicionar Conteúdo
         </button>
       )}
 
-      <div className="mt-8 w-8 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="mt-8 w-8 h-px bg-gradient-to-r from-transparent via-[var(--border-muted)] to-transparent" />
     </div>
   );
 }

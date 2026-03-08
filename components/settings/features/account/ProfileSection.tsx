@@ -118,30 +118,30 @@ export default function ProfileSection() {
   };
 
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+    <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white mb-1 flex items-center gap-2">
-        <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
+      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+        <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Perfil
       </p>
-      <p className="text-[9px] text-zinc-500 mb-6 ml-3">nome de usuario e foto</p>
+      <p className="text-[9px] text-[var(--text-muted)] mb-6 ml-3">nome de usuario e foto</p>
 
       <div className="flex items-start gap-6">
         <div className="shrink-0">
           <button
             onClick={() => fileRef.current?.click()}
-            className="relative w-16 h-16 rounded-xl border border-white/[0.08] bg-white/[0.03] overflow-hidden group transition-all duration-200 hover:border-white/20"
+            className="relative w-16 h-16 rounded-xl border border-[var(--border-muted)] bg-[var(--bg-elevated)] overflow-hidden group transition-all duration-200 hover:border-[var(--border-visible)]"
           >
             {avatar ? (
               <img src={avatar} alt="avatar" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="text-2xl">U</span>
+                <span className="text-2xl text-[var(--text-secondary)]">U</span>
               </div>
             )}
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <Camera size={14} className="text-white" />
+            <div className="absolute inset-0 bg-[var(--bg-strong)] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Camera size={14} className="text-[var(--text-primary)]" />
             </div>
           </button>
           <input
@@ -151,14 +151,14 @@ export default function ProfileSection() {
             className="hidden"
             onChange={handleFileChange}
           />
-          <p className="text-[7px] text-zinc-700 uppercase tracking-wider font-bold text-center mt-1.5">
+          <p className="text-[7px] text-[var(--text-faint)] uppercase tracking-wider font-bold text-center mt-1.5">
             Foto
           </p>
         </div>
 
         <div className="flex-1 space-y-4">
           <div>
-            <label className="text-[8px] font-black uppercase tracking-widest text-zinc-500 block mb-2">
+            <label className="text-[8px] font-black uppercase tracking-widest text-[var(--text-muted)] block mb-2">
               Nome de Usuario
             </label>
             <input
@@ -166,7 +166,7 @@ export default function ProfileSection() {
               value={username}
               onChange={e => setUsername(e.target.value)}
               disabled={isLoadingUser || isSaving}
-              className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-4 py-2.5 text-white text-[11px] font-bold tracking-wide outline-none focus:border-white/20 transition-colors placeholder:text-zinc-700 disabled:opacity-60"
+              className="w-full bg-[var(--bg-input)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 text-[var(--text-primary)] text-[11px] font-bold tracking-wide outline-none focus:border-[var(--border-visible)] transition-colors placeholder:text-[var(--text-faint)] disabled:opacity-60"
               placeholder={isLoadingUser ? 'Carregando...' : 'Seu nome'}
             />
           </div>
@@ -179,7 +179,7 @@ export default function ProfileSection() {
                 </p>
               )}
               {saved && !error && (
-                <p className="text-[8px] text-white/50 uppercase tracking-wider font-bold">
+                <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">
                   Perfil atualizado.
                 </p>
               )}
@@ -191,9 +191,9 @@ export default function ProfileSection() {
               disabled={isLoadingUser || isSaving}
               className="flex items-center gap-2 px-4 py-2 border text-[9px] font-black uppercase tracking-wider transition-all duration-200 disabled:opacity-60"
               style={{
-                borderColor: saved ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
-                color: saved ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)',
-                backgroundColor: saved ? 'rgba(255,255,255,0.06)' : 'transparent',
+                borderColor: saved ? 'var(--border-visible)' : 'var(--border-muted)',
+                color: saved ? 'var(--text-primary)' : 'var(--text-secondary)',
+                backgroundColor: saved ? 'var(--bg-elevated)' : 'transparent',
               }}
             >
               {isSaving ? <Loader2 size={10} className="animate-spin" /> : null}

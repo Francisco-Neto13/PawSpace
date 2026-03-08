@@ -87,7 +87,7 @@ export default function LibraryPage() {
     ...n,
     name: n.data.name || n.data.label || 'Sem Nome',
     icon: n.data.icon || '*',
-    color: n.data.color || '#ffffff',
+    color: n.data.color || '#22d3ee',
     contents: nodeContents[n.id] ?? [],
   })) as SkillNode[], [nodes, nodeContents]);
 
@@ -124,10 +124,10 @@ export default function LibraryPage() {
 
   if (isLoadingNexus && nodes.length === 0) {
     return (
-      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0a0a0a]">
+      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
         <div className="relative flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-[#ffffff]/20 border-t-[#ffffff] rounded-full animate-spin" />
-          <p className="text-[#ffffff] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
+          <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
+          <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
             Sincronizando Pawspace...
           </p>
         </div>
@@ -138,7 +138,7 @@ export default function LibraryPage() {
   if (!isLoadingNexus && nodes.length === 0) {
     return (
       <div
-        className="relative w-full bg-[#0a0a0a] overflow-hidden"
+        className="relative w-full bg-[var(--bg-base)] overflow-hidden"
         style={{
           height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))',
           opacity: visible ? 1 : 0,
@@ -147,27 +147,27 @@ export default function LibraryPage() {
       >
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 text-center pointer-events-none">
           <div className="space-y-2">
-            <p className="text-zinc-300 text-[11px] font-black uppercase tracking-[0.4em]">
+            <p className="text-[var(--text-primary)] text-[11px] font-black uppercase tracking-[0.4em]">
               Árvore Vazia
             </p>
-            <p className="text-zinc-400 text-[11px] font-normal max-w-[260px] leading-relaxed">
+            <p className="text-[var(--text-secondary)] text-[11px] font-normal max-w-[260px] leading-relaxed">
               Crie sua Árvore primeiro para começar a organizar conteúdos por módulo.
             </p>
           </div>
           <a
             href="/tree"
-            className="pointer-events-auto flex items-center gap-2 px-6 py-3 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[9px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 hover:border-[#ffffff]/50 transition-all duration-200 active:scale-95"
+            className="pointer-events-auto flex items-center gap-2 px-6 py-3 border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] transition-all duration-200 active:scale-95"
           >
             Ir para Árvore
           </a>
-          <div className="w-8 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          <div className="w-8 h-px bg-gradient-to-r from-transparent via-[var(--border-muted)] to-transparent" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen w-full bg-[#0a0a0a]">
+    <div className="relative min-h-screen w-full bg-[var(--bg-base)]">
       <PageBackground src="/cat3.webp" />
 
       <div
@@ -180,11 +180,11 @@ export default function LibraryPage() {
       >
 
         <div className="flex items-center gap-3 mb-6">
-          <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
-          <span className="text-[#ffffff] text-[9px] font-black uppercase tracking-[0.4em]">
+          <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+          <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
             Pawspace / Biblioteca
           </span>
-          <div className="h-[1px] flex-1 bg-gradient-to-r from-[#ffffff]/15 to-transparent" />
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
         </div>
 
         <header>
@@ -197,18 +197,18 @@ export default function LibraryPage() {
               ].map((s, i, arr) => (
                 <div key={i} className="flex items-center gap-8">
                   <div className="text-right">
-                    <p className="text-white text-2xl font-black font-mono leading-none tracking-tighter">
+                    <p className="text-[var(--text-primary)] text-2xl font-black font-mono leading-none tracking-tighter">
                       {s.value.toString().padStart(2, '0')}
                     </p>
-                    <p className="text-zinc-400 text-[9px] font-black uppercase tracking-widest mt-1">{s.label}</p>
+                    <p className="text-[var(--text-secondary)] text-[9px] font-black uppercase tracking-widest mt-1">{s.label}</p>
                   </div>
-                  {i < arr.length - 1 && <div className="w-[1px] h-6 bg-white/[0.06]" />}
+                  {i < arr.length - 1 && <div className="w-[1px] h-6 bg-[var(--border-subtle)]" />}
                 </div>
               ))}
               <button
                 onClick={() => setShowAddContent(true)}
                 disabled={!selectedNode}
-                className="flex items-center gap-2 px-4 py-2.5 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[9px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2.5 border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus size={11} />
                 Novo Conteúdo
@@ -230,22 +230,22 @@ export default function LibraryPage() {
           />
 
           <main
-            className="flex-1 min-w-0 border border-white/[0.06] bg-white/[0.02] flex flex-col relative rounded-2xl overflow-hidden shadow-2xl"
+            className="flex-1 min-w-0 border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col relative rounded-2xl overflow-hidden shadow-2xl"
             style={{
               height: 'calc(100dvh - var(--navbar-height) - 120px)',
               position: 'sticky',
               top: 'calc(var(--navbar-height) + 24px)',
             }}
           >
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-            <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-white opacity-[0.04] pointer-events-none" />
-            <div className="shrink-0 px-8 pt-8 pb-6 border-b border-white/[0.04] flex flex-col gap-5">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+            <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04] pointer-events-none" />
+            <div className="shrink-0 px-8 pt-8 pb-6 border-b border-[var(--border-subtle)] flex flex-col gap-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{selectedNode?.icon}</span>
                   <div>
-                    <p className="text-white text-xl font-black tracking-wide">{selectedNode?.name}</p>
-                    <p className="text-zinc-500 text-[9px] font-mono mt-0.5">
+                    <p className="text-[var(--text-primary)] text-xl font-black tracking-wide">{selectedNode?.name}</p>
+                    <p className="text-[var(--text-muted)] text-[9px] font-mono mt-0.5">
                       {currentContents.length} {currentContents.length === 1 ? 'item' : 'itens'} indexados
                     </p>
                   </div>
@@ -262,7 +262,7 @@ export default function LibraryPage() {
 
             <div
               className="flex-1 overflow-y-auto px-8 py-6"
-              style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
+              style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--border-visible) transparent' }}
             >
               <LibraryContentList
                 contents={filteredContents}

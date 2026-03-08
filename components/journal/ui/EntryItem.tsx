@@ -21,27 +21,27 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
       onClick={onSelect}
       className={`group relative w-full flex flex-col gap-2 px-4 py-4 border rounded-xl text-left transition-all duration-300
         ${isSelected
-          ? 'border-white/20 bg-white/[0.06]'
-          : 'border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.03]'
+          ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)]'
+          : 'border-[var(--border-subtle)] hover:border-[var(--border-visible)] hover:bg-[var(--bg-elevated)]'
         }`}
     >
       {isSelected && (
         <>
-          <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-white" />
+          <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[var(--text-primary)]" />
           <div
             className="absolute top-0 left-0 right-0 h-[1px]"
-            style={{ background: 'linear-gradient(to right, #ffffff33, transparent)' }}
+            style={{ background: 'linear-gradient(to right, var(--shimmer-via), transparent)' }}
           />
         </>
       )}
 
       <p className={`text-[11px] font-bold truncate transition-colors ${
-        isSelected ? 'text-white' : 'text-zinc-300 group-hover:text-zinc-100'
+        isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'
       }`}>
         {entry.title || 'Sem Título'}
       </p>
 
-      <p className="text-[10px] text-zinc-400 font-medium leading-relaxed line-clamp-2 min-h-[30px]">
+      <p className="text-[10px] text-[var(--text-secondary)] font-medium leading-relaxed line-clamp-2 min-h-[30px]">
         {preview}…
       </p>
 
@@ -51,9 +51,9 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
             <span
               className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border flex items-center gap-1.5"
               style={{ 
-                color: skill.color || '#ffffff',
-                borderColor: `${skill.color || '#ffffff'}30`,
-                backgroundColor: `${skill.color || '#ffffff'}0d`
+                color: skill.color || 'var(--text-contrast)',
+                borderColor: skill.color ? `${skill.color}30` : 'var(--border-visible)',
+                backgroundColor: skill.color ? `${skill.color}0d` : 'var(--bg-elevated)',
               }}
             >
               <span className="opacity-80 text-[10px]">{skill.icon}</span>
@@ -62,13 +62,13 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
           </div>
         )}
         
-        <span className="text-[9px] text-zinc-500 font-mono flex items-center gap-1 ml-auto">
+        <span className="text-[9px] text-[var(--text-muted)] font-mono flex items-center gap-1 ml-auto">
           <Calendar size={8} />
           {formatDate(entry.createdAt)}
         </span>
       </div>
 
-      <div className="absolute bottom-0 right-0 w-0 h-0 border-b-[4px] border-r-[4px] border-transparent group-hover:border-r-white/10 group-hover:border-b-white/10 transition-all" />
+      <div className="absolute bottom-0 right-0 w-0 h-0 border-b-[4px] border-r-[4px] border-transparent group-hover:border-r-[var(--border-muted)] group-hover:border-b-[var(--border-muted)] transition-all" />
     </button>
   );
 }

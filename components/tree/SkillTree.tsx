@@ -145,16 +145,16 @@ function SkillTreeInner() {
 
   return (
     <div
-      className="relative w-full bg-[#0a0a0a] overflow-hidden select-none font-sans"
+      className="relative w-full bg-[var(--bg-base)] overflow-hidden select-none font-sans"
       style={{ height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))' }}
     >
       <PageBackground src="/cat2.webp" />
 
       {isLoadingTree && nodes.length === 0 && (
-        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0a0a0a]">
+        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
           <div className="relative flex flex-col items-center gap-4">
-            <div className="w-8 h-8 border-2 border-[#ffffff]/20 border-t-[#ffffff] rounded-full animate-spin" />
-            <p className="text-[#ffffff] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
+            <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
+            <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
               Sincronizando Pawspace...
             </p>
           </div>
@@ -169,9 +169,9 @@ function SkillTreeInner() {
 
       {canSave && (
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 animate-in slide-in-from-bottom-5 duration-500">
-          <div className="flex items-center gap-2 px-3 py-1 bg-black/80 border border-[#ffffff]/20 backdrop-blur-md shadow-2xl">
-            <AlertCircle size={10} className="text-[#ffffff] animate-pulse" />
-            <span className="text-[7px] text-[#ffffff]/70 font-black uppercase tracking-[0.2em]">
+          <div className="flex items-center gap-2 px-3 py-1 bg-[var(--bg-strong)] border border-[var(--border-visible)] backdrop-blur-md shadow-2xl">
+            <AlertCircle size={10} className="text-[var(--text-primary)] animate-pulse" />
+            <span className="text-[7px] text-[var(--text-secondary)] font-black uppercase tracking-[0.2em]">
               Alterações Pendentes
             </span>
           </div>
@@ -181,8 +181,8 @@ function SkillTreeInner() {
             disabled={isSaving}
             className={`flex items-center gap-3 px-8 py-4 border transition-all backdrop-blur-md shadow-2xl group
               ${isSaving
-                ? 'border-[#ffffff]/20 bg-[#0a0a0a]/60 text-[#ffffff]/40 cursor-not-allowed'
-                : 'border-[#ffffff]/40 bg-[#0a0a0a]/90 text-[#ffffff] hover:bg-[#ffffff]/10 hover:border-[#ffffff] active:scale-95 cursor-pointer'
+                ? 'border-[var(--border-visible)] bg-[var(--bg-surface)] text-[var(--text-faint)] cursor-not-allowed'
+                : 'border-[var(--border-visible)] bg-[var(--bg-strong)] text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] hover:border-[var(--text-primary)] active:scale-95 cursor-pointer'
               }`}
           >
             {isSaving

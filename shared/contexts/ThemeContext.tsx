@@ -11,21 +11,22 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function applyTheme(theme: Theme) {
+  const html = document.documentElement;
+  html.classList.remove('dark', 'light');
+  html.classList.add(theme);
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('dark');
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === 'undefined') return 'dark';
+    const stored = localStorage.getItem('pawspace-theme') as Theme | null;
+    return stored ?? 'dark';
+  });
 
   useEffect(() => {
-    const stored = localStorage.getItem('pawspace-theme') as Theme | null;
-    const resolved = stored ?? 'dark';
-    setThemeState(resolved);
-    applyTheme(resolved);
-  }, []);
-
-  const applyTheme = (t: Theme) => {
-    const html = document.documentElement;
-    html.classList.remove('dark', 'light');
-    html.classList.add(t);
-  };
+    applyTheme(theme);
+  }, [theme]);
 
   const setTheme = (t: Theme) => {
     setThemeState(t);

@@ -47,7 +47,7 @@ export function AchievementsPage() {
   );
 
   return (
-    <div className="relative min-h-screen w-full bg-[#0a0a0a] overflow-x-hidden">
+    <div className="relative min-h-screen w-full bg-[var(--bg-base)] overflow-x-hidden">
       <PageBackground src="/cat5.webp" />
       <main
         className="relative z-10 py-8 space-y-6 pb-20"

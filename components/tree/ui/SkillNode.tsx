@@ -5,7 +5,26 @@ import { SkillData, SkillShape, SHAPE_SIZE } from '../types';
 
 type CompatibleSkillNode = Node<SkillData>;
 
-const DEFAULT_NODE_COLOR = '#ffffff';
+const DEFAULT_NODE_COLOR = '#22d3ee';
+
+function normalizeHexColor(candidate: string): string {
+  const hex = candidate.trim().toLowerCase();
+  if (/^#[0-9a-f]{6}$/.test(hex)) return hex;
+  if (/^#[0-9a-f]{3}$/.test(hex)) {
+    const [r, g, b] = hex.slice(1).split('');
+    return `#${r}${r}${g}${g}${b}${b}`;
+  }
+  return '';
+}
+
+function isNearWhiteHex(hex: string): boolean {
+  const normalized = normalizeHexColor(hex);
+  if (!normalized) return false;
+  const r = Number.parseInt(normalized.slice(1, 3), 16);
+  const g = Number.parseInt(normalized.slice(3, 5), 16);
+  const b = Number.parseInt(normalized.slice(5, 7), 16);
+  return r >= 235 && g >= 235 && b >= 235;
+}
 
 export function SvgDefs() {
   return (
@@ -40,7 +59,21 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
     parentId,
   } = data;
 
-  const nodeColor = useMemo(() => color || DEFAULT_NODE_COLOR, [color]);
+  const nodeColor = useMemo(() => {
+    const candidate = (color || '').trim();
+    if (!candidate) return DEFAULT_NODE_COLOR;
+    if (candidate.toLowerCase() === 'white') return 'var(--text-contrast)';
+    if (isNearWhiteHex(candidate)) return 'var(--text-contrast)';
+    return candidate;
+  }, [color]);
+  const glowColor = useMemo(
+    () => (nodeColor.startsWith('var(') ? 'var(--text-secondary)' : `color-mix(in srgb, ${nodeColor} 60%, transparent)`),
+    [nodeColor]
+  );
+  const selectedBorderColor = useMemo(
+    () => (nodeColor.startsWith('var(') ? 'var(--border-visible)' : `color-mix(in srgb, ${nodeColor} 55%, transparent)`),
+    [nodeColor]
+  );
 
   const isRoot = !parentId;
   const effectiveShape: SkillShape = isRoot ? 'hexagon' : (shape as SkillShape);
@@ -79,13 +112,13 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
           style={{
             backgroundColor: nodeColor,
             clipPath,
-            filter: isRoot ? 'url(#glow-keystone)' : `drop-shadow(0 0 5px ${nodeColor}66)`,
+            filter: isRoot ? 'url(#glow-keystone)' : `drop-shadow(0 0 5px ${glowColor})`,
             opacity: 1,
           }}
         />
 
         <div
-          className="absolute pointer-events-none bg-[#0a0a0a]"
+          className="absolute pointer-events-none bg-[var(--bg-base)]"
           style={{
             inset: '2px',
             clipPath,
@@ -97,7 +130,7 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
             ${isRoot ? 'text-3xl' : 'text-xl'}
             grayscale-0 opacity-100
           `}
-          style={{ color: '#fff' }}
+          style={{ color: 'var(--text-contrast)' }}
         >
           {icon || '*'}
         </span>
@@ -105,7 +138,7 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
         {selected && (
           <div
             className="absolute -inset-1 border animate-pulse pointer-events-none"
-            style={{ clipPath, borderColor: `${nodeColor}88` }}
+            style={{ clipPath, borderColor: selectedBorderColor }}
           />
         )}
       </div>
@@ -124,8 +157,8 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
           style={{
             fontSize: isRoot ? '12px' : '11px',
             lineHeight: 1.2,
-            color: '#ffffff',
-            textShadow: `0 0 8px ${nodeColor}66`,
+            color: 'var(--text-contrast)',
+            textShadow: `0 0 8px ${glowColor}`,
           }}
         >
           {name || label}

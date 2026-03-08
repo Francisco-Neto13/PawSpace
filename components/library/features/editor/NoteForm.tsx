@@ -1,7 +1,7 @@
 ﻿'use client';
 
-const inputClass = "w-full bg-white/[0.02] border border-white/[0.08] p-3.5 text-white text-sm outline-none focus:border-[#ffffff]/40 transition-colors font-normal placeholder:text-zinc-500 cursor-text";
-const labelClass = "text-[9px] text-zinc-400 uppercase font-black tracking-[0.25em] block mb-2.5";
+const inputClass = "w-full bg-[var(--bg-surface)] border border-[var(--border-muted)] p-3.5 text-[var(--text-primary)] text-sm outline-none focus:border-[var(--border-visible)] transition-colors font-normal placeholder:text-[var(--text-muted)] cursor-text";
+const labelClass = "text-[9px] text-[var(--text-secondary)] uppercase font-black tracking-[0.25em] block mb-2.5";
 
 interface NoteFormProps {
   body: string;

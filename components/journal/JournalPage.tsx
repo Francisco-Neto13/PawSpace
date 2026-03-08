@@ -31,7 +31,7 @@ export default function JournalPage() {
     id: n.id,
     name: n.data.label || n.data.name || 'Sem Nome',
     icon: n.data.icon || '*',
-    color: n.data.color || '#ffffff',
+    color: n.data.color || 'var(--text-contrast)',
   })), [nodes]);
 
   const selectedEntry = useMemo(() =>
@@ -119,9 +119,9 @@ export default function JournalPage() {
 
   if (isLoadingNexus && nodes.length === 0) {
     return (
-      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#0a0a0a]">
-        <div className="w-8 h-8 border-2 border-[#ffffff]/20 border-t-[#ffffff] rounded-full animate-spin" />
-        <p className="text-[#ffffff] text-[10px] font-black uppercase tracking-[0.4em] mt-4 animate-pulse">
+      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
+        <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
+        <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-[0.4em] mt-4 animate-pulse">
           Sincronizando Pawspace...
         </p>
       </div>
@@ -129,7 +129,7 @@ export default function JournalPage() {
   }
 
   return (
-    <div className="relative min-h-screen w-full bg-[#0a0a0a]">
+    <div className="relative min-h-screen w-full bg-[var(--bg-base)]">
       <PageBackground src="/cat4.webp" />
 
       <div
@@ -141,26 +141,26 @@ export default function JournalPage() {
         }}
       >
         <div className="flex items-center gap-3 mb-6">
-          <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
-          <span className="text-[#ffffff] text-[9px] font-black uppercase tracking-[0.4em]">
+          <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+          <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
             Pawspace / Diário
           </span>
-          <div className="h-[1px] flex-1 bg-gradient-to-r from-[#ffffff]/15 to-transparent" />
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
         </div>
 
         <header>
           <div className="flex items-center justify-end">
             <div className="flex items-center gap-8">
               <div className="text-right">
-                <p className="text-white text-2xl font-black font-mono leading-none tracking-tighter">
+                <p className="text-[var(--text-primary)] text-2xl font-black font-mono leading-none tracking-tighter">
                   {isLoadingEntries ? '--' : entries.length.toString().padStart(2, '0')}
                 </p>
-                <p className="text-zinc-400 text-[9px] font-black uppercase tracking-widest mt-1">Registros</p>
+                <p className="text-[var(--text-secondary)] text-[9px] font-black uppercase tracking-widest mt-1">Registros</p>
               </div>
               <button
                 onClick={handleNewEntry}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-4 py-2.5 border border-[#ffffff]/30 bg-[#ffffff]/[0.06] text-[#ffffff] text-[9px] font-black uppercase tracking-widest hover:bg-[#ffffff]/10 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2.5 border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus size={11} />
                 Nova Entrada
@@ -177,12 +177,12 @@ export default function JournalPage() {
             onSelect={handleSelectEntry}
           />
 
-          <main className="flex-1 min-w-0 border border-white/[0.06] bg-white/[0.02] flex flex-col relative rounded-2xl overflow-hidden shadow-2xl">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-            <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-white opacity-[0.04] pointer-events-none" />
+          <main className="flex-1 min-w-0 border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col relative rounded-2xl overflow-hidden shadow-2xl">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+            <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04] pointer-events-none" />
             {isLoadingEntries ? (
               <div className="flex-1 flex items-center justify-center">
-                <Loader2 className="text-[#ffffff]/20 animate-spin" size={24} />
+                <Loader2 className="text-[var(--text-secondary)] animate-spin" size={24} />
               </div>
             ) : selectedEntry ? (
               <JournalEditor
@@ -194,8 +194,8 @@ export default function JournalPage() {
               />
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center gap-4 group py-20">
-                <BookOpen size={32} className="text-zinc-500 group-hover:text-zinc-400 transition-colors duration-500" />
-                <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.3em]">
+                <BookOpen size={32} className="text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors duration-500" />
+                <p className="text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-[0.3em]">
                   Nenhum registro selecionado
                 </p>
               </div>

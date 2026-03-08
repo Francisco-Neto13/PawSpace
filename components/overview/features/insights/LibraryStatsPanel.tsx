@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { memo, useMemo, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
@@ -23,19 +23,19 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
-    <div className="bg-[#0a0a0a] border border-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-wider">
-      <p className="text-white">{d.name}</p>
-      <p className="text-zinc-400">{d.value} itens</p>
+    <div className="bg-[var(--bg-base)] border border-[var(--border-muted)] px-3 py-2 text-[10px] font-black uppercase tracking-wider">
+      <p className="text-[var(--text-primary)]">{d.name}</p>
+      <p className="text-[var(--text-secondary)]">{d.value} itens</p>
     </div>
   );
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  video: 'rgba(255,255,255,0.9)',
-  article: 'rgba(255,255,255,0.65)',
-  pdf: 'rgba(255,255,255,0.45)',
-  link: 'rgba(255,255,255,0.25)',
-  note: 'rgba(255,255,255,0.12)',
+  video: 'var(--chart-strong)',
+  article: 'var(--chart-medium)',
+  pdf: 'var(--chart-soft)',
+  link: 'var(--chart-faint)',
+  note: 'var(--border-muted)',
 };
 
 interface LibraryStatsPanelProps {
@@ -58,13 +58,13 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
 
   if (totalContents === 0) {
     return (
-      <div className="h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white mb-1 flex items-center gap-2">
-          <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
+      <div className="h-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+          <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
           Caixinha de Areia
         </p>
-        <p className="text-[9px] text-zinc-500 mt-6 ml-3">{emptyMessage}</p>
+        <p className="text-[9px] text-[var(--text-muted)] mt-6 ml-3">{emptyMessage}</p>
       </div>
     );
   }
@@ -72,14 +72,14 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
   const activeType = activeIndex !== null ? byType[activeIndex] : null;
 
   return (
-    <div className="h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden flex flex-col">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+    <div className="h-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden flex flex-col">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white mb-1 flex items-center gap-2">
-        <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
+      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+        <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Caixinha de Areia
       </p>
-      <p className="text-[9px] text-zinc-400 mb-6 ml-3">conteudos por tipo</p>
+      <p className="text-[9px] text-[var(--text-secondary)] mb-6 ml-3">conteudos por tipo</p>
 
       <div className="flex-1 flex items-center">
         <div className="flex items-center gap-6 w-full">
@@ -101,7 +101,7 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
                   {byType.map((entry, i) => (
                     <Cell
                       key={i}
-                      fill={TYPE_COLORS[entry.name] ?? 'rgba(255,255,255,0.1)'}
+                      fill={TYPE_COLORS[entry.name] ?? 'var(--chart-faint)'}
                       stroke="transparent"
                       style={{ cursor: 'pointer' }}
                       opacity={activeIndex === null || activeIndex === i ? 1 : 0.35}
@@ -113,10 +113,10 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
             </ResponsiveContainer>
 
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-white font-mono font-black text-sm leading-none">
+              <span className="text-[var(--text-primary)] font-mono font-black text-sm leading-none">
                 {activeType ? activeType.value : totalContents}
               </span>
-              <span className="text-zinc-400 text-[7px] uppercase tracking-wider font-bold mt-0.5">
+              <span className="text-[var(--text-secondary)] text-[7px] uppercase tracking-wider font-bold mt-0.5">
                 {activeType ? activeType.name : 'itens'}
               </span>
             </div>
@@ -140,7 +140,7 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
                   <div
                     className="w-2 h-2 shrink-0"
                     style={{
-                      backgroundColor: TYPE_COLORS[t.name] ?? 'rgba(255,255,255,0.1)',
+                      backgroundColor: TYPE_COLORS[t.name] ?? 'var(--chart-faint)',
                       transform: isActive ? 'scale(1.4)' : 'scale(1)',
                       transition: 'transform 0.15s ease',
                     }}
@@ -148,21 +148,21 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
                   <span
                     className="text-[9px] uppercase tracking-wider font-bold flex-1"
                     style={{
-                      color: isActive ? 'rgba(255,255,255,0.8)' : '#a1a1aa',
+                      color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                       transition: 'color 0.15s ease',
                     }}
                   >
                     {t.name}
                   </span>
-                  <span className="text-[9px] text-zinc-400 font-mono min-w-[64px] text-right">
+                  <span className="text-[9px] text-[var(--text-secondary)] font-mono min-w-[64px] text-right">
                     {pct}% ({t.value})
                   </span>
                 </div>
               );
             })}
 
-            <div className="pt-2 border-t border-white/[0.04]">
-              <span className="text-[8px] text-zinc-400 uppercase tracking-wider font-bold">
+            <div className="pt-2 border-t border-[var(--border-subtle)]">
+              <span className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">
                 {totalContents} itens em {totalNodes} modulos
               </span>
             </div>

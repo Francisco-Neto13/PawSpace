@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
+
 import { useState } from 'react';
 import { AlertTriangle, Trash2 } from 'lucide-react';
-import { PawIcon } from '@/components/shared/PawIcon';
 
 export default function DangerZone() {
   const [confirm, setConfirm] = useState('');
@@ -16,23 +16,23 @@ export default function DangerZone() {
   };
 
   return (
-    <div className="rounded-2xl border border-red-500/20 bg-red-500/[0.02] p-6 relative overflow-hidden">
+    <div className="rounded-2xl border border-red-500/20 bg-red-500/[0.04] p-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
 
       <p className="text-[9px] font-black uppercase tracking-[0.4em] text-red-400/80 mb-1 flex items-center gap-2">
         <AlertTriangle className="w-3 h-3 shrink-0" />
         Zona de Perigo
       </p>
-      <p className="text-[9px] text-zinc-600 mb-6 ml-3">ações permanentes e irreversíveis</p>
+      <p className="text-[9px] text-[var(--text-muted)] mb-6 ml-3">acoes permanentes e irreversiveis</p>
 
-      <div className="border border-red-500/[0.12] rounded-lg bg-black/20 p-4">
+      <div className="border border-red-500/[0.16] rounded-lg bg-[var(--bg-elevated)] p-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] text-white/80 font-bold uppercase tracking-wider mb-1">
+            <p className="text-[11px] text-[var(--text-primary)] font-bold uppercase tracking-wider mb-1">
               Deletar Conta
             </p>
-            <p className="text-[9px] text-zinc-600 leading-relaxed max-w-sm">
-              Todos os seus dados serão permanentemente removidos — árvore, diário, biblioteca e configurações. Esta ação não pode ser desfeita.
+            <p className="text-[9px] text-[var(--text-muted)] leading-relaxed max-w-sm">
+              Todos os seus dados serao permanentemente removidos: arvore, diario, biblioteca e configuracoes. Esta acao nao pode ser desfeita.
             </p>
           </div>
           <button
@@ -46,10 +46,10 @@ export default function DangerZone() {
 
         {open && (
           <div
-            className="mt-4 pt-4 border-t border-red-500/[0.08]"
+            className="mt-4 pt-4 border-t border-red-500/[0.12]"
             style={{ animation: 'slideDown 0.2s ease-out' }}
           >
-            <p className="text-[8px] text-zinc-500 uppercase tracking-wider font-bold mb-3">
+            <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold mb-3">
               Digite <span className="text-red-400/80 font-black">{CONFIRM_WORD}</span> para confirmar
             </p>
             <div className="flex items-center gap-3">
@@ -58,7 +58,7 @@ export default function DangerZone() {
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
                 placeholder={CONFIRM_WORD}
-                className="flex-1 bg-black/40 border border-red-500/[0.12] rounded px-3 py-2 text-white text-[11px] font-bold tracking-widest outline-none focus:border-red-500/30 transition-colors placeholder:text-zinc-800 uppercase"
+                className="flex-1 bg-[var(--bg-input)] border border-red-500/[0.18] rounded px-3 py-2 text-[var(--text-primary)] text-[11px] font-bold tracking-widest outline-none focus:border-red-500/40 transition-colors placeholder:text-[var(--text-faint)] uppercase"
               />
               <button
                 onClick={handleDelete}
@@ -66,7 +66,7 @@ export default function DangerZone() {
                 className="flex items-center gap-1.5 px-4 py-2 border text-[9px] font-black uppercase tracking-wider transition-all duration-200"
                 style={{
                   borderColor: canDelete ? 'rgba(239,68,68,0.4)' : 'rgba(239,68,68,0.1)',
-                  color:       canDelete ? 'rgba(239,68,68,0.9)' : 'rgba(239,68,68,0.3)',
+                  color: canDelete ? 'rgba(239,68,68,0.9)' : 'rgba(239,68,68,0.3)',
                   backgroundColor: canDelete ? 'rgba(239,68,68,0.08)' : 'transparent',
                   cursor: canDelete ? 'pointer' : 'not-allowed',
                 }}

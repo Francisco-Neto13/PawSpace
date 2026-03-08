@@ -18,16 +18,16 @@ export function AchievementFilters({ active, onChange, resultCount }: Achievemen
         <button
           key={cat}
           onClick={() => onChange(cat)}
-          className={`px-4 py-2 text-[9px] font-black uppercase tracking-widest border transition-all duration-200 cursor-pointer ${
+          className={`px-4 py-2 text-[9px] font-black uppercase tracking-wider border transition-all duration-200 cursor-pointer ${
             active === cat
-              ? 'border-[#ffffff]/40 bg-[#ffffff]/[0.06] text-[#ffffff]'
-              : 'border-white/[0.04] text-zinc-400 hover:text-zinc-200 hover:border-white/10'
+              ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+              : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)]'
           }`}
         >
           {cat === 'all' ? 'Todas' : CATEGORY_LABELS[cat as Achievement['category']]}
         </button>
       ))}
-      <span className="ml-auto text-[8px] text-zinc-500 font-black uppercase tracking-widest">
+      <span className="ml-auto text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-wide">
         {resultCount} resultado{resultCount !== 1 ? 's' : ''}
       </span>
     </div>

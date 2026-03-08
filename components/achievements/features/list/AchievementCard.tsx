@@ -11,31 +11,35 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
   const progressPct = progress ? Math.min((progress.current / progress.total) * 100, 100) : 0;
 
   return (
-    <article className="relative min-h-[320px] rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+    <article className="relative min-h-[320px] rounded-2xl border border-[var(--border-visible)] bg-[var(--bg-surface)] p-5 overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
       <div className="relative z-10 flex items-center justify-between">
-        <span className={`text-[8px] font-black uppercase tracking-[0.35em] ${isUnlocked ? 'text-white/80' : 'text-zinc-400'}`}>
+        <span className={`text-[8px] font-black uppercase tracking-[0.3em] ${isUnlocked ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
           {CATEGORY_LABELS[category]}
         </span>
-        <span className={`text-[8px] font-black uppercase tracking-[0.25em] ${isUnlocked ? 'text-white' : 'text-zinc-400'}`}>
+        <span className={`text-[8px] font-black uppercase tracking-[0.2em] px-2 py-0.5 border ${
+          isUnlocked
+            ? 'text-[var(--text-primary)] border-[var(--border-visible)] bg-[var(--bg-elevated)]'
+            : 'text-[var(--text-secondary)] border-[var(--border-subtle)] bg-[var(--bg-surface)]'
+        }`}>
           {isUnlocked ? 'Obtida' : 'Pendente'}
         </span>
       </div>
 
       <div className="relative z-10 flex items-center justify-center py-8">
         <div className={`w-24 h-24 rounded-2xl border flex items-center justify-center text-3xl font-black font-mono tracking-tight ${
-          isUnlocked ? 'border-white/25 bg-white/[0.06] text-white' : 'border-white/[0.08] bg-black/30 text-zinc-500'
+          isUnlocked ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]' : 'border-[var(--border-muted)] bg-[var(--bg-input)] text-[var(--text-muted)]'
         }`}>
           {isUnlocked ? icon : '---'}
         </div>
       </div>
 
       <div className="relative z-10">
-        <h3 className={`text-[11px] font-black uppercase tracking-[0.2em] mb-2 leading-tight ${isUnlocked ? 'text-white' : 'text-zinc-400'}`}>
+        <h3 className={`text-[12px] font-black uppercase tracking-[0.14em] mb-2 leading-tight ${isUnlocked ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
           {isUnlocked ? title : 'Bloqueada'}
         </h3>
-        <p className={`text-[11px] leading-relaxed font-light ${isUnlocked ? 'text-zinc-400' : 'text-zinc-500'}`}>
+        <p className={`text-[12px] leading-relaxed font-normal ${isUnlocked ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
           {isUnlocked ? description : 'Continue progredindo para revelar esta conquista.'}
         </p>
       </div>
@@ -43,17 +47,17 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
       {progress && (
         <div className="relative z-10 mt-5">
           <div className="flex items-center justify-between mb-1.5">
-            <span className={`text-[7px] font-black uppercase tracking-wider ${isUnlocked ? 'text-zinc-400' : 'text-zinc-500'}`}>
+            <span className={`text-[8px] font-black uppercase tracking-wide ${isUnlocked ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
               Progresso
             </span>
-            <span className={`text-[8px] font-mono font-bold tabular-nums ${isUnlocked ? 'text-white' : 'text-zinc-400'}`}>
+            <span className={`text-[9px] font-mono font-bold tabular-nums ${isUnlocked ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
               {progress.current}/{progress.total}
             </span>
           </div>
-          <div className="h-[2px] w-full bg-white/[0.06] overflow-hidden">
+          <div className="h-[2px] w-full bg-[var(--chart-faint)] overflow-hidden">
             <div
               className="h-full transition-all duration-700"
-              style={{ width: `${progressPct}%`, backgroundColor: isUnlocked ? '#ffffff' : '#3f3f46' }}
+              style={{ width: `${progressPct}%`, backgroundColor: isUnlocked ? 'var(--chart-strong)' : 'var(--text-faint)' }}
             />
           </div>
         </div>

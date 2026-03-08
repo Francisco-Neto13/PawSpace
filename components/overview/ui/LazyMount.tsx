@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
@@ -46,7 +46,7 @@ export default function LazyMount({
         children
       ) : (
         <div
-          className="h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] animate-pulse"
+          className="h-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] animate-pulse"
           style={{ minHeight }}
           aria-hidden="true"
         />

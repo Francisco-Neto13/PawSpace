@@ -117,18 +117,18 @@ export default function EmailSection() {
   };
 
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+    <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white mb-1 flex items-center gap-2">
-        <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
+      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+        <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Email
       </p>
-      <p className="text-[9px] text-zinc-500 mb-6 ml-3">endereco de email da conta</p>
+      <p className="text-[9px] text-[var(--text-muted)] mb-6 ml-3">endereco de email da conta</p>
 
       <div className="space-y-4">
         <div>
-          <label className="text-[8px] font-black uppercase tracking-widest text-zinc-500 block mb-2">
+          <label className="text-[8px] font-black uppercase tracking-widest text-[var(--text-muted)] block mb-2">
             Email Atual
           </label>
           <input
@@ -136,14 +136,14 @@ export default function EmailSection() {
             value={email}
             onChange={e => setEmail(e.target.value)}
             disabled={isLoadingUser || isSaving}
-            className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-4 py-2.5 text-white text-[11px] font-bold tracking-wide outline-none focus:border-white/20 transition-colors placeholder:text-zinc-700 disabled:opacity-60"
+            className="w-full bg-[var(--bg-input)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 text-[var(--text-primary)] text-[11px] font-bold tracking-wide outline-none focus:border-[var(--border-visible)] transition-colors placeholder:text-[var(--text-faint)] disabled:opacity-60"
             placeholder={isLoadingUser ? 'Carregando...' : 'seu@email.com'}
           />
         </div>
 
         <div className="flex items-center justify-between pt-1 gap-4">
           <div>
-            <p className="text-[8px] text-zinc-700 uppercase tracking-wider font-bold">
+            <p className="text-[8px] text-[var(--text-faint)] uppercase tracking-wider font-bold">
               Um link de confirmacao sera enviado para o novo email.
             </p>
             {error && (
@@ -152,7 +152,7 @@ export default function EmailSection() {
               </p>
             )}
             {message && !error && (
-              <p className="text-[8px] text-white/50 uppercase tracking-wider font-bold mt-1">
+              <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mt-1">
                 {message}
               </p>
             )}
@@ -165,9 +165,9 @@ export default function EmailSection() {
             disabled={isLoadingUser || isSaving}
             className="flex items-center gap-2 px-4 py-2 border text-[9px] font-black uppercase tracking-wider transition-all duration-200 disabled:opacity-60"
             style={{
-              borderColor: saved ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
-              color: saved ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)',
-              backgroundColor: saved ? 'rgba(255,255,255,0.06)' : 'transparent',
+              borderColor: saved ? 'var(--border-visible)' : 'var(--border-muted)',
+              color: saved ? 'var(--text-primary)' : 'var(--text-secondary)',
+              backgroundColor: saved ? 'var(--bg-elevated)' : 'transparent',
             }}
           >
             {isSaving ? <Loader2 size={10} className="animate-spin" /> : null}
