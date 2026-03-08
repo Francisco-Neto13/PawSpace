@@ -1,17 +1,112 @@
-'use client';
-import { useState, useRef } from 'react';
-import { Camera, Check } from 'lucide-react';
+﻿'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { Camera, Check, Loader2 } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
+import { createClient } from '@/shared/supabase/client';
 
 export default function ProfileSection() {
-  const [username, setUsername] = useState('Francisco Neto');
+  const [username, setUsername] = useState('');
+  const [initialUsername, setInitialUsername] = useState('');
   const [saved, setSaved] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [avatar, setAvatar] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  useEffect(() => {
+    let mounted = true;
+    const loadingTimeout = window.setTimeout(() => {
+      if (!mounted) return;
+      setIsLoadingUser(false);
+      setError(prev => prev ?? 'Nao foi possivel carregar o perfil.');
+    }, 8000);
+
+    const loadUser = async () => {
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (!mounted) return;
+
+        if (userError || !user) {
+          setError('Sessao nao encontrada.');
+          return;
+        }
+
+        const rawName = user.user_metadata?.display_name ?? user.user_metadata?.name ?? '';
+        const resolvedName = typeof rawName === 'string' ? rawName : '';
+
+        setUsername(resolvedName);
+        setInitialUsername(resolvedName);
+      } catch {
+        if (!mounted) return;
+        setError('Falha ao carregar dados do usuario.');
+      } finally {
+        if (!mounted) return;
+        window.clearTimeout(loadingTimeout);
+        setIsLoadingUser(false);
+      }
+    };
+
+    void loadUser();
+
+    return () => {
+      mounted = false;
+      window.clearTimeout(loadingTimeout);
+    };
+  }, []);
+
+  const handleSave = async () => {
+    if (isSaving) return;
+
+    setError(null);
+    setSaved(false);
+
+    const nextName = username.trim();
+    if (!nextName) {
+      setError('Informe um nome de usuario valido.');
+      return;
+    }
+
+    if (nextName === initialUsername) {
+      setSaved(true);
+      return;
+    }
+
+    setIsSaving(true);
+    const supabase = createClient();
+
+    try {
+      const { error: updateError } = await supabase.auth.updateUser(
+        {
+          data: { display_name: nextName, name: nextName },
+        }
+      );
+
+      if (updateError) {
+        setError(updateError.message);
+        return;
+      }
+
+      setInitialUsername(nextName);
+      window.dispatchEvent(
+        new CustomEvent('auth-display-name-updated', {
+          detail: { displayName: nextName },
+        })
+      );
+      setSaved(true);
+    } catch (saveError) {
+      const message =
+        saveError instanceof Error ? saveError.message : 'Falha ao salvar perfil.';
+      setError(message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,7 +125,7 @@ export default function ProfileSection() {
         <PawIcon className="w-3 h-3 text-white/60 shrink-0" />
         Perfil
       </p>
-      <p className="text-[9px] text-zinc-500 mb-6 ml-3">nome de usuário e foto</p>
+      <p className="text-[9px] text-zinc-500 mb-6 ml-3">nome de usuario e foto</p>
 
       <div className="flex items-start gap-6">
         <div className="shrink-0">
@@ -42,7 +137,7 @@ export default function ProfileSection() {
               <img src={avatar} alt="avatar" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="text-2xl">🐱</span>
+                <span className="text-2xl">U</span>
               </div>
             )}
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -64,29 +159,46 @@ export default function ProfileSection() {
         <div className="flex-1 space-y-4">
           <div>
             <label className="text-[8px] font-black uppercase tracking-widest text-zinc-500 block mb-2">
-              Nome de Usuário
+              Nome de Usuario
             </label>
             <input
               type="text"
               value={username}
               onChange={e => setUsername(e.target.value)}
-              className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-4 py-2.5 text-white text-[11px] font-bold tracking-wide outline-none focus:border-white/20 transition-colors placeholder:text-zinc-700"
-              placeholder="Seu nome"
+              disabled={isLoadingUser || isSaving}
+              className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-4 py-2.5 text-white text-[11px] font-bold tracking-wide outline-none focus:border-white/20 transition-colors placeholder:text-zinc-700 disabled:opacity-60"
+              placeholder={isLoadingUser ? 'Carregando...' : 'Seu nome'}
             />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between">
+            <div>
+              {error && (
+                <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold">
+                  {error}
+                </p>
+              )}
+              {saved && !error && (
+                <p className="text-[8px] text-white/50 uppercase tracking-wider font-bold">
+                  Perfil atualizado.
+                </p>
+              )}
+            </div>
             <button
-              onClick={handleSave}
-              className="flex items-center gap-2 px-4 py-2 border text-[9px] font-black uppercase tracking-wider transition-all duration-200"
+              onClick={() => {
+                void handleSave();
+              }}
+              disabled={isLoadingUser || isSaving}
+              className="flex items-center gap-2 px-4 py-2 border text-[9px] font-black uppercase tracking-wider transition-all duration-200 disabled:opacity-60"
               style={{
                 borderColor: saved ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
                 color: saved ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)',
                 backgroundColor: saved ? 'rgba(255,255,255,0.06)' : 'transparent',
               }}
             >
-              {saved ? <Check size={10} /> : null}
-              {saved ? 'Salvo' : 'Salvar'}
+              {isSaving ? <Loader2 size={10} className="animate-spin" /> : null}
+              {!isSaving && saved ? <Check size={10} /> : null}
+              {isSaving ? 'Salvando...' : saved ? 'Salvo' : 'Salvar'}
             </button>
           </div>
         </div>

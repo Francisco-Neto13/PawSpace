@@ -1,7 +1,9 @@
-'use client';
-import { useState } from 'react';
-import { Eye, EyeOff, Check } from 'lucide-react';
+﻿'use client';
+
+import { useEffect, useState } from 'react';
+import { Eye, EyeOff, Check, Loader2 } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
+import { createClient } from '@/shared/supabase/client';
 
 function PasswordInput({ label, value, onChange, placeholder }: {
   label: string;
@@ -10,6 +12,7 @@ function PasswordInput({ label, value, onChange, placeholder }: {
   placeholder?: string;
 }) {
   const [show, setShow] = useState(false);
+
   return (
     <div>
       <label className="text-[8px] font-black uppercase tracking-widest text-zinc-500 block mb-2">
@@ -20,7 +23,7 @@ function PasswordInput({ label, value, onChange, placeholder }: {
           type={show ? 'text' : 'password'}
           value={value}
           onChange={e => onChange(e.target.value)}
-          placeholder={placeholder ?? '••••••••'}
+          placeholder={placeholder ?? '********'}
           className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-4 py-2.5 pr-10 text-white text-[11px] font-bold tracking-wide outline-none focus:border-white/20 transition-colors placeholder:text-zinc-700"
         />
         <button
@@ -36,20 +39,125 @@ function PasswordInput({ label, value, onChange, placeholder }: {
 }
 
 export default function PasswordSection() {
-  const [current, setCurrent]   = useState('');
-  const [next, setNext]         = useState('');
-  const [confirm, setConfirm]   = useState('');
-  const [saved, setSaved]       = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+  const [current, setCurrent] = useState('');
+  const [next, setNext] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [saved, setSaved] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSave = () => {
+  useEffect(() => {
+    let mounted = true;
+    const loadingTimeout = window.setTimeout(() => {
+      if (!mounted) return;
+      setIsLoadingUser(false);
+      setError(prev => prev ?? 'Nao foi possivel carregar o usuario.');
+    }, 8000);
+
+    const loadEmail = async () => {
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (!mounted) return;
+
+        if (userError || !user?.email) {
+          setError('Sessao nao encontrada.');
+          return;
+        }
+
+        setUserEmail(user.email);
+      } catch {
+        if (!mounted) return;
+        setError('Falha ao carregar dados do usuario.');
+      } finally {
+        if (!mounted) return;
+        window.clearTimeout(loadingTimeout);
+        setIsLoadingUser(false);
+      }
+    };
+
+    void loadEmail();
+
+    return () => {
+      mounted = false;
+      window.clearTimeout(loadingTimeout);
+    };
+  }, []);
+
+  const handleSave = async () => {
+    if (isSaving) return;
+
     setError(null);
-    if (!current) return setError('Digite a senha atual.');
-    if (next.length < 8) return setError('A nova senha deve ter ao menos 8 caracteres.');
-    if (next !== confirm) return setError('As senhas não coincidem.');
-    setSaved(true);
-    setCurrent(''); setNext(''); setConfirm('');
-    setTimeout(() => setSaved(false), 2000);
+    setSaved(false);
+
+    if (!current) {
+      setError('Digite a senha atual.');
+      return;
+    }
+
+    if (next.length < 8) {
+      setError('A nova senha deve ter ao menos 8 caracteres.');
+      return;
+    }
+
+    if (next !== confirm) {
+      setError('As senhas nao coincidem.');
+      return;
+    }
+
+    if (!userEmail) {
+      setError('Nao foi possivel validar o usuario atual.');
+      return;
+    }
+
+    setIsSaving(true);
+    const savingWatchdog = window.setTimeout(() => {
+      setIsSaving(false);
+      setError(
+        'A atualizacao esta demorando. Verifique se a senha mudou e tente novamente.'
+      );
+    }, 20000);
+    const supabase = createClient();
+
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: userEmail,
+        password: current,
+      });
+
+      if (signInError) {
+        setError('Senha atual incorreta.');
+        return;
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: next,
+      });
+
+      if (updateError) {
+        setError(updateError.message);
+        return;
+      }
+
+      setError(null);
+      setSaved(true);
+      setCurrent('');
+      setNext('');
+      setConfirm('');
+    } catch (saveError) {
+      const message =
+        saveError instanceof Error ? saveError.message : 'Falha ao atualizar senha.';
+      setError(message);
+    } finally {
+      window.clearTimeout(savingWatchdog);
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -63,8 +171,8 @@ export default function PasswordSection() {
       <p className="text-[9px] text-zinc-500 mb-6 ml-3">alterar senha de acesso</p>
 
       <div className="space-y-4">
-        <PasswordInput label="Senha Atual"    value={current} onChange={setCurrent} />
-        <PasswordInput label="Nova Senha"     value={next}    onChange={setNext} />
+        <PasswordInput label="Senha Atual" value={current} onChange={setCurrent} />
+        <PasswordInput label="Nova Senha" value={next} onChange={setNext} />
         <PasswordInput label="Confirmar Nova Senha" value={confirm} onChange={setConfirm} />
 
         <div className="flex items-center justify-between pt-1">
@@ -72,21 +180,25 @@ export default function PasswordSection() {
             {error && (
               <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold">{error}</p>
             )}
-            {saved && (
+            {saved && !error && (
               <p className="text-[8px] text-white/50 uppercase tracking-wider font-bold">Senha atualizada.</p>
             )}
           </div>
           <button
-            onClick={handleSave}
-            className="flex items-center gap-2 px-4 py-2 border text-[9px] font-black uppercase tracking-wider transition-all duration-200"
+            onClick={() => {
+              void handleSave();
+            }}
+            disabled={isLoadingUser || isSaving}
+            className="flex items-center gap-2 px-4 py-2 border text-[9px] font-black uppercase tracking-wider transition-all duration-200 disabled:opacity-60"
             style={{
               borderColor: saved ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
               color: saved ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)',
               backgroundColor: saved ? 'rgba(255,255,255,0.06)' : 'transparent',
             }}
           >
-            {saved ? <Check size={10} /> : null}
-            {saved ? 'Salvo' : 'Alterar Senha'}
+            {isSaving ? <Loader2 size={10} className="animate-spin" /> : null}
+            {!isSaving && saved ? <Check size={10} /> : null}
+            {isSaving ? 'Salvando...' : saved ? 'Salvo' : 'Alterar Senha'}
           </button>
         </div>
       </div>

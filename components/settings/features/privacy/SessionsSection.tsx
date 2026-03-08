@@ -1,49 +1,142 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Monitor, Smartphone, LogOut } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
+import { createClient } from '@/shared/supabase/client';
 
-const MOCK_SESSIONS = [
-  {
-    id: '1',
-    device: 'Windows · Chrome',
-    location: 'Maceió, BR',
-    lastSeen: 'Agora',
-    isCurrent: true,
-    type: 'desktop' as const,
-  },
-  {
-    id: '2',
-    device: 'iPhone · Safari',
-    location: 'Maceió, BR',
-    lastSeen: 'Há 2 horas',
-    isCurrent: false,
-    type: 'mobile' as const,
-  },
-  {
-    id: '3',
-    device: 'macOS · Firefox',
-    location: 'São Paulo, BR',
-    lastSeen: 'Há 3 dias',
-    isCurrent: false,
-    type: 'desktop' as const,
-  },
-];
+type SessionItem = {
+  id: string;
+  device: string;
+  location: string;
+  lastSeen: string;
+  isCurrent: boolean;
+  type: 'desktop' | 'mobile';
+};
+
+type SessionRow = {
+  id: string;
+  device: string | null;
+  location: string | null;
+  last_seen: string | null;
+  is_current: boolean | null;
+  type: 'desktop' | 'mobile' | null;
+};
+
+function detectBrowser(ua: string): string {
+  if (ua.includes('Edg/')) return 'Edge';
+  if (ua.includes('Firefox/')) return 'Firefox';
+  if (ua.includes('Safari/') && !ua.includes('Chrome/')) return 'Safari';
+  if (ua.includes('Chrome/')) return 'Chrome';
+  return 'Navegador';
+}
+
+function formatLastSeen(value: string | null): string {
+  if (!value) return 'Agora';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+}
 
 export default function SessionsSection() {
-  const [sessions, setSessions] = useState(MOCK_SESSIONS);
+  const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [revoking, setRevoking] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const handleRevoke = (id: string) => {
+  useEffect(() => {
+    let mounted = true;
+
+    const loadSessions = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!mounted || !user) {
+        if (mounted) setSessions([]);
+        return;
+      }
+
+      setUserId(user.id);
+
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('id, device, location, last_seen, is_current, type')
+        .eq('user_id', user.id)
+        .order('is_current', { ascending: false })
+        .order('last_seen', { ascending: false });
+
+      if (mounted && !error && data && data.length > 0) {
+        const mapped = (data as SessionRow[]).map(row => ({
+          id: row.id,
+          device: row.device ?? 'Dispositivo',
+          location: row.location ?? 'Local desconhecido',
+          lastSeen: formatLastSeen(row.last_seen),
+          isCurrent: Boolean(row.is_current),
+          type: row.type === 'mobile' ? 'mobile' : 'desktop',
+        }));
+        setSessions(mapped);
+        return;
+      }
+
+      if (!mounted) return;
+
+      const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+      const platform = typeof navigator !== 'undefined' ? navigator.platform : 'Dispositivo';
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+
+      setSessions([
+        {
+          id: 'current',
+          device: `${platform} · ${detectBrowser(ua)}`,
+          location: 'Sessão atual',
+          lastSeen: 'Agora',
+          isCurrent: true,
+          type: isMobile ? 'mobile' : 'desktop',
+        },
+      ]);
+    };
+
+    void loadSessions();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleRevoke = async (id: string) => {
+    if (!userId) return;
     setRevoking(id);
-    setTimeout(() => {
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('sessions')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+
+    if (!error) {
       setSessions(prev => prev.filter(s => s.id !== id));
-      setRevoking(null);
-    }, 800);
+    }
+
+    setRevoking(null);
   };
 
-  const handleRevokeAll = () => {
-    setSessions(prev => prev.filter(s => s.isCurrent));
+  const handleRevokeAll = async () => {
+    if (!userId) return;
+    setRevoking('__all__');
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('sessions')
+      .delete()
+      .eq('user_id', userId)
+      .neq('is_current', true);
+
+    if (!error) {
+      setSessions(prev => prev.filter(s => s.isCurrent));
+    }
+
+    setRevoking(null);
   };
 
   const others = sessions.filter(s => !s.isCurrent);
@@ -59,7 +152,9 @@ export default function SessionsSection() {
         </p>
         {others.length > 0 && (
           <button
-            onClick={handleRevokeAll}
+            onClick={() => {
+              void handleRevokeAll();
+            }}
             className="text-[8px] font-black uppercase tracking-wider text-[var(--text-muted)] hover:text-red-400/70 transition-colors"
           >
             Encerrar todas
@@ -102,7 +197,9 @@ export default function SessionsSection() {
 
               {!session.isCurrent && (
                 <button
-                  onClick={() => handleRevoke(session.id)}
+                  onClick={() => {
+                    void handleRevoke(session.id);
+                  }}
                   disabled={!!revoking}
                   className="flex items-center gap-1 text-[8px] font-black uppercase tracking-wider transition-colors"
                   style={{ color: isRevoking ? 'var(--text-faint)' : 'var(--text-muted)' }}

@@ -1,6 +1,8 @@
 ﻿'use client';
+
 import { useState, useEffect, useMemo } from 'react';
 import { PawIcon } from '@/components/shared/PawIcon';
+import { useAuthDisplayName } from '@/shared/hooks/useAuthDisplayName';
 
 interface OverviewHeaderProps {
   initialProgress?: number;
@@ -10,10 +12,10 @@ interface OverviewHeaderProps {
 
 const RANKS = [
   { threshold: 100, title: 'Gato Lendário', label: 'SS' },
-  { threshold: 80,  title: 'Gato Ninja',    label: 'S'  },
-  { threshold: 50,  title: 'Gato de Rua',   label: 'A'  },
-  { threshold: 20,  title: 'Gatinho',        label: 'B'  },
-  { threshold: 0,   title: 'Filhote',        label: 'C'  },
+  { threshold: 80, title: 'Gato Ninja', label: 'S' },
+  { threshold: 50, title: 'Gato de Rua', label: 'A' },
+  { threshold: 20, title: 'Gatinho', label: 'B' },
+  { threshold: 0, title: 'Filhote', label: 'C' },
 ];
 
 const MARKS = [0, 20, 40, 60, 80, 100];
@@ -25,31 +27,41 @@ export default function OverviewHeader({
 }: OverviewHeaderProps) {
   const [mounted, setMounted] = useState(false);
   const [progress, setProgress] = useState(initialProgress);
+  const { displayName } = useAuthDisplayName();
+
+  const [firstName, restName] = useMemo(() => {
+    const parts = displayName.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return ['Usuario', ''];
+    if (parts.length === 1) return [parts[0], ''];
+    return [parts[0], parts.slice(1).join(' ')];
+  }, [displayName]);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 50);
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => { setProgress(initialProgress); }, [initialProgress]);
+  useEffect(() => {
+    setProgress(initialProgress);
+  }, [initialProgress]);
 
   useEffect(() => {
     const handle = (e: Event) => {
       const val = (e as CustomEvent<number>).detail;
       if (typeof val === 'number') setProgress(val);
     };
+
     window.addEventListener('skill-progress-update', handle);
     return () => window.removeEventListener('skill-progress-update', handle);
   }, []);
 
   const rank = useMemo(
-    () => RANKS.find(r => progress >= r.threshold) ?? RANKS[RANKS.length - 1],
+    () => RANKS.find((r) => progress >= r.threshold) ?? RANKS[RANKS.length - 1],
     [progress]
   );
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-
       <div className="lg:col-span-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
         <div className="relative z-10">
@@ -62,7 +74,8 @@ export default function OverviewHeader({
                 </span>
               </div>
               <h1 className="text-white text-3xl font-black uppercase tracking-tighter leading-none">
-                Francisco <span className="text-white/60">Neto</span>
+                {firstName}
+                {restName && <span className="text-white/60"> {restName}</span>}
               </h1>
             </div>
 
@@ -81,7 +94,8 @@ export default function OverviewHeader({
                 {unlockedCount} / {totalCount} módulos com conteúdo
               </span>
               <span className="font-mono text-xl text-white font-black leading-none">
-                {progress}<span className="text-xs ml-0.5 text-zinc-400">%</span>
+                {progress}
+                <span className="text-xs ml-0.5 text-zinc-400">%</span>
               </span>
             </div>
 
@@ -98,11 +112,14 @@ export default function OverviewHeader({
             </div>
 
             <div className="flex justify-between w-full px-0.5">
-              {MARKS.map(mark => (
+              {MARKS.map((mark) => (
                 <div key={mark} className="flex flex-col items-center gap-1">
                   <div
                     className="w-[1px] h-2 transition-colors duration-500"
-                    style={{ backgroundColor: progress >= mark ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.06)' }}
+                    style={{
+                      backgroundColor:
+                        progress >= mark ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.06)',
+                    }}
                   />
                   <span
                     className="text-[9px] font-mono font-bold transition-colors duration-500"
@@ -123,7 +140,6 @@ export default function OverviewHeader({
         <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-white opacity-[0.04]" />
 
         <div className="space-y-6 w-full">
-
           <div>
             <span className="text-zinc-500 text-[9px] font-black uppercase tracking-widest block mb-2">
               Versão do Pawspace
@@ -149,10 +165,8 @@ export default function OverviewHeader({
             <p className="text-zinc-500 text-[9px] font-black uppercase tracking-widest mb-1">Cobertura</p>
             <p className="text-white text-3xl font-black font-mono tabular-nums leading-none">{progress}%</p>
           </div>
-
         </div>
       </div>
-
     </section>
   );
 }

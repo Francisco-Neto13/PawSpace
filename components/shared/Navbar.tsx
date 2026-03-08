@@ -1,4 +1,5 @@
 ﻿'use client';
+
 import React, { forwardRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -6,6 +7,7 @@ import { Menu, X } from 'lucide-react';
 import { createClient } from '@/shared/supabase/client';
 import { useNexus } from '@/shared/contexts/NexusContext';
 import { useJournal } from '@/shared/contexts/JournalContext';
+import { useAuthDisplayName } from '@/shared/hooks/useAuthDisplayName';
 
 const Navbar = forwardRef<HTMLElement>((_, ref) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,8 +15,10 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
   const router = useRouter();
   const supabase = createClient();
 
+  const { displayName, isLoading: isLoadingDisplayName } = useAuthDisplayName();
   const { isDirty, setIsDirty, discardLocalChanges } = useNexus();
   const { flushPending } = useJournal();
+  const avatarLetter = (displayName.trim().charAt(0) || 'U').toUpperCase();
 
   if (pathname === '/login') return null;
 
@@ -27,33 +31,36 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
 
     if (isDirty) {
       const confirmExit = window.confirm(
-        "Você tem alterações não salvas na sua Árvore. Se sair agora, elas serão perdidas. Deseja sair mesmo assim?"
+        'Você tem alterações não salvas na sua Árvore. Se sair agora, elas serão perdidas. Deseja sair mesmo assim?'
       );
       if (!confirmExit) return;
       discardLocalChanges();
       setIsDirty(false);
     }
+
     await flushPending();
     setIsOpen(false);
     router.push(href);
   };
 
   const links = [
-    { name: "Resumo",        href: "/overview"  },
-    { name: "Árvore",        href: "/tree"      },
-    { name: "Biblioteca",    href: "/library"   },
-    { name: "Diário",        href: "/journal"   },
-    { name: "Conquistas",    href: "/achievements" },
-    { name: "Configurações", href: "/settings"  },
+    { name: 'Resumo', href: '/overview' },
+    { name: 'Árvore', href: '/tree' },
+    { name: 'Biblioteca', href: '/library' },
+    { name: 'Diário', href: '/journal' },
+    { name: 'Conquistas', href: '/achievements' },
+    { name: 'Configurações', href: '/settings' },
   ];
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
+
     if (isDirty) {
-      const confirmExit = window.confirm("Sair e perder alterações não salvas?");
+      const confirmExit = window.confirm('Sair e perder alterações não salvas?');
       if (!confirmExit) return;
       setIsDirty(false);
     }
+
     try {
       await flushPending();
       await supabase.auth.signOut();
@@ -70,18 +77,17 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
       className="w-full border-b border-white/5 bg-black/60 backdrop-blur-xl sticky top-0 z-[100]"
     >
       <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 py-3 flex justify-between items-center sm:grid sm:grid-cols-3">
-
         <div className="justify-self-start">
           <Link
             href="/overview"
-            onClick={(e) => handleSafeNavigation(e, "/overview")}
+            onClick={(e) => handleSafeNavigation(e, '/overview')}
             className="flex items-center gap-3 group"
           >
             <div className="h-9 w-9 rounded-full border border-[#ffffff]/30 bg-[#ffffff]/10 flex items-center justify-center transition-colors group-hover:border-[#ffffff]/60">
-              <span className="text-[#ffffff] text-sm font-black">F</span>
+              <span className="text-[#ffffff] text-sm font-black">{avatarLetter}</span>
             </div>
             <span className="text-zinc-200 text-[11px] font-black uppercase tracking-[0.2em] group-hover:text-[#ffffff] transition-colors">
-              Francisco
+              {isLoadingDisplayName ? 'Carregando' : displayName}
             </span>
           </Link>
         </div>
@@ -89,6 +95,7 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
         <div className="hidden md:flex justify-self-center items-center gap-8 lg:gap-10">
           {links.map((link) => {
             const isActive = pathname === link.href;
+
             return (
               <Link
                 key={link.name}
@@ -99,9 +106,11 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
                 }`}
               >
                 {link.name}
-                <span className={`absolute bottom-0 left-0 h-0.5 bg-[#ffffff] transition-all duration-300 shadow-[0_0_10px_rgba(255,255,255,0.5)] ${
-                  isActive ? 'w-full' : 'w-0 group-hover:w-full'
-                }`} />
+                <span
+                  className={`absolute bottom-0 left-0 h-0.5 bg-[#ffffff] transition-all duration-300 shadow-[0_0_10px_rgba(255,255,255,0.5)] ${
+                    isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                  }`}
+                />
               </Link>
             );
           })}
@@ -153,4 +162,3 @@ const Navbar = forwardRef<HTMLElement>((_, ref) => {
 
 Navbar.displayName = 'Navbar';
 export default Navbar;
-
