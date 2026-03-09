@@ -67,14 +67,14 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
               <button
                 key={node.id}
                 onClick={() => onSelect(node.id)}
-                className={`group relative flex items-center gap-4 px-5 py-4 border rounded-xl text-left transition-all duration-300 ${
+                className={`group relative flex items-center gap-4 px-5 py-4 border rounded-xl overflow-hidden text-left transition-all duration-300 ${
                   isSelected
                     ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)]'
                     : 'border-[var(--border-subtle)] hover:border-[var(--border-muted)] hover:bg-[var(--bg-surface)]'
                 }`}
               >
                 {isSelected && (
-                  <div className="absolute left-0 top-0 bottom-0 w-[2px] rounded-l-xl" style={{ backgroundColor: node.color }} />
+                  <div className="absolute left-0 top-[1px] bottom-[1px] w-[2px] rounded-l-xl" style={{ backgroundColor: node.color }} />
                 )}
 
                 <div

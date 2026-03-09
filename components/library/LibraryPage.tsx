@@ -62,12 +62,12 @@ export default function LibraryPage() {
   const resolvedSelectedNodeId = useMemo(() => {
     if (isLoadingNexus || nodes.length === 0) return null;
 
-    if (nodeIdFromUrl && nodes.some((node) => node.id === nodeIdFromUrl)) {
-      return nodeIdFromUrl;
-    }
-
     if (selectedNodeId && nodes.some((node) => node.id === selectedNodeId)) {
       return selectedNodeId;
+    }
+
+    if (nodeIdFromUrl && nodes.some((node) => node.id === nodeIdFromUrl)) {
+      return nodeIdFromUrl;
     }
 
     return nodes[0]?.id ?? null;

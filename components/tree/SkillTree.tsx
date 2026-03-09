@@ -1,6 +1,6 @@
 ﻿'use client';
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { ReactFlow, ConnectionMode, type NodeTypes, useReactFlow, ReactFlowProvider } from '@xyflow/react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { ReactFlow, ConnectionMode, type NodeTypes, useReactFlow, ReactFlowProvider, useNodesInitialized } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Save, Loader2, AlertCircle } from 'lucide-react';
 
@@ -18,6 +18,7 @@ import { useSkillTree, SkillTreeProvider } from '@/contexts/SkillTreeContext';
 import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
 import { PageBackground } from '../shared/PageBackground';
+import { PawIcon } from '../shared/PawIcon';
 import type { SkillData } from './types';
 import { useTheme } from '@/shared/contexts/ThemeContext';
 
@@ -37,18 +38,19 @@ const defaultEdgeOptions = {
 
 function CenterOnRoot({ nodes, isLoading }: { nodes: SkillNode[]; isLoading: boolean }) {
   const { fitView } = useReactFlow();
-  const [hasCentered, setHasCentered] = useState(false);
+  const nodesInitialized = useNodesInitialized();
+  const hasCenteredRef = useRef(false);
 
   useEffect(() => {
-    if (isLoading || nodes.length === 0 || hasCentered) return;
+    if (isLoading || nodes.length === 0 || hasCenteredRef.current || !nodesInitialized) return;
     const rootNode = nodes.find(n => !n.data.parentId);
     if (!rootNode) return;
-    const timer = setTimeout(() => {
-      fitView({ nodes: [rootNode], padding: 0.4, duration: 800, maxZoom: 1 });
-      setHasCentered(true);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [isLoading, nodes, hasCentered, fitView]);
+    const raf = requestAnimationFrame(() => {
+      fitView({ nodes: [rootNode], padding: 0.4, maxZoom: 1 });
+      hasCenteredRef.current = true;
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [isLoading, nodes, nodesInitialized, fitView]);
 
   return null;
 }
@@ -71,9 +73,15 @@ function SkillTreeInner() {
   const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
   const [hasStructuralChanges, setHasStructuralChanges] = useState(false);
+  const [isCanvasVisible, setIsCanvasVisible] = useState(false);
 
   const canSave = isDirty || hasDragChanges || hasStructuralChanges;
   const isEmpty = !isLoadingTree && nodes.length === 0;
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setIsCanvasVisible(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   useEffect(() => {
     refreshNexus(true);
@@ -152,6 +160,18 @@ function SkillTreeInner() {
     >
       <PageBackground src="/cat2.webp" />
 
+      <div className="absolute top-8 left-0 right-0 z-30 pointer-events-none reveal-fade delay-0">
+        <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16">
+          <div className="flex items-center gap-3">
+            <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+            <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
+              Pawspace / Arvore
+            </span>
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--border-subtle)] to-transparent" />
+          </div>
+        </div>
+      </div>
+
       {isLoadingTree && nodes.length === 0 && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
           <div className="relative flex flex-col items-center gap-4">
@@ -198,7 +218,15 @@ function SkillTreeInner() {
         </div>
       )}
 
-      <div style={{ width: '100%', height: '100%' }} className="relative">
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          opacity: isCanvasVisible ? 1 : 0,
+          transition: 'opacity 250ms ease',
+        }}
+        className="relative"
+      >
         <ReactFlow
           colorMode={theme}
           nodes={nodes}

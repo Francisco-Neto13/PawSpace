@@ -64,7 +64,7 @@ export default function OverviewContent() {
 
       <main className="relative z-10 py-8 space-y-4 pb-20">
 
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-6 reveal-fade delay-0">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
           <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
             Pawspace / Visao Geral
@@ -72,19 +72,23 @@ export default function OverviewContent() {
           <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--border-subtle)] to-transparent" />
         </div>
 
-        <OverviewHeader
-          initialProgress={stats.progress}
-          unlockedCount={stats.unlocked}
-          totalCount={stats.total}
-        />
+        <div className="reveal-up delay-100">
+          <OverviewHeader
+            initialProgress={stats.progress}
+            unlockedCount={stats.unlocked}
+            totalCount={stats.total}
+          />
+        </div>
 
-        <StatsGrid
-          unlockedCount={stats.unlocked}
-          totalCount={stats.total}
-          progress={stats.progress}
-        />
+        <div className="reveal-up delay-200">
+          <StatsGrid
+            unlockedCount={stats.unlocked}
+            totalCount={stats.total}
+            progress={stats.progress}
+          />
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={deferredSectionStyle}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 reveal-up delay-300" style={deferredSectionStyle}>
           <LazyMount minHeight={330}>
             <CategoryChart data={snapshot.categoryData} />
           </LazyMount>
@@ -93,23 +97,23 @@ export default function OverviewContent() {
           </LazyMount>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4" style={deferredSectionStyle}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 reveal-up delay-400" style={deferredSectionStyle}>
           <div className="lg:col-span-2">
-            <LazyMount minHeight={290}>
+            <LazyMount minHeight={360}>
               <JournalActivityChart />
             </LazyMount>
           </div>
-          <LazyMount minHeight={290}>
+          <LazyMount minHeight={360}>
             <LibraryStatsPanel stats={libraryStats} isBootstrapLoading={isBootstrapLoading} />
           </LazyMount>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={deferredSectionStyle}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 reveal-up delay-500" style={deferredSectionStyle}>
           <CriticalNodesPanel critical={snapshot.criticalNodes} />
           <RecentActivityFeed initialPage={recentActivity} isBootstrapLoading={isBootstrapLoading} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2" style={deferredSectionStyle}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2 reveal-up delay-500" style={deferredSectionStyle}>
 
           <div className="lg:col-span-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
@@ -164,4 +168,3 @@ export default function OverviewContent() {
     </div>
   );
 }
-

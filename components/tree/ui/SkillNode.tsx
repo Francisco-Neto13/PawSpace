@@ -109,7 +109,7 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
 
       <div
         className={`relative flex items-center justify-center transition-all duration-300 z-20
-          ${selected ? 'scale-110' : 'hover:scale-105'}
+          ${selected ? 'scale-[1.08]' : 'hover:scale-[1.02]'}
         `}
         style={{ width: size, height: size }}
       >

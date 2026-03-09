@@ -1,6 +1,6 @@
-﻿'use client';
+'use client';
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { BookOpen } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/app/actions/activity';
 
 const PAGE_SIZE = 10;
+const MAX_ACTIVITY_ITEMS = 40;
 
 function timeAgo(date: string | Date): string {
   const diff = Date.now() - new Date(date).getTime();
@@ -33,12 +34,30 @@ function mergeUniqueItems(previous: ActivityFeedItem[], incoming: ActivityFeedIt
     merged.push(item);
   });
 
-  return merged.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return merged
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, MAX_ACTIVITY_ITEMS);
 }
 
 interface RecentActivityFeedProps {
   initialPage: RecentActivityResult | null;
   isBootstrapLoading?: boolean;
+}
+
+interface ActivityCounters {
+  all: number;
+  journal: number;
+  skill: number;
+  library: number;
+}
+
+function buildCounters(source: ActivityFeedItem[]): ActivityCounters {
+  return {
+    all: source.length,
+    journal: source.filter((i) => i.type === 'journal').length,
+    skill: source.filter((i) => i.type === 'skill').length,
+    library: source.filter((i) => i.type === 'library').length,
+  };
 }
 
 function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentActivityFeedProps) {
@@ -58,6 +77,9 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
   );
   const [isLoadingInitial, setIsLoadingInitial] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [counters, setCounters] = useState<ActivityCounters>(
+    hasInitialPage ? buildCounters(initialPage?.items ?? []) : { all: 0, journal: 0, skill: 0, library: 0 }
+  );
 
   const loadFirstPage = useCallback(async (activeFilter: ActivityFilter) => {
     setIsLoadingInitial(true);
@@ -80,8 +102,11 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
       }
 
       setItems(response.items);
+      if (activeFilter === 'all') {
+        setCounters(buildCounters(response.items));
+      }
       setNextCursor(response.nextCursor);
-      setHasMore(response.hasMore && Boolean(response.nextCursor));
+      setHasMore(response.hasMore && Boolean(response.nextCursor) && response.items.length < MAX_ACTIVITY_ITEMS);
     } catch (error) {
       console.error('[Overview] Failed to load recent activity:', error);
       setItems([]);
@@ -93,7 +118,7 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
   }, []);
 
   const loadMorePage = useCallback(async () => {
-    if (!hasMore || !nextCursor || isLoadingMore) return;
+    if (!hasMore || !nextCursor || isLoadingMore || items.length >= MAX_ACTIVITY_ITEMS) return;
     setIsLoadingMore(true);
 
     try {
@@ -105,15 +130,21 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
 
       if (response.status !== 'ok') return;
 
-      setItems((previous) => mergeUniqueItems(previous, response.items));
+      setItems((previous) => {
+        const merged = mergeUniqueItems(previous, response.items);
+        if (filter === 'all') {
+          setCounters(buildCounters(merged));
+        }
+        setHasMore(response.hasMore && Boolean(response.nextCursor) && merged.length < MAX_ACTIVITY_ITEMS);
+        return merged;
+      });
       setNextCursor(response.nextCursor);
-      setHasMore(response.hasMore && Boolean(response.nextCursor));
     } catch (error) {
       console.error('[Overview] Failed to load more activity:', error);
     } finally {
       setIsLoadingMore(false);
     }
-  }, [filter, hasMore, nextCursor, isLoadingMore]);
+  }, [filter, hasMore, nextCursor, isLoadingMore, items.length]);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 100);
@@ -126,11 +157,13 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
 
     if (initialPage.status === 'ok') {
       setItems(initialPage.items);
+      setCounters(buildCounters(initialPage.items));
       setNextCursor(initialPage.nextCursor);
-      setHasMore(initialPage.hasMore && Boolean(initialPage.nextCursor));
+      setHasMore(initialPage.hasMore && Boolean(initialPage.nextCursor) && initialPage.items.length < MAX_ACTIVITY_ITEMS);
       skipFirstResetFetchRef.current = true;
     } else {
       setItems([]);
+      setCounters({ all: 0, journal: 0, skill: 0, library: 0 });
       setNextCursor(null);
       setHasMore(false);
       skipFirstResetFetchRef.current = false;
@@ -149,13 +182,8 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
     void loadFirstPage(filter);
   }, [filter, loadFirstPage, isBootstrapLoading]);
 
-  const { journalCount, skillCount, libraryCount } = useMemo(() => ({
-    journalCount: items.filter((i) => i.type === 'journal').length,
-    skillCount: items.filter((i) => i.type === 'skill').length,
-    libraryCount: items.filter((i) => i.type === 'library').length,
-  }), [items]);
-
   const isLoading = (isBootstrapLoading || isLoadingInitial) && items.length === 0;
+  const reachedActivityLimit = items.length >= MAX_ACTIVITY_ITEMS;
 
   return (
     <div className="h-full max-h-[440px] rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden flex flex-col">
@@ -169,10 +197,10 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
 
       <div className="flex gap-1 mb-4 ml-3 shrink-0">
         {([
-          ['all', 'Tudo', items.length],
-          ['journal', 'Diario', journalCount],
-          ['skill', 'Modulos', skillCount],
-          ['library', 'Biblioteca', libraryCount],
+          ['all', 'Tudo', counters.all],
+          ['journal', 'Diario', counters.journal],
+          ['skill', 'Modulos', counters.skill],
+          ['library', 'Biblioteca', counters.library],
         ] as const).map(([key, label, count]) => (
           <button
             key={key}
@@ -249,10 +277,10 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
         </span>
         <button
           onClick={() => void loadMorePage()}
-          disabled={!hasMore || isLoadingMore || isLoadingInitial || isBootstrapLoading}
+          disabled={!hasMore || isLoadingMore || isLoadingInitial || isBootstrapLoading || reachedActivityLimit}
           className="text-[8px] font-black uppercase tracking-wider px-2 py-1 border border-[var(--border-muted)] text-[var(--text-secondary)] disabled:text-[var(--text-faint)] disabled:border-[var(--border-subtle)] disabled:cursor-not-allowed"
         >
-          {isLoadingMore ? 'Carregando...' : hasMore ? 'Ver mais' : 'Sem mais itens'}
+          {isLoadingMore ? 'Carregando...' : reachedActivityLimit ? 'Limite atingido' : hasMore ? 'Ver mais' : 'Sem mais itens'}
         </button>
       </div>
     </div>
@@ -260,3 +288,4 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
 }
 
 export default memo(RecentActivityFeed);
+

@@ -4,15 +4,32 @@ import { CircleCheck, Circle, ChevronRight } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { CriticalNodeDatum } from '@/components/overview/lib/overviewMetrics';
 
-interface Props { critical: CriticalNodeDatum[] }
+interface Props {
+  critical: CriticalNodeDatum[];
+}
 
 function CriticalNodesPanel({ critical }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  if (critical.length === 0) return null;
+  const safeExpandedId = critical.some((item) => item.id === expandedId) ? expandedId : null;
 
-  const covered   = critical.filter(n => n.hasContent).length;
-  const uncovered = critical.filter(n => !n.hasContent).length;
+  if (critical.length === 0) {
+    return (
+      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] flex items-center gap-2">
+          <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+          Patas Criticas
+        </p>
+        <p className="text-[9px] text-[var(--text-secondary)] mt-6 ml-3">
+          Sem dependencias suficientes para analisar no momento.
+        </p>
+      </div>
+    );
+  }
+
+  const covered = critical.filter((n) => n.hasContent).length;
+  const uncovered = critical.filter((n) => !n.hasContent).length;
 
   return (
     <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
@@ -21,7 +38,7 @@ function CriticalNodesPanel({ critical }: Props) {
       <div className="flex items-start justify-between mb-1">
         <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          Patas Críticas
+          Patas Criticas
         </p>
         <div className="flex gap-1.5">
           {covered > 0 && (
@@ -36,12 +53,13 @@ function CriticalNodesPanel({ critical }: Props) {
           )}
         </div>
       </div>
-      <p className="text-[9px] text-[var(--text-secondary)] mb-6 ml-3">módulos que sustentam mais dependências</p>
+      <p className="text-[9px] text-[var(--text-secondary)] mb-6 ml-3">modulos que sustentam mais dependencias</p>
 
       <div className="space-y-1">
         {critical.map((n, i) => {
-          const isExpanded = expandedId === n.id;
-          const barPct = Math.min((n.dependents / critical[0].dependents) * 100, 100);
+          const isExpanded = safeExpandedId === n.id;
+          const maxDependents = Math.max(critical[0]?.dependents ?? 1, 1);
+          const barPct = Math.min((n.dependents / maxDependents) * 100, 100);
 
           return (
             <div key={n.id}>
@@ -66,10 +84,11 @@ function CriticalNodesPanel({ critical }: Props) {
                 <span className="text-[9px] text-[var(--text-secondary)] font-mono shrink-0">{n.dependents} deps</span>
 
                 <div className="w-4 shrink-0 flex items-center justify-center">
-                  {n.hasContent
-                    ? <CircleCheck size={11} className="text-[var(--text-secondary)]" />
-                    : <Circle     size={11} className="text-[var(--text-muted)]" />
-                  }
+                  {n.hasContent ? (
+                    <CircleCheck size={11} className="text-[var(--text-secondary)]" />
+                  ) : (
+                    <Circle size={11} className="text-[var(--text-muted)]" />
+                  )}
                 </div>
 
                 <div className="w-20 h-[3px] bg-[var(--bg-elevated)] overflow-hidden rounded-full shrink-0">
@@ -102,7 +121,7 @@ function CriticalNodesPanel({ critical }: Props) {
                       <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.linksCount}</p>
                     </div>
                     <div>
-                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">Conteúdos</p>
+                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">Conteudos</p>
                       <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.contentsCount}</p>
                     </div>
                     <div>
@@ -117,7 +136,7 @@ function CriticalNodesPanel({ critical }: Props) {
                           color: n.hasContent ? 'var(--text-primary)' : 'var(--text-muted)',
                         }}
                       >
-                        {n.hasContent ? 'Coberto' : 'Sem conteúdo'}
+                        {n.hasContent ? 'Coberto' : 'Sem conteudo'}
                       </span>
                     </div>
                   </div>
@@ -132,7 +151,7 @@ function CriticalNodesPanel({ critical }: Props) {
         <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center gap-2">
           <Circle size={8} className="text-[var(--text-secondary)] shrink-0" />
           <p className="text-[8px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">
-            {uncovered} pata{uncovered > 1 ? 's' : ''} crítica{uncovered > 1 ? 's' : ''} sem conteúdo — prioridade alta
+            {uncovered} pata{uncovered > 1 ? 's' : ''} critica{uncovered > 1 ? 's' : ''} sem conteudo - prioridade alta
           </p>
         </div>
       )}

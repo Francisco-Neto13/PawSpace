@@ -1,21 +1,68 @@
-'use client';
+﻿'use client';
 import { useState } from 'react';
 import { Download } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 
 const EXPORT_ITEMS = [
-  { key: 'tree',    label: 'Árvore de Conhecimento', sub: 'nodes e conexões em JSON' },
-  { key: 'journal', label: 'Diário',                 sub: 'todas as entradas em JSON' },
-  { key: 'library', label: 'Biblioteca',             sub: 'conteúdos e links em JSON' },
-  { key: 'all',     label: 'Tudo',                   sub: 'exportação completa'       },
-];
+  { key: 'tree', label: 'Arvore de Conhecimento', sub: 'nodes e conexoes em JSON' },
+  { key: 'journal', label: 'Diario', sub: 'todas as entradas em JSON' },
+  { key: 'library', label: 'Biblioteca', sub: 'conteudos e links em JSON' },
+  { key: 'all', label: 'Tudo', sub: 'exportacao completa' },
+] as const;
+
+type ExportKey = (typeof EXPORT_ITEMS)[number]['key'];
+
+function getFileNameFromResponse(response: Response, fallbackScope: ExportKey) {
+  const disposition = response.headers.get('Content-Disposition') || '';
+  const match = disposition.match(/filename="([^"]+)"/i);
+  if (match?.[1]) return match[1];
+
+  const fileDate = new Date().toISOString().slice(0, 10);
+  return `pawspace-${fallbackScope}-${fileDate}.json`;
+}
+
+function getExportErrorMessage(scope: ExportKey) {
+  if (scope === 'tree') return 'Falha ao exportar arvore.';
+  if (scope === 'journal') return 'Falha ao exportar diario.';
+  if (scope === 'library') return 'Falha ao exportar biblioteca.';
+  return 'Falha ao exportar dados completos.';
+}
 
 export default function ExportSection() {
-  const [loading, setLoading] = useState<string | null>(null);
+  const [loading, setLoading] = useState<ExportKey | null>(null);
 
-  const handleExport = (key: string) => {
+  const handleExport = async (key: ExportKey) => {
     setLoading(key);
-    setTimeout(() => setLoading(null), 1500);
+
+    try {
+      const response = await fetch(`/api/export?scope=${key}`, { method: 'GET' });
+      if (!response.ok) {
+        const fallback = getExportErrorMessage(key);
+        try {
+          const data = (await response.json()) as { error?: string };
+          throw new Error(data.error || fallback);
+        } catch {
+          throw new Error(fallback);
+        }
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const fileName = getFileNameFromResponse(response, key);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : getExportErrorMessage(key);
+      alert(message);
+    } finally {
+      setLoading(null);
+    }
   };
 
   return (
@@ -29,8 +76,9 @@ export default function ExportSection() {
       <p className="text-[9px] text-[var(--text-muted)] mb-6 ml-3">baixe seus dados em formato JSON</p>
 
       <div className="space-y-2">
-        {EXPORT_ITEMS.map(item => {
+        {EXPORT_ITEMS.map((item) => {
           const isLoading = loading === item.key;
+
           return (
             <div
               key={item.key}
@@ -45,7 +93,7 @@ export default function ExportSection() {
                 </p>
               </div>
               <button
-                onClick={() => handleExport(item.key)}
+                onClick={() => void handleExport(item.key)}
                 disabled={!!loading}
                 className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--border-muted)] text-[8px] font-black uppercase tracking-wider text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-200 disabled:opacity-40"
               >

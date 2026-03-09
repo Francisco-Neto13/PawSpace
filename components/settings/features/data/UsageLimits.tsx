@@ -1,13 +1,44 @@
-'use client';
+﻿'use client';
+import { useEffect, useMemo } from 'react';
 import { PawIcon } from '@/components/shared/PawIcon';
-
-const USAGE_ITEMS = [
-  { label: 'Entradas no Diário',   current: 12,  max: 100,  unit: 'entradas' },
-  { label: 'Módulos na Árvore',    current: 34,  max: 200,  unit: 'módulos'  },
-  { label: 'Conteúdos na Biblioteca', current: 8, max: 500, unit: 'itens'    },
-];
+import { useNexus } from '@/contexts/NexusContext';
+import { LIMITS } from '@/shared/lib/limits';
 
 export default function UsageLimits() {
+  const { nodes, globalStats, refreshGlobalStats } = useNexus();
+
+  useEffect(() => {
+    void refreshGlobalStats();
+  }, [refreshGlobalStats]);
+
+  const usageItems = useMemo(() => {
+    const totalModules = nodes.length;
+    const moduleLimit = LIMITS.quantity.skillsPerUser;
+    const journalLimit = LIMITS.quantity.journalEntries;
+    const libraryLimit = Math.max(totalModules, 1) * LIMITS.quantity.contentsPerNode;
+
+    return [
+      {
+        label: 'Entradas no Diario',
+        current: globalStats.totalJournalEntries,
+        max: journalLimit,
+        unit: 'entradas',
+      },
+      {
+        label: 'Modulos na Arvore',
+        current: totalModules,
+        max: moduleLimit,
+        unit: 'modulos',
+      },
+      {
+        label: 'Conteudos na Biblioteca',
+        current: globalStats.totalLibraryContents,
+        max: libraryLimit,
+        unit: 'itens',
+      },
+    ];
+  }, [nodes.length, globalStats.totalJournalEntries, globalStats.totalLibraryContents]);
+
   return (
     <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
@@ -19,7 +50,7 @@ export default function UsageLimits() {
       <p className="text-[9px] text-[var(--text-muted)] mb-6 ml-3">consumo vs limites do plano</p>
 
       <div className="space-y-5">
-        {USAGE_ITEMS.map(item => {
+        {usageItems.map((item) => {
           const pct = Math.min((item.current / item.max) * 100, 100);
           const isHigh = pct >= 80;
           return (
@@ -28,7 +59,8 @@ export default function UsageLimits() {
                 <span className="text-[9px] text-[var(--text-muted)] font-bold uppercase tracking-wider">
                   {item.label}
                 </span>
-                <span className="text-[9px] font-mono font-black"
+                <span
+                  className="text-[9px] font-mono font-black"
                   style={{ color: isHigh ? 'rgba(239,68,68,0.8)' : 'var(--text-secondary)' }}
                 >
                   {item.current} / {item.max}
@@ -47,7 +79,8 @@ export default function UsageLimits() {
                 <span className="text-[7px] text-[var(--text-faint)] uppercase tracking-wider font-bold">
                   {item.unit}
                 </span>
-                <span className="text-[7px] font-mono font-bold"
+                <span
+                  className="text-[7px] font-mono font-bold"
                   style={{ color: isHigh ? 'rgba(239,68,68,0.6)' : 'var(--text-faint)' }}
                 >
                   {Math.round(pct)}%

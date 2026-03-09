@@ -108,7 +108,7 @@ function JournalActivityChart() {
       <p className="text-[9px] text-[var(--text-secondary)] mb-6 ml-3">entradas por mês — últimos 6 meses</p>
 
       {/* Gráfico cresce para preencher o espaço disponível */}
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-[220px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} barSize={20}>
             <XAxis

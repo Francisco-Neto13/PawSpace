@@ -19,7 +19,7 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
   return (
     <button
       onClick={onSelect}
-      className={`group relative w-full flex flex-col gap-2 px-4 py-4 border rounded-xl text-left transition-all duration-300
+      className={`group relative w-full flex flex-col gap-2 px-4 py-4 border rounded-xl overflow-hidden text-left transition-all duration-300
         ${isSelected
           ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)]'
           : 'border-[var(--border-subtle)] hover:border-[var(--border-visible)] hover:bg-[var(--bg-elevated)]'
@@ -27,7 +27,7 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
     >
       {isSelected && (
         <>
-          <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[var(--text-primary)]" />
+          <div className="absolute left-0 top-[1px] bottom-[1px] w-[2px] bg-[var(--text-primary)]" />
           <div
             className="absolute top-0 left-0 right-0 h-[1px]"
             style={{ background: 'linear-gradient(to right, var(--shimmer-via), transparent)' }}
