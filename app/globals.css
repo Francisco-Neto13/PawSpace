@@ -44,7 +44,7 @@
   color-scheme: dark;
 }
 
-.light {
+html.light {
   --bg-base:          #f4f4f5;
   --bg-surface:       rgba(0,0,0,0.02);
   --bg-elevated:      rgba(0,0,0,0.05);

@@ -9,7 +9,32 @@ interface SkillPanelProps {
   onClose: () => void;
 }
 
-const DEFAULT_SYSTEM_COLOR = '#22d3ee';
+const DEFAULT_SYSTEM_COLOR = 'var(--text-secondary)';
+const SAFE_NEUTRAL_COLOR = 'var(--text-secondary)';
+
+function normalizeHexColor(candidate: string): string {
+  const hex = candidate.trim().toLowerCase();
+  if (/^#[0-9a-f]{6}$/.test(hex)) return hex;
+  if (/^#[0-9a-f]{3}$/.test(hex)) {
+    const [r, g, b] = hex.slice(1).split('');
+    return `#${r}${r}${g}${g}${b}${b}`;
+  }
+  return '';
+}
+
+function isNearWhiteHex(hex: string): boolean {
+  const normalized = normalizeHexColor(hex);
+  if (!normalized) return false;
+  const r = Number.parseInt(normalized.slice(1, 3), 16);
+  const g = Number.parseInt(normalized.slice(3, 5), 16);
+  const b = Number.parseInt(normalized.slice(5, 7), 16);
+  return r >= 235 && g >= 235 && b >= 235;
+}
+
+function isThemeContrastToken(value: string): boolean {
+  const token = value.trim().toLowerCase();
+  return token === 'var(--text-contrast)' || token === 'var(--text-primary)';
+}
 
 const poly = `polygon(
   10px 0,
@@ -30,7 +55,15 @@ function SkillPanelComponent({ data, onClose }: SkillPanelProps) {
   const activeColor = useMemo(() => {
     const raw = (data?.color || '').trim().toLowerCase();
     if (!raw) return DEFAULT_SYSTEM_COLOR;
-    if (raw === 'white' || raw === '#fff' || raw === '#ffffff') return 'var(--text-contrast)';
+    if (
+      raw === 'white' ||
+      raw === '#fff' ||
+      raw === '#ffffff' ||
+      isNearWhiteHex(raw) ||
+      isThemeContrastToken(raw)
+    ) {
+      return SAFE_NEUTRAL_COLOR;
+    }
     return data?.color || DEFAULT_SYSTEM_COLOR;
   }, [data?.color]);
 

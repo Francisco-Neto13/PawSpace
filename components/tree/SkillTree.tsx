@@ -19,6 +19,7 @@ import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
 import { PageBackground } from '../shared/PageBackground';
 import type { SkillData } from './types';
+import { useTheme } from '@/shared/contexts/ThemeContext';
 
 interface ContextMenu {
   x: number;
@@ -53,6 +54,7 @@ function CenterOnRoot({ nodes, isLoading }: { nodes: SkillNode[]; isLoading: boo
 }
 
 function SkillTreeInner() {
+  const { theme } = useTheme();
   const { nodes, edges, isLoading: isLoadingTree } = useSkillTree();
   const { refreshNexus, setIsDirty, isDirty, setNodes, setEdges } = useNexus();
   const { invalidateOverview } = useOverview();
@@ -198,6 +200,7 @@ function SkillTreeInner() {
 
       <div style={{ width: '100%', height: '100%' }} className="relative">
         <ReactFlow
+          colorMode={theme}
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}

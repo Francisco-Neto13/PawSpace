@@ -68,7 +68,7 @@ export function useSkillActions() {
       label: 'Novo Módulo',
       description: 'Defina os objetivos deste módulo.',
       icon: '*',
-      color: '#ffffff',
+      color: null,
       shape: 'hexagon' as SkillShape,
       category: 'keystone',
       parentId: parentId ?? undefined,

@@ -5,7 +5,7 @@ import { SkillData, SkillShape, SHAPE_SIZE } from '../types';
 
 type CompatibleSkillNode = Node<SkillData>;
 
-const DEFAULT_NODE_COLOR = '#22d3ee';
+const DEFAULT_NODE_COLOR = 'var(--border-visible)';
 
 function normalizeHexColor(candidate: string): string {
   const hex = candidate.trim().toLowerCase();
@@ -24,6 +24,11 @@ function isNearWhiteHex(hex: string): boolean {
   const g = Number.parseInt(normalized.slice(3, 5), 16);
   const b = Number.parseInt(normalized.slice(5, 7), 16);
   return r >= 235 && g >= 235 && b >= 235;
+}
+
+function isThemeContrastToken(value: string): boolean {
+  const token = value.trim().toLowerCase();
+  return token === 'var(--text-contrast)' || token === 'var(--text-primary)';
 }
 
 export function SvgDefs() {
@@ -62,8 +67,9 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
   const nodeColor = useMemo(() => {
     const candidate = (color || '').trim();
     if (!candidate) return DEFAULT_NODE_COLOR;
-    if (candidate.toLowerCase() === 'white') return 'var(--text-contrast)';
-    if (isNearWhiteHex(candidate)) return 'var(--text-contrast)';
+    if (candidate.toLowerCase() === 'white') return 'var(--border-visible)';
+    if (isNearWhiteHex(candidate)) return 'var(--border-visible)';
+    if (isThemeContrastToken(candidate)) return 'var(--border-visible)';
     return candidate;
   }, [color]);
   const glowColor = useMemo(
@@ -118,10 +124,11 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
         />
 
         <div
-          className="absolute pointer-events-none bg-[var(--bg-base)]"
+          className="absolute pointer-events-none"
           style={{
             inset: '2px',
             clipPath,
+            backgroundColor: 'var(--bg-base, #0a0a0a)',
           }}
         />
 
