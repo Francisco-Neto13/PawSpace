@@ -1,7 +1,8 @@
 ﻿'use client';
 import React, { memo, useMemo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
-import { SkillData, SkillShape, SHAPE_SIZE } from '../types';
+import { useNexus } from '@/contexts/NexusContext';
+import { SkillData } from '../types';
 
 type CompatibleSkillNode = Node<SkillData>;
 
@@ -31,150 +32,144 @@ function isThemeContrastToken(value: string): boolean {
   return token === 'var(--text-contrast)' || token === 'var(--text-primary)';
 }
 
-export function SvgDefs() {
-  return (
-    <svg width={0} height={0} style={{ position: 'absolute', pointerEvents: 'none' }}>
-      <defs>
-        <filter id="glow-keystone" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
-      </defs>
-    </svg>
-  );
-}
+const SIZE_ROOT         = 72;
+const SIZE_INTERMEDIATE = 52;
+const SIZE_LEAF         = 36;
 
-function getClipPath(shape: SkillShape): string {
-  switch (shape) {
-    case 'hexagon': return 'polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%)';
-    case 'circle': return 'circle(50% at 50% 50%)';
-    case 'square': return 'inset(0% round 4px)';
-    case 'diamond': return 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
-    default: return 'polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%)';
-  }
+export function SvgDefs() {
+  return null;
 }
 
 function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) {
-  const {
-    icon,
-    name,
-    label,
-    shape = 'hexagon',
-    color,
-    parentId,
-  } = data;
+  const { icon, name, label, color, parentId } = data;
+  const { nodes } = useNexus();
+  const isChildOfSelected = data.isChildOfSelected === true;
+
+  const isRoot         = !parentId;
+  const hasChildren    = useMemo(() => nodes.some(n => n.data.parentId === data.id), [nodes, data.id]);
+  const isLeaf         = !isRoot && !hasChildren;
+
+  const size = isRoot ? SIZE_ROOT : !isRoot && hasChildren ? SIZE_INTERMEDIATE : SIZE_LEAF;
 
   const nodeColor = useMemo(() => {
     const candidate = (color || '').trim();
     if (!candidate) return DEFAULT_NODE_COLOR;
-    if (candidate.toLowerCase() === 'white') return 'var(--border-visible)';
-    if (isNearWhiteHex(candidate)) return 'var(--border-visible)';
-    if (isThemeContrastToken(candidate)) return 'var(--border-visible)';
+    if (candidate.toLowerCase() === 'white') return DEFAULT_NODE_COLOR;
+    if (isNearWhiteHex(candidate)) return DEFAULT_NODE_COLOR;
+    if (isThemeContrastToken(candidate)) return DEFAULT_NODE_COLOR;
     return candidate;
   }, [color]);
-  const glowColor = useMemo(
-    () => (nodeColor.startsWith('var(') ? 'var(--text-secondary)' : `color-mix(in srgb, ${nodeColor} 60%, transparent)`),
-    [nodeColor]
-  );
-  const selectedBorderColor = useMemo(
-    () => (nodeColor.startsWith('var(') ? 'var(--border-visible)' : `color-mix(in srgb, ${nodeColor} 55%, transparent)`),
-    [nodeColor]
-  );
 
-  const isRoot = !parentId;
-  const effectiveShape: SkillShape = isRoot ? 'hexagon' : (shape as SkillShape);
-  const baseSize = SHAPE_SIZE[effectiveShape] || SHAPE_SIZE.hexagon;
-  const size = isRoot ? baseSize + 16 : baseSize;
-  const clipPath = getClipPath(effectiveShape);
+  const borderWidth = isRoot ? 3 : 2;
+  const iconSize    = isRoot ? '1.5rem' : !isLeaf ? '1.1rem' : '0.85rem';
 
-  const centralHandleStyle: React.CSSProperties = {
-    background: 'transparent',
-    border: 'none',
-    width: '1px',
-    height: '1px',
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    zIndex: -1,
+  // Handle invisível e centralizado — posição absoluta 50%/50%
+  const handleStyle: React.CSSProperties = {
+    background:  'transparent',
+    border:      'none',
+    width:       1,
+    height:      1,
+    minWidth:    1,
+    minHeight:   1,
+    top:         '50%',
+    left:        '50%',
+    transform:   'translate(-50%, -50%)',
+    position:    'absolute',
   };
 
   return (
+    // O wrapper tem exatamente size×size para o React Flow medir corretamente
     <div
-      className={`group relative flex items-center justify-center ${selected ? 'z-50' : 'z-10'}`}
-      style={{ width: size, height: size }}
+      style={{
+        width:    size,
+        height:   size,
+        position: 'relative',
+      }}
+      className={selected ? 'z-50' : 'z-10'}
     >
-      <Handle type="target" position={Position.Top} style={centralHandleStyle} />
-      <Handle type="source" position={Position.Top} style={centralHandleStyle} />
+      {/* Handles centrais — React Flow conecta a partir deles */}
+      <Handle type="target" position={Position.Top}    style={handleStyle} id="t" />
+      <Handle type="source" position={Position.Bottom} style={handleStyle} id="s" />
 
+      {/* Círculo visual */}
       <div
-        className={`relative flex items-center justify-center transition-all duration-300 z-20
-          ${selected ? 'scale-[1.08]' : 'hover:scale-[1.02]'}
-        `}
-        style={{ width: size, height: size }}
-      >
-        <div
-          className="absolute inset-0 transition-all duration-500 pointer-events-none"
-          style={{
-            backgroundColor: nodeColor,
-            clipPath,
-            filter: isRoot ? 'url(#glow-keystone)' : `drop-shadow(0 0 5px ${glowColor})`,
-            opacity: 1,
-          }}
-        />
-
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            inset: '2px',
-            clipPath,
-            backgroundColor: 'var(--bg-base, #0a0a0a)',
-          }}
-        />
-
-        <span
-          className={`relative z-10 select-none transition-all duration-300 pointer-events-none
-            ${isRoot ? 'text-3xl' : 'text-xl'}
-            grayscale-0 opacity-100
-          `}
-          style={{ color: 'var(--text-contrast)' }}
-        >
-          {icon || '*'}
-        </span>
-
-        {selected && (
-          <div
-            className="absolute -inset-1 border animate-pulse pointer-events-none"
-            style={{ clipPath, borderColor: selectedBorderColor }}
-          />
-        )}
-      </div>
-
-      <div
-        className="absolute flex flex-col items-center pointer-events-none z-30"
+        className="absolute inset-0 rounded-full transition-all duration-300"
         style={{
-          top: size + 8,
-          width: 200,
-          left: '50%',
+          backgroundColor: 'var(--bg-base)',
+          border:          `${borderWidth}px solid ${nodeColor}`,
+          transform:       selected ? 'scale(1.08)' : undefined,
+        }}
+      />
+
+      {/* Ícone centralizado absolutamente */}
+      <span
+        className="absolute inset-0 flex items-center justify-center select-none pointer-events-none"
+        style={{
+          fontSize: iconSize,
+          color:    nodeColor,
+        }}
+      >
+        {icon || '·'}
+      </span>
+
+      {/* Anel de seleção */}
+      {selected && (
+        <div
+          className="absolute rounded-full pointer-events-none animate-pulse"
+          style={{
+            inset:       -5,
+            border:      `1.5px solid ${nodeColor}`,
+            opacity:     0.5,
+          }}
+        />
+      )}
+
+      {isChildOfSelected && !selected && (
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            inset: -4,
+            border: '1px dashed var(--border-visible)',
+            opacity: 0.45,
+          }}
+        />
+      )}
+
+      {/* Label — fora do fluxo do nó, posicionado abaixo */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top:       size + 6,
+          left:      '50%',
           transform: 'translateX(-50%)',
+          width:     160,
+          textAlign: 'center',
         }}
       >
         <span
-          className="font-sans text-center uppercase transition-all duration-300 px-1 tracking-[0.12em] w-full font-bold"
           style={{
-            fontSize: isRoot ? '12px' : '11px',
-            lineHeight: 1.2,
-            color: 'var(--text-contrast)',
-            textShadow: `0 0 8px ${glowColor}`,
+            fontSize:      isRoot ? '11px' : isLeaf ? '9px' : '10px',
+            fontWeight:    700,
+            fontFamily:    'var(--font-main)',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            lineHeight:    1.2,
+            color:         isChildOfSelected ? 'var(--text-primary)' : 'var(--text-contrast)',
+            opacity:       isChildOfSelected ? 1 : isLeaf ? 0.7 : 1,
+            display:       'block',
           }}
         >
           {name || label}
         </span>
-
         {selected && (
           <div
-            className="w-8 h-[1px] mt-1.5 opacity-60"
-            style={{ backgroundColor: nodeColor, boxShadow: `0 0 4px ${nodeColor}` }}
+            style={{
+              width:           24,
+              height:          1,
+              margin:          '6px auto 0',
+              backgroundColor: nodeColor,
+              opacity:         0.6,
+            }}
           />
         )}
       </div>
@@ -183,4 +178,3 @@ function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) 
 }
 
 export const SkillNode = memo(SkillNodeComponent);
-

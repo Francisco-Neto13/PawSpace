@@ -5,8 +5,7 @@ import '@xyflow/react/dist/style.css';
 import { Save, Loader2, AlertCircle } from 'lucide-react';
 
 import { SkillNode as SkillNodeComponent, SvgDefs } from './ui/SkillNode';
-import { SkillEdge } from './ui/SkillEdge';
-import { SkillPanel } from './features/panel/SkillPanel';
+import { SkillEdge, EdgeDefs } from './ui/SkillEdge';
 import { EditSkillModal } from './features/editor/EditSkillModal';
 import { NodeContextMenu } from './ui/NodeContextMenu';
 import { TreeOnboarding } from './ui/TreeOnboarding';
@@ -19,8 +18,8 @@ import { useSkillDrag } from './hooks/useSkillDrag';
 import { useSkillActions } from './hooks/useSkillActions';
 import { PageBackground } from '../shared/PageBackground';
 import { PawIcon } from '../shared/PawIcon';
-import type { SkillData } from './types';
 import { useTheme } from '@/shared/contexts/ThemeContext';
+import type { SkillData } from './types';
 
 interface ContextMenu {
   x: number;
@@ -36,21 +35,46 @@ const defaultEdgeOptions = {
   style: { strokeWidth: 2, transition: 'stroke 0.5s ease' },
 };
 
-function CenterOnRoot({ nodes, isLoading }: { nodes: SkillNode[]; isLoading: boolean }) {
-  const { fitView } = useReactFlow();
+const VIEWPORT_STORAGE_KEY = 'pawspace.tree.viewport.v1';
+
+function RestoreViewportOnLoad({ nodes, isLoading }: { nodes: SkillNode[]; isLoading: boolean }) {
+  const { fitView, setViewport } = useReactFlow();
   const nodesInitialized = useNodesInitialized();
-  const hasCenteredRef = useRef(false);
+  const hasRestoredRef = useRef(false);
 
   useEffect(() => {
-    if (isLoading || nodes.length === 0 || hasCenteredRef.current || !nodesInitialized) return;
-    const rootNode = nodes.find(n => !n.data.parentId);
-    if (!rootNode) return;
+    if (isLoading || nodes.length === 0 || hasRestoredRef.current || !nodesInitialized) return;
+
+    try {
+      const raw = window.localStorage.getItem(VIEWPORT_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as { x?: number; y?: number; zoom?: number };
+        if (
+          Number.isFinite(parsed.x) &&
+          Number.isFinite(parsed.y) &&
+          Number.isFinite(parsed.zoom)
+        ) {
+          setViewport({ x: parsed.x as number, y: parsed.y as number, zoom: parsed.zoom as number }, { duration: 0 });
+          hasRestoredRef.current = true;
+          return;
+        }
+      }
+    } catch {
+      // Ignora erro de leitura/parsing do estado salvo e segue com fallback.
+    }
+
+    const rootNode = nodes.find((n) => !n.data.parentId);
+    if (!rootNode) {
+      hasRestoredRef.current = true;
+      return;
+    }
+
     const raf = requestAnimationFrame(() => {
       fitView({ nodes: [rootNode], padding: 0.4, maxZoom: 1 });
-      hasCenteredRef.current = true;
+      hasRestoredRef.current = true;
     });
     return () => cancelAnimationFrame(raf);
-  }, [isLoading, nodes, nodesInitialized, fitView]);
+  }, [isLoading, nodes, nodesInitialized, fitView, setViewport]);
 
   return null;
 }
@@ -69,11 +93,11 @@ function SkillTreeInner() {
     handleGlobalSave,
   } = useSkillActions();
 
-  const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [editingSkillId, setEditingSkillId] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
   const [hasStructuralChanges, setHasStructuralChanges] = useState(false);
   const [isCanvasVisible, setIsCanvasVisible] = useState(false);
+  const isContextMenuOpen = contextMenu !== null;
 
   const canSave = isDirty || hasDragChanges || hasStructuralChanges;
   const isEmpty = !isLoadingTree && nodes.length === 0;
@@ -137,14 +161,71 @@ function SkillTreeInner() {
     }
   };
 
-  const selectedNode = useMemo(() =>
-    nodes.find(n => n.id === selectedSkillId),
-    [nodes, selectedSkillId]
+  const selectedNode = useMemo(
+    () => nodes.find((node) => node.selected) ?? null,
+    [nodes]
   );
 
-  const panelData = useMemo(() => {
-    if (!selectedNode) return null;
-    return { ...selectedNode.data, id: selectedNode.id } as SkillData & { id: string };
+  const selectedNodeId = selectedNode?.id ?? null;
+
+  const immediateChildIds = useMemo(() => {
+    if (!selectedNodeId) return new Set<string>();
+    return new Set(
+      nodes
+        .filter((node) => node.data.parentId === selectedNodeId)
+        .map((node) => node.id)
+    );
+  }, [nodes, selectedNodeId]);
+
+  const flowNodes = useMemo(
+    () =>
+      nodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          isChildOfSelected: immediateChildIds.has(node.id),
+        },
+      })),
+    [nodes, immediateChildIds]
+  );
+
+  const flowEdges = useMemo(() => {
+    if (!selectedNodeId) {
+      return edges.map((edge) => ({
+        ...edge,
+        data: {
+          ...edge.data,
+          isHighlighted: false,
+          isDimmed: false,
+        },
+      }));
+    }
+
+    return edges.map((edge) => {
+      const isHighlighted = edge.source === selectedNodeId || edge.target === selectedNodeId;
+      return {
+        ...edge,
+        data: {
+          ...edge.data,
+          isHighlighted,
+          isDimmed: !isHighlighted,
+        },
+      };
+    });
+  }, [edges, selectedNodeId]);
+
+  const selectedContentsCount = useMemo(() => {
+    if (!selectedNode) return 0;
+    const linksCount = Array.isArray(selectedNode.data.links) ? selectedNode.data.links.length : 0;
+    const contentsCount = Array.isArray(selectedNode.data.contents) ? selectedNode.data.contents.length : 0;
+    return linksCount + contentsCount;
+  }, [selectedNode]);
+
+  const selectedProgress = useMemo(() => {
+    if (!selectedNode || typeof selectedNode.data.progress !== 'number') return '0%';
+    const raw = selectedNode.data.progress <= 1 ? selectedNode.data.progress * 100 : selectedNode.data.progress;
+    const clamped = Math.max(0, Math.min(100, Math.round(raw)));
+    return `${clamped}%`;
   }, [selectedNode]);
 
   const editingSkillData = useMemo(() => {
@@ -174,6 +255,7 @@ function SkillTreeInner() {
 
       {isLoadingTree && nodes.length === 0 && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
+          <div className="theme-grid-overlay absolute inset-0 pointer-events-none [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_60%,transparent_100%)]" />
           <div className="relative flex flex-col items-center gap-4">
             <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
             <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
@@ -184,6 +266,7 @@ function SkillTreeInner() {
       )}
 
       <SvgDefs />
+      <EdgeDefs />
 
       {isEmpty && (
         <TreeEmptyState onCreate={handleCreateRoot} />
@@ -218,6 +301,42 @@ function SkillTreeInner() {
         </div>
       )}
 
+      {selectedNode && (
+        <div className="absolute left-6 bottom-8 z-40 w-[320px] pointer-events-none animate-in fade-in zoom-in-95 duration-200 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden shadow-2xl">
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+
+          <div className="relative z-10 p-4">
+            <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-[0.22em] font-black mb-2">
+              Modulo Selecionado
+            </p>
+            <h3 className="text-[12px] text-[var(--text-primary)] font-black uppercase tracking-[0.18em] leading-snug mb-3">
+              {selectedNode.data.label || selectedNode.data.name || 'Sem nome'}
+            </h3>
+            <div className="h-px bg-[var(--border-subtle)] mb-3" />
+            <div className="grid grid-cols-3 gap-2">
+              <div className="relative rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-2.5 overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+                <p className="text-[8px] uppercase tracking-[0.15em] text-[var(--text-muted)] font-black mb-1">Filhos</p>
+                <p className="text-[14px] leading-none text-[var(--text-primary)] font-black font-mono tabular-nums">{immediateChildIds.size}</p>
+                <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[var(--border-muted)]" />
+              </div>
+              <div className="relative rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-2.5 overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+                <p className="text-[8px] uppercase tracking-[0.15em] text-[var(--text-muted)] font-black mb-1">Conteudos</p>
+                <p className="text-[14px] leading-none text-[var(--text-primary)] font-black font-mono tabular-nums">{selectedContentsCount}</p>
+                <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[var(--border-muted)]" />
+              </div>
+              <div className="relative rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-2.5 overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+                <p className="text-[8px] uppercase tracking-[0.15em] text-[var(--text-muted)] font-black mb-1">Progresso</p>
+                <p className="text-[14px] leading-none text-[var(--text-primary)] font-black font-mono tabular-nums">{selectedProgress}</p>
+                <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[var(--border-muted)]" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div
         style={{
           width: '100%',
@@ -229,40 +348,71 @@ function SkillTreeInner() {
       >
         <ReactFlow
           colorMode={theme}
-          nodes={nodes}
-          edges={edges}
+          nodes={flowNodes}
+          edges={flowEdges}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
-          onNodeClick={(_, node) => {
+          onNodeClick={() => {
             setContextMenu(null);
-            setSelectedSkillId(node.id);
+            setEditingSkillId(null);
           }}
           onNodeContextMenu={(e, node) => {
             e.preventDefault();
-            setSelectedSkillId(null);
+            setEditingSkillId(null);
+            const target = e.currentTarget as HTMLElement | null;
+            const menuWidth = 220;
+            const margin = 12;
+            let x = e.clientX;
+            let y = e.clientY;
+
+            if (target) {
+              const rect = target.getBoundingClientRect();
+              x = rect.left + rect.width / 2 - menuWidth / 2;
+              y = rect.bottom + 8;
+            }
+
+            const maxX = window.innerWidth - menuWidth - margin;
+            const clampedX = Math.max(margin, Math.min(x, maxX));
+            const maxY = window.innerHeight - margin;
+            const clampedY = Math.max(margin, Math.min(y, maxY));
+
             setContextMenu({
-              x: e.clientX,
-              y: e.clientY,
+              x: clampedX,
+              y: clampedY,
               nodeId: node.id,
               nodeName: node.data.label || node.data.name || '',
             });
           }}
           onPaneClick={() => {
             setContextMenu(null);
-            setSelectedSkillId(null);
+            setEditingSkillId(null);
           }}
           defaultEdgeOptions={defaultEdgeOptions}
-          nodesDraggable
-          panOnDrag
-          zoomOnScroll
+          nodesDraggable={!isContextMenuOpen}
+          panOnDrag={!isContextMenuOpen}
+          zoomOnScroll={!isContextMenuOpen}
+          zoomOnPinch={!isContextMenuOpen}
+          zoomOnDoubleClick={!isContextMenuOpen}
           minZoom={0.05}
           maxZoom={2}
           connectionMode={ConnectionMode.Loose}
           nodesConnectable={false}
+          onMoveEnd={(_, viewport) => {
+            if (!viewport) return;
+            try {
+              window.localStorage.setItem(VIEWPORT_STORAGE_KEY, JSON.stringify({
+                x: viewport.x,
+                y: viewport.y,
+                zoom: viewport.zoom,
+              }));
+            } catch {
+              // Se armazenamento falhar, apenas segue sem persistencia.
+            }
+          }}
           style={{ background: 'transparent' }}
         >
-          <CenterOnRoot nodes={nodes} isLoading={isLoadingTree && nodes.length === 0} />
+          <RestoreViewportOnLoad nodes={nodes} isLoading={isLoadingTree && nodes.length === 0} />
         </ReactFlow>
       </div>
 
@@ -288,11 +438,6 @@ function SkillTreeInner() {
           onClose={() => setContextMenu(null)}
         />
       )}
-
-      <SkillPanel
-        data={panelData}
-        onClose={() => setSelectedSkillId(null)}
-      />
 
       <EditSkillModal
         isOpen={editingSkillId !== null}

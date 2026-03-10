@@ -46,6 +46,21 @@ export function useSkillActions() {
 
   const handleDelete = useCallback(async (nodeId: string) => {
     const node = nodes.find((item) => item.id === nodeId);
+    if (!node) return false;
+
+    const isRoot = !node.data.parentId;
+    const hasChildren = nodes.some((item) => item.data.parentId === nodeId);
+
+    if (isRoot) {
+      alert('Nao e possivel remover o modulo raiz da arvore.');
+      return false;
+    }
+
+    if (hasChildren) {
+      alert('Nao e possivel remover um modulo que ainda possui submodulos.');
+      return false;
+    }
+
     const isConfirmed = await confirmDialog({
       title: 'Remover módulo',
       description: `O módulo "${node?.data.label || node?.data.name || 'Sem nome'}" e todas as conexões serão removidos.`,
@@ -80,7 +95,7 @@ export function useSkillActions() {
       description: 'Defina os objetivos deste módulo.',
       icon: '*',
       color: null,
-      shape: 'hexagon' as SkillShape,
+      shape: 'circle' as SkillShape,
       category: 'keystone',
       parentId: parentId ?? undefined,
       positionX,

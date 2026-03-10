@@ -57,7 +57,7 @@ export async function addSkill(data: SkillMutationInput) {
         icon: data.icon || null,
         color: data.color || null,
         category: data.category || 'keystone',
-        shape: data.shape || 'hexagon',
+        shape: data.shape || 'circle',
         parentId: data.parentId || null,
         positionX: Number.isFinite(data.positionX) ? Number(data.positionX) : 0,
         positionY: Number.isFinite(data.positionY) ? Number(data.positionY) : 0,
@@ -125,7 +125,7 @@ export async function saveNexusChanges(nodes: NexusSkillNodeInput[]) {
     const categoryCases = validNodes.map((n) => `WHEN id = '${n.id}' THEN '${(n.data.category || '').replace(/'/g, "''")}'`).join(' ');
     const descCases = validNodes.map((n) => `WHEN id = '${n.id}' THEN '${(n.data.description || '').slice(0, DESC_MAX).replace(/'/g, "''")}'`).join(' ');
     const iconCases = validNodes.map((n) => `WHEN id = '${n.id}' THEN '${(n.data.icon || '').replace(/'/g, "''")}'`).join(' ');
-    const shapeCases = validNodes.map((n) => `WHEN id = '${n.id}' THEN '${(n.data.shape || 'hexagon').replace(/'/g, "''")}'`).join(' ');
+    const shapeCases = validNodes.map((n) => `WHEN id = '${n.id}' THEN '${(n.data.shape || 'circle').replace(/'/g, "''")}'`).join(' ');
 
     await prisma.$executeRawUnsafe(`
       UPDATE "Skill"

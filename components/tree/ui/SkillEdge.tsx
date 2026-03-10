@@ -1,12 +1,13 @@
 ﻿'use client';
 import React, { memo } from 'react';
-import { EdgeProps, BaseEdge, getStraightPath, type Edge } from '@xyflow/react';
+import { EdgeProps, getStraightPath, type Edge } from '@xyflow/react';
 import { SkillEdgeData } from '../types';
 
 type CompatibleSkillEdge = Edge<SkillEdgeData & { [key: string]: unknown }>;
 type SkillEdgeProps = EdgeProps<CompatibleSkillEdge>;
 
-const DEFAULT_EDGE_COLOR = 'var(--border-visible)';
+const DEFAULT_EDGE_COLOR = 'var(--text-muted)';
+const ARROW_ID = 'skill-arrow';
 
 function normalizeHexColor(candidate: string): string {
   const hex = candidate.trim().toLowerCase();
@@ -41,59 +42,55 @@ function normalizeEdgeColor(raw: string | undefined): string {
     candidate === '#ffffff' ||
     isNearWhiteHex(candidate) ||
     isThemeContrastToken(candidate)
-  ) {
-    return DEFAULT_EDGE_COLOR;
-  }
+  ) return DEFAULT_EDGE_COLOR;
   return raw || DEFAULT_EDGE_COLOR;
+}
+
+// Definição da seta — renderizada uma vez fora do componente
+export function EdgeDefs() {
+  return (
+    <svg width={0} height={0} style={{ position: 'absolute', pointerEvents: 'none' }}>
+      <defs>
+        <marker
+          id={ARROW_ID}
+          markerWidth="6"
+          markerHeight="6"
+          refX="5"
+          refY="3"
+          orient="auto"
+          markerUnits="strokeWidth"
+        >
+          <path d="M0,0 L0,6 L6,3 z" fill="var(--border-visible)" />
+        </marker>
+      </defs>
+    </svg>
+  );
 }
 
 function SkillEdgeComponent({
   id,
-  sourceX, sourceY, targetX, targetY,
+  sourceX, sourceY,
+  targetX, targetY,
   data,
 }: SkillEdgeProps) {
   const [path] = getStraightPath({ sourceX, sourceY, targetX, targetY });
   const strokeColor = normalizeEdgeColor(data?.color);
+  const isHighlighted = data?.isHighlighted === true;
+  const isDimmed = data?.isDimmed === true;
 
   return (
-    <>
-      <BaseEdge
-        id={`${id}-shadow`}
-        path={path}
-        style={{
-          stroke: '#000',
-          strokeWidth: 5,
-          opacity: 0.9,
-          transition: 'stroke-width 0.3s ease',
-        }}
-      />
-
-      <path
-        d={path}
-        fill="none"
-        stroke={strokeColor}
-        strokeWidth={2.5}
-        strokeLinecap="butt"
-        opacity={1}
-        className="pointer-events-none"
-        style={{
-          transition: 'stroke 0.5s ease, stroke-width 0.3s ease, opacity 0.3s ease',
-        }}
-      />
-
-      <path
-        d={path}
-        fill="none"
-        stroke="var(--border-visible)"
-        strokeWidth={1}
-        strokeLinecap="butt"
-        strokeDasharray="4 60"
-        opacity={0.5}
-        className="edge-flow pointer-events-none"
-      />
-    </>
+    <path
+      id={id}
+      d={path}
+      fill="none"
+      stroke={isHighlighted ? 'var(--text-primary)' : strokeColor}
+      strokeWidth={isHighlighted ? 2.2 : 1.5}
+      strokeOpacity={isHighlighted ? 0.95 : isDimmed ? 0.18 : 0.65}
+      markerEnd={`url(#${ARROW_ID})`}
+      className="pointer-events-none"
+      style={{ transition: 'stroke 0.3s ease' }}
+    />
   );
 }
 
 export const SkillEdge = memo(SkillEdgeComponent);
-

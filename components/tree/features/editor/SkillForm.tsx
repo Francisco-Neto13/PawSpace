@@ -8,12 +8,7 @@ import { LIMITS } from '@/lib/limits';
 const NAME_MAX = LIMITS.skill.name;
 const DESC_MAX = LIMITS.skill.description;
 
-const SHAPES: { value: SkillShape; label: string; preview: string }[] = [
-  { value: 'hexagon', label: 'Hexágono', preview: 'polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%)' },
-  { value: 'circle',  label: 'Círculo',  preview: 'circle(50% at 50% 50%)' },
-  { value: 'square',  label: 'Quadrado', preview: 'inset(0% round 4px)' },
-  { value: 'diamond', label: 'Diamante', preview: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' },
-];
+const DEFAULT_SHAPE: SkillShape = 'circle';
 
 interface SkillFormProps {
   onSubmit: (data: SkillFormData) => void;
@@ -48,7 +43,7 @@ function getInitialFormData(
     description: initialData?.description || '',
     icon: initialData?.icon || '✦',
     color: normalizeHexColor(initialData?.color || '#22d3ee'),
-    shape: (initialData?.shape as SkillShape) || 'hexagon',
+    shape: (initialData?.shape as SkillShape) || DEFAULT_SHAPE,
     parentId: initialData?.parentId || initialParentId || '',
   };
 }
@@ -133,36 +128,7 @@ export function SkillForm({
         </div>
       </div>
 
-      <div>
-        <label className={`${labelClass} block mb-2`}>Arquitetura do Nó</label>
-        <div className="grid grid-cols-4 gap-2">
-          {SHAPES.map(s => (
-            <button
-              key={s.value}
-              type="button"
-              onClick={() => setFormData((prev) => ({ ...prev, shape: s.value }))}
-              className={`group flex flex-col items-center gap-2.5 p-3 border transition-all duration-300 cursor-pointer ${
-                formData.shape === s.value
-                  ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)]'
-                  : 'border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-muted)] hover:bg-[var(--bg-elevated)]'
-              }`}
-            >
-              <div
-                className="w-5 h-5 transition-colors duration-300"
-                style={{
-                  clipPath: s.preview,
-                  backgroundColor: formData.shape === s.value ? formData.color : 'var(--text-faint)',
-                }}
-              />
-              <span className={`text-[7px] font-black uppercase tracking-wider transition-colors duration-300 ${
-                formData.shape === s.value ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'
-              }`}>
-                {s.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
+      <input type="hidden" value={formData.shape} readOnly />
 
       <div>
         <div className="flex items-center justify-between mb-2">

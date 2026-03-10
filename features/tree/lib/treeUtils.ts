@@ -68,7 +68,7 @@ export function generateTreeLayout(
     const finalX = hasSavedPosition ? (skill.positionX as number) : autoX;
     const finalY = hasSavedPosition ? (skill.positionY as number) : autoY;
 
-    const shape = (skill.shape as SkillShape) ?? 'hexagon';
+    const shape = (skill.shape as SkillShape) ?? 'circle';
 
     nodes.push({
       id: skill.id,

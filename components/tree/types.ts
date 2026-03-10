@@ -1,4 +1,4 @@
-export type SkillShape = 'hexagon' | 'circle' | 'square' | 'diamond';
+export type SkillShape = 'circle';
 
 export interface SkillData {
   id: string;
@@ -27,8 +27,5 @@ export interface SkillEdgeData {
 
 
 export const SHAPE_SIZE: Record<SkillShape, number> = {
-  hexagon: 64,
-  circle:  52,
-  square:  52,
-  diamond: 52,
+  circle: 52,
 };
