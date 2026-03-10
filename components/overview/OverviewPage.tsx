@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from 'react';
 import { useNexus } from '@/shared/contexts/NexusContext';
 import { useOverview } from '@/shared/contexts/OverviewContext';
+import { useJournal } from '@/contexts/JournalContext';
 import OverviewHeader from './ui/OverviewHeader';
 import StatsGrid from './features/stats/StatsGrid';
 import CategoryChart from './features/stats/CategoryChart';
@@ -21,21 +22,16 @@ const deferredSectionStyle = {
   containIntrinsicSize: '1px 700px',
 };
 
-const EMPTY_OVERVIEW_SUMMARY = {
-  total: 0,
-  unlocked: 0,
-  progress: 0,
-};
+const EMPTY_OVERVIEW_SUMMARY = { total: 0, unlocked: 0, progress: 0 };
 
 export default function OverviewContent() {
   const { nodes, edges, isLoading } = useNexus();
   const { bootstrap, isLoading: isBootstrapLoading, refreshOverview } = useOverview();
+  const { entries } = useJournal();
 
-  useEffect(() => {
-    void refreshOverview();
-  }, [refreshOverview]);
+  useEffect(() => { void refreshOverview(); }, [refreshOverview]);
 
-  const libraryStats = bootstrap?.libraryStats ?? null;
+  const libraryStats   = bootstrap?.libraryStats   ?? null;
   const recentActivity = bootstrap?.recentActivity ?? null;
 
   const snapshot = useMemo(
@@ -43,6 +39,21 @@ export default function OverviewContent() {
     [nodes, edges]
   );
   const stats = snapshot.stats;
+
+  const currentMonthEntries = useMemo(() => {
+    const now = new Date();
+    const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return entries.filter(e => {
+      const d = new Date(typeof e.createdAt === 'string' ? e.createdAt : e.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      return key === currentKey;
+    }).length;
+  }, [entries]);
+
+  const criticalUncovered = useMemo(
+    () => snapshot.criticalNodes.filter(n => !n.hasContent).length,
+    [snapshot.criticalNodes]
+  );
 
   if (isLoading && nodes.length === 0) {
     return (
@@ -58,6 +69,8 @@ export default function OverviewContent() {
     );
   }
 
+  const pending = stats.total - stats.unlocked;
+
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
       <PageBackground src="/cat.webp" />
@@ -67,7 +80,7 @@ export default function OverviewContent() {
         <div className="flex items-center gap-3 mb-6 reveal-fade delay-0">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
           <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
-            Pawspace / Visao Geral
+            Pawspace / Visão Geral
           </span>
           <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--border-subtle)] to-transparent" />
         </div>
@@ -77,6 +90,8 @@ export default function OverviewContent() {
             initialProgress={stats.progress}
             unlockedCount={stats.unlocked}
             totalCount={stats.total}
+            criticalUncovered={criticalUncovered}
+            currentMonthEntries={currentMonthEntries}
           />
         </div>
 
@@ -113,57 +128,73 @@ export default function OverviewContent() {
           <RecentActivityFeed initialPage={recentActivity} isBootstrapLoading={isBootstrapLoading} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2 reveal-up delay-500" style={deferredSectionStyle}>
+        {stats.total > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2 reveal-up delay-500" style={deferredSectionStyle}>
 
-          <div className="lg:col-span-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-6 flex items-center gap-2">
-              <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-              Resumo do Curriculo
-            </p>
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <p className="text-[var(--text-muted)] text-sm leading-relaxed font-light max-w-sm">
-                Voce tem conteudo em{' '}
-                <span className="text-[var(--text-primary)] font-bold">{stats.unlocked} modulos</span>,
-                representando{' '}
-                <span className="text-[var(--text-primary)] font-black">{stats.progress}%</span>{' '}
-                da sua arvore. Ainda sem conteudo:{' '}
-                <span className="text-[var(--text-secondary)] font-semibold">{stats.total - stats.unlocked} modulos</span>.
+            <div className="lg:col-span-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-6 flex items-center gap-2">
+                <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+                Próximo Passo
               </p>
-              <div className="flex gap-6 shrink-0 font-mono">
-                <div className="text-right">
-                  <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Total</p>
-                  <p className="text-[var(--text-primary)] text-3xl font-black tabular-nums">{stats.total}</p>
+
+              {pending === 0 ? (
+                <div className="flex flex-col gap-2">
+                  <p className="text-[var(--text-primary)] text-sm font-bold">
+                    Árvore completa — todos os módulos têm conteúdo.
+                  </p>
+                  <p className="text-[var(--text-muted)] text-[11px] font-medium leading-relaxed">
+                    Continue atualizando os conteúdos existentes para manter a árvore relevante.
+                  </p>
                 </div>
-                <div className="w-[1px] bg-[var(--bg-elevated)]" />
-                <div className="text-right">
-                  <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Com Conteudo</p>
-                  <p className="text-[var(--text-primary)] text-3xl font-black tabular-nums">{stats.unlocked}</p>
+              ) : criticalUncovered > 0 ? (
+                <div className="flex flex-col gap-2">
+                  <p className="text-[var(--text-primary)] text-sm font-bold">
+                    Priorize os {criticalUncovered} módulo{criticalUncovered > 1 ? 's críticos' : ' crítico'} sem conteúdo.
+                  </p>
+                  <p className="text-[var(--text-muted)] text-[11px] font-medium leading-relaxed max-w-lg">
+                    Estes módulos sustentam outros na sua árvore. Preencher eles primeiro
+                    desbloqueia o avanço em mais áreas ao mesmo tempo.
+                  </p>
                 </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <p className="text-[var(--text-primary)] text-sm font-bold">
+                    {pending} módulo{pending > 1 ? 's ainda sem' : ' ainda sem'} conteúdo.
+                  </p>
+                  <p className="text-[var(--text-muted)] text-[11px] font-medium leading-relaxed max-w-lg">
+                    Veja o painel de módulos críticos acima para saber por onde continuar.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-2xl border border-[var(--border-muted)] bg-[var(--bg-surface)] p-6 flex flex-col justify-center gap-5 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+
+              <div>
+                <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Total na árvore</p>
+                <p className="text-[var(--text-primary)] text-3xl font-black font-mono tabular-nums leading-none">{stats.total}</p>
+              </div>
+
+              <div className="w-full h-px bg-[var(--border-subtle)]" />
+
+              <div>
+                <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Com conteúdo</p>
+                <p className="text-[var(--text-primary)] text-3xl font-black font-mono tabular-nums leading-none">{stats.unlocked}</p>
+              </div>
+
+              <div className="w-full h-px bg-[var(--border-subtle)]" />
+
+              <div>
+                <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Cobertura</p>
+                <p className="text-[var(--text-primary)] text-3xl font-black font-mono tabular-nums leading-none">{stats.progress}<span className="text-lg ml-0.5 text-[var(--text-secondary)]">%</span></p>
               </div>
             </div>
-          </div>
 
-          <div className="rounded-2xl border border-[var(--border-muted)] bg-[var(--bg-surface)] p-6 flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-            <p className="text-[8px] text-[var(--text-muted)] font-black uppercase tracking-[0.4em] mb-4">
-              Proxima Meta
-            </p>
-            <div className="flex-1 flex flex-col items-start justify-center gap-3">
-              <div className="rounded-lg border border-[var(--border-visible)] px-3 py-1.5 bg-[var(--bg-input)]">
-                <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-wider">
-                  {stats.progress < 100 ? 'Adicionar Conteudo' : 'Cobertura Completa'}
-                </p>
-              </div>
-              <p className="text-[10px] text-[var(--text-muted)] font-mono leading-snug">
-                {stats.total - stats.unlocked > 0
-                  ? `${stats.total - stats.unlocked} modulos sem conteudo`
-                  : 'Todos os modulos tem conteudo!'}
-              </p>
-            </div>
           </div>
+        )}
 
-        </div>
       </main>
     </div>
   );

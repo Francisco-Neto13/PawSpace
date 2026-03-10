@@ -1,5 +1,5 @@
 ﻿'use client';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
@@ -26,6 +26,7 @@ export default function LibraryPage() {
     nodeContents,
     loadingNodeId,
     loadNodeContents,
+    refreshNodeContents,
     preloadAllContents,
     addNodeContent,
     removeNodeContent,
@@ -36,6 +37,7 @@ export default function LibraryPage() {
   const [showAddContent, setShowAddContent] = useState(false);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<ContentType | 'all'>('all');
+  const optimisticNodeByTempIdRef = useRef<Record<string, string>>({});
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 80);
@@ -114,12 +116,23 @@ export default function LibraryPage() {
   const isLoadingContents = loadingNodeId === resolvedSelectedNodeId;
 
   const handleDelete = async (id: string) => {
+    if (!resolvedSelectedNodeId) return;
+    const current = nodeContents[resolvedSelectedNodeId] ?? [];
+    const removed = current.find((content) => content.id === id);
+
+    removeNodeContent(resolvedSelectedNodeId, id);
     const result = await deleteContent(id);
-    if (result.success && resolvedSelectedNodeId) {
-      removeNodeContent(resolvedSelectedNodeId, id);
+    if (result.success) {
       invalidateOverview();
       void refreshGlobalStats();
+      return;
     }
+
+    if (removed) {
+      addNodeContent(resolvedSelectedNodeId, removed);
+      return;
+    }
+    void refreshNodeContents(resolvedSelectedNodeId);
   };
 
   if (isLoadingNexus && nodes.length === 0) {
@@ -278,6 +291,31 @@ export default function LibraryPage() {
       <AddContentModal
         isOpen={showAddContent}
         onClose={() => setShowAddContent(false)}
+        onOptimisticCreate={(tempContent) => {
+          const row = tempContent as { id?: string; skillId?: string };
+          if (!row.id || !row.skillId) return;
+          optimisticNodeByTempIdRef.current[row.id] = row.skillId;
+          addNodeContent(row.skillId, tempContent);
+        }}
+        onOptimisticResolve={(tempId, createdContent) => {
+          const nodeId =
+            optimisticNodeByTempIdRef.current[tempId] ||
+            (createdContent as { skillId?: string } | undefined)?.skillId;
+          if (!nodeId) return;
+          removeNodeContent(nodeId, tempId);
+          delete optimisticNodeByTempIdRef.current[tempId];
+          if (createdContent) {
+            addNodeContent(nodeId, createdContent);
+          }
+          invalidateOverview();
+          void refreshGlobalStats();
+        }}
+        onOptimisticRollback={(tempId) => {
+          const nodeId = optimisticNodeByTempIdRef.current[tempId];
+          if (!nodeId) return;
+          removeNodeContent(nodeId, tempId);
+          delete optimisticNodeByTempIdRef.current[tempId];
+        }}
         onSuccess={(createdContent) => {
           if (resolvedSelectedNodeId) {
             if (createdContent) {

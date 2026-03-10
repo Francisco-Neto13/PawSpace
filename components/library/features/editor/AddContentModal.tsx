@@ -42,6 +42,9 @@ interface AddContentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (createdContent?: unknown) => void;
+  onOptimisticCreate?: (tempContent: unknown) => void;
+  onOptimisticResolve?: (tempId: string, createdContent?: unknown) => void;
+  onOptimisticRollback?: (tempId: string) => void;
   skillId: string;
 }
 
@@ -56,7 +59,15 @@ function CharCounter({ current, max }: { current: number; max: number }) {
   );
 }
 
-export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddContentModalProps) {
+export function AddContentModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  onOptimisticCreate,
+  onOptimisticResolve,
+  onOptimisticRollback,
+  skillId,
+}: AddContentModalProps) {
   const [activeTab, setActiveTab] = useState<ContentType>('link');
   const [isLoading, setIsLoading] = useState(false);
   const [pdfMode, setPdfMode] = useState<'upload' | 'link'>('upload');
@@ -82,10 +93,29 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
 
   const handleSubmit = async () => {
     if (!isValid() || isLoading) return;
-    setIsLoading(true);
+    const isPdfUpload = activeTab === 'pdf' && pdfMode === 'upload';
+    const useOptimistic = !isPdfUpload;
+    let tempId: string | null = null;
+    if (!useOptimistic) setIsLoading(true);
 
     try {
       const payload: ContentInput = { skillId, type: activeTab, title: form.title.trim() };
+
+      if (useOptimistic) {
+        tempId = `temp-content-${Date.now()}`;
+        const optimisticContent = {
+          id: tempId,
+          skillId,
+          type: activeTab,
+          title: form.title.trim(),
+          url: form.url.trim() || null,
+          body: form.body.trim() || null,
+          fileKey: null,
+          createdAt: new Date().toISOString(),
+        };
+        onOptimisticCreate?.(optimisticContent);
+        handleClose();
+      }
 
       if (activeTab === 'link' || activeTab === 'video') payload.url = form.url.trim();
 
@@ -107,12 +137,19 @@ export function AddContentModal({ isOpen, onClose, onSuccess, skillId }: AddCont
       const result = await addContent(payload);
       if (!result.success) throw new Error('Falha ao salvar');
 
-      onSuccess(result.content);
-      handleClose();
+      if (tempId) {
+        onOptimisticResolve?.(tempId, result.content);
+      } else {
+        onSuccess(result.content);
+        handleClose();
+      }
     } catch (err) {
       console.error('❌ [AddContentModal] Erro:', err);
+      if (tempId) {
+        onOptimisticRollback?.(tempId);
+      }
     } finally {
-      setIsLoading(false);
+      if (!useOptimistic) setIsLoading(false);
     }
   };
 

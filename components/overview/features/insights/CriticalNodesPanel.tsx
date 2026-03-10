@@ -1,6 +1,6 @@
 ﻿'use client';
 import { memo, useState } from 'react';
-import { CircleCheck, Circle, ChevronRight } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ChevronRight } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { CriticalNodeDatum } from '@/components/overview/lib/overviewMetrics';
 
@@ -10,7 +10,6 @@ interface Props {
 
 function CriticalNodesPanel({ critical }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
   const safeExpandedId = critical.some((item) => item.id === expandedId) ? expandedId : null;
 
   if (critical.length === 0) {
@@ -19,43 +18,46 @@ function CriticalNodesPanel({ critical }: Props) {
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
         <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          Patas Criticas
+          Módulos Críticos
         </p>
         <p className="text-[9px] text-[var(--text-secondary)] mt-6 ml-3">
-          Sem dependencias suficientes para analisar no momento.
+          Adicione dependências entre módulos para identificar os mais importantes.
         </p>
       </div>
     );
   }
 
-  const covered = critical.filter((n) => n.hasContent).length;
+  const covered   = critical.filter((n) => n.hasContent).length;
   const uncovered = critical.filter((n) => !n.hasContent).length;
 
   return (
-    <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+    <div className="h-full max-h-[440px] rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden flex flex-col">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <div className="flex items-start justify-between mb-1">
+      <div className="flex items-start justify-between mb-1 shrink-0">
         <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          Patas Criticas
+          Módulos Críticos
         </p>
         <div className="flex gap-1.5">
           {covered > 0 && (
             <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 bg-[var(--bg-elevated)] border border-[var(--border-muted)] text-[var(--text-secondary)]">
-              OK {covered}
+              {covered} coberto{covered > 1 ? 's' : ''}
             </span>
           )}
           {uncovered > 0 && (
             <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
-              PEND {uncovered}
+              {uncovered} pendente{uncovered > 1 ? 's' : ''}
             </span>
           )}
         </div>
       </div>
-      <p className="text-[9px] text-[var(--text-secondary)] mb-6 ml-3">modulos que sustentam mais dependencias</p>
+      <p className="text-[9px] text-[var(--text-secondary)] mb-6 ml-3 shrink-0">
+        módulos que outros dependem para avançar
+      </p>
 
-      <div className="space-y-1">
+      <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+        <div className="space-y-1">
         {critical.map((n, i) => {
           const isExpanded = safeExpandedId === n.id;
           const maxDependents = Math.max(critical[0]?.dependents ?? 1, 1);
@@ -64,34 +66,30 @@ function CriticalNodesPanel({ critical }: Props) {
           return (
             <div key={n.id}>
               <button
-                className="w-full flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-lg transition-all duration-200 group text-left"
-                style={{
-                  backgroundColor: isExpanded ? 'var(--bg-elevated)' : 'transparent',
-                }}
+                className="w-full flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-lg transition-all duration-200 text-left"
+                style={{ backgroundColor: isExpanded ? 'var(--bg-elevated)' : 'transparent' }}
                 onClick={() => setExpandedId(isExpanded ? null : n.id)}
               >
                 <span className="text-[9px] text-[var(--text-muted)] font-mono w-4 shrink-0">{i + 1}</span>
-
                 <span className="text-base shrink-0">{n.icon}</span>
 
                 <span
                   className="text-[10px] font-bold flex-1 truncate transition-colors duration-200"
-                  style={{ color: isExpanded ? 'var(--text-primary)' : n.hasContent ? 'var(--text-primary)' : 'var(--text-muted)' }}
+                  style={{ color: isExpanded || n.hasContent ? 'var(--text-primary)' : 'var(--text-muted)' }}
                 >
                   {n.name}
                 </span>
 
-                <span className="text-[9px] text-[var(--text-secondary)] font-mono shrink-0">{n.dependents} deps</span>
+                <span className="text-[10px] text-[var(--text-secondary)] font-mono font-black shrink-0">
+                  {n.dependents} dep.
+                </span>
 
-                <div className="w-4 shrink-0 flex items-center justify-center">
-                  {n.hasContent ? (
-                    <CircleCheck size={11} className="text-[var(--text-secondary)]" />
-                  ) : (
-                    <Circle size={11} className="text-[var(--text-muted)]" />
-                  )}
-                </div>
+                {n.hasContent
+                  ? <CheckCircle2 size={11} className="text-[var(--text-secondary)] shrink-0" />
+                  : <AlertCircle  size={11} className="text-[var(--text-muted)] shrink-0" />
+                }
 
-                <div className="w-20 h-[3px] bg-[var(--bg-elevated)] overflow-hidden rounded-full shrink-0">
+                <div className="w-16 h-[3px] bg-[var(--bg-elevated)] overflow-hidden rounded-full shrink-0">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -110,51 +108,69 @@ function CriticalNodesPanel({ critical }: Props) {
 
               {isExpanded && (
                 <div
-                  className="ml-7 mb-2 px-3 py-3 border border-[var(--border-subtle)] bg-[var(--bg-surface)] rounded-lg"
-                  style={{
-                    animation: 'slideDown 0.2s ease-out',
-                  }}
+                  className="ml-7 mb-2 px-4 py-3 border border-[var(--border-subtle)] bg-[var(--bg-surface)] rounded-lg"
+                  style={{ animation: 'slideDown 0.2s ease-out' }}
                 >
-                  <div className="flex items-center gap-6">
+                  <div className="grid grid-cols-3 gap-4 mb-3">
                     <div>
-                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">Links</p>
+                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
+                        Links externos
+                      </p>
                       <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.linksCount}</p>
                     </div>
                     <div>
-                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">Conteudos</p>
+                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
+                        Conteúdos
+                      </p>
                       <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.contentsCount}</p>
                     </div>
                     <div>
-                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">Dependentes</p>
+                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
+                        Módulos que dependem
+                      </p>
                       <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.dependents}</p>
                     </div>
-                    <div className="flex-1 flex items-center justify-end">
-                      <span
-                        className="text-[9px] font-black uppercase tracking-wider px-2 py-1 border"
-                        style={{
-                          borderColor: n.hasContent ? 'var(--border-visible)' : 'var(--border-subtle)',
-                          color: n.hasContent ? 'var(--text-primary)' : 'var(--text-muted)',
-                        }}
-                      >
-                        {n.hasContent ? 'Coberto' : 'Sem conteudo'}
-                      </span>
-                    </div>
+                  </div>
+
+                  <div
+                    className="flex items-center gap-2 pt-2 border-t border-[var(--border-subtle)]"
+                  >
+                    {n.hasContent ? (
+                      <CheckCircle2 size={10} className="text-[var(--text-secondary)] shrink-0" />
+                    ) : (
+                      <AlertCircle size={10} className="text-[var(--text-muted)] shrink-0" />
+                    )}
+                    <p className="text-[9px] uppercase tracking-wider font-bold"
+                      style={{ color: n.hasContent ? 'var(--text-secondary)' : 'var(--text-muted)' }}
+                    >
+                      {n.hasContent
+                        ? 'Este módulo já tem conteúdo cadastrado'
+                        : 'Sem conteúdo — adicionar aqui impacta vários módulos'
+                      }
+                    </p>
                   </div>
                 </div>
               )}
             </div>
           );
         })}
+        </div>
       </div>
 
-      {uncovered > 0 && (
-        <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center gap-2">
-          <Circle size={8} className="text-[var(--text-secondary)] shrink-0" />
-          <p className="text-[8px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">
-            {uncovered} pata{uncovered > 1 ? 's' : ''} critica{uncovered > 1 ? 's' : ''} sem conteudo - prioridade alta
-          </p>
-        </div>
-      )}
+      <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex flex-col gap-2 shrink-0">
+        <p className="text-[8px] text-[var(--text-muted)] font-bold uppercase tracking-wider">
+          dep. — quantidade de módulos que dependem deste para avançar
+        </p>
+        {uncovered > 0 && (
+          <div className="flex items-center gap-2">
+            <AlertCircle size={8} className="text-[var(--text-secondary)] shrink-0" />
+            <p className="text-[8px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">
+              {uncovered} módulo{uncovered > 1 ? 's críticos sem' : ' crítico sem'} conteúdo —
+              preencher estes desbloqueia o avanço de outros
+            </p>
+          </div>
+        )}
+      </div>
 
       <style>{`
         @keyframes slideDown {

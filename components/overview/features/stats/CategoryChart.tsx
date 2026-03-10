@@ -53,7 +53,6 @@ function CategoryChart({ data }: Props) {
           data={data}
           barGap={4}
           barSize={28}
-          onMouseLeave={() => setActiveCategory(null)}
         >
           <XAxis
             dataKey="category"
