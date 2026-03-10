@@ -5,6 +5,7 @@ import { LibraryProvider } from "@/shared/contexts/LibraryContext";
 import { JournalProvider } from "@/shared/contexts/JournalContext";
 import { OverviewProvider } from "@/shared/contexts/OverviewContext";
 import { ThemeProvider } from "@/shared/contexts/ThemeContext";
+import { ConfirmDialogProvider } from "@/shared/contexts/ConfirmDialogContext";
 import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
@@ -21,7 +22,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <LibraryProvider>
               <JournalProvider>
                 <OverviewProvider>
-                  <ClientLayout>{children}</ClientLayout>
+                  <ConfirmDialogProvider>
+                    <ClientLayout>{children}</ClientLayout>
+                  </ConfirmDialogProvider>
                 </OverviewProvider>
               </JournalProvider>
             </LibraryProvider>

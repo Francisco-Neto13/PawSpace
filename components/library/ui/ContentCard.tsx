@@ -2,6 +2,7 @@
 import { ExternalLink, Clock, Trash2 } from 'lucide-react';
 import { Content } from '../types';
 import { TYPE_CONFIG } from '../constants';
+import { useConfirmDialog } from '@/shared/contexts/ConfirmDialogContext';
 
 interface ContentCardProps {
   content: Content;
@@ -10,9 +11,17 @@ interface ContentCardProps {
 
 export function ContentCard({ content, onDelete }: ContentCardProps) {
   const cfg = TYPE_CONFIG[content.type];
+  const confirmDialog = useConfirmDialog();
 
   const handleDelete = async () => {
-    if (!confirm('Deseja remover este conteudo?')) return;
+    const isConfirmed = await confirmDialog({
+      title: 'Remover conteúdo',
+      description: `Este item será removido da biblioteca: "${content.title}".`,
+      confirmLabel: 'Remover',
+      cancelLabel: 'Manter',
+      tone: 'danger',
+    });
+    if (!isConfirmed) return;
     onDelete?.(content.id);
   };
 

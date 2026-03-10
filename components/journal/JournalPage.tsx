@@ -9,12 +9,14 @@ import { JournalEntry, SkillBase } from './types';
 import { useNexus } from '@/shared/contexts/NexusContext';
 import { useJournal } from '@/shared/contexts/JournalContext';
 import { useOverview } from '@/shared/contexts/OverviewContext';
+import { useConfirmDialog } from '@/shared/contexts/ConfirmDialogContext';
 import { saveJournalEntry, deleteJournalEntry } from '@/app/actions/journal';
 
 export default function JournalPage() {
   const { nodes, isLoading: isLoadingNexus, refreshGlobalStats } = useNexus();
   const { entries, setEntries, isLoading: isLoadingEntries, flushPending } = useJournal();
   const { invalidateOverview } = useOverview();
+  const confirmDialog = useConfirmDialog();
 
   const [visible, setVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -82,7 +84,16 @@ export default function JournalPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Deseja deletar esta entrada?')) return;
+    const entry = entries.find((item) => item.id === id);
+    const isConfirmed = await confirmDialog({
+      title: 'Excluir entrada',
+      description: `Esta entrada será removida do diário: "${entry?.title ?? 'Sem título'}".`,
+      confirmLabel: 'Excluir',
+      cancelLabel: 'Cancelar',
+      tone: 'danger',
+    });
+
+    if (!isConfirmed) return;
     if (isSaving) return;
 
     const previousEntries = [...entries];

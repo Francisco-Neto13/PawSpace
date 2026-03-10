@@ -87,7 +87,7 @@ export default function LibraryPage() {
     ...n,
     name: n.data.name || n.data.label || 'Sem Nome',
     icon: n.data.icon || '*',
-    color: n.data.color || '#22d3ee',
+    color: n.data.color || '#71717a',
     contents: nodeContents[n.id] ?? [],
   })) as SkillNode[], [nodes, nodeContents]);
 

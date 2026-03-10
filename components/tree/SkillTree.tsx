@@ -276,9 +276,14 @@ function SkillTreeInner() {
           }}
           onEdit={() => { setEditingSkillId(contextMenu.nodeId); setContextMenu(null); }}
           onDelete={() => {
-            handleDelete(contextMenu.nodeId);
-            setHasStructuralChanges(true);
+            const nodeId = contextMenu.nodeId;
             setContextMenu(null);
+            void (async () => {
+              const didDelete = await handleDelete(nodeId);
+              if (didDelete) {
+                setHasStructuralChanges(true);
+              }
+            })();
           }}
           onClose={() => setContextMenu(null)}
         />

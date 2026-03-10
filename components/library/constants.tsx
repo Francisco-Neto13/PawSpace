@@ -3,11 +3,13 @@ import { Link2, FileText, StickyNote, Video } from 'lucide-react';
 import React from 'react';
 import { ContentType } from './types';
 
+const CONTENT_ACCENT = '#71717a';
+
 export const TYPE_CONFIG: Record<ContentType, { icon: React.ReactNode; label: string; color: string }> = {
-  link:  { icon: <Link2 size={13} />,      label: 'Link',   color: '#0ea5e9' },
-  pdf:   { icon: <FileText size={13} />,   label: 'PDF',    color: '#f59e0b' },
-  note:  { icon: <StickyNote size={13} />, label: 'Nota',   color: '#a855f7' },
-  video: { icon: <Video size={13} />,      label: 'Vídeo',  color: '#10b981' },
+  link:  { icon: <Link2 size={13} />,      label: 'Link',   color: CONTENT_ACCENT },
+  pdf:   { icon: <FileText size={13} />,   label: 'PDF',    color: CONTENT_ACCENT },
+  note:  { icon: <StickyNote size={13} />, label: 'Nota',   color: CONTENT_ACCENT },
+  video: { icon: <Video size={13} />,      label: 'Vídeo',  color: CONTENT_ACCENT },
 };
 
 export const FILTER_OPTIONS: { value: ContentType | 'all'; label: string }[] = [

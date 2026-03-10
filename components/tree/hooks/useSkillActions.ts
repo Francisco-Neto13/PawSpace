@@ -5,6 +5,7 @@ import { useNexus, type SkillNode } from '@/contexts/NexusContext';
 import type { SkillData, SkillShape } from '@/components/tree/types';
 import { updateSkill, saveNexusChanges, deleteSkill, addSkill } from '@/app/actions/skills';
 import { getNewChildPosition } from '@/utils/treeUtils';
+import { useConfirmDialog } from '@/shared/contexts/ConfirmDialogContext';
 
 interface SkillPreviewDetail {
   skillId: string;
@@ -15,6 +16,7 @@ interface SkillPreviewDetail {
 
 export function useSkillActions() {
   const { nodes, edges, setNodes, setEdges, refreshNexus, originalNodeIds } = useNexus();
+  const confirmDialog = useConfirmDialog();
 
   useEffect(() => {
     const handlePreview = (e: Event) => {
@@ -42,11 +44,20 @@ export function useSkillActions() {
     return () => window.removeEventListener('skill-preview', handlePreview);
   }, [setNodes]);
 
-  const handleDelete = useCallback((nodeId: string) => {
-    if (!confirm('Remover este módulo e todas as conexões?')) return;
+  const handleDelete = useCallback(async (nodeId: string) => {
+    const node = nodes.find((item) => item.id === nodeId);
+    const isConfirmed = await confirmDialog({
+      title: 'Remover módulo',
+      description: `O módulo "${node?.data.label || node?.data.name || 'Sem nome'}" e todas as conexões serão removidos.`,
+      confirmLabel: 'Remover',
+      cancelLabel: 'Cancelar',
+      tone: 'danger',
+    });
+    if (!isConfirmed) return false;
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
     setEdges((prev) => prev.filter((e) => e.source !== nodeId && e.target !== nodeId));
-  }, [setNodes, setEdges]);
+    return true;
+  }, [confirmDialog, nodes, setNodes, setEdges]);
 
   const handleCreateQuickSkill = useCallback((parentId: string | null) => {
     let positionX = 0;
