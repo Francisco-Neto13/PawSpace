@@ -9,7 +9,6 @@ import { PageBackground } from '@/components/shared/PageBackground';
 
 export function AchievementsPage() {
   const { nodes, globalStats, refreshGlobalStats } = useNexus();
-
   const [visible, setVisible] = useState(false);
   const [filter, setFilter] = useState<FilterCategory>('all');
 
@@ -24,15 +23,11 @@ export function AchievementsPage() {
 
   const achievements = useMemo(() => {
     const getContentCount = (nodeData: { links?: unknown; contents?: unknown }) => {
-      const linksCount = Array.isArray(nodeData.links) ? nodeData.links.length : 0;
+      const linksCount    = Array.isArray(nodeData.links)    ? nodeData.links.length    : 0;
       const contentsCount = Array.isArray(nodeData.contents) ? nodeData.contents.length : 0;
       return linksCount + contentsCount;
     };
-
-    const activeNodes = nodes.filter(n => {
-      return getContentCount(n.data) > 0;
-    }).length;
-
+    const activeNodes = nodes.filter(n => getContentCount(n.data) > 0).length;
     return computeAchievements({
       activeNodes,
       totalNodes:      nodes.length,
@@ -41,19 +36,24 @@ export function AchievementsPage() {
     });
   }, [nodes, globalStats]);
 
-  const filtered = useMemo(() =>
-    filter === 'all' ? achievements : achievements.filter(a => a.category === filter),
-    [achievements, filter]
-  );
+  const filtered = useMemo(() => {
+    if (filter === 'all') return achievements;
+    if (filter === 'progress') {
+      return achievements.filter(a =>
+        a.progress && a.progress.current < a.progress.total
+      );
+    }
+    return achievements.filter(a => a.category === filter);
+  }, [achievements, filter]);
 
   return (
-    <div className="relative min-h-full w-full bg-[var(--bg-base)] overflow-x-hidden">
+    <div className="relative min-h-full w-full overflow-x-hidden">
       <PageBackground src="/cat5.webp" />
       <main
-        className="relative z-10 py-8 space-y-6 pb-20"
+        className="relative z-10 py-8 space-y-4 pb-20"
         style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0)' : 'translateY(6px)',
+          opacity:    visible ? 1 : 0,
+          transform:  visible ? 'translateY(0)' : 'translateY(6px)',
           transition: 'opacity 0.5s ease, transform 0.5s ease',
         }}
       >
@@ -68,4 +68,3 @@ export function AchievementsPage() {
     </div>
   );
 }
-
