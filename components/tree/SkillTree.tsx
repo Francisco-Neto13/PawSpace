@@ -1,5 +1,5 @@
 ﻿'use client';
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 import { ReactFlow, ConnectionMode, type NodeTypes, useReactFlow, ReactFlowProvider, useNodesInitialized } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Save, Loader2, AlertCircle } from 'lucide-react';
@@ -10,6 +10,7 @@ import { EditSkillModal } from './features/editor/EditSkillModal';
 import { NodeContextMenu } from './ui/NodeContextMenu';
 import { TreeOnboarding } from './ui/TreeOnboarding';
 import { TreeEmptyState } from './ui/TreeEmptyState';
+import { TreeMiniMap } from './ui/TreeMiniMap';
 
 import { useNexus, type SkillNode } from '@/contexts/NexusContext';
 import { useOverview } from '@/contexts/OverviewContext';
@@ -97,6 +98,11 @@ function SkillTreeInner() {
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
   const [hasStructuralChanges, setHasStructuralChanges] = useState(false);
   const [isCanvasVisible, setIsCanvasVisible] = useState(false);
+  const isHydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const isContextMenuOpen = contextMenu !== null;
 
   const canSave = isDirty || hasDragChanges || hasStructuralChanges;
@@ -255,7 +261,6 @@ function SkillTreeInner() {
 
       {isLoadingTree && nodes.length === 0 && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
-          <div className="theme-grid-overlay absolute inset-0 pointer-events-none [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_60%,transparent_100%)]" />
           <div className="relative flex flex-col items-center gap-4">
             <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
             <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
@@ -347,7 +352,7 @@ function SkillTreeInner() {
         className="relative"
       >
         <ReactFlow
-          colorMode={theme}
+          colorMode={isHydrated ? theme : 'dark'}
           nodes={flowNodes}
           edges={flowEdges}
           nodeTypes={nodeTypes}
@@ -413,6 +418,7 @@ function SkillTreeInner() {
           style={{ background: 'transparent' }}
         >
           <RestoreViewportOnLoad nodes={nodes} isLoading={isLoadingTree && nodes.length === 0} />
+          <TreeMiniMap selectedNodeId={selectedNodeId} />
         </ReactFlow>
       </div>
 

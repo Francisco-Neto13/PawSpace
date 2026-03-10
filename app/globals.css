@@ -1,20 +1,20 @@
 ﻿@import "tailwindcss";
 
 :root {
-  --bg-base:          #0a0a0a;   
-  --bg-surface:       rgba(255,255,255,0.02); 
-  --bg-elevated:      rgba(255,255,255,0.04); 
-  --bg-input:         rgba(0,0,0,0.40);      
+  --bg-base:          #0a0a0a;
+  --bg-surface:       rgba(255,255,255,0.02);
+  --bg-elevated:      rgba(255,255,255,0.04);
+  --bg-input:         rgba(0,0,0,0.40);
   --bg-strong:        rgba(0,0,0,0.72);
 
-  --border-subtle:    rgba(255,255,255,0.06); 
-  --border-muted:     rgba(255,255,255,0.08);  
-  --border-visible:   rgba(255,255,255,0.15);  
+  --border-subtle:    rgba(255,255,255,0.06);
+  --border-muted:     rgba(255,255,255,0.08);
+  --border-visible:   rgba(255,255,255,0.15);
 
-  --text-primary:     rgba(255,255,255,0.95);  
-  --text-secondary:   rgba(255,255,255,0.60);  
-  --text-muted:       #71717a;                  
-  --text-faint:       #3f3f46;                 
+  --text-primary:     rgba(255,255,255,0.95);
+  --text-secondary:   rgba(255,255,255,0.60);
+  --text-muted:       #71717a;
+  --text-faint:       #3f3f46;
   --text-contrast:    #ffffff;
 
   --chart-strong:     rgba(255,255,255,0.9);
@@ -25,7 +25,6 @@
   --chart-cursor:     rgba(255,255,255,0.04);
 
   --shimmer-via:      rgba(255,255,255,0.15);
-  --grid-line:        rgba(255,255,255,0.06);
 
   --bg-image-opacity: 0.18;
   --bg-image-filter:  invert(1) contrast(1.16) brightness(1.14);
@@ -69,7 +68,6 @@ html.light {
   --chart-cursor:     rgba(24,24,27,0.06);
 
   --shimmer-via:      rgba(0,0,0,0.08);
-  --grid-line:        rgba(0,0,0,0.12);
 
   --bg-image-opacity: 0.16;
   --bg-image-filter:  none;
@@ -85,29 +83,6 @@ html.light {
 
   color-scheme: light;
 }
-
-/* ============================================================
-   BACKGROUNDS:
-   bg-[#0a0a0a]              → bg-[var(--bg-base)]
-   bg-white/[0.02]           → bg-[var(--bg-surface)]
-   bg-white/[0.04]           → bg-[var(--bg-elevated)]
-   bg-black/40               → bg-[var(--bg-input)]
-
-   BORDERS:
-   border-white/[0.06]       → border-[var(--border-subtle)]
-   border-white/[0.08]       → border-[var(--border-muted)]
-   border-white/[0.15]       → border-[var(--border-visible)]
-
-   TEXT:
-   text-white                → text-[var(--text-primary)]
-   text-white/60             → text-[var(--text-secondary)]
-   text-zinc-500 / zinc-600  → text-[var(--text-muted)]
-   text-zinc-700 / zinc-800  → text-[var(--text-faint)]
-
-   SHIMMER (gradiente topo dos cards):
-   via-white/15              → via-[var(--shimmer-via)]
-
-   ============================================================ */
 
 @layer base {
   ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -191,9 +166,46 @@ h1, h2, h3, h4, h5, h6, button, .skill-label-text {
 .react-flow__node.selected { z-index: 100 !important; }
 .react-flow__attribution { display: none !important; }
 .react-flow__handle { pointer-events: none !important; opacity: 0 !important; }
+
+.react-flow__minimap.minimap-card {
+  position: absolute !important;
+  box-sizing: border-box;
+  border-radius: 18px !important;
+  border: 1px solid var(--border-subtle) !important;
+  background: var(--bg-surface) !important;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  overflow: hidden;
+}
+.react-flow__minimap.minimap-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--shimmer-via), transparent);
+  pointer-events: none;
+}
+.react-flow__minimap.minimap-card::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  border-right: 1px solid var(--border-muted);
+  border-bottom: 1px solid var(--border-muted);
+  pointer-events: none;
+}
+.react-flow__minimap.minimap-card .react-flow__minimap-svg {
+  border-radius: 18px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .edge-flow, .glass-reflection::after { animation: none !important; transition: none !important; }
 }
+
 @keyframes reveal-up {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -220,11 +232,4 @@ h1, h2, h3, h4, h5, h6, button, .skill-label-text {
   opacity: var(--bg-image-opacity);
   filter: var(--bg-image-filter);
   mix-blend-mode: var(--bg-image-blend);
-}
-
-.theme-grid-overlay {
-  background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 4rem 4rem;
 }

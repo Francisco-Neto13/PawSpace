@@ -4,9 +4,10 @@ export const LIMITS = {
     description: 200,
   },
   library: {
-    title: 80,
-    url:   500,
-    body:  2000,
+    title:       80,
+    url:         500,
+    body:        2000,
+    pdfMaxBytes: 10 * 1024 * 1024, // 10 MB
   },
   journal: {
     title: 80,

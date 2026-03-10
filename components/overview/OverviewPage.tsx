@@ -58,7 +58,6 @@ export default function OverviewContent() {
   if (isLoading && nodes.length === 0) {
     return (
       <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
-        <div className="theme-grid-overlay absolute inset-0 pointer-events-none [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_60%,transparent_100%)]" />
         <div className="relative flex flex-col items-center gap-4">
           <div className="w-7 h-7 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
           <p className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.5em] animate-pulse">

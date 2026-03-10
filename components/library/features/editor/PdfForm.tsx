@@ -9,13 +9,16 @@ interface PdfFormProps {
   mode: 'upload' | 'link';
   url: string;
   file: File | null;
+  maxFileSizeBytes: number;
   onModeChange: (mode: 'upload' | 'link') => void;
   onUrlChange: (url: string) => void;
   onFileChange: (file: File | null) => void;
 }
 
-export function PdfForm({ mode, url, file, onModeChange, onUrlChange, onFileChange }: PdfFormProps) {
+export function PdfForm({ mode, url, file, maxFileSizeBytes, onModeChange, onUrlChange, onFileChange }: PdfFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const maxMb = Math.floor(maxFileSizeBytes / 1024 / 1024);
+  const isOverLimit = !!file && file.size > maxFileSizeBytes;
 
   return (
     <div className="space-y-5">
@@ -50,7 +53,9 @@ export function PdfForm({ mode, url, file, onModeChange, onUrlChange, onFileChan
             type="button"
             onClick={() => fileInputRef.current?.click()}
             className={`w-full flex flex-col items-center justify-center gap-3 py-8 border border-dashed transition-all duration-300 cursor-pointer
-              ${file
+              ${isOverLimit
+                ? 'border-red-500/70 bg-red-500/10 text-[var(--text-primary)]'
+                : file
                 ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
                 : 'border-[var(--border-muted)] text-[var(--text-secondary)] hover:border-[var(--border-visible)] hover:text-[var(--text-primary)]'
               }`}
@@ -67,6 +72,9 @@ export function PdfForm({ mode, url, file, onModeChange, onUrlChange, onFileChan
               )}
             </div>
           </button>
+          <p className={`mt-2 text-[9px] font-mono ${isOverLimit ? 'text-red-400' : 'text-[var(--text-secondary)]'}`}>
+            {isOverLimit ? `Arquivo acima do limite de ${maxMb} MB.` : `Tamanho maximo: ${maxMb} MB`}
+          </p>
         </div>
       ) : (
         <div className="animate-in fade-in duration-300">

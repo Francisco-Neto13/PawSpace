@@ -9,6 +9,7 @@ const MAX_CONTENTS = LIMITS.quantity.contentsPerNode;
 const TITLE_MAX    = LIMITS.library.title;
 const URL_MAX      = LIMITS.library.url;
 const BODY_MAX     = LIMITS.library.body;
+const PDF_MAX_BYTES = LIMITS.library.pdfMaxBytes;
 
 export async function addContent(data: ContentInput) {
   const totalStart = Date.now();
@@ -78,9 +79,16 @@ export async function uploadPdf(formData: FormData, userId?: string) {
 
     const file = formData.get('file') as File;
     if (!file) return { success: false, error: 'Nenhum arquivo enviado' };
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    if (!isPdf) return { success: false, error: 'Apenas arquivos PDF sao permitidos.' };
+    if (file.size > PDF_MAX_BYTES) {
+      return {
+        success: false,
+        error: `Arquivo excede o limite de ${Math.floor(PDF_MAX_BYTES / 1024 / 1024)} MB.`,
+      };
+    }
 
-    const ext      = file.name.split('.').pop();
-    const fileKey  = `${finalUserId}/${Date.now()}.${ext}`;
+    const fileKey  = `${finalUserId}/${Date.now()}.pdf`;
     const supabase = await createClient();
 
     const { error } = await supabase.storage

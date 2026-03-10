@@ -146,14 +146,6 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
                     className="relative overflow-hidden p-7"
                     style={{ clipPath: poly, backgroundColor: 'var(--bg-strong)' }}
                   >
-                    <div
-                      className="absolute inset-0 opacity-[0.025] pointer-events-none"
-                      style={{
-                        backgroundImage:
-                          'repeating-linear-gradient(0deg, transparent, transparent 2px, var(--grid-line) 2px, var(--grid-line) 4px)',
-                      }}
-                    />
-
                     <div className="relative z-10 mb-6">
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div className="flex items-start gap-3">
