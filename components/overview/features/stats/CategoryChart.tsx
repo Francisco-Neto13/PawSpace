@@ -15,9 +15,9 @@ function CustomTooltip({ active, payload }: TooltipProps) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
-    <div className="bg-[var(--bg-base)] border border-[var(--border-muted)] px-3 py-2 text-[10px] font-black uppercase tracking-wider space-y-0.5">
-      <p className="text-[var(--text-primary)]">{d.category}</p>
-      <p className="text-[var(--text-primary)]">{d.withContent} / {d.total} com conteúdo</p>
+    <div className="bg-[var(--bg-base)] border border-[var(--border-muted)] rounded-lg px-3 py-2 text-[10px] space-y-0.5 shadow-xl">
+      <p className="text-[var(--text-primary)] font-black uppercase tracking-wider">{d.category}</p>
+      <p className="text-[var(--text-secondary)] font-bold">{d.withContent} / {d.total} com conteúdo</p>
       <div className="flex items-center gap-2 mt-1">
         <div className="h-[2px] flex-1 bg-[var(--border-muted)]">
           <div className="h-full bg-[var(--text-secondary)]" style={{ width: `${d.pct}%` }} />
@@ -37,16 +37,19 @@ function CategoryChart({ data }: Props) {
   const worstCategory = data[data.length - 1];
 
   return (
-    <div className="h-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden flex flex-col">
+    <div className="h-full overview-card overview-card-hover p-6 relative overflow-hidden flex flex-col">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <div className="flex items-start justify-between mb-1">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] flex items-center gap-2">
+      <div className="flex items-start justify-between mb-1 gap-3">
+        <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
           Progresso por Categoria
         </p>
+        <span className="text-[8px] uppercase tracking-[0.15em] font-black text-[var(--text-muted)] border border-[var(--border-subtle)] px-2 py-1 rounded-lg">
+          Distribuição
+        </span>
       </div>
-      <p className="text-[9px] text-[var(--text-secondary)] mb-6 ml-3">cobertura de conteúdo por área</p>
+      <p className="overview-subtitle mb-6 ml-3">Cobertura de conteúdo por área de estudo</p>
 
       <ResponsiveContainer width="100%" height={200}>
         <BarChart
@@ -104,7 +107,7 @@ function CategoryChart({ data }: Props) {
       {activeCategory && (() => {
         const cat = data.find(d => d.category === activeCategory)!;
         return (
-          <div className="mt-4 border border-[var(--border-muted)] bg-[var(--bg-surface)] rounded-lg px-4 py-3 flex items-center justify-between">
+          <div className="mt-4 border border-[var(--border-muted)] bg-[var(--bg-surface)] rounded-xl px-4 py-3 flex items-center justify-between">
             <div>
               <p className="text-[10px] font-black uppercase tracking-wider text-[var(--text-primary)]">{cat.category}</p>
               <p className="text-[9px] text-[var(--text-muted)] mt-0.5">{cat.pending} módulos sem conteúdo</p>
@@ -132,8 +135,8 @@ function CategoryChart({ data }: Props) {
             </div>
           ))}
         </div>
-        <span className="text-[8px] text-[var(--text-secondary)] italic">
-          Clique para detalhes
+        <span className="text-[8px] text-[var(--text-secondary)] tracking-[0.02em] font-medium">
+          Clique em uma barra
         </span>
       </div>
 

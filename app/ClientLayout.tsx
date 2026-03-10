@@ -1,19 +1,18 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import Navbar from '@/components/shared/Navbar';
 import Footer from '@/components/shared/Footer';
+import AppSidebar from '@/components/shared/AppSidebar';
 
-const FULLSCREEN_ROUTES = ['/tree'];
+const SIDEBAR_ROUTES = ['/overview', '/tree', '/library', '/journal', '/achievements', '/settings'];
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
-  const navRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
-  const isFullscreen = FULLSCREEN_ROUTES.some(route => pathname.startsWith(route));
+  const hasSidebarLayout = SIDEBAR_ROUTES.some(route => pathname.startsWith(route));
 
   useEffect(() => {
     const update = () => {
-      const nav = navRef.current?.offsetHeight ?? 0;
+      const nav = 0;
       document.documentElement.style.setProperty('--navbar-height', `${nav}px`);
       document.documentElement.style.setProperty('--footer-height', '0px');
     };
@@ -22,17 +21,25 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return () => window.removeEventListener('resize', update);
   }, []);
 
+  if (hasSidebarLayout) {
+    return (
+      <div className="min-h-screen w-full">
+        <div className="flex min-h-screen w-full">
+          <AppSidebar />
+          <main className="relative flex-1 min-w-0 pt-14 lg:pt-0">
+            {children}
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen w-full">
-      <Navbar ref={navRef} />
       <main className="relative flex-1 w-full">
-        {isFullscreen ? (
-          children
-        ) : (
-          <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 h-full">
-            {children}
-          </div>
-        )}
+        <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 h-full">
+          {children}
+        </div>
       </main>
       <Footer />
     </div>

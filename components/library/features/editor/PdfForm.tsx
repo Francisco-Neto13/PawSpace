@@ -2,8 +2,8 @@
 import { useRef } from 'react';
 import { Upload } from 'lucide-react';
 
-const inputClass = "w-full bg-[var(--bg-surface)] border border-[var(--border-muted)] p-3.5 text-[var(--text-primary)] text-sm outline-none focus:border-[var(--border-visible)] transition-colors font-normal placeholder:text-[var(--text-muted)] cursor-text";
-const labelClass = "text-[9px] text-[var(--text-secondary)] uppercase font-black tracking-[0.25em] block mb-2.5";
+const inputClass = 'library-input p-3.5 text-sm font-normal placeholder:text-[var(--text-muted)] cursor-text';
+const labelClass = 'text-[9px] text-[var(--text-secondary)] uppercase font-black tracking-[0.25em] block mb-2.5';
 
 interface PdfFormProps {
   mode: 'upload' | 'link';
@@ -28,7 +28,7 @@ export function PdfForm({ mode, url, file, maxFileSizeBytes, onModeChange, onUrl
             key={m}
             type="button"
             onClick={() => { onModeChange(m); onFileChange(null); onUrlChange(''); }}
-            className={`flex-1 py-3 border text-[9px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer
+            className={`h-10 flex-1 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer
               ${mode === m
                 ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)]'
@@ -52,7 +52,7 @@ export function PdfForm({ mode, url, file, maxFileSizeBytes, onModeChange, onUrl
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className={`w-full flex flex-col items-center justify-center gap-3 py-8 border border-dashed transition-all duration-300 cursor-pointer
+            className={`w-full flex flex-col items-center justify-center gap-3 py-8 rounded-xl border border-dashed transition-all duration-200 cursor-pointer
               ${isOverLimit
                 ? 'border-red-500/70 bg-red-500/10 text-[var(--text-primary)]'
                 : file

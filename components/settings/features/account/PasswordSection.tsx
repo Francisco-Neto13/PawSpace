@@ -1,34 +1,37 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff, Check, Loader2 } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { createClient } from '@/shared/supabase/client';
 
-function PasswordInput({ label, value, onChange, placeholder }: {
+function PasswordInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
   label: string;
   value: string;
-  onChange: (v: string) => void;
+  onChange: (value: string) => void;
   placeholder?: string;
 }) {
   const [show, setShow] = useState(false);
 
   return (
     <div>
-      <label className="text-[8px] font-black uppercase tracking-widest text-[var(--text-muted)] block mb-2">
-        {label}
-      </label>
+      <label className="text-[8px] font-black uppercase tracking-widest text-[var(--text-muted)] block mb-2">{label}</label>
       <div className="relative">
         <input
           type={show ? 'text' : 'password'}
           value={value}
-          onChange={e => onChange(e.target.value)}
+          onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder ?? '********'}
-          className="w-full bg-[var(--bg-input)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 pr-10 text-[var(--text-primary)] text-[11px] font-bold tracking-wide outline-none focus:border-[var(--border-visible)] transition-colors placeholder:text-[var(--text-faint)]"
+          className="library-input h-10 px-3.5 pr-10 text-[11px] font-bold tracking-wide placeholder:text-[var(--text-faint)]"
         />
         <button
           type="button"
-          onClick={() => setShow(v => !v)}
+          onClick={() => setShow((value) => !value)}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-faint)] hover:text-[var(--text-secondary)] transition-colors"
         >
           {show ? <EyeOff size={12} /> : <Eye size={12} />}
@@ -53,7 +56,7 @@ export default function PasswordSection() {
     const loadingTimeout = window.setTimeout(() => {
       if (!mounted) return;
       setIsLoadingUser(false);
-      setError(prev => prev ?? 'Nao foi possivel carregar o usuario.');
+      setError((prev) => prev ?? 'Nao foi possivel carregar o usuario.');
     }, 8000);
 
     const loadEmail = async () => {
@@ -65,7 +68,6 @@ export default function PasswordSection() {
         } = await supabase.auth.getUser();
 
         if (!mounted) return;
-
         if (userError || !user?.email) {
           setError('Sessao nao encontrada.');
           return;
@@ -100,17 +102,14 @@ export default function PasswordSection() {
       setError('Digite a senha atual.');
       return;
     }
-
     if (next.length < 8) {
       setError('A nova senha deve ter ao menos 8 caracteres.');
       return;
     }
-
     if (next !== confirm) {
       setError('As senhas nao coincidem.');
       return;
     }
-
     if (!userEmail) {
       setError('Nao foi possivel validar o usuario atual.');
       return;
@@ -119,10 +118,9 @@ export default function PasswordSection() {
     setIsSaving(true);
     const savingWatchdog = window.setTimeout(() => {
       setIsSaving(false);
-      setError(
-        'A atualizacao esta demorando. Verifique se a senha mudou e tente novamente.'
-      );
+      setError('A atualizacao esta demorando. Verifique se a senha mudou e tente novamente.');
     }, 20000);
+
     const supabase = createClient();
 
     try {
@@ -145,14 +143,12 @@ export default function PasswordSection() {
         return;
       }
 
-      setError(null);
       setSaved(true);
       setCurrent('');
       setNext('');
       setConfirm('');
     } catch (saveError) {
-      const message =
-        saveError instanceof Error ? saveError.message : 'Falha ao atualizar senha.';
+      const message = saveError instanceof Error ? saveError.message : 'Falha ao atualizar senha.';
       setError(message);
     } finally {
       window.clearTimeout(savingWatchdog);
@@ -161,35 +157,29 @@ export default function PasswordSection() {
   };
 
   return (
-    <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+    <section className="library-panel p-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+      <p className="library-kicker mb-1 flex items-center gap-2">
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Senha
       </p>
-      <p className="text-[9px] text-[var(--text-muted)] mb-6 ml-3">alterar senha de acesso</p>
+      <p className="library-subtitle mb-5 ml-3">alterar senha de acesso</p>
 
       <div className="space-y-4">
         <PasswordInput label="Senha Atual" value={current} onChange={setCurrent} />
         <PasswordInput label="Nova Senha" value={next} onChange={setNext} />
         <PasswordInput label="Confirmar Nova Senha" value={confirm} onChange={setConfirm} />
 
-        <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center justify-between pt-1 gap-3">
           <div>
-            {error && (
-              <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold">{error}</p>
-            )}
-            {saved && !error && (
-              <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">Senha atualizada.</p>
-            )}
+            {error && <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold">{error}</p>}
+            {saved && !error && <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">Senha atualizada.</p>}
           </div>
           <button
-            onClick={() => {
-              void handleSave();
-            }}
+            onClick={() => void handleSave()}
             disabled={isLoadingUser || isSaving}
-            className="flex items-center gap-2 px-4 py-2 border text-[9px] font-black uppercase tracking-wider transition-all duration-200 disabled:opacity-60"
+            className="h-10 px-4 rounded-xl border flex items-center gap-2 text-[9px] font-black uppercase tracking-wider transition-all duration-200 disabled:opacity-60"
             style={{
               borderColor: saved ? 'var(--border-visible)' : 'var(--border-muted)',
               color: saved ? 'var(--text-primary)' : 'var(--text-secondary)',
@@ -202,6 +192,6 @@ export default function PasswordSection() {
           </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

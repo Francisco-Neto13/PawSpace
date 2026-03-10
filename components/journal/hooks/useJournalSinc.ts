@@ -20,10 +20,21 @@ export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalE
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isSavingRef = useRef(false);
 
-  useEffect(() => { titleRef.current = title; }, [title]);
-  useEffect(() => { skillIdRef.current = skillId; }, [skillId]);
-  useEffect(() => { entryRef.current = entry; }, [entry]);
-  useEffect(() => { onUpdateRef.current = onUpdate; }, [onUpdate]);
+  useEffect(() => {
+    titleRef.current = title;
+  }, [title]);
+
+  useEffect(() => {
+    skillIdRef.current = skillId;
+  }, [skillId]);
+
+  useEffect(() => {
+    entryRef.current = entry;
+  }, [entry]);
+
+  useEffect(() => {
+    onUpdateRef.current = onUpdate;
+  }, [onUpdate]);
 
   const updatePending = useCallback(() => {
     if (isTemporaryEntry) {
@@ -84,8 +95,8 @@ export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalE
         setPending(null);
         onUpdateRef.current(result.entry as unknown as JournalEntry);
       }
-    } catch (e) {
-      console.error('❌ [Journal] Erro na sincronização:', e);
+    } catch (error) {
+      console.error('[Journal] Erro na sincronizacao:', error);
     } finally {
       isSavingRef.current = false;
       setIsSaving(false);
@@ -116,7 +127,7 @@ export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalE
     if (bodyRef.current && bodyRef.current.innerHTML !== entry.body) {
       bodyRef.current.innerHTML = entry.body;
     }
-  }, [entry.id, setPending]);
+  }, [entry.id, entry.title, entry.skillId, entry.body, setPending]);
 
   return {
     bodyRef,

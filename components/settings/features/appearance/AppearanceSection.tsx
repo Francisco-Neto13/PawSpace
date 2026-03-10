@@ -7,7 +7,7 @@ const THEME_OPTIONS = [
   {
     key: 'dark' as const,
     label: 'Escuro',
-    sub: 'fundo preto, o padrão do Pawspace',
+    sub: 'fundo preto, padrao do Pawspace',
     icon: Moon,
     preview: {
       bg: '#0a0a0a',
@@ -32,12 +32,9 @@ const THEME_OPTIONS = [
   },
 ];
 
-function ThemePreview({ preview }: { preview: typeof THEME_OPTIONS[0]['preview'] }) {
+function ThemePreview({ preview }: { preview: (typeof THEME_OPTIONS)[0]['preview'] }) {
   return (
-    <div
-      className="w-full h-16 rounded-lg overflow-hidden border p-2 flex flex-col gap-1.5"
-      style={{ backgroundColor: preview.bg, borderColor: preview.border }}
-    >
+    <div className="w-full h-16 rounded-lg overflow-hidden border p-2 flex flex-col gap-1.5" style={{ backgroundColor: preview.bg, borderColor: preview.border }}>
       <div className="flex items-center gap-1.5">
         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: preview.surface, border: `1px solid ${preview.border}` }} />
         <div className="h-1.5 w-12 rounded-full" style={{ backgroundColor: preview.muted, opacity: 0.4 }} />
@@ -58,39 +55,37 @@ export default function AppearanceSection() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+    <section className="library-panel p-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+      <p className="library-kicker mb-1 flex items-center gap-2">
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-        Aparência
+        Aparencia
       </p>
-      <p className="text-[9px] text-[var(--text-muted)] mb-6 ml-3">tema da interface</p>
+      <p className="library-subtitle mb-5 ml-3">tema da interface</p>
 
-      <div className="grid grid-cols-2 gap-3">
-        {THEME_OPTIONS.map(opt => {
-          const isActive = theme === opt.key;
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {THEME_OPTIONS.map((option) => {
+          const isActive = theme === option.key;
           return (
             <button
-              key={opt.key}
-              onClick={() => setTheme(opt.key)}
+              key={option.key}
+              onClick={() => setTheme(option.key)}
               className="text-left rounded-xl border p-4 transition-all duration-200"
               style={{
                 borderColor: isActive ? 'var(--border-visible)' : 'var(--border-subtle)',
                 backgroundColor: isActive ? 'var(--bg-elevated)' : 'transparent',
               }}
             >
-              <ThemePreview preview={opt.preview} />
+              <ThemePreview preview={option.preview} />
 
               <div className="flex items-start justify-between mt-3">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
-                    <opt.icon size={10} />
-                    {opt.label}
+                    <option.icon size={10} />
+                    {option.label}
                   </p>
-                  <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold mt-0.5">
-                    {opt.sub}
-                  </p>
+                  <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold mt-0.5">{option.sub}</p>
                 </div>
                 <div
                   className="w-3 h-3 rounded-full border-2 shrink-0 mt-0.5 transition-all duration-200"
@@ -105,6 +100,6 @@ export default function AppearanceSection() {
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

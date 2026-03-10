@@ -1,5 +1,5 @@
 ﻿'use client';
-import { memo, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { AlertCircle, CheckCircle2, ChevronRight } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { CriticalNodeDatum } from '@/components/overview/lib/overviewMetrics';
@@ -10,17 +10,24 @@ interface Props {
 
 function CriticalNodesPanel({ critical }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const safeExpandedId = critical.some((item) => item.id === expandedId) ? expandedId : null;
+  const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+    const el = scrollAreaRef.current;
+    if (!el) return;
+    e.preventDefault();
+    el.scrollTop += e.deltaY * 0.45;
+  }, []);
 
   if (critical.length === 0) {
     return (
-      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+      <div className="overview-card overview-card-hover p-6 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] flex items-center gap-2">
+        <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
           Módulos Críticos
         </p>
-        <p className="text-[9px] text-[var(--text-secondary)] mt-6 ml-3">
+        <p className="overview-subtitle mt-6 ml-3">
           Adicione dependências entre módulos para identificar os mais importantes.
         </p>
       </div>
@@ -31,11 +38,11 @@ function CriticalNodesPanel({ critical }: Props) {
   const uncovered = critical.filter((n) => !n.hasContent).length;
 
   return (
-    <div className="h-full max-h-[440px] rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden flex flex-col">
+    <div className="h-full max-h-[440px] overview-card overview-card-hover p-6 relative overflow-hidden flex flex-col">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
       <div className="flex items-start justify-between mb-1 shrink-0">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] flex items-center gap-2">
+        <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
           Módulos Críticos
         </p>
@@ -52,12 +59,16 @@ function CriticalNodesPanel({ critical }: Props) {
           )}
         </div>
       </div>
-      <p className="text-[9px] text-[var(--text-secondary)] mb-6 ml-3 shrink-0">
-        módulos que outros dependem para avançar
+      <p className="overview-subtitle mb-6 ml-3 shrink-0">
+        Módulos que mais destravam progresso quando recebem conteúdo
       </p>
 
-      <div className="flex-1 min-h-0 overflow-y-auto pr-1">
-        <div className="space-y-1">
+      <div
+        ref={scrollAreaRef}
+        onWheel={handleWheel}
+        className="flex-1 min-h-0 overview-scroll-area"
+      >
+        <div className="space-y-1 pr-1">
         {critical.map((n, i) => {
           const isExpanded = safeExpandedId === n.id;
           const maxDependents = Math.max(critical[0]?.dependents ?? 1, 1);
@@ -74,7 +85,7 @@ function CriticalNodesPanel({ critical }: Props) {
                 <span className="text-base shrink-0">{n.icon}</span>
 
                 <span
-                  className="text-[10px] font-bold flex-1 truncate transition-colors duration-200"
+                  className="text-[10px] font-black uppercase tracking-[0.1em] flex-1 truncate transition-colors duration-200"
                   style={{ color: isExpanded || n.hasContent ? 'var(--text-primary)' : 'var(--text-muted)' }}
                 >
                   {n.name}

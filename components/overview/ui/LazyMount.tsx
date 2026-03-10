@@ -46,7 +46,7 @@ export default function LazyMount({
         children
       ) : (
         <div
-          className="h-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] animate-pulse"
+          className="h-full overview-card animate-pulse"
           style={{ minHeight }}
           aria-hidden="true"
         />

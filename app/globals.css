@@ -202,6 +202,140 @@ h1, h2, h3, h4, h5, h6, button, .skill-label-text {
   border-radius: 18px;
 }
 
+/* Overview visual system */
+.overview-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  background: var(--bg-surface);
+  box-shadow: none;
+}
+.overview-card-soft {
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  background: var(--bg-surface);
+  box-shadow: none;
+}
+.overview-card-hover {
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+.overview-card-hover:hover {
+  border-color: var(--border-muted);
+  background: var(--bg-elevated);
+}
+.overview-kicker {
+  font-size: 9px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  font-weight: 900;
+  color: var(--text-secondary);
+}
+.overview-title {
+  color: var(--text-primary);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.overview-subtitle {
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.55;
+  font-weight: 500;
+}
+.overview-chip {
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.625rem;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.32rem 0.5rem;
+}
+.overview-subtle-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-subtle), transparent);
+}
+
+/* Library visual system */
+.library-panel {
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  background: var(--bg-surface);
+}
+.library-panel-hover {
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+.library-panel-hover:hover {
+  border-color: var(--border-muted);
+  background: var(--bg-elevated);
+}
+.library-kicker {
+  font-size: 9px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  font-weight: 900;
+  color: var(--text-secondary);
+}
+.library-subtitle {
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.55;
+  font-weight: 500;
+}
+.library-chip {
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.625rem;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.32rem 0.5rem;
+}
+.library-input {
+  width: 100%;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+.library-input:focus {
+  outline: none;
+  border-color: var(--border-visible);
+  background: var(--bg-elevated);
+}
+
+.overview-scroll-area {
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  scroll-behavior: auto;
+}
+
+.overview-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overview-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: 4px;
+}
+
+.overview-scroll-area::-webkit-scrollbar-thumb {
+  background: var(--border-muted);
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.overview-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: var(--border-visible);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .edge-flow, .glass-reflection::after { animation: none !important; transition: none !important; }
 }

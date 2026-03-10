@@ -23,9 +23,9 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
-    <div className="bg-[var(--bg-base)] border border-[var(--border-muted)] px-3 py-2 text-[10px] font-black uppercase tracking-wider">
-      <p className="text-[var(--text-primary)]">{d.name}</p>
-      <p className="text-[var(--text-secondary)]">{d.value} itens</p>
+    <div className="bg-[var(--bg-base)] border border-[var(--border-muted)] rounded-lg px-3 py-2 text-[10px]">
+      <p className="text-[var(--text-primary)] uppercase tracking-wider font-black">{d.name}</p>
+      <p className="text-[var(--text-secondary)] font-bold">{d.value} itens</p>
     </div>
   );
 }
@@ -58,13 +58,13 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
 
   if (totalContents === 0) {
     return (
-      <div className="h-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+      <div className="h-full overview-card overview-card-hover p-6 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+        <p className="overview-kicker text-[var(--text-primary)] mb-1 flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
           Caixinha de Areia
         </p>
-        <p className="text-[9px] text-[var(--text-muted)] mt-6 ml-3">{emptyMessage}</p>
+        <p className="overview-subtitle mt-6 ml-3">{emptyMessage}</p>
       </div>
     );
   }
@@ -72,14 +72,19 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
   const activeType = activeIndex !== null ? byType[activeIndex] : null;
 
   return (
-    <div className="h-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden flex flex-col">
+    <div className="h-full overview-card overview-card-hover p-6 relative overflow-hidden flex flex-col">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+      <div className="flex items-start justify-between gap-3 mb-1">
+      <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Caixinha de Areia
       </p>
-      <p className="text-[9px] text-[var(--text-secondary)] mb-6 ml-3">conteudos por tipo</p>
+      <span className="text-[8px] uppercase tracking-[0.15em] font-black text-[var(--text-muted)] border border-[var(--border-subtle)] px-2 py-1 rounded-lg">
+        Biblioteca
+      </span>
+      </div>
+      <p className="overview-subtitle mb-6 ml-3">Conteúdos por tipo e distribuição no acervo</p>
 
       <div className="flex-1 flex items-center">
         <div className="flex items-center gap-6 w-full">

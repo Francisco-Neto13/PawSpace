@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState } from 'react';
 import { BookOpen, Search } from 'lucide-react';
 import { EntryItem } from '../../ui/EntryItem';
@@ -14,25 +14,20 @@ interface JournalSidebarProps {
 export function JournalSidebar({ entries, skills, selectedId, onSelect }: JournalSidebarProps) {
   const [search, setSearch] = useState('');
 
-  const filtered = entries.filter(e =>
-    e.title.toLowerCase().includes(search.toLowerCase())
+  const filtered = entries.filter((entry) =>
+    entry.title.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <aside
-      className="w-80 shrink-0 flex flex-col gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 relative overflow-hidden"
-      style={{
-        height: 'calc(100dvh - var(--navbar-height) - 120px)',
-        position: 'sticky',
-        top: 'calc(var(--navbar-height) + 24px)',
-      }}
+      className="library-panel self-start relative overflow-hidden p-4 flex flex-col gap-3 xl:sticky xl:top-[calc(var(--navbar-height)+24px)]"
+      style={{ height: 'calc(100dvh - var(--navbar-height) - 140px)' }}
     >
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-      <div className="flex items-center gap-2">
-        <div className="w-1 h-3 bg-[var(--text-secondary)]" />
-        <p className="text-[9px] text-[var(--text-secondary)] uppercase font-black tracking-[0.3em] antialiased">
-          Arquivo de Notas
-        </p>
+
+      <div className="flex items-center justify-between gap-2">
+        <p className="library-kicker">Arquivo de Notas</p>
+        <span className="library-chip">{entries.length}</span>
       </div>
 
       <div className="relative">
@@ -40,31 +35,25 @@ export function JournalSidebar({ entries, skills, selectedId, onSelect }: Journa
         <input
           type="text"
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar entrada..."
-          className="w-full bg-[var(--bg-input)] border border-[var(--border-muted)] pl-8 pr-3 py-2.5 text-[10px] text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] font-mono outline-none focus:border-[var(--border-visible)] transition-colors"
+          className="library-input h-10 pl-8 pr-3 text-[10px] font-mono text-[var(--text-secondary)] placeholder:text-[var(--text-muted)]"
         />
       </div>
 
-      <div
-        className="flex flex-col gap-[2px] overflow-y-auto flex-1 pb-4"
-        style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'var(--border-visible) transparent',
-        }}
-      >
+      <div className="flex flex-col gap-1.5 flex-1 min-h-0 overview-scroll-area pr-1">
         {entries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 border border-dashed border-[var(--border-subtle)] rounded-xl mr-2">
+          <div className="flex flex-col items-center justify-center py-16 border border-dashed border-[var(--border-subtle)] rounded-xl">
             <BookOpen size={16} className="text-[var(--text-muted)] mb-3" />
             <p className="text-[var(--text-muted)] text-[8px] font-black uppercase tracking-[0.2em] text-center px-4">
-              Aguardando nova indexação de dados
+              Aguardando nova entrada
             </p>
           </div>
         ) : filtered.length === 0 ? (
           <p className="text-[10px] text-[var(--text-muted)] font-mono text-center py-8">Nenhuma entrada encontrada</p>
         ) : (
-          <div className="flex flex-col gap-1 pr-2">
-            {filtered.map(entry => (
+          <div className="flex flex-col gap-1">
+            {filtered.map((entry) => (
               <EntryItem
                 key={entry.id}
                 entry={entry}

@@ -20,14 +20,14 @@ function CustomTooltip({ active, payload }: TooltipProps) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
-    <div className="bg-[var(--bg-base)] border border-[var(--border-muted)] px-3 py-2 text-[10px] font-black uppercase tracking-wider">
-      <p className="text-[var(--text-primary)]">{d.label}</p>
-      <p className="text-[var(--text-primary)]">{d.count} {d.count === 1 ? 'entrada' : 'entradas'}</p>
+    <div className="bg-[var(--bg-base)] border border-[var(--border-muted)] rounded-lg px-3 py-2 text-[10px]">
+      <p className="text-[var(--text-primary)] uppercase tracking-wider font-black">{d.label}</p>
+      <p className="text-[var(--text-primary)] font-bold">{d.count} {d.count === 1 ? 'entrada' : 'entradas'}</p>
       {d.isCurrentMonth && (
-        <p className="text-[var(--text-secondary)] text-[8px] mt-0.5">mês atual</p>
+        <p className="text-[var(--text-secondary)] text-[8px] mt-0.5 uppercase tracking-wider font-black">mês atual</p>
       )}
       {d.isPeak && d.count > 0 && (
-        <p className="text-[var(--text-secondary)] text-[8px] mt-0.5">pico</p>
+        <p className="text-[var(--text-secondary)] text-[8px] mt-0.5 uppercase tracking-wider font-black">pico</p>
       )}
     </div>
   );
@@ -83,12 +83,12 @@ function JournalActivityChart() {
   }, [trend, totalEntries, peakMonth, maxCount]);
 
   return (
-    <div className="h-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden group flex flex-col">
+    <div className="h-full overview-card overview-card-hover p-6 relative overflow-hidden group flex flex-col">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
       {/* Header */}
       <div className="flex items-start justify-between mb-1">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] flex items-center gap-2">
+        <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
           Atividade no Ronronário
         </p>
@@ -105,11 +105,11 @@ function JournalActivityChart() {
           </span>
         )}
       </div>
-      <p className="text-[9px] text-[var(--text-secondary)] mb-6 ml-3">entradas por mês — últimos 6 meses</p>
+      <p className="overview-subtitle mb-6 ml-3">Entradas por mês nos últimos 6 meses</p>
 
       {/* Gráfico cresce para preencher o espaço disponível */}
-      <div className="flex-1 min-h-[220px]">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="flex-1 min-h-[220px] min-w-0">
+        <ResponsiveContainer width="100%" height={220} minWidth={0}>
           <BarChart data={data} barSize={20}>
             <XAxis
               dataKey="label"
@@ -144,7 +144,7 @@ function JournalActivityChart() {
         <span className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">
           Total: {totalEntries} entradas
         </span>
-        <span className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold italic">
+        <span className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">
           {insight}
         </span>
         <span className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">

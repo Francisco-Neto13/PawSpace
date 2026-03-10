@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { createPortal } from 'react-dom';
 import { SkillForm, type SkillFormData } from './SkillForm';
 import { useNexus } from '@/contexts/NexusContext';
@@ -24,8 +24,8 @@ export function EditSkillModal({
   if (!isOpen || !skillData || typeof document === 'undefined') return null;
 
   const handleFormSubmit = async (formData: SkillFormData) => {
-    setNodes((nds) =>
-      nds.map((node) =>
+    setNodes((nodes) =>
+      nodes.map((node) =>
         node.id === skillData.id
           ? {
               ...node,
@@ -54,67 +54,36 @@ export function EditSkillModal({
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 isolate">
-      <div
-        className="absolute inset-0 bg-black/0 backdrop-blur-md cursor-pointer"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-md cursor-pointer" onClick={onClose} />
 
-      <div
-        className="relative w-full max-w-md animate-in zoom-in-95 fade-in duration-300 z-10 pointer-events-auto rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-base)] overflow-hidden shadow-2xl"
-      >
-        <div
-          className="flex flex-col p-8 relative overflow-hidden max-h-[90vh] overflow-y-auto"
-          style={{
-            scrollbarWidth: 'none',
-          }}
-        >
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+      <div className="relative w-full max-w-xl rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-base)] overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-200 z-10 pointer-events-auto">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-          <div className="relative z-10 mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-5 bg-[var(--text-primary)]" />
-                <div>
-                  <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-[0.3em] font-black mb-0.5">
-                    Configuração de Módulo
-                  </p>
-                  <h2 className="text-[var(--text-primary)] text-[13px] font-black uppercase tracking-[0.3em]">
-                    Ajustar Módulo
-                  </h2>
-                </div>
+        <div className="flex flex-col p-6 md:p-7 relative max-h-[90vh] overflow-y-auto">
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="library-kicker mb-1">Configuracao de Modulo</p>
+                <h2 className="text-[var(--text-primary)] text-lg font-black tracking-tight">Ajustar Modulo</h2>
               </div>
               <button
                 onClick={onClose}
-                className="w-7 h-7 flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-300 text-xs cursor-pointer bg-[var(--bg-elevated)]"
+                className="w-8 h-8 rounded-xl flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-200 cursor-pointer bg-[var(--bg-elevated)]"
               >
                 ✕
               </button>
             </div>
-            <div
-              className="h-[1px] w-full"
-              style={{ background: 'linear-gradient(to right, var(--shimmer-via), transparent)' }}
-            />
+            <div className="h-[1px] bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
           </div>
 
-          <div className="relative z-10 pointer-events-auto">
-            <SkillForm
-              key={skillData.id}
-              onSubmit={handleFormSubmit}
-              onCancel={onClose}
-              isEditing={true}
-              initialData={skillData}
-              existingSkills={existingSkills}
-            />
-          </div>
-
-          <div className="mt-8 flex justify-center gap-3 opacity-20 relative z-10">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="w-1.5 h-1.5 rotate-45 border border-[var(--border-muted)]"
-              />
-            ))}
-          </div>
+          <SkillForm
+            key={skillData.id}
+            onSubmit={handleFormSubmit}
+            onCancel={onClose}
+            isEditing
+            initialData={skillData}
+            existingSkills={existingSkills}
+          />
         </div>
       </div>
     </div>,

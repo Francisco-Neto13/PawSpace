@@ -12,20 +12,22 @@ interface StatItem {
   label: string;
   value: string | number;
   sub: string;
+  hint: string;
   icon: LucideIcon;
   barWidth: number;
 }
 
 function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
   const stats = useMemo<StatItem[]>(() => {
-    const pending      = totalCount - unlockedCount;
+    const pending      = Math.max(totalCount - unlockedCount, 0);
     const progressSafe = totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
     const pendingSafe  = totalCount > 0 ? (pending / totalCount) * 100 : 0;
     return [
       {
         label:    'Patas com Conteúdo',
         value:    unlockedCount,
-        sub:      `de ${totalCount} no roadmap`,
+        sub:      `de ${totalCount} no mapa`,
+        hint:     'Continue por blocos de dependência.',
         icon:     Zap,
         barWidth: progressSafe,
       },
@@ -33,6 +35,7 @@ function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
         label:    'Cobertura',
         value:    `${progress}%`,
         sub:      'da árvore de conhecimento',
+        hint:     progress >= 80 ? 'Faixa alta de cobertura.' : 'Ainda há espaço para evolução.',
         icon:     Target,
         barWidth: progress,
       },
@@ -40,6 +43,7 @@ function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
         label:    'Sem Conteúdo',
         value:    pending,
         sub:      'módulos ainda vazios',
+        hint:     pending > 0 ? 'Priorize os críticos primeiro.' : 'Sem pendências estruturais.',
         icon:     Layout,
         barWidth: pendingSafe,
       },
@@ -51,34 +55,32 @@ function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
       {stats.map((item) => (
         <div
           key={item.label}
-          className="relative rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden group"
+          className="relative overview-card overview-card-hover overflow-hidden group"
         >
-          <div className="absolute top-0 left-0 right-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-[1px] opacity-80 transition-opacity duration-300 bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-          <div className="p-7 flex flex-col justify-between h-full">
-            <div className="flex justify-between items-start mb-6">
-              <item.icon size={18} className="text-[var(--text-primary)] opacity-30 group-hover:opacity-60 transition-opacity duration-300" />
-              <div className="flex gap-1.5">
-                {[0, 1, 2].map(d => (
-                  <div key={d} className="w-1 h-1 rounded-full bg-[var(--border-visible)] group-hover:bg-[var(--text-secondary)] transition-colors duration-300" />
-                ))}
+          <div className="p-6 flex flex-col justify-between h-full">
+            <div className="flex justify-between items-start mb-5">
+              <div className="w-8 h-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center justify-center">
+                <item.icon size={14} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors duration-300" />
               </div>
+              <span className="text-[8px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black">Métricas</span>
             </div>
 
-            <div className="mb-6">
-              <div className="text-5xl font-black text-[var(--text-primary)] mb-3 tracking-tighter font-mono leading-none tabular-nums">
+            <div className="mb-4">
+              <div className="text-4xl font-black text-[var(--text-primary)] mb-2 tracking-tighter font-mono leading-none tabular-nums">
                 {item.value}
               </div>
-              <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.3em] block mb-1">
+              <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.18em] block mb-1">
                 {item.label}
               </span>
-              <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide font-medium">
+              <span className="text-[10px] text-[var(--text-muted)] tracking-[0.02em] font-medium">
                 {item.sub}
               </span>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="h-[2px] w-full bg-[var(--chart-faint)] overflow-hidden">
+            <div className="space-y-2">
+              <div className="h-[3px] w-full bg-[var(--chart-faint)] overflow-hidden rounded-full">
                 <div
                   style={{
                     width: `${item.barWidth}%`,
@@ -87,10 +89,12 @@ function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
                   }}
                 />
               </div>
-              <div className="flex justify-between">
-                <span className="text-[9px] text-[var(--text-secondary)] font-mono font-bold">0%</span>
+              <div className="flex justify-between items-center">
                 <span className="text-[9px] text-[var(--text-secondary)] font-mono font-black">
                   {Math.round(item.barWidth)}%
+                </span>
+                <span className="text-[8px] text-[var(--text-muted)] tracking-[0.02em] font-medium">
+                  {item.hint}
                 </span>
               </div>
             </div>

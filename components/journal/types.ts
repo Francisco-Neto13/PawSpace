@@ -27,16 +27,19 @@ export function getSkill(skillId: string | null, skills: SkillBase[]) {
 
 export function formatDate(date: string | Date) {
   const d = new Date(date);
-  return d.toLocaleDateString('pt-BR', { 
-    day: '2-digit', 
-    month: 'short', 
-    year: 'numeric' 
-  }).replace('.', ''); 
+  if (Number.isNaN(d.getTime())) return '--';
+  return d
+    .toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })
+    .replace('.', '');
 }
 
 export function getEntrySummary(htmlBody: string, length = 100) {
   const plainText = htmlBody.replace(/<[^>]*>?/gm, '');
-  return plainText.length > length 
-    ? plainText.substring(0, length) + '...' 
+  return plainText.length > length
+    ? plainText.substring(0, length) + '...'
     : plainText;
 }

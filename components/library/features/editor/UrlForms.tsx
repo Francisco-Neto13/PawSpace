@@ -1,7 +1,7 @@
 ﻿'use client';
 
-const inputClass = "w-full bg-[var(--bg-surface)] border border-[var(--border-muted)] p-3.5 text-[var(--text-primary)] text-sm outline-none focus:border-[var(--border-visible)] transition-colors font-normal placeholder:text-[var(--text-muted)] cursor-text";
-const labelClass = "text-[9px] text-[var(--text-secondary)] uppercase font-black tracking-[0.25em] block mb-2.5";
+const inputClass = 'library-input p-3.5 text-sm font-normal placeholder:text-[var(--text-muted)] cursor-text';
+const labelClass = 'text-[9px] text-[var(--text-secondary)] uppercase font-black tracking-[0.25em] block mb-2.5';
 
 interface UrlFormProps {
   url: string;

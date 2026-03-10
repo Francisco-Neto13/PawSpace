@@ -1,16 +1,10 @@
 ﻿'use client';
 
 import React, { forwardRef } from 'react';
-import { usePathname } from 'next/navigation';
 import { Github, Instagram } from 'lucide-react';
 
-const HIDDEN_PATHS = ['/journal', '/library', '/tree', '/achievements', '/settings'];
-
 const Footer = forwardRef<HTMLElement>((_, ref) => {
-  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
-
-  if (HIDDEN_PATHS.some((p) => pathname.startsWith(p))) return null;
 
   return (
     <footer

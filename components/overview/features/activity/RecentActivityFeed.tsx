@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { BookOpen } from 'lucide-react';
@@ -64,6 +64,7 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
   const hasInitialPage = initialPage?.status === 'ok';
   const skipFirstResetFetchRef = useRef(false);
   const hasBootstrappedRef = useRef(false);
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const [filter, setFilter] = useState<ActivityFilter>('all');
   const [mounted, setMounted] = useState(false);
   const [items, setItems] = useState<ActivityFeedItem[]>(
@@ -184,16 +185,22 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
 
   const isLoading = (isBootstrapLoading || isLoadingInitial) && items.length === 0;
   const reachedActivityLimit = items.length >= MAX_ACTIVITY_ITEMS;
+  const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+    const el = scrollAreaRef.current;
+    if (!el) return;
+    e.preventDefault();
+    el.scrollTop += e.deltaY * 0.45;
+  }, []);
 
   return (
-    <div className="h-full max-h-[440px] rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden flex flex-col">
+    <div className="h-full max-h-[440px] overview-card overview-card-hover p-6 relative overflow-hidden flex flex-col">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+      <p className="overview-kicker text-[var(--text-primary)] mb-1 flex items-center gap-2">
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Atividade Recente
       </p>
-      <p className="text-[9px] text-[var(--text-secondary)] mb-4 ml-3">log das ultimas alteracoes</p>
+      <p className="overview-subtitle mb-4 ml-3">Log das alteraÃ§Ãµes mais recentes no sistema</p>
 
       <div className="flex gap-1 mb-4 ml-3 shrink-0">
         {([
@@ -209,7 +216,7 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
             style={{
               borderColor: filter === key ? 'var(--border-visible)' : 'var(--border-subtle)',
               color: filter === key ? 'var(--text-primary)' : 'var(--text-muted)',
-              backgroundColor: filter === key ? 'var(--bg-elevated)' : 'transparent',
+              backgroundColor: filter === key ? 'var(--bg-elevated)' : 'var(--bg-surface)',
             }}
           >
             {label} <span className="opacity-50">{count}</span>
@@ -222,7 +229,12 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
       ) : items.length === 0 ? (
         <p className="text-[9px] text-[var(--text-muted)] ml-3">Nenhuma patinha por aqui ainda.</p>
       ) : (
-        <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+        <div
+          ref={scrollAreaRef}
+          onWheel={handleWheel}
+          className="flex-1 min-h-0 overview-scroll-area"
+        >
+          <div className="pr-1">
           {items.map((item, i) => {
             const isJournal = item.type === 'journal';
             return (
@@ -268,6 +280,7 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
               </div>
             );
           })}
+          </div>
         </div>
       )}
 
@@ -288,4 +301,6 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
 }
 
 export default memo(RecentActivityFeed);
+
+
 

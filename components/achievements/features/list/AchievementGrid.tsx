@@ -7,8 +7,20 @@ interface AchievementGridProps {
 }
 
 export function AchievementGrid({ achievements }: AchievementGridProps) {
+  if (achievements.length === 0) {
+    return (
+      <section className="library-panel p-8 text-center relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+        <p className="library-kicker mb-2">Sem Resultados</p>
+        <p className="library-subtitle">
+          Nenhuma conquista encontrada para esse filtro.
+        </p>
+      </section>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 pb-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 pb-4">
       {achievements.map(achievement => (
         <AchievementCard key={achievement.id} achievement={achievement} />
       ))}

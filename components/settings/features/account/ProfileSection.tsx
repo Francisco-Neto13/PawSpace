@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { Camera, Check, Loader2 } from 'lucide-react';
@@ -20,7 +20,7 @@ export default function ProfileSection() {
     const loadingTimeout = window.setTimeout(() => {
       if (!mounted) return;
       setIsLoadingUser(false);
-      setError(prev => prev ?? 'Nao foi possivel carregar o perfil.');
+      setError((prev) => prev ?? 'Nao foi possivel carregar o perfil.');
     }, 8000);
 
     const loadUser = async () => {
@@ -32,7 +32,6 @@ export default function ProfileSection() {
         } = await supabase.auth.getUser();
 
         if (!mounted) return;
-
         if (userError || !user) {
           setError('Sessao nao encontrada.');
           return;
@@ -40,7 +39,6 @@ export default function ProfileSection() {
 
         const rawName = user.user_metadata?.display_name ?? user.user_metadata?.name ?? '';
         const resolvedName = typeof rawName === 'string' ? rawName : '';
-
         setUsername(resolvedName);
         setInitialUsername(resolvedName);
       } catch {
@@ -82,11 +80,9 @@ export default function ProfileSection() {
     const supabase = createClient();
 
     try {
-      const { error: updateError } = await supabase.auth.updateUser(
-        {
-          data: { display_name: nextName, name: nextName },
-        }
-      );
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { display_name: nextName, name: nextName },
+      });
 
       if (updateError) {
         setError(updateError.message);
@@ -101,16 +97,15 @@ export default function ProfileSection() {
       );
       setSaved(true);
     } catch (saveError) {
-      const message =
-        saveError instanceof Error ? saveError.message : 'Falha ao salvar perfil.';
+      const message = saveError instanceof Error ? saveError.message : 'Falha ao salvar perfil.';
       setError(message);
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => setAvatar(reader.result as string);
@@ -118,16 +113,16 @@ export default function ProfileSection() {
   };
 
   return (
-    <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+    <section className="library-panel p-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+      <p className="library-kicker mb-1 flex items-center gap-2">
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Perfil
       </p>
-      <p className="text-[9px] text-[var(--text-muted)] mb-6 ml-3">nome de usuario e foto</p>
+      <p className="library-subtitle mb-5 ml-3">nome de usuario e foto</p>
 
-      <div className="flex items-start gap-6">
+      <div className="flex items-start gap-5">
         <div className="shrink-0">
           <button
             onClick={() => fileRef.current?.click()}
@@ -144,16 +139,8 @@ export default function ProfileSection() {
               <Camera size={14} className="text-[var(--text-primary)]" />
             </div>
           </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          <p className="text-[7px] text-[var(--text-faint)] uppercase tracking-wider font-bold text-center mt-1.5">
-            Foto
-          </p>
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+          <p className="text-[7px] text-[var(--text-faint)] uppercase tracking-wider font-bold text-center mt-1.5">Foto</p>
         </div>
 
         <div className="flex-1 space-y-4">
@@ -164,32 +151,22 @@ export default function ProfileSection() {
             <input
               type="text"
               value={username}
-              onChange={e => setUsername(e.target.value)}
+              onChange={(event) => setUsername(event.target.value)}
               disabled={isLoadingUser || isSaving}
-              className="w-full bg-[var(--bg-input)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 text-[var(--text-primary)] text-[11px] font-bold tracking-wide outline-none focus:border-[var(--border-visible)] transition-colors placeholder:text-[var(--text-faint)] disabled:opacity-60"
+              className="library-input h-10 px-3.5 text-[11px] font-bold tracking-wide placeholder:text-[var(--text-faint)] disabled:opacity-60"
               placeholder={isLoadingUser ? 'Carregando...' : 'Seu nome'}
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
-              {error && (
-                <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold">
-                  {error}
-                </p>
-              )}
-              {saved && !error && (
-                <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">
-                  Perfil atualizado.
-                </p>
-              )}
+              {error && <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold">{error}</p>}
+              {saved && !error && <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">Perfil atualizado.</p>}
             </div>
             <button
-              onClick={() => {
-                void handleSave();
-              }}
+              onClick={() => void handleSave()}
               disabled={isLoadingUser || isSaving}
-              className="flex items-center gap-2 px-4 py-2 border text-[9px] font-black uppercase tracking-wider transition-all duration-200 disabled:opacity-60"
+              className="h-10 px-4 rounded-xl border flex items-center gap-2 text-[9px] font-black uppercase tracking-wider transition-all duration-200 disabled:opacity-60"
               style={{
                 borderColor: saved ? 'var(--border-visible)' : 'var(--border-muted)',
                 color: saved ? 'var(--text-primary)' : 'var(--text-secondary)',
@@ -203,6 +180,6 @@ export default function ProfileSection() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

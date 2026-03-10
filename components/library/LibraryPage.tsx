@@ -1,13 +1,13 @@
 ﻿'use client';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Plus } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { PageBackground } from '@/components/shared/PageBackground';
 
 import { ContentType, SkillNode } from './types';
 import { LibraryContentList } from './features/viewer/LibraryContentList';
 import { LibraryFilters } from './features/viewer/LibraryFilters';
+import { LibraryNodeHeader } from './features/viewer/LibraryNodeHeader';
 import { AddContentModal } from './features/editor/AddContentModal';
 import { LibrarySidebar } from './ui/LibrarySideBar';
 
@@ -180,111 +180,93 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="relative min-h-screen w-full bg-[var(--bg-base)]">
+    <div className="relative min-h-screen w-full overflow-x-hidden">
       <PageBackground src="/cat3.webp" />
 
       <div
-        className="relative z-10 w-full py-8 pb-20 space-y-4"
+        className="relative z-10 py-8 pb-20"
         style={{
           opacity: visible ? 1 : 0,
           transform: visible ? 'translateY(0)' : 'translateY(6px)',
           transition: 'opacity 0.5s ease, transform 0.5s ease',
         }}
       >
-
-        <div className="flex items-center gap-3 mb-6">
-          <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
-            Pawspace / Biblioteca
-          </span>
-          <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
-        </div>
-
-        <header>
-          <div className="flex items-center justify-end">
-            <div className="flex items-center gap-8">
-              {[
-                { label: 'Módulos',       value: nodes.length },
-                { label: 'Conteúdos',     value: totalContents },
-                { label: 'Disponíveis', value: nodes.length },
-              ].map((s, i, arr) => (
-                <div key={i} className="flex items-center gap-8">
-                  <div className="text-right">
-                    <p className="text-[var(--text-primary)] text-2xl font-black font-mono leading-none tracking-tighter">
-                      {s.value.toString().padStart(2, '0')}
-                    </p>
-                    <p className="text-[var(--text-secondary)] text-[9px] font-black uppercase tracking-widest mt-1">{s.label}</p>
-                  </div>
-                  {i < arr.length - 1 && <div className="w-[1px] h-6 bg-[var(--border-subtle)]" />}
-                </div>
-              ))}
-              <button
-                onClick={() => setShowAddContent(true)}
-                disabled={!selectedNode}
-                className="flex items-center gap-2 px-4 py-2.5 border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <Plus size={11} />
-                Novo Conteúdo
-              </button>
-            </div>
+        <div className="relative max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 space-y-5">
+          <div className="flex items-center gap-3">
+            <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+            <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
+              Pawspace / Biblioteca
+            </span>
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
           </div>
-        </header>
 
-        <div className="flex gap-8" style={{ minHeight: 'calc(100dvh - var(--navbar-height) - 120px)' }}>
-          <LibrarySidebar
-            nodes={mappedNodes}
-            selectedNodeId={resolvedSelectedNodeId || ''}
-            onSelect={id => {
-              setSelectedNodeId(id);
-              setSearch('');
-              setTypeFilter('all');
-              loadNodeContents(id);
-            }}
-          />
-
-          <main
-            className="flex-1 min-w-0 border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col relative rounded-2xl overflow-hidden shadow-2xl"
-            style={{
-              height: 'calc(100dvh - var(--navbar-height) - 120px)',
-              position: 'sticky',
-              top: 'calc(var(--navbar-height) + 24px)',
-            }}
-          >
+          <section className="library-panel library-panel-hover p-6 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-            <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04] pointer-events-none" />
-            <div className="shrink-0 px-8 pt-8 pb-6 border-b border-[var(--border-subtle)] flex flex-col gap-5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">{selectedNode?.icon}</span>
-                  <div>
-                    <p className="text-[var(--text-primary)] text-xl font-black tracking-wide">{selectedNode?.name}</p>
-                    <p className="text-[var(--text-muted)] text-[9px] font-mono mt-0.5">
-                      {currentContents.length} {currentContents.length === 1 ? 'item' : 'itens'} indexados
-                    </p>
-                  </div>
+
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+              <div>
+                <p className="library-kicker mb-2">Repositório de Conhecimento</p>
+                <h1 className="overview-title text-2xl md:text-3xl mb-2">Biblioteca da Árvore</h1>
+                <p className="library-subtitle max-w-2xl">
+                  Organize links, vídeos, PDFs e notas por módulo. Selecione um módulo na lateral e mantenha tudo indexado em um único fluxo.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <span className="library-chip">Módulos: {nodes.length}</span>
+                  <span className="library-chip">Conteúdos: {totalContents}</span>
+                  <span className="library-chip">
+                    Selecionado: {selectedNode?.name ?? 'Nenhum'}
+                  </span>
                 </div>
               </div>
 
-              <LibraryFilters
-                search={search}
-                typeFilter={typeFilter}
-                onSearchChange={setSearch}
-                onTypeChange={setTypeFilter}
-              />
             </div>
+          </section>
 
-            <div
-              className="flex-1 overflow-y-auto px-8 py-6"
-              style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--border-visible) transparent' }}
+          <div className="grid grid-cols-1 xl:grid-cols-[300px_minmax(0,1fr)] gap-4 items-start">
+            <LibrarySidebar
+              nodes={mappedNodes}
+              selectedNodeId={resolvedSelectedNodeId || ''}
+              onSelect={(id) => {
+                setSelectedNodeId(id);
+                setSearch('');
+                setTypeFilter('all');
+                void loadNodeContents(id);
+              }}
+            />
+
+            <main
+              className="library-panel relative overflow-hidden flex flex-col min-h-[calc(100dvh-var(--navbar-height)-140px)]"
             >
-              <LibraryContentList
-                contents={filteredContents}
-                isLoading={isLoadingContents}
-                onDelete={handleDelete}
-                onAdd={() => setShowAddContent(true)}
-              />
-            </div>
-          </main>
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+              <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04] pointer-events-none" />
+
+              <div className="shrink-0 px-5 md:px-7 pt-5 md:pt-6 pb-5 border-b border-[var(--border-subtle)] flex flex-col gap-4">
+                {selectedNode && (
+                  <LibraryNodeHeader
+                    node={selectedNode}
+                    contentsCount={currentContents.length}
+                    isLoading={isLoadingContents}
+                    onAddContent={() => setShowAddContent(true)}
+                  />
+                )}
+                <LibraryFilters
+                  search={search}
+                  typeFilter={typeFilter}
+                  onSearchChange={setSearch}
+                  onTypeChange={setTypeFilter}
+                />
+              </div>
+
+              <div className="flex-1 min-h-0 px-5 md:px-7 py-5 overview-scroll-area">
+                <LibraryContentList
+                  contents={filteredContents}
+                  isLoading={isLoadingContents}
+                  onDelete={handleDelete}
+                  onAdd={() => setShowAddContent(true)}
+                />
+              </div>
+            </main>
+          </div>
         </div>
       </div>
 

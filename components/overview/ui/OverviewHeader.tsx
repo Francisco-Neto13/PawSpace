@@ -65,36 +65,44 @@ export default function OverviewHeader({
   );
 
   const pending = totalCount - unlockedCount;
+  const progressToneClass =
+    progress >= 80
+      ? 'text-[var(--text-primary)]'
+      : progress >= 40
+        ? 'text-[var(--text-secondary)]'
+        : 'text-[var(--text-muted)]';
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-
-      <div className="lg:col-span-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 relative overflow-hidden">
+      <div className="lg:col-span-3 overview-card overview-card-hover p-8 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
         <div className="relative z-10">
-          <div className="mb-6">
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] mb-2">
-              Visão Geral
+          <div className="mb-5">
+            <p className="overview-kicker mb-2">
+              Cockpit de Progresso
             </p>
-            <h1 className="text-[var(--text-primary)] text-3xl font-black uppercase tracking-tighter leading-none">
-              {firstName}
+            <h1 className="overview-title text-3xl md:text-4xl mb-2">
+              Olá, {firstName}
               {restName && <span className="text-[var(--text-secondary)]"> {restName}</span>}
             </h1>
+            <p className="overview-subtitle max-w-2xl">
+              {message}
+            </p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 border border-[var(--border-subtle)] rounded-xl p-4 bg-[var(--bg-surface)]">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em] flex items-center gap-2">
+              <span className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.22em] flex items-center gap-2">
                 <PawIcon className="w-3 h-3 text-[var(--text-secondary)]" />
-                {unlockedCount} de {totalCount} módulos com conteúdo
+                Cobertura atual
               </span>
-              <span className="font-mono text-xl text-[var(--text-primary)] font-black leading-none">
+              <span className={`font-mono text-2xl font-black leading-none tabular-nums ${progressToneClass}`}>
                 {progress}<span className="text-xs ml-0.5 text-[var(--text-secondary)]">%</span>
               </span>
             </div>
 
-            <div className="h-2 w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-full p-[1.5px] overflow-hidden">
+            <div className="h-2.5 w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-full p-[1.5px] overflow-hidden">
               <div
                 className="h-full rounded-full"
                 style={{
@@ -124,19 +132,30 @@ export default function OverviewHeader({
             </div>
           </div>
 
-          <p className="mt-5 text-[10px] text-[var(--text-secondary)] font-medium leading-relaxed border-t border-[var(--border-subtle)] pt-4">
-            {message}
-          </p>
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2">
+              <p className="text-[8px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black mb-1">Módulos com conteúdo</p>
+              <p className="text-[var(--text-primary)] text-lg font-black font-mono tabular-nums leading-none">{unlockedCount}<span className="text-[var(--text-secondary)] text-xs">/{totalCount}</span></p>
+            </div>
+            <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2">
+              <p className="text-[8px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black mb-1">Críticos pendentes</p>
+              <p className="text-[var(--text-primary)] text-lg font-black font-mono tabular-nums leading-none">{criticalUncovered}</p>
+            </div>
+            <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2">
+              <p className="text-[8px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black mb-1">Mês atual</p>
+              <p className="text-[var(--text-primary)] text-lg font-black font-mono tabular-nums leading-none">{currentMonthEntries}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[var(--border-muted)] bg-[var(--bg-surface)] p-6 flex flex-col justify-between relative overflow-hidden">
+      <div className="overview-card overview-card-hover p-6 flex flex-col justify-between relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
         <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04]" />
 
         <div className="space-y-5">
           <div>
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] mb-3">
+            <p className="text-[9px] font-black uppercase tracking-[0.36em] text-[var(--text-secondary)] mb-3">
               Este mês
             </p>
             <p className="text-4xl font-black font-mono text-[var(--text-primary)] tabular-nums leading-none">
@@ -150,7 +169,7 @@ export default function OverviewHeader({
           <div className="w-full h-px bg-[var(--border-subtle)]" />
 
           <div>
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] mb-3">
+            <p className="text-[9px] font-black uppercase tracking-[0.36em] text-[var(--text-secondary)] mb-3">
               Pendentes
             </p>
             <p className="text-4xl font-black font-mono tabular-nums leading-none"

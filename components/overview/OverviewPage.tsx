@@ -69,131 +69,146 @@ export default function OverviewContent() {
   }
 
   const pending = stats.total - stats.unlocked;
+  const nextAction = (() => {
+    if (pending <= 0) {
+      return {
+        title: 'Cobertura completa atingida',
+        body: 'Todos os módulos têm conteúdo. Foque agora em revisão e atualização dos itens mais antigos.',
+        tag: 'Manutenção',
+      };
+    }
+    if (criticalUncovered > 0) {
+      return {
+        title: `${criticalUncovered} módulo${criticalUncovered > 1 ? 's críticos sem' : ' crítico sem'} conteúdo`,
+        body: 'Preencha esses módulos primeiro. Eles destravam mais avanço na árvore do que módulos isolados.',
+        tag: 'Prioridade alta',
+      };
+    }
+    return {
+      title: `${pending} módulo${pending > 1 ? 's ainda sem' : ' ainda sem'} conteúdo`,
+      body: 'Continue por categoria para aumentar cobertura geral sem perder consistência entre níveis.',
+      tag: 'Próximo passo',
+    };
+  })();
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
       <PageBackground src="/cat.webp" />
 
-      <main className="relative z-10 py-8 space-y-4 pb-20">
+      <main className="relative z-10 py-8 pb-20">
+        <div className="relative max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 space-y-5">
 
-        <div className="flex items-center gap-3 mb-6 reveal-fade delay-0">
-          <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
-            Pawspace / Visão Geral
-          </span>
-          <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--border-subtle)] to-transparent" />
-        </div>
-
-        <div className="reveal-up delay-100">
-          <OverviewHeader
-            initialProgress={stats.progress}
-            unlockedCount={stats.unlocked}
-            totalCount={stats.total}
-            criticalUncovered={criticalUncovered}
-            currentMonthEntries={currentMonthEntries}
-          />
-        </div>
-
-        <div className="reveal-up delay-200">
-          <StatsGrid
-            unlockedCount={stats.unlocked}
-            totalCount={stats.total}
-            progress={stats.progress}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 reveal-up delay-300" style={deferredSectionStyle}>
-          <LazyMount minHeight={330}>
-            <CategoryChart data={snapshot.categoryData} />
-          </LazyMount>
-          <LazyMount minHeight={330}>
-            <TreeDepthChart data={snapshot.depthData} maxGapLevel={snapshot.maxGapLevel} />
-          </LazyMount>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 reveal-up delay-400" style={deferredSectionStyle}>
-          <div className="lg:col-span-2">
-            <LazyMount minHeight={360}>
-              <JournalActivityChart />
-            </LazyMount>
+          <div className="flex items-center gap-3 reveal-fade delay-0">
+            <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+            <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
+              Pawspace / Visão Geral
+            </span>
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--border-subtle)] to-transparent" />
           </div>
-          <LazyMount minHeight={360}>
-            <LibraryStatsPanel stats={libraryStats} isBootstrapLoading={isBootstrapLoading} />
-          </LazyMount>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 reveal-up delay-500" style={deferredSectionStyle}>
-          <CriticalNodesPanel critical={snapshot.criticalNodes} />
-          <RecentActivityFeed initialPage={recentActivity} isBootstrapLoading={isBootstrapLoading} />
-        </div>
+          <div className="reveal-up delay-100">
+            <OverviewHeader
+              initialProgress={stats.progress}
+              unlockedCount={stats.unlocked}
+              totalCount={stats.total}
+              criticalUncovered={criticalUncovered}
+              currentMonthEntries={currentMonthEntries}
+            />
+          </div>
 
-        {stats.total > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2 reveal-up delay-500" style={deferredSectionStyle}>
-
-            <div className="lg:col-span-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 relative overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 reveal-up delay-200" style={deferredSectionStyle}>
+            <div className="lg:col-span-2 overview-card overview-card-hover p-7 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-6 flex items-center gap-2">
-                <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-                Próximo Passo
+              <div className="flex items-center justify-between mb-4">
+                <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
+                  <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+                  Decisão Imediata
+                </p>
+                <span className="overview-chip">
+                  {nextAction.tag}
+                </span>
+              </div>
+              <h3 className="text-[var(--text-primary)] text-xl font-black tracking-tight leading-snug mb-2">
+                {nextAction.title}
+              </h3>
+              <p className="overview-subtitle max-w-2xl">
+                {nextAction.body}
               </p>
-
-              {pending === 0 ? (
-                <div className="flex flex-col gap-2">
-                  <p className="text-[var(--text-primary)] text-sm font-bold">
-                    Árvore completa — todos os módulos têm conteúdo.
-                  </p>
-                  <p className="text-[var(--text-muted)] text-[11px] font-medium leading-relaxed">
-                    Continue atualizando os conteúdos existentes para manter a árvore relevante.
-                  </p>
-                </div>
-              ) : criticalUncovered > 0 ? (
-                <div className="flex flex-col gap-2">
-                  <p className="text-[var(--text-primary)] text-sm font-bold">
-                    Priorize os {criticalUncovered} módulo{criticalUncovered > 1 ? 's críticos' : ' crítico'} sem conteúdo.
-                  </p>
-                  <p className="text-[var(--text-muted)] text-[11px] font-medium leading-relaxed max-w-lg">
-                    Estes módulos sustentam outros na sua árvore. Preencher eles primeiro
-                    desbloqueia o avanço em mais áreas ao mesmo tempo.
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <p className="text-[var(--text-primary)] text-sm font-bold">
-                    {pending} módulo{pending > 1 ? 's ainda sem' : ' ainda sem'} conteúdo.
-                  </p>
-                  <p className="text-[var(--text-muted)] text-[11px] font-medium leading-relaxed max-w-lg">
-                    Veja o painel de módulos críticos acima para saber por onde continuar.
-                  </p>
-                </div>
-              )}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="overview-chip">Pendentes: {pending}</span>
+                <span className="overview-chip">Críticos: {criticalUncovered}</span>
+                <span className="overview-chip">Cobertura: {stats.progress}%</span>
+              </div>
             </div>
 
-            <div className="rounded-2xl border border-[var(--border-muted)] bg-[var(--bg-surface)] p-6 flex flex-col justify-center gap-5 relative overflow-hidden">
+            <div className="overview-card overview-card-hover p-6 flex flex-col justify-center gap-5 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-
               <div>
                 <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Total na árvore</p>
                 <p className="text-[var(--text-primary)] text-3xl font-black font-mono tabular-nums leading-none">{stats.total}</p>
               </div>
-
               <div className="w-full h-px bg-[var(--border-subtle)]" />
-
               <div>
                 <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Com conteúdo</p>
                 <p className="text-[var(--text-primary)] text-3xl font-black font-mono tabular-nums leading-none">{stats.unlocked}</p>
               </div>
-
               <div className="w-full h-px bg-[var(--border-subtle)]" />
-
               <div>
                 <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Cobertura</p>
-                <p className="text-[var(--text-primary)] text-3xl font-black font-mono tabular-nums leading-none">{stats.progress}<span className="text-lg ml-0.5 text-[var(--text-secondary)]">%</span></p>
+                <p className="text-[var(--text-primary)] text-3xl font-black font-mono tabular-nums leading-none">
+                  {stats.progress}<span className="text-lg ml-0.5 text-[var(--text-secondary)]">%</span>
+                </p>
               </div>
             </div>
-
           </div>
-        )}
 
+          <div className="reveal-up delay-300">
+            <StatsGrid
+              unlockedCount={stats.unlocked}
+              totalCount={stats.total}
+              progress={stats.progress}
+            />
+          </div>
+
+          <div className="reveal-fade delay-400 pt-0.5">
+            <div className="flex items-center gap-3">
+              <span className="overview-kicker">Prioridades</span>
+              <div className="flex-1 overview-subtle-divider" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 reveal-up delay-400" style={deferredSectionStyle}>
+            <CriticalNodesPanel critical={snapshot.criticalNodes} />
+            <RecentActivityFeed initialPage={recentActivity} isBootstrapLoading={isBootstrapLoading} />
+          </div>
+
+          <div className="reveal-fade delay-500 pt-0.5">
+            <div className="flex items-center gap-3">
+              <span className="overview-kicker">Análises</span>
+              <div className="flex-1 overview-subtle-divider" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 reveal-up delay-500" style={deferredSectionStyle}>
+            <LazyMount minHeight={330}>
+              <CategoryChart data={snapshot.categoryData} />
+            </LazyMount>
+            <LazyMount minHeight={330}>
+              <TreeDepthChart data={snapshot.depthData} maxGapLevel={snapshot.maxGapLevel} />
+            </LazyMount>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 reveal-up delay-500" style={deferredSectionStyle}>
+            <div className="lg:col-span-2">
+              <LazyMount minHeight={360}>
+                <JournalActivityChart />
+              </LazyMount>
+            </div>
+            <LazyMount minHeight={360}>
+              <LibraryStatsPanel stats={libraryStats} isBootstrapLoading={isBootstrapLoading} />
+            </LazyMount>
+          </div>
+        </div>
       </main>
     </div>
   );

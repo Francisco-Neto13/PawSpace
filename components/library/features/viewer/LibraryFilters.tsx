@@ -17,33 +17,33 @@ export function LibraryFilters({
   onTypeChange,
 }: LibraryFiltersProps) {
   return (
-    <div className="flex items-center gap-4">
-      <div className="relative flex-1">
-        <Search size={13} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+    <div className="flex flex-col md:flex-row md:items-center gap-3">
+      <div className="relative flex-1 min-w-0">
+        <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
         <input
           type="text"
           value={search}
           onChange={e => onSearchChange(e.target.value)}
           placeholder="Buscar conteúdo..."
-          className="w-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] pl-11 pr-4 py-3.5 text-[var(--text-primary)] text-sm font-medium outline-none focus:border-[var(--border-visible)] transition-colors placeholder:text-[var(--text-muted)] cursor-text"
+          className="library-input h-11 pl-10 pr-10 text-sm font-medium placeholder:text-[var(--text-muted)]"
         />
         {search && (
           <button
             onClick={() => onSearchChange('')}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
           >
             <X size={12} />
           </button>
         )}
       </div>
 
-      <div className="flex items-center gap-1.5">
-        <Filter size={12} className="text-[var(--text-muted)] mr-1" />
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        <Filter size={12} className="text-[var(--text-muted)] shrink-0" />
         {FILTER_OPTIONS.map(f => (
           <button
             key={f.value}
             onClick={() => onTypeChange(f.value)}
-            className={`px-4 py-3.5 text-[9px] font-black uppercase tracking-widest border transition-all duration-200 cursor-pointer
+            className={`h-10 shrink-0 px-4 text-[9px] font-black uppercase tracking-widest border rounded-xl transition-all duration-200 cursor-pointer
               ${typeFilter === f.value
                 ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
                 : 'border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)]'

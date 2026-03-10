@@ -16,44 +16,33 @@ export function LibraryNodeHeader({
   onAddContent,
 }: LibraryNodeHeaderProps) {
   return (
-    <div className="p-8 border border-[var(--border-subtle)] rounded-2xl bg-[var(--bg-surface)] relative overflow-hidden group">
-      <div
-        className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
-        style={{ background: `linear-gradient(to right, transparent, ${node.color}44, transparent)` }}
-      />
-      <div className="absolute top-0 left-0 bottom-0 w-[2px]" style={{ backgroundColor: node.color }} />
-      <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-[var(--border-subtle)] group-hover:border-[var(--border-muted)] transition-colors duration-300" />
-
-      <div className="flex items-center justify-between pl-5">
-        <div className="flex items-center gap-6">
+    <div className="relative rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <div
-            className="w-14 h-14 flex items-center justify-center border text-2xl"
-            style={{ borderColor: `${node.color}30`, backgroundColor: `${node.color}0d` }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center border text-xl shrink-0"
+            style={{ borderColor: `${node.color}30`, backgroundColor: `${node.color}12` }}
           >
             {node.icon}
           </div>
-          <div>
-            <p className="text-[var(--text-secondary)] text-[9px] font-black uppercase tracking-[0.3em] mb-1">
-              Módulo Selecionado
-            </p>
-            <h2 className="text-[var(--text-primary)] text-xl font-black uppercase tracking-[0.15em] leading-none">
-              {node.name}
-            </h2>
-            <p className="text-[var(--text-secondary)] text-[10px] font-medium mt-2">
+          <div className="min-w-0">
+            <p className="library-kicker mb-1">Módulo Selecionado</p>
+            <h2 className="text-[var(--text-primary)] text-lg font-black truncate">{node.name}</h2>
+            <p className="text-[var(--text-secondary)] text-[10px] font-medium mt-1">
               {isLoading
-                ? 'Carregando...'
-                : `${contentsCount} conteúdo${contentsCount !== 1 ? 's' : ''} registrado${contentsCount !== 1 ? 's' : ''}`
-              }
+                ? 'Carregando conteúdos...'
+                : `${contentsCount} conteúdo${contentsCount !== 1 ? 's' : ''} registrado${contentsCount !== 1 ? 's' : ''}`}
             </p>
           </div>
         </div>
 
         <button
           onClick={onAddContent}
-          className="flex items-center gap-3 px-6 py-3.5 border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] transition-all duration-300 cursor-pointer"
+          className="h-10 shrink-0 flex items-center justify-center gap-2 px-4 border border-[var(--border-visible)] rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] transition-all duration-200 cursor-pointer"
         >
-          <Plus size={14} />
-          <span className="text-[10px] font-black uppercase tracking-widest">Adicionar Conteúdo</span>
+          <Plus size={13} />
+          <span className="text-[9px] font-black uppercase tracking-widest">Adicionar Conteúdo</span>
         </button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { Check, Loader2 } from 'lucide-react';
@@ -19,7 +19,7 @@ export default function EmailSection() {
     const loadingTimeout = window.setTimeout(() => {
       if (!mounted) return;
       setIsLoadingUser(false);
-      setError(prev => prev ?? 'Nao foi possivel carregar o email.');
+      setError((prev) => prev ?? 'Nao foi possivel carregar o email.');
     }, 8000);
 
     const loadUser = async () => {
@@ -31,7 +31,6 @@ export default function EmailSection() {
         } = await supabase.auth.getUser();
 
         if (!mounted) return;
-
         if (userError || !user) {
           setError('Sessao nao encontrada.');
           return;
@@ -66,7 +65,6 @@ export default function EmailSection() {
     setSaved(false);
 
     const nextEmail = email.trim().toLowerCase();
-
     if (!nextEmail) {
       setError('Informe um email valido.');
       return;
@@ -84,9 +82,7 @@ export default function EmailSection() {
     const savingWatchdog = window.setTimeout(() => {
       timedOut = true;
       setIsSaving(false);
-      setError(
-        'A atualizacao esta demorando. Verifique seu email e, se necessario, tente novamente.'
-      );
+      setError('A atualizacao esta demorando. Verifique seu email e tente novamente.');
     }, 20000);
 
     try {
@@ -99,17 +95,15 @@ export default function EmailSection() {
         return;
       }
 
-      setError(null);
       setSaved(true);
       setMessage(
         timedOut
-          ? 'Atualizacao concluida. Confira seu email para confirmar a alteracao.'
+          ? 'Atualizacao concluida. Confira seu email para confirmar.'
           : 'Verifique seu email para confirmar a alteracao.'
       );
     } catch (saveError) {
-      const messageText =
-        saveError instanceof Error ? saveError.message : 'Falha ao atualizar email.';
-      setError(messageText);
+      const text = saveError instanceof Error ? saveError.message : 'Falha ao atualizar email.';
+      setError(text);
     } finally {
       window.clearTimeout(savingWatchdog);
       setIsSaving(false);
@@ -117,14 +111,14 @@ export default function EmailSection() {
   };
 
   return (
-    <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+    <section className="library-panel p-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] mb-1 flex items-center gap-2">
+      <p className="library-kicker mb-1 flex items-center gap-2">
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Email
       </p>
-      <p className="text-[9px] text-[var(--text-muted)] mb-6 ml-3">endereco de email da conta</p>
+      <p className="library-subtitle mb-5 ml-3">endereco de email da conta</p>
 
       <div className="space-y-4">
         <div>
@@ -134,9 +128,9 @@ export default function EmailSection() {
           <input
             type="email"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(event) => setEmail(event.target.value)}
             disabled={isLoadingUser || isSaving}
-            className="w-full bg-[var(--bg-input)] border border-[var(--border-muted)] rounded-lg px-4 py-2.5 text-[var(--text-primary)] text-[11px] font-bold tracking-wide outline-none focus:border-[var(--border-visible)] transition-colors placeholder:text-[var(--text-faint)] disabled:opacity-60"
+            className="library-input h-10 px-3.5 text-[11px] font-bold tracking-wide placeholder:text-[var(--text-faint)] disabled:opacity-60"
             placeholder={isLoadingUser ? 'Carregando...' : 'seu@email.com'}
           />
         </div>
@@ -146,24 +140,16 @@ export default function EmailSection() {
             <p className="text-[8px] text-[var(--text-faint)] uppercase tracking-wider font-bold">
               Um link de confirmacao sera enviado para o novo email.
             </p>
-            {error && (
-              <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold mt-1">
-                {error}
-              </p>
-            )}
+            {error && <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold mt-1">{error}</p>}
             {message && !error && (
-              <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mt-1">
-                {message}
-              </p>
+              <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mt-1">{message}</p>
             )}
           </div>
 
           <button
-            onClick={() => {
-              void handleSave();
-            }}
+            onClick={() => void handleSave()}
             disabled={isLoadingUser || isSaving}
-            className="flex items-center gap-2 px-4 py-2 border text-[9px] font-black uppercase tracking-wider transition-all duration-200 disabled:opacity-60"
+            className="h-10 px-4 rounded-xl border flex items-center gap-2 text-[9px] font-black uppercase tracking-wider transition-all duration-200 disabled:opacity-60"
             style={{
               borderColor: saved ? 'var(--border-visible)' : 'var(--border-muted)',
               color: saved ? 'var(--text-primary)' : 'var(--text-secondary)',
@@ -176,6 +162,6 @@ export default function EmailSection() {
           </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

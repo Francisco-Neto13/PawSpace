@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState } from 'react';
 import { ColorPicker } from './ColorPicker';
 import { EmojiPicker } from './EmojiPicker';
@@ -7,7 +7,6 @@ import { LIMITS } from '@/lib/limits';
 
 const NAME_MAX = LIMITS.skill.name;
 const DESC_MAX = LIMITS.skill.description;
-
 const DEFAULT_SHAPE: SkillShape = 'circle';
 
 interface SkillFormProps {
@@ -71,26 +70,27 @@ export function SkillForm({
 
   const emitPreview = (patch: Partial<typeof formData>) => {
     if (!initialData?.id) return;
-    window.dispatchEvent(new CustomEvent('skill-preview', {
-      detail: { skillId: initialData.id, ...patch },
-    }));
+    window.dispatchEvent(
+      new CustomEvent('skill-preview', {
+        detail: { skillId: initialData.id, ...patch },
+      })
+    );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     if (!formData.label.trim()) return;
     onSubmit(formData);
   };
 
   const labelClass = 'text-[8px] text-[var(--text-secondary)] uppercase font-black tracking-[0.25em]';
-  const inputClass = 'w-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] p-3.5 text-[var(--text-primary)] text-sm outline-none focus:border-[var(--border-visible)] transition-colors font-light placeholder:text-[var(--text-muted)] cursor-text';
+  const inputClass = 'library-input p-3.5 text-sm font-light placeholder:text-[var(--text-muted)] cursor-text';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className={labelClass}>Identificação *</label>
+          <label className={labelClass}>Identificacao *</label>
           <CharCounter current={formData.label.length} max={NAME_MAX} />
         </div>
         <input
@@ -98,13 +98,13 @@ export function SkillForm({
           type="text"
           value={formData.label}
           maxLength={NAME_MAX}
-          onChange={(e) => {
-            const label = e.target.value.slice(0, NAME_MAX);
+          onChange={(event) => {
+            const label = event.target.value.slice(0, NAME_MAX);
             setFormData((prev) => ({ ...prev, label }));
             emitPreview({ label });
           }}
           className={inputClass}
-          placeholder="Ex: TypeScript Avançado"
+          placeholder="Ex: TypeScript Avancado"
         />
       </div>
 
@@ -138,43 +138,47 @@ export function SkillForm({
         <textarea
           value={formData.description}
           maxLength={DESC_MAX}
-          onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value.slice(0, DESC_MAX) }))}
+          onChange={(event) =>
+            setFormData((prev) => ({ ...prev, description: event.target.value.slice(0, DESC_MAX) }))
+          }
           className={`${inputClass} resize-none`}
-          placeholder="O que será dominado neste nível..."
+          placeholder="O que sera dominado neste nivel..."
           rows={3}
         />
       </div>
 
       {!isEditing && initialParentId === undefined && (
         <div>
-          <label className={`${labelClass} block mb-2`}>Módulo pai (opcional)</label>
+          <label className={`${labelClass} block mb-2`}>Modulo pai (opcional)</label>
           <select
             value={formData.parentId}
-            onChange={(e) => setFormData((prev) => ({ ...prev, parentId: e.target.value }))}
+            onChange={(event) => setFormData((prev) => ({ ...prev, parentId: event.target.value }))}
             className={`${inputClass} appearance-none cursor-pointer uppercase text-[10px]`}
           >
             <option value="">Raiz</option>
-            {existingSkills.map(skill => (
-              <option key={skill.id} value={skill.id}>{skill.name}</option>
+            {existingSkills.map((skill) => (
+              <option key={skill.id} value={skill.id}>
+                {skill.name}
+              </option>
             ))}
           </select>
         </div>
       )}
 
-      <div className="h-[1px]" style={{ background: 'linear-gradient(to right, transparent, var(--border-subtle), transparent)' }} />
+      <div className="h-[1px] bg-gradient-to-r from-transparent via-[var(--border-subtle)] to-transparent" />
 
       <div className="flex gap-3 pt-1">
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 py-3.5 border border-[var(--border-subtle)] text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)] transition-all duration-300 cursor-pointer"
+          className="flex-1 h-11 rounded-xl border border-[var(--border-subtle)] text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)] transition-all duration-200 cursor-pointer"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isLoading || !formData.label.trim()}
-          className="flex-1 py-3.5 border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
+          className="flex-1 h-11 rounded-xl border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer"
         >
           {isLoading ? 'Sincronizando...' : isEditing ? 'Salvar Pawspace' : 'Confirmar'}
         </button>

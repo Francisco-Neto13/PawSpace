@@ -18,7 +18,7 @@ export function EditorToolbar() {
   ];
 
   return (
-    <div className="flex items-center gap-0.5 px-6 py-1.5 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+    <div className="flex items-center gap-0.5 px-4 md:px-6 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
       {tools.map((t, i) => {
         if ('isSeparator' in t) {
           return <div key={i} className="w-[1px] h-3 bg-[var(--border-muted)] mx-2" />;
@@ -32,15 +32,15 @@ export function EditorToolbar() {
               e.preventDefault();
               t.action();
             }}
-            className="w-8 h-8 flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent hover:border-[var(--border-subtle)] transition-all duration-200 cursor-pointer rounded-sm active:scale-90"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent hover:border-[var(--border-subtle)] transition-all duration-200 cursor-pointer active:scale-[0.96]"
           >
             {t.icon}
           </button>
         );
       })}
 
-      <div className="ml-auto text-[7px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em] pointer-events-none antialiased">
-        Markdown Support: Active
+      <div className="ml-auto hidden md:block text-[7px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em] pointer-events-none">
+        Editor ativo
       </div>
     </div>
   );

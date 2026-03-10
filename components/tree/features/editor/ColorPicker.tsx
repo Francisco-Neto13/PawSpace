@@ -5,14 +5,7 @@ interface ColorPickerProps {
   onChange: (color: string) => void;
 }
 
-const QUICK_SWATCHES = [
-  '#ffffff',
-  '#22d3ee',
-  '#34d399',
-  '#60a5fa',
-  '#f59e0b',
-  '#f87171',
-];
+const QUICK_SWATCHES = ['#ffffff', '#22d3ee', '#34d399', '#60a5fa', '#f59e0b', '#f87171'];
 
 function normalizeHexColor(color: string | null | undefined): string {
   const candidate = (color || '').trim();
@@ -24,22 +17,18 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="font-mono text-[10px] tracking-[0.2em] text-[var(--text-muted)] uppercase">
-        Cor
-      </label>
-      <div className="flex items-center gap-3 p-2 bg-[var(--bg-elevated)] border border-[var(--border-muted)] rounded-sm hover:border-[var(--border-visible)] transition-colors">
+      <label className="text-[8px] text-[var(--text-secondary)] uppercase font-black tracking-[0.25em]">Cor</label>
+      <div className="flex items-center gap-3 p-2.5 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-xl hover:border-[var(--border-visible)] transition-colors">
         <div className="relative w-8 h-8 rounded-full overflow-hidden border border-[var(--border-visible)]">
           <input
             type="color"
             value={safeValue}
-            onInput={(e) => onChange((e.target as HTMLInputElement).value)}
-            onChange={(e) => onChange(e.target.value)}
+            onInput={(event) => onChange((event.target as HTMLInputElement).value)}
+            onChange={(event) => onChange(event.target.value)}
             className="block w-full h-full cursor-pointer bg-transparent border-none p-0"
           />
         </div>
-        <span className="font-mono text-xs text-[var(--text-secondary)] uppercase tracking-widest">
-          {safeValue}
-        </span>
+        <span className="font-mono text-xs text-[var(--text-secondary)] uppercase tracking-widest">{safeValue}</span>
       </div>
 
       <div className="grid grid-cols-6 gap-1.5">
@@ -48,7 +37,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
             key={swatch}
             type="button"
             onClick={() => onChange(swatch)}
-            className="h-5 border border-[var(--border-visible)] hover:border-[var(--text-primary)] transition-colors cursor-pointer"
+            className="h-5 rounded-md border border-[var(--border-visible)] hover:border-[var(--text-primary)] transition-colors cursor-pointer"
             style={{
               backgroundColor: swatch,
               boxShadow: safeValue === swatch ? '0 0 0 1px var(--text-primary) inset' : undefined,

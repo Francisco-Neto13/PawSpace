@@ -15,66 +15,70 @@ const NAV_ITEMS: {
   icon: React.ElementType;
   danger?: boolean;
 }[] = [
-  { key: 'account',    label: 'Conta',         sub: 'perfil e credenciais',  icon: User },
-  { key: 'appearance', label: 'Aparência',      sub: 'tema da interface',     icon: Palette },
-  { key: 'data',       label: 'Dados',          sub: 'uso e exportação',      icon: Database },
-  { key: 'privacy',    label: 'Privacidade',    sub: 'sessões e acesso',      icon: Shield },
-  { key: 'danger',     label: 'Zona de Perigo', sub: 'ações irreversíveis',   icon: AlertTriangle, danger: true },
+  { key: 'account', label: 'Conta', sub: 'perfil e credenciais', icon: User },
+  { key: 'appearance', label: 'Aparencia', sub: 'tema da interface', icon: Palette },
+  { key: 'data', label: 'Dados', sub: 'uso e exportacao', icon: Database },
+  { key: 'privacy', label: 'Privacidade', sub: 'sessoes e acesso', icon: Shield },
+  { key: 'danger', label: 'Zona de Perigo', sub: 'acoes irreversiveis', icon: AlertTriangle, danger: true },
 ];
 
 export default function SettingsNav({ active, onChange }: Props) {
   return (
-    <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 relative overflow-hidden">
+    <aside className="library-panel self-start relative overflow-hidden p-3 xl:sticky xl:top-[calc(var(--navbar-height)+24px)]">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <p className="text-[8px] font-black uppercase tracking-[0.4em] text-[var(--text-faint)] px-3 pt-2 pb-3 flex items-center gap-2">
+      <p className="library-kicker px-2.5 pt-2 pb-3 flex items-center gap-2">
         <PawIcon className="w-2.5 h-2.5 shrink-0" />
         Menu
       </p>
 
-      <div className="space-y-0.5">
-        {NAV_ITEMS.map(item => {
+      <div className="space-y-1">
+        {NAV_ITEMS.map((item) => {
           const isActive = active === item.key;
           return (
             <button
               key={item.key}
               onClick={() => onChange(item.key)}
-              className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-all duration-200"
-              style={{ backgroundColor: isActive ? 'var(--bg-elevated)' : 'transparent' }}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left border transition-all duration-200 ${
+                isActive
+                  ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)]'
+                  : 'border-transparent hover:border-[var(--border-subtle)] hover:bg-[var(--bg-surface)]'
+              }`}
             >
               <item.icon
                 size={13}
                 style={{
-                  color: isActive
-                    ? item.danger ? '#ef4444' : 'var(--text-primary)'
-                    : item.danger ? 'rgba(239,68,68,0.4)' : 'var(--text-faint)',
-                  transition: 'color 0.2s',
-                  flexShrink: 0,
+                  color: item.danger
+                    ? isActive
+                      ? 'rgba(239,68,68,0.95)'
+                      : 'rgba(239,68,68,0.55)'
+                    : isActive
+                    ? 'var(--text-primary)'
+                    : 'var(--text-faint)',
                 }}
               />
               <div className="min-w-0">
                 <p
                   className="text-[10px] font-black uppercase tracking-wider leading-none mb-0.5"
                   style={{
-                    color: isActive
-                      ? item.danger ? '#ef4444' : 'var(--text-primary)'
-                      : item.danger ? 'rgba(239,68,68,0.5)' : 'var(--text-muted)',
-                    transition: 'color 0.2s',
+                    color: item.danger
+                      ? isActive
+                        ? 'rgba(239,68,68,0.95)'
+                        : 'rgba(239,68,68,0.55)'
+                      : isActive
+                      ? 'var(--text-primary)'
+                      : 'var(--text-muted)',
                   }}
                 >
                   {item.label}
                 </p>
-                <p className="text-[8px] text-[var(--text-faint)] uppercase tracking-wider font-bold truncate">
-                  {item.sub}
-                </p>
+                <p className="text-[8px] text-[var(--text-faint)] uppercase tracking-wider font-bold truncate">{item.sub}</p>
               </div>
-              {isActive && (
-                <div className="ml-auto w-1 h-1 rounded-full bg-[var(--text-secondary)] shrink-0" />
-              )}
+              {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--text-secondary)] shrink-0" />}
             </button>
           );
         })}
       </div>
-    </div>
+    </aside>
   );
 }

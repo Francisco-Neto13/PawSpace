@@ -66,7 +66,7 @@ export default function SessionsSection() {
         .order('last_seen', { ascending: false });
 
       if (mounted && !error && data && data.length > 0) {
-        const mapped = (data as SessionRow[]).map(row => ({
+        const mapped = (data as SessionRow[]).map((row) => ({
           id: row.id,
           device: row.device ?? 'Dispositivo',
           location: row.location ?? 'Local desconhecido',
@@ -87,8 +87,8 @@ export default function SessionsSection() {
       setSessions([
         {
           id: 'current',
-          device: `${platform} · ${detectBrowser(ua)}`,
-          location: 'Sessão atual',
+          device: `${platform} - ${detectBrowser(ua)}`,
+          location: 'Sessao atual',
           lastSeen: 'Agora',
           isCurrent: true,
           type: isMobile ? 'mobile' : 'desktop',
@@ -97,7 +97,6 @@ export default function SessionsSection() {
     };
 
     void loadSessions();
-
     return () => {
       mounted = false;
     };
@@ -108,16 +107,11 @@ export default function SessionsSection() {
     setRevoking(id);
 
     const supabase = createClient();
-    const { error } = await supabase
-      .from('sessions')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', userId);
+    const { error } = await supabase.from('sessions').delete().eq('id', id).eq('user_id', userId);
 
     if (!error) {
-      setSessions(prev => prev.filter(s => s.id !== id));
+      setSessions((prev) => prev.filter((session) => session.id !== id));
     }
-
     setRevoking(null);
   };
 
@@ -126,82 +120,71 @@ export default function SessionsSection() {
     setRevoking('__all__');
 
     const supabase = createClient();
-    const { error } = await supabase
-      .from('sessions')
-      .delete()
-      .eq('user_id', userId)
-      .neq('is_current', true);
+    const { error } = await supabase.from('sessions').delete().eq('user_id', userId).neq('is_current', true);
 
     if (!error) {
-      setSessions(prev => prev.filter(s => s.isCurrent));
+      setSessions((prev) => prev.filter((session) => session.isCurrent));
     }
-
     setRevoking(null);
   };
 
-  const others = sessions.filter(s => !s.isCurrent);
+  const others = sessions.filter((session) => !session.isCurrent);
 
   return (
-    <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 relative overflow-hidden">
+    <section className="library-panel p-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <div className="flex items-start justify-between mb-1">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] flex items-center gap-2">
+      <div className="flex items-start justify-between gap-3 mb-1">
+        <p className="library-kicker flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          Sessões Ativas
+          Sessoes Ativas
         </p>
         {others.length > 0 && (
           <button
-            onClick={() => {
-              void handleRevokeAll();
-            }}
-            className="text-[8px] font-black uppercase tracking-wider text-[var(--text-muted)] hover:text-red-400/70 transition-colors"
+            onClick={() => void handleRevokeAll()}
+            className="text-[8px] font-black uppercase tracking-wider text-[var(--text-muted)] hover:text-red-400/80 transition-colors"
           >
             Encerrar todas
           </button>
         )}
       </div>
-      <p className="text-[9px] text-[var(--text-muted)] mb-6 ml-3">dispositivos com acesso à sua conta</p>
+      <p className="library-subtitle mb-5 ml-3">dispositivos com acesso a sua conta</p>
 
       <div className="space-y-2">
-        {sessions.map(session => {
+        {sessions.map((session) => {
           const isRevoking = revoking === session.id;
           const Icon = session.type === 'mobile' ? Smartphone : Monitor;
           return (
             <div
               key={session.id}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200"
               style={{
                 borderColor: session.isCurrent ? 'var(--border-visible)' : 'var(--border-subtle)',
                 backgroundColor: session.isCurrent ? 'var(--bg-elevated)' : 'transparent',
                 opacity: isRevoking ? 0.4 : 1,
               }}
             >
-              <Icon size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+              <Icon size={14} className="text-[var(--text-muted)] shrink-0" />
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider">
-                    {session.device}
-                  </p>
+                  <p className="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider truncate">{session.device}</p>
                   {session.isCurrent && (
-                    <span className="text-[7px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-[var(--border-visible)] text-[var(--text-secondary)]">
-                      Esta sessão
+                    <span className="text-[7px] font-black uppercase tracking-wider px-1.5 py-0.5 border rounded border-[var(--border-visible)] text-[var(--text-secondary)]">
+                      Esta sessao
                     </span>
                   )}
                 </div>
-                <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold mt-0.5">
-                  {session.location} · {session.lastSeen}
+                <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold mt-0.5 truncate">
+                  {session.location} - {session.lastSeen}
                 </p>
               </div>
 
               {!session.isCurrent && (
                 <button
-                  onClick={() => {
-                    void handleRevoke(session.id);
-                  }}
+                  onClick={() => void handleRevoke(session.id)}
                   disabled={!!revoking}
-                  className="flex items-center gap-1 text-[8px] font-black uppercase tracking-wider transition-colors"
+                  className="h-8 px-2.5 rounded-lg border border-[var(--border-subtle)] flex items-center gap-1 text-[8px] font-black uppercase tracking-wider transition-colors"
                   style={{ color: isRevoking ? 'var(--text-faint)' : 'var(--text-muted)' }}
                 >
                   {isRevoking ? (
@@ -218,10 +201,10 @@ export default function SessionsSection() {
 
         {others.length === 0 && sessions.length === 1 && (
           <p className="text-[9px] text-[var(--text-faint)] uppercase tracking-wider font-bold ml-1">
-            Nenhuma outra sessão ativa.
+            Nenhuma outra sessao ativa.
           </p>
         )}
       </div>
-    </div>
+    </section>
   );
 }
