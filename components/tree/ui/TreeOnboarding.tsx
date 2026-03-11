@@ -108,14 +108,6 @@ export function TreeOnboarding({
                 </div>
               ))}
             </div>
-
-            <div className="mt-5 pt-3 border-t border-[var(--border-subtle)] flex justify-between items-center">
-              <span className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest font-mono">Pawspace</span>
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--text-primary)] animate-pulse" />
-                <span className="text-[8px] text-[var(--text-primary)] uppercase tracking-widest font-mono">Online</span>
-              </div>
-            </div>
           </div>
         </div>
       )}

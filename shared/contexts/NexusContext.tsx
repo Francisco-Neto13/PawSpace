@@ -13,24 +13,28 @@ interface GlobalStats {
   totalJournalEntries: number;
 }
 
-interface NexusContextType {
+interface NexusGraphContextType {
   nodes: SkillNode[];
   edges: Edge[];
   setNodes: React.Dispatch<React.SetStateAction<SkillNode[]>>;
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   isLoading: boolean;
+  originalNodeIds: React.MutableRefObject<Set<string>>;
+  refreshNexus: (silent?: boolean) => Promise<void>;
+}
+
+interface NexusMetaContextType {
   isDirty: boolean;
   setIsDirty: React.Dispatch<React.SetStateAction<boolean>>;
   isSaving: boolean;
   setIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
-  originalNodeIds: React.MutableRefObject<Set<string>>;
-  refreshNexus: (silent?: boolean) => Promise<void>;
   discardLocalChanges: () => void;
   globalStats: GlobalStats;
   refreshGlobalStats: () => Promise<void>;
 }
 
-const NexusContext = createContext<NexusContextType | undefined>(undefined);
+const NexusGraphContext = createContext<NexusGraphContextType | undefined>(undefined);
+const NexusMetaContext = createContext<NexusMetaContextType | undefined>(undefined);
 
 function isPublicRoute(pathname: string | null) {
   if (!pathname) return false;
@@ -86,11 +90,9 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (hasLoadedRef.current && silent) {
-      console.log('[Pawspace] Dados já em memória, ignorando refresh silencioso.');
       return;
     }
 
-    console.log(`[Pawspace] Refresh ${silent ? 'SILENCIOSO' : 'COMPLETO'} iniciado...`);
     if (!silent) setIsLoading(true);
 
     try {
@@ -111,7 +113,6 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
 
         setNodes(prevNodes => {
           if (isDirtyRef.current && silent) {
-            console.log('[Pawspace] Mantendo alterações locais (Silent mode + Dirty).');
             return prevNodes;
           }
           return incomingNodes;
@@ -125,7 +126,6 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
         if (!isDirtyRef.current) {
           setIsDirty(false);
           originalNodeIds.current = new Set(incomingNodes.map(n => n.id));
-          console.log(`[Pawspace] ${originalNodeIds.current.size} ids originais registrados.`);
         }
 
         hasLoadedRef.current = true;
@@ -134,7 +134,6 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
       console.error('[Pawspace] Erro na sincronização:', error);
     } finally {
       setIsLoading(false);
-      console.log('[Pawspace] Refresh finalizado.');
     }
   }, [skipHydration]);
 
@@ -173,21 +172,37 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
     setIsSaving(false);
   }, [skipHydration]);
 
-  const contextValue = useMemo(
+  const graphContextValue = useMemo(
     () => ({
-      nodes, edges, setNodes, setEdges,
-      isLoading, isDirty, setIsDirty,
-      isSaving, setIsSaving,
-      originalNodeIds, refreshNexus, discardLocalChanges,
-      globalStats, refreshGlobalStats,
+      nodes,
+      edges,
+      setNodes,
+      setEdges,
+      isLoading,
+      originalNodeIds,
+      refreshNexus,
     }),
     [
       nodes,
       edges,
       isLoading,
+      refreshNexus,
+    ]
+  );
+
+  const metaContextValue = useMemo(
+    () => ({
+      isDirty,
+      setIsDirty,
+      isSaving,
+      setIsSaving,
+      discardLocalChanges,
+      globalStats,
+      refreshGlobalStats,
+    }),
+    [
       isDirty,
       isSaving,
-      refreshNexus,
       discardLocalChanges,
       globalStats,
       refreshGlobalStats,
@@ -195,14 +210,32 @@ export function NexusProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <NexusContext.Provider value={contextValue}>
-      {children}
-    </NexusContext.Provider>
+    <NexusGraphContext.Provider value={graphContextValue}>
+      <NexusMetaContext.Provider value={metaContextValue}>
+        {children}
+      </NexusMetaContext.Provider>
+    </NexusGraphContext.Provider>
   );
 }
 
 export function useNexus() {
-  const context = useContext(NexusContext);
-  if (!context) throw new Error('useNexus deve ser usado dentro do contexto Pawspace');
+  const graph = useContext(NexusGraphContext);
+  const meta = useContext(NexusMetaContext);
+  if (!graph || !meta) throw new Error('useNexus deve ser usado dentro do contexto Pawspace');
+  return {
+    ...graph,
+    ...meta,
+  };
+}
+
+export function useNexusGraph() {
+  const context = useContext(NexusGraphContext);
+  if (!context) throw new Error('useNexusGraph deve ser usado dentro do contexto Pawspace');
+  return context;
+}
+
+export function useNexusMeta() {
+  const context = useContext(NexusMetaContext);
+  if (!context) throw new Error('useNexusMeta deve ser usado dentro do contexto Pawspace');
   return context;
 }

@@ -162,7 +162,7 @@ h1, h2, h3, h4, h5, h6, button, .skill-label-text {
 }
 .edge-flow { animation: flow 3s linear infinite; }
 .react-flow__edge { z-index: 0 !important; }
-.react-flow__node { z-index: 10; will-change: transform; }
+.react-flow__node { z-index: 10; }
 .react-flow__node.selected { z-index: 100 !important; }
 .react-flow__attribution { display: none !important; }
 .react-flow__handle { pointer-events: none !important; opacity: 0 !important; }
@@ -173,8 +173,8 @@ h1, h2, h3, h4, h5, h6, button, .skill-label-text {
   border-radius: 18px !important;
   border: 1px solid var(--border-subtle) !important;
   background: var(--bg-surface) !important;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.28);
   overflow: hidden;
 }
 .react-flow__minimap.minimap-card::before {
@@ -338,6 +338,21 @@ h1, h2, h3, h4, h5, h6, button, .skill-label-text {
 
 @media (prefers-reduced-motion: reduce) {
   .edge-flow, .glass-reflection::after { animation: none !important; transition: none !important; }
+  .react-flow__minimap.minimap-card {
+    backdrop-filter: none;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+  }
+  .page-background-img {
+    filter: none;
+    mix-blend-mode: normal;
+  }
+}
+
+@media (max-width: 1024px) {
+  .page-background-img {
+    filter: none;
+    mix-blend-mode: normal;
+  }
 }
 
 @keyframes reveal-up {

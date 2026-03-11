@@ -6,35 +6,66 @@ import { ContentInput } from './types';
 import { LIMITS } from '@/shared/lib/limits';
 
 const MAX_CONTENTS = LIMITS.quantity.contentsPerNode;
-const TITLE_MAX    = LIMITS.library.title;
-const URL_MAX      = LIMITS.library.url;
-const BODY_MAX     = LIMITS.library.body;
+const TITLE_MAX = LIMITS.library.title;
+const URL_MAX = LIMITS.library.url;
+const BODY_MAX = LIMITS.library.body;
 const PDF_MAX_BYTES = LIMITS.library.pdfMaxBytes;
+
+async function resolveOwnedSkillId(skillIdInput: string, userId: string) {
+  const skillId = (skillIdInput || '').trim();
+  if (!skillId) return { skillId: null as string | null, error: 'Skill invalida.' };
+
+  const skill = await prisma.skill.findFirst({
+    where: { id: skillId, userId },
+    select: { id: true },
+  });
+
+  if (!skill) return { skillId: null as string | null, error: 'Skill nao encontrada para este usuario.' };
+  return { skillId: skill.id };
+}
 
 export async function addContent(data: ContentInput) {
   const totalStart = Date.now();
   try {
     const userId = await getAuthUser();
-    const finalUserId = userId || data.userId;
-    if (!finalUserId) throw new Error('Usuário não identificado.');
+    if (!userId) throw new Error('Usuario nao identificado.');
 
     const title = (data.title || '').trim();
-    const url   = (data.url   || '').trim();
-    const body  = (data.body  || '').trim();
+    const url = (data.url || '').trim();
+    const body = (data.body || '').trim();
 
-    if (title.length > TITLE_MAX)
-      return { success: false, error: `Título pode ter no máximo ${TITLE_MAX} caracteres.` };
-    if (url && url.length > URL_MAX)
-      return { success: false, error: `URL pode ter no máximo ${URL_MAX} caracteres.` };
-    if (body && body.length > BODY_MAX)
-      return { success: false, error: `Nota pode ter no máximo ${BODY_MAX} caracteres.` };
+    if (title.length > TITLE_MAX) {
+      return { success: false, error: `Titulo pode ter no maximo ${TITLE_MAX} caracteres.` };
+    }
+    if (url && url.length > URL_MAX) {
+      return { success: false, error: `URL pode ter no maximo ${URL_MAX} caracteres.` };
+    }
+    if (body && body.length > BODY_MAX) {
+      return { success: false, error: `Nota pode ter no maximo ${BODY_MAX} caracteres.` };
+    }
 
-    const count = await prisma.libraryContent.count({ where: { skillId: data.skillId } });
-    if (count >= MAX_CONTENTS)
-      return { success: false, error: `Limite de ${MAX_CONTENTS} conteúdos por nó atingido.` };
+    const skillResolution = await resolveOwnedSkillId(data.skillId, userId);
+    if (skillResolution.error || !skillResolution.skillId) {
+      return { success: false, error: skillResolution.error || 'Skill invalida.' };
+    }
+
+    const count = await prisma.libraryContent.count({
+      where: { skillId: skillResolution.skillId, userId },
+    });
+    if (count >= MAX_CONTENTS) {
+      return { success: false, error: `Limite de ${MAX_CONTENTS} conteudos por no atingido.` };
+    }
 
     const content = await prisma.libraryContent.create({
-      data: { ...data, title, url: url || undefined, body: body || undefined, userId: finalUserId },
+      data: {
+        skillId: skillResolution.skillId,
+        userId,
+        type: data.type,
+        title,
+        url: url || undefined,
+        fileKey: data.fileKey || undefined,
+        body: body || undefined,
+      },
     });
 
     console.log(`✅ [Library Mutation] Content ADD: ${Date.now() - totalStart}ms`);
@@ -49,19 +80,19 @@ export async function deleteContent(contentId: string) {
   const totalStart = Date.now();
   try {
     const userId = await getAuthUser();
-    if (!userId) return { success: false, error: 'Não autorizado' };
+    if (!userId) return { success: false, error: 'Nao autorizado' };
 
-    const content = await prisma.libraryContent.findUnique({
+    const content = await prisma.libraryContent.findFirst({
       where: { id: contentId, userId },
     });
-    if (!content) throw new Error('Conteúdo não encontrado.');
+    if (!content) throw new Error('Conteudo nao encontrado.');
 
     if (content.fileKey) {
       const supabase = await createClient();
       await supabase.storage.from('biblioteca-pdfs').remove([content.fileKey]);
     }
 
-    await prisma.libraryContent.delete({ where: { id: contentId, userId } });
+    await prisma.libraryContent.deleteMany({ where: { id: contentId, userId } });
     console.log(`✅ [Library Mutation] Content DELETE: ${Date.now() - totalStart}ms`);
     return { success: true };
   } catch (error) {
@@ -70,12 +101,11 @@ export async function deleteContent(contentId: string) {
   }
 }
 
-export async function uploadPdf(formData: FormData, userId?: string) {
+export async function uploadPdf(formData: FormData) {
   const totalStart = Date.now();
   try {
-    const authId = await getAuthUser();
-    const finalUserId = userId || authId;
-    if (!finalUserId) return { success: false, error: 'Não autorizado' };
+    const userId = await getAuthUser();
+    if (!userId) return { success: false, error: 'Nao autorizado' };
 
     const file = formData.get('file') as File;
     if (!file) return { success: false, error: 'Nenhum arquivo enviado' };
@@ -88,7 +118,7 @@ export async function uploadPdf(formData: FormData, userId?: string) {
       };
     }
 
-    const fileKey  = `${finalUserId}/${Date.now()}.pdf`;
+    const fileKey = `${userId}/${Date.now()}.pdf`;
     const supabase = await createClient();
 
     const { error } = await supabase.storage

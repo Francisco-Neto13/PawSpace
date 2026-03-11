@@ -24,7 +24,7 @@ export default function SettingsPage() {
 
       <main className="relative z-10 py-8 pb-20">
         <div className="relative max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 space-y-5">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 reveal-fade delay-0">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
             <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
               Pawspace / Configuracoes
@@ -32,12 +32,16 @@ export default function SettingsPage() {
             <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
           </div>
 
-          <SettingsHeader active={active} />
+          <div className="reveal-up delay-100">
+            <SettingsHeader active={active} />
+          </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-[300px_minmax(0,1fr)] gap-4 items-start">
-            <SettingsNav active={active} onChange={setActive} />
+          <div className="grid grid-cols-1 xl:grid-cols-[300px_minmax(0,1fr)] gap-4 items-start reveal-up delay-200">
+            <div>
+              <SettingsNav active={active} onChange={setActive} />
+            </div>
 
-            <section className="space-y-4">
+            <section key={active} className="space-y-4 reveal-up delay-300">
               {active === 'account' && (
                 <>
                   <ProfileSection />

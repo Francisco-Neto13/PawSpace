@@ -32,7 +32,6 @@ export default function OverviewHeader({
   criticalUncovered = 0,
   currentMonthEntries = 0,
 }: OverviewHeaderProps) {
-  const [mounted, setMounted] = useState(false);
   const [progress, setProgress] = useState(initialProgress);
   const { displayName } = useAuthDisplayName();
 
@@ -42,11 +41,6 @@ export default function OverviewHeader({
     if (parts.length === 1) return [parts[0], ''];
     return [parts[0], parts.slice(1).join(' ')];
   }, [displayName]);
-
-  useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 50);
-    return () => clearTimeout(t);
-  }, []);
 
   useEffect(() => { setProgress(initialProgress); }, [initialProgress]);
 
@@ -106,7 +100,7 @@ export default function OverviewHeader({
               <div
                 className="h-full rounded-full"
                 style={{
-                  width: mounted ? `${progress}%` : '0%',
+                  width: `${progress}%`,
                   backgroundColor: 'var(--chart-strong)',
                   transition: 'width 1s cubic-bezier(0.16, 1, 0.3, 1)',
                   boxShadow: '0 0 10px var(--chart-faint)',

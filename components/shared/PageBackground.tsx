@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 interface PageBackgroundProps {
   src: string;
 }
@@ -8,11 +10,14 @@ export function PageBackground({ src }: PageBackgroundProps) {
       className="fixed inset-0 z-0 pointer-events-none select-none"
       style={{ backgroundColor: 'var(--bg-image-canvas)' }}
     >
-      <img
+      <Image
         src={src}
         alt=""
-        className="page-background-img w-full h-full object-contain object-center"
+        fill
+        sizes="100vw"
+        className="page-background-img object-contain object-center"
         draggable={false}
+        aria-hidden="true"
       />
     </div>
   );

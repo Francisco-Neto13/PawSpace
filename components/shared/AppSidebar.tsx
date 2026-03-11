@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { PanelLeftClose, PanelLeftOpen, Menu, X, LogOut } from 'lucide-react';
 import { createClient } from '@/shared/supabase/client';
-import { useNexus } from '@/shared/contexts/NexusContext';
+import { useNexusMeta } from '@/shared/contexts/NexusContext';
 import { useJournal } from '@/shared/contexts/JournalContext';
 import { useAuthDisplayName } from '@/shared/hooks/useAuthDisplayName';
 import { APP_NAV_LINKS } from './appNavigation';
@@ -18,7 +18,7 @@ export default function AppSidebar() {
   const supabase = createClient();
 
   const { displayName, isLoading: isLoadingDisplayName } = useAuthDisplayName();
-  const { isDirty, setIsDirty, discardLocalChanges } = useNexus();
+  const { isDirty, setIsDirty, discardLocalChanges } = useNexusMeta();
   const { flushPending } = useJournal();
 
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
@@ -115,7 +115,7 @@ export default function AppSidebar() {
   return (
     <>
       <aside
-        className={`hidden lg:flex h-screen sticky top-0 z-[95] border-r border-[var(--border-subtle)] bg-[var(--bg-strong)] backdrop-blur-xl transition-[width] duration-250 ${
+        className={`hidden lg:flex h-screen sticky top-0 z-[95] border-r border-[var(--border-subtle)] bg-[var(--bg-strong)] backdrop-blur-md transition-[width] duration-250 ${
           isCollapsed ? 'w-[92px]' : 'w-[280px]'
         }`}
       >
@@ -177,7 +177,7 @@ export default function AppSidebar() {
 
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-[110] h-10 w-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-strong)] text-[var(--text-primary)] backdrop-blur-xl flex items-center justify-center"
+        className="lg:hidden fixed top-4 left-4 z-[110] h-10 w-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-strong)] text-[var(--text-primary)] backdrop-blur-md flex items-center justify-center"
         aria-label="Abrir menu lateral"
       >
         <Menu size={18} />

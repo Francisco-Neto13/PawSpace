@@ -1,5 +1,5 @@
 'use client';
-import { useSyncExternalStore } from 'react';
+import { memo, useSyncExternalStore } from 'react';
 import { MiniMap, Panel, useReactFlow } from '@xyflow/react';
 import { useTheme } from '@/shared/contexts/ThemeContext';
 
@@ -11,7 +11,7 @@ const MINIMAP_WIDTH = 248;
 const MINIMAP_HEIGHT = 152;
 const OFFSET = 14;
 
-export function TreeMiniMap({ selectedNodeId }: TreeMiniMapProps) {
+function TreeMiniMapComponent({ selectedNodeId }: TreeMiniMapProps) {
   const { fitView } = useReactFlow();
   const { theme } = useTheme();
   const isHydrated = useSyncExternalStore(
@@ -30,8 +30,6 @@ export function TreeMiniMap({ selectedNodeId }: TreeMiniMapProps) {
     <>
       <MiniMap
         position="bottom-right"
-        pannable
-        zoomable
         maskColor={minimapMaskColor}
         nodeBorderRadius={999}
         nodeColor={(node) => (node.id === selectedNodeId ? 'var(--text-primary)' : 'var(--text-secondary)')}
@@ -52,7 +50,7 @@ export function TreeMiniMap({ selectedNodeId }: TreeMiniMapProps) {
           pointerEvents: 'auto',
         }}
       >
-        <div className="relative box-border rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden shadow-2xl" style={{ width: MINIMAP_WIDTH }}>
+        <div className="relative box-border rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden shadow-xl" style={{ width: MINIMAP_WIDTH }}>
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
           <div className="relative z-10 h-10 px-2.5 flex items-center justify-between gap-2">
             <p className="text-[7px] uppercase tracking-[0.2em] font-black text-[var(--text-secondary)]">Navegacao</p>
@@ -73,3 +71,5 @@ export function TreeMiniMap({ selectedNodeId }: TreeMiniMapProps) {
     </>
   );
 }
+
+export const TreeMiniMap = memo(TreeMiniMapComponent);

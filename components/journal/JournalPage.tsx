@@ -18,14 +18,8 @@ export default function JournalPage() {
   const { invalidateOverview } = useOverview();
   const confirmDialog = useConfirmDialog();
 
-  const [visible, setVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(entries.length > 0 ? entries[0].id : null);
   const [isPersisting, setIsPersisting] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 80);
-    return () => clearTimeout(t);
-  }, []);
 
   const skillList = useMemo<SkillBase[]>(
     () =>
@@ -156,14 +150,7 @@ export default function JournalPage() {
     <div className="relative min-h-screen w-full overflow-x-hidden">
       <PageBackground src="/cat4.webp" />
 
-      <div
-        className="relative z-10 py-8 pb-20"
-        style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0)' : 'translateY(6px)',
-          transition: 'opacity 0.5s ease, transform 0.5s ease',
-        }}
-      >
+      <div className="relative z-10 py-8 pb-20">
         <div className="relative max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 space-y-5">
           <div className="flex items-center gap-3">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />

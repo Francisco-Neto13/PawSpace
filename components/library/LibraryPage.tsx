@@ -32,17 +32,11 @@ export default function LibraryPage() {
     removeNodeContent,
   } = useLibrary();
 
-  const [visible, setVisible] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [showAddContent, setShowAddContent] = useState(false);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<ContentType | 'all'>('all');
   const optimisticNodeByTempIdRef = useRef<Record<string, string>>({});
-
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 80);
-    return () => clearTimeout(t);
-  }, []);
 
   useEffect(() => {
     const isEmptyLibrary = !isLoadingNexus && nodes.length === 0;
@@ -82,7 +76,10 @@ export default function LibraryPage() {
 
   useEffect(() => {
     if (!resolvedSelectedNodeId) return;
-    void preloadAllContents(resolvedSelectedNodeId);
+    const timer = window.setTimeout(() => {
+      void preloadAllContents();
+    }, 1200);
+    return () => window.clearTimeout(timer);
   }, [resolvedSelectedNodeId, preloadAllContents]);
 
   const mappedNodes = useMemo(() => nodes.map(n => ({
@@ -154,8 +151,6 @@ export default function LibraryPage() {
         className="relative w-full bg-[var(--bg-base)] overflow-hidden"
         style={{
           height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))',
-          opacity: visible ? 1 : 0,
-          transition: 'opacity 0.5s ease',
         }}
       >
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 text-center pointer-events-none">
@@ -183,14 +178,7 @@ export default function LibraryPage() {
     <div className="relative min-h-screen w-full overflow-x-hidden">
       <PageBackground src="/cat3.webp" />
 
-      <div
-        className="relative z-10 py-8 pb-20"
-        style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0)' : 'translateY(6px)',
-          transition: 'opacity 0.5s ease, transform 0.5s ease',
-        }}
-      >
+      <div className="relative z-10 py-8 pb-20">
         <div className="relative max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 space-y-5">
           <div className="flex items-center gap-3">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />

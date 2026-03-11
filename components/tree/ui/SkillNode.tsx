@@ -1,7 +1,6 @@
 ﻿'use client';
 import React, { memo, useMemo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
-import { useNexus } from '@/contexts/NexusContext';
 import { SkillData } from '../types';
 
 type CompatibleSkillNode = Node<SkillData>;
@@ -42,11 +41,10 @@ export function SvgDefs() {
 
 function SkillNodeComponent({ data, selected }: NodeProps<CompatibleSkillNode>) {
   const { icon, name, label, color, parentId } = data;
-  const { nodes } = useNexus();
   const isChildOfSelected = data.isChildOfSelected === true;
+  const hasChildren = data.hasChildren === true;
 
   const isRoot         = !parentId;
-  const hasChildren    = useMemo(() => nodes.some(n => n.data.parentId === data.id), [nodes, data.id]);
   const isLeaf         = !isRoot && !hasChildren;
 
   const size = isRoot ? SIZE_ROOT : !isRoot && hasChildren ? SIZE_INTERMEDIATE : SIZE_LEAF;

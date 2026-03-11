@@ -50,6 +50,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
   const [loadingNodeId, setLoadingNodeId] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const hasLoadedAllRef = useRef(false);
+  const isPreloadingAllRef = useRef(false);
   const skipHydrationRef = useRef(skipHydration);
 
   useEffect(() => {
@@ -74,6 +75,8 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
   const preloadAllContents = useCallback(async (focusNodeId?: string) => {
     if (skipHydrationRef.current) return;
     if (hasLoadedAllRef.current) return;
+    if (isPreloadingAllRef.current) return;
+    isPreloadingAllRef.current = true;
     if (focusNodeId) setLoadingNodeId(focusNodeId);
     try {
       const { getAllContentsForLibrary } = await import('@/app/actions/library');
@@ -85,6 +88,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.error('[Library] Failed to preload all contents:', e);
     } finally {
+      isPreloadingAllRef.current = false;
       if (focusNodeId) setLoadingNodeId(null);
     }
   }, [groupBySkillId]);
@@ -103,35 +107,21 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     setLoadingNodeId(nodeId);
 
     try {
-      const { getAllContentsForLibrary } = await import('@/app/actions/library');
-      const allContents = await getAllContentsForLibrary();
-      if (controller.signal.aborted || skipHydrationRef.current) return;
-
-      const grouped = groupBySkillId(allContents as LibraryContentRow[]);
-      setNodeContents(prev => ({
-        ...prev,
-        ...grouped,
-        [nodeId]: grouped[nodeId] ?? [],
-      }));
-      hasLoadedAllRef.current = true;
+      const { getContentsBySkill } = await import('@/app/actions/library');
+      const updated = await getContentsBySkill(nodeId);
+      if (!controller.signal.aborted && !skipHydrationRef.current) {
+        setNodeContents(prev => ({
+          ...prev,
+          [nodeId]: (updated as LibraryContentRow[]).map(normalizeContent),
+        }));
+      }
     } catch (e: unknown) {
       if (e instanceof Error && e.name === 'AbortError') return;
-      try {
-        const { getContentsBySkill } = await import('@/app/actions/library');
-        const updated = await getContentsBySkill(nodeId);
-        if (!controller.signal.aborted && !skipHydrationRef.current) {
-          setNodeContents(prev => ({
-            ...prev,
-            [nodeId]: (updated as LibraryContentRow[]).map(normalizeContent),
-          }));
-        }
-      } catch (fallbackError) {
-        console.error('[Library] Failed to load node contents:', fallbackError);
-      }
+      console.error('[Library] Failed to load node contents:', e);
     } finally {
       if (!controller.signal.aborted) setLoadingNodeId(null);
     }
-  }, [nodeContents, normalizeContent, groupBySkillId]);
+  }, [nodeContents, normalizeContent]);
 
   const refreshNodeContents = useCallback(async (nodeId: string) => {
     if (skipHydrationRef.current) return;
@@ -176,6 +166,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     if (!skipHydration) return;
 
     hasLoadedAllRef.current = false;
+    isPreloadingAllRef.current = false;
     abortControllerRef.current?.abort();
     abortControllerRef.current = null;
     setNodeContents({});

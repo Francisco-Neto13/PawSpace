@@ -64,9 +64,7 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
   const hasInitialPage = initialPage?.status === 'ok';
   const skipFirstResetFetchRef = useRef(false);
   const hasBootstrappedRef = useRef(false);
-  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const [filter, setFilter] = useState<ActivityFilter>('all');
-  const [mounted, setMounted] = useState(false);
   const [items, setItems] = useState<ActivityFeedItem[]>(
     hasInitialPage ? (initialPage?.items ?? []) : []
   );
@@ -148,11 +146,6 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
   }, [filter, hasMore, nextCursor, isLoadingMore, items.length]);
 
   useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
     if (hasBootstrappedRef.current) return;
     if (isBootstrapLoading || initialPage === null) return;
 
@@ -185,12 +178,6 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
 
   const isLoading = (isBootstrapLoading || isLoadingInitial) && items.length === 0;
   const reachedActivityLimit = items.length >= MAX_ACTIVITY_ITEMS;
-  const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
-    const el = scrollAreaRef.current;
-    if (!el) return;
-    e.preventDefault();
-    el.scrollTop += e.deltaY * 0.45;
-  }, []);
 
   return (
     <div className="h-full max-h-[440px] overview-card overview-card-hover p-6 relative overflow-hidden flex flex-col">
@@ -229,23 +216,14 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
       ) : items.length === 0 ? (
         <p className="text-[9px] text-[var(--text-muted)] ml-3">Nenhuma patinha por aqui ainda.</p>
       ) : (
-        <div
-          ref={scrollAreaRef}
-          onWheel={handleWheel}
-          className="flex-1 min-h-0 overview-scroll-area"
-        >
+        <div className="flex-1 min-h-0 overview-scroll-area">
           <div className="pr-1">
-          {items.map((item, i) => {
+          {items.map((item) => {
             const isJournal = item.type === 'journal';
             return (
               <div
                 key={item.key}
                 className="flex items-center gap-3 py-2.5 border-b border-[var(--border-subtle)] last:border-0 group"
-                style={{
-                  opacity: mounted ? 1 : 0,
-                  transform: mounted ? 'translateX(0)' : 'translateX(-6px)',
-                  transition: `opacity 0.4s ease ${i * 40}ms, transform 0.4s ease ${i * 40}ms`,
-                }}
               >
                 <div
                   className="w-6 h-6 flex items-center justify-center shrink-0 border transition-colors duration-200"

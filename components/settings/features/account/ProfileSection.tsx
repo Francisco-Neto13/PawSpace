@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { Camera, Check, Loader2 } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { createClient } from '@/shared/supabase/client';
@@ -129,7 +130,7 @@ export default function ProfileSection() {
             className="relative w-16 h-16 rounded-xl border border-[var(--border-muted)] bg-[var(--bg-elevated)] overflow-hidden group transition-all duration-200 hover:border-[var(--border-visible)]"
           >
             {avatar ? (
-              <img src={avatar} alt="avatar" className="w-full h-full object-cover" />
+              <Image src={avatar} alt="avatar" fill sizes="64px" className="object-cover" unoptimized />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <span className="text-2xl text-[var(--text-secondary)]">U</span>

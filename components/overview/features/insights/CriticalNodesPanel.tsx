@@ -1,5 +1,5 @@
-﻿'use client';
-import { memo, useCallback, useRef, useState } from 'react';
+'use client';
+import { memo, useState } from 'react';
 import { AlertCircle, CheckCircle2, ChevronRight } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { CriticalNodeDatum } from '@/components/overview/lib/overviewMetrics';
@@ -10,14 +10,7 @@ interface Props {
 
 function CriticalNodesPanel({ critical }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const safeExpandedId = critical.some((item) => item.id === expandedId) ? expandedId : null;
-  const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
-    const el = scrollAreaRef.current;
-    if (!el) return;
-    e.preventDefault();
-    el.scrollTop += e.deltaY * 0.45;
-  }, []);
 
   if (critical.length === 0) {
     return (
@@ -34,7 +27,7 @@ function CriticalNodesPanel({ critical }: Props) {
     );
   }
 
-  const covered   = critical.filter((n) => n.hasContent).length;
+  const covered = critical.filter((n) => n.hasContent).length;
   const uncovered = critical.filter((n) => !n.hasContent).length;
 
   return (
@@ -63,108 +56,103 @@ function CriticalNodesPanel({ critical }: Props) {
         Módulos que mais destravam progresso quando recebem conteúdo
       </p>
 
-      <div
-        ref={scrollAreaRef}
-        onWheel={handleWheel}
-        className="flex-1 min-h-0 overview-scroll-area"
-      >
+      <div className="flex-1 min-h-0 overview-scroll-area">
         <div className="space-y-1 pr-1">
-        {critical.map((n, i) => {
-          const isExpanded = safeExpandedId === n.id;
-          const maxDependents = Math.max(critical[0]?.dependents ?? 1, 1);
-          const barPct = Math.min((n.dependents / maxDependents) * 100, 100);
+          {critical.map((n, i) => {
+            const isExpanded = safeExpandedId === n.id;
+            const maxDependents = Math.max(critical[0]?.dependents ?? 1, 1);
+            const barPct = Math.min((n.dependents / maxDependents) * 100, 100);
 
-          return (
-            <div key={n.id}>
-              <button
-                className="w-full flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-lg transition-all duration-200 text-left"
-                style={{ backgroundColor: isExpanded ? 'var(--bg-elevated)' : 'transparent' }}
-                onClick={() => setExpandedId(isExpanded ? null : n.id)}
-              >
-                <span className="text-[9px] text-[var(--text-muted)] font-mono w-4 shrink-0">{i + 1}</span>
-                <span className="text-base shrink-0">{n.icon}</span>
-
-                <span
-                  className="text-[10px] font-black uppercase tracking-[0.1em] flex-1 truncate transition-colors duration-200"
-                  style={{ color: isExpanded || n.hasContent ? 'var(--text-primary)' : 'var(--text-muted)' }}
+            return (
+              <div key={n.id}>
+                <button
+                  className="w-full flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-lg transition-all duration-200 text-left"
+                  style={{ backgroundColor: isExpanded ? 'var(--bg-elevated)' : 'transparent' }}
+                  onClick={() => setExpandedId(isExpanded ? null : n.id)}
                 >
-                  {n.name}
-                </span>
+                  <span className="text-[9px] text-[var(--text-muted)] font-mono w-4 shrink-0">{i + 1}</span>
+                  <span className="text-base shrink-0">{n.icon}</span>
 
-                <span className="text-[10px] text-[var(--text-secondary)] font-mono font-black shrink-0">
-                  {n.dependents} dep.
-                </span>
-
-                {n.hasContent
-                  ? <CheckCircle2 size={11} className="text-[var(--text-secondary)] shrink-0" />
-                  : <AlertCircle  size={11} className="text-[var(--text-muted)] shrink-0" />
-                }
-
-                <div className="w-16 h-[3px] bg-[var(--bg-elevated)] overflow-hidden rounded-full shrink-0">
-                  <div
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${barPct}%`,
-                      backgroundColor: n.hasContent ? 'var(--chart-medium)' : 'var(--text-faint)',
-                    }}
-                  />
-                </div>
-
-                <ChevronRight
-                  size={10}
-                  className="shrink-0 transition-transform duration-200 text-[var(--text-muted)]"
-                  style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
-                />
-              </button>
-
-              {isExpanded && (
-                <div
-                  className="ml-7 mb-2 px-4 py-3 border border-[var(--border-subtle)] bg-[var(--bg-surface)] rounded-lg"
-                  style={{ animation: 'slideDown 0.2s ease-out' }}
-                >
-                  <div className="grid grid-cols-3 gap-4 mb-3">
-                    <div>
-                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
-                        Links externos
-                      </p>
-                      <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.linksCount}</p>
-                    </div>
-                    <div>
-                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
-                        Conteúdos
-                      </p>
-                      <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.contentsCount}</p>
-                    </div>
-                    <div>
-                      <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
-                        Módulos que dependem
-                      </p>
-                      <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.dependents}</p>
-                    </div>
-                  </div>
-
-                  <div
-                    className="flex items-center gap-2 pt-2 border-t border-[var(--border-subtle)]"
+                  <span
+                    className="text-[10px] font-black uppercase tracking-[0.1em] flex-1 truncate transition-colors duration-200"
+                    style={{ color: isExpanded || n.hasContent ? 'var(--text-primary)' : 'var(--text-muted)' }}
                   >
-                    {n.hasContent ? (
-                      <CheckCircle2 size={10} className="text-[var(--text-secondary)] shrink-0" />
-                    ) : (
-                      <AlertCircle size={10} className="text-[var(--text-muted)] shrink-0" />
-                    )}
-                    <p className="text-[9px] uppercase tracking-wider font-bold"
-                      style={{ color: n.hasContent ? 'var(--text-secondary)' : 'var(--text-muted)' }}
-                    >
-                      {n.hasContent
-                        ? 'Este módulo já tem conteúdo cadastrado'
-                        : 'Sem conteúdo — adicionar aqui impacta vários módulos'
-                      }
-                    </p>
+                    {n.name}
+                  </span>
+
+                  <span className="text-[10px] text-[var(--text-secondary)] font-mono font-black shrink-0">
+                    {n.dependents} dep.
+                  </span>
+
+                  {n.hasContent
+                    ? <CheckCircle2 size={11} className="text-[var(--text-secondary)] shrink-0" />
+                    : <AlertCircle size={11} className="text-[var(--text-muted)] shrink-0" />
+                  }
+
+                  <div className="w-16 h-[3px] bg-[var(--bg-elevated)] overflow-hidden rounded-full shrink-0">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${barPct}%`,
+                        backgroundColor: n.hasContent ? 'var(--chart-medium)' : 'var(--text-faint)',
+                      }}
+                    />
                   </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
+
+                  <ChevronRight
+                    size={10}
+                    className="shrink-0 transition-transform duration-200 text-[var(--text-muted)]"
+                    style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                  />
+                </button>
+
+                {isExpanded && (
+                  <div
+                    className="ml-7 mb-2 px-4 py-3 border border-[var(--border-subtle)] bg-[var(--bg-surface)] rounded-lg"
+                    style={{ animation: 'slideDown 0.2s ease-out' }}
+                  >
+                    <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div>
+                        <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
+                          Links externos
+                        </p>
+                        <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.linksCount}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
+                          Conteúdos
+                        </p>
+                        <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.contentsCount}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
+                          Módulos que dependem
+                        </p>
+                        <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.dependents}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-subtle)]">
+                      {n.hasContent ? (
+                        <CheckCircle2 size={10} className="text-[var(--text-secondary)] shrink-0" />
+                      ) : (
+                        <AlertCircle size={10} className="text-[var(--text-muted)] shrink-0" />
+                      )}
+                      <p
+                        className="text-[9px] uppercase tracking-wider font-bold"
+                        style={{ color: n.hasContent ? 'var(--text-secondary)' : 'var(--text-muted)' }}
+                      >
+                        {n.hasContent
+                          ? 'Este módulo já tem conteúdo cadastrado'
+                          : 'Sem conteúdo — adicionar aqui impacta vários módulos'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 

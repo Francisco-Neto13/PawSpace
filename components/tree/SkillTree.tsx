@@ -98,6 +98,7 @@ function SkillTreeInner() {
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
   const [hasStructuralChanges, setHasStructuralChanges] = useState(false);
   const [isCanvasVisible, setIsCanvasVisible] = useState(false);
+  const lastSavedViewportRef = useRef<{ x: number; y: number; zoom: number } | null>(null);
   const isHydrated = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -183,16 +184,73 @@ function SkillTreeInner() {
     );
   }, [nodes, selectedNodeId]);
 
+  const childCountByParent = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const node of nodes) {
+      const parentId = node.data.parentId;
+      if (!parentId) continue;
+      counts.set(parentId, (counts.get(parentId) ?? 0) + 1);
+    }
+    return counts;
+  }, [nodes]);
+
+  const flowNodeCacheRef = useRef(
+    new Map<
+      string,
+      {
+        source: SkillNode;
+        isChildOfSelected: boolean;
+        hasChildren: boolean;
+        flowNode: SkillNode;
+      }
+    >()
+  );
+
   const flowNodes = useMemo(
-    () =>
-      nodes.map((node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          isChildOfSelected: immediateChildIds.has(node.id),
-        },
-      })),
-    [nodes, immediateChildIds]
+    () => {
+      const currentNodeIds = new Set(nodes.map((node) => node.id));
+      const cache = flowNodeCacheRef.current;
+
+      for (const cachedId of cache.keys()) {
+        if (!currentNodeIds.has(cachedId)) {
+          cache.delete(cachedId);
+        }
+      }
+
+      return nodes.map((node) => {
+        const isChildOfSelected = immediateChildIds.has(node.id);
+        const hasChildren = (childCountByParent.get(node.id) ?? 0) > 0;
+        const cached = cache.get(node.id);
+
+        if (
+          cached &&
+          cached.source === node &&
+          cached.isChildOfSelected === isChildOfSelected &&
+          cached.hasChildren === hasChildren
+        ) {
+          return cached.flowNode;
+        }
+
+        const flowNode: SkillNode = {
+          ...node,
+          data: {
+            ...node.data,
+            isChildOfSelected,
+            hasChildren,
+          },
+        };
+
+        cache.set(node.id, {
+          source: node,
+          isChildOfSelected,
+          hasChildren,
+          flowNode,
+        });
+
+        return flowNode;
+      });
+    },
+    [nodes, immediateChildIds, childCountByParent]
   );
 
   const flowEdges = useMemo(() => {
@@ -254,6 +312,15 @@ function SkillTreeInner() {
     if (!node) return null;
     return { ...node.data, id: node.id } as SkillData & { id: string };
   }, [nodes, editingSkillId]);
+
+  const existingSkills = useMemo(
+    () =>
+      nodes.map((node) => ({
+        id: node.id,
+        name: node.data.label || node.data.name || '',
+      })),
+    [nodes]
+  );
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden select-none">
@@ -390,6 +457,7 @@ function SkillTreeInner() {
                 edges={flowEdges}
                 nodeTypes={nodeTypes}
                 edgeTypes={edgeTypes}
+                onlyRenderVisibleElements
                 onNodesChange={onNodesChange}
                 onNodeClick={() => {
                   setContextMenu(null);
@@ -438,6 +506,22 @@ function SkillTreeInner() {
                 nodesConnectable={false}
                 onMoveEnd={(_, viewport) => {
                   if (!viewport) return;
+                  const previous = lastSavedViewportRef.current;
+                  if (
+                    previous &&
+                    previous.x === viewport.x &&
+                    previous.y === viewport.y &&
+                    previous.zoom === viewport.zoom
+                  ) {
+                    return;
+                  }
+
+                  lastSavedViewportRef.current = {
+                    x: viewport.x,
+                    y: viewport.y,
+                    zoom: viewport.zoom,
+                  };
+
                   try {
                     window.localStorage.setItem(VIEWPORT_STORAGE_KEY, JSON.stringify({
                       x: viewport.x,
@@ -488,10 +572,7 @@ function SkillTreeInner() {
           await handleUpdateSkill(id, data);
         }}
         skillData={editingSkillData}
-        existingSkills={nodes.map(n => ({
-          id: n.id,
-          name: n.data.label || n.data.name || '',
-        }))}
+        existingSkills={existingSkills}
       />
     </div>
   );

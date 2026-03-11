@@ -9,6 +9,21 @@ const MAX_ENTRIES = LIMITS.quantity.journalEntries;
 const TITLE_MAX = LIMITS.journal.title;
 const BODY_MAX = LIMITS.journal.body;
 
+async function resolveOwnedSkillId(skillIdInput: string | null | undefined, userId: string) {
+  if (skillIdInput === undefined || skillIdInput === null) return { skillId: null as string | null };
+
+  const skillId = skillIdInput.trim();
+  if (!skillId) return { skillId: null as string | null };
+
+  const skill = await prisma.skill.findFirst({
+    where: { id: skillId, userId },
+    select: { id: true },
+  });
+
+  if (!skill) return { skillId: null as string | null, error: 'Skill invalida para este usuario.' };
+  return { skillId: skill.id };
+}
+
 export async function saveJournalEntry(data: JournalInput) {
   const totalStart = Date.now();
   const isTemporaryId = Boolean(data.id && data.id.startsWith('temp-'));
@@ -37,14 +52,19 @@ export async function saveJournalEntry(data: JournalInput) {
   }
 
   try {
+    const skillResolution = await resolveOwnedSkillId(data.skillId, userId);
+    if (skillResolution.error) {
+      return { success: false, error: skillResolution.error };
+    }
+
     const dbStart = Date.now();
     const entry = shouldUpdate
       ? await prisma.journalEntry.update({
           where: { id: data.id, userId },
-          data: { title, body, skillId: data.skillId || null },
+          data: { title, body, skillId: skillResolution.skillId },
         })
       : await prisma.journalEntry.create({
-          data: { title, body, userId, skillId: data.skillId || null },
+          data: { title, body, userId, skillId: skillResolution.skillId },
         });
 
     console.log(`[DB] Persistencia Prisma: ${Date.now() - dbStart}ms`);

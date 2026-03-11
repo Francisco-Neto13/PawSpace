@@ -1,16 +1,13 @@
 ﻿'use client';
 
 import { useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useNexus } from '@/shared/contexts/NexusContext';
 import { useOverview } from '@/shared/contexts/OverviewContext';
 import { useJournal } from '@/contexts/JournalContext';
 import OverviewHeader from './ui/OverviewHeader';
 import StatsGrid from './features/stats/StatsGrid';
-import CategoryChart from './features/stats/CategoryChart';
-import TreeDepthChart from './features/stats/TreeDepthChart';
 import CriticalNodesPanel from './features/insights/CriticalNodesPanel';
-import JournalActivityChart from './features/activity/JournalActivityChart';
-import LibraryStatsPanel from './features/insights/LibraryStatsPanel';
 import RecentActivityFeed from './features/activity/RecentActivityFeed';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { PageBackground } from '@/components/shared/PageBackground';
@@ -23,6 +20,35 @@ const deferredSectionStyle = {
 };
 
 const EMPTY_OVERVIEW_SUMMARY = { total: 0, unlocked: 0, progress: 0 };
+
+function ChartLoadingCard({ message }: { message: string }) {
+  return (
+    <div className="h-full overview-card overview-card-hover p-6 relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+      <p className="text-[9px] text-[var(--text-muted)] uppercase tracking-[0.2em] font-black">{message}</p>
+    </div>
+  );
+}
+
+const CategoryChart = dynamic(() => import('./features/stats/CategoryChart'), {
+  ssr: false,
+  loading: () => <ChartLoadingCard message="Carregando categorias..." />,
+});
+
+const TreeDepthChart = dynamic(() => import('./features/stats/TreeDepthChart'), {
+  ssr: false,
+  loading: () => <ChartLoadingCard message="Carregando profundidade..." />,
+});
+
+const JournalActivityChart = dynamic(() => import('./features/activity/JournalActivityChart'), {
+  ssr: false,
+  loading: () => <ChartLoadingCard message="Carregando atividade..." />,
+});
+
+const LibraryStatsPanel = dynamic(() => import('./features/insights/LibraryStatsPanel'), {
+  ssr: false,
+  loading: () => <ChartLoadingCard message="Carregando biblioteca..." />,
+});
 
 export default function OverviewContent() {
   const { nodes, edges, isLoading } = useNexus();

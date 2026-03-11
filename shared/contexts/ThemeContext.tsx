@@ -31,7 +31,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const setTheme = (t: Theme) => {
     setThemeState(t);
     localStorage.setItem('pawspace-theme', t);
-    applyTheme(t);
   };
 
   const toggle = () => setTheme(theme === 'dark' ? 'light' : 'dark');
