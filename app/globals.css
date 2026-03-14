@@ -97,6 +97,21 @@ html.light {
     box-shadow: 0 0 8px var(--rpg-glow);
   }
   * { scrollbar-width: thin; scrollbar-color: var(--rpg-muted) var(--bg-base); }
+  a[href],
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  input[type="button"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  input[type="reset"]:not(:disabled) {
+    cursor: pointer;
+  }
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    cursor: not-allowed;
+  }
 }
 
 @theme inline {

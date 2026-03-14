@@ -9,7 +9,7 @@ import { ConfirmDialogProvider } from "@/shared/contexts/ConfirmDialogContext";
 import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
-  title: "Pawspace",
+  title: "PawSpace",
   description: "",
 };
 

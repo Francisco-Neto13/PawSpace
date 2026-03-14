@@ -38,13 +38,30 @@ export async function proxy(request: NextRequest) {
   const user = session?.user ?? null
 
   const url = request.nextUrl.clone()
+  const isLoginRoute = url.pathname.startsWith('/login')
+  const isResetPasswordRoute = url.pathname.startsWith('/reset-password')
+  const isAuthCallbackRoute = url.pathname.startsWith('/auth/callback')
+  const hasRecoveryCode = Boolean(url.searchParams.get('code'))
+  const hasRecoveryTokenHash = Boolean(url.searchParams.get('token_hash'))
+  const isRecoveryFlow =
+    url.searchParams.get('type') === 'recovery' ||
+    hasRecoveryCode ||
+    hasRecoveryTokenHash
 
-  if (!user && !url.pathname.startsWith('/login')) {
+  if (isRecoveryFlow && !isResetPasswordRoute && !isAuthCallbackRoute) {
+    url.pathname = '/auth/callback'
+    if (!url.searchParams.has('next')) {
+      url.searchParams.set('next', '/reset-password')
+    }
+    return NextResponse.redirect(url)
+  }
+
+  if (!user && !isLoginRoute && !isResetPasswordRoute && !isAuthCallbackRoute) {
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  if (user && url.pathname.startsWith('/login')) {
+  if (user && isLoginRoute) {
     url.pathname = '/overview'
     return NextResponse.redirect(url)
   }

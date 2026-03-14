@@ -26,7 +26,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           </div>
           <div className="text-[11px] font-black uppercase tracking-[0.2em] order-1 md:order-2 md:absolute md:left-1/2 md:-translate-x-1/2 whitespace-nowrap">
             <span className="text-[var(--text-secondary)]">© {currentYear} • </span>
-            <span className="text-[var(--text-primary)]">Francisco Neto</span>
+            <span className="text-[var(--text-primary)]">PawSpace</span>
           </div>
           <div className="flex items-center gap-6 order-3">
             <a
