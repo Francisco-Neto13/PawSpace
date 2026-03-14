@@ -322,6 +322,10 @@ function SkillTreeInner() {
     [nodes]
   );
 
+  if (isEmpty) {
+    return <TreeEmptyState onCreate={handleCreateRoot} />;
+  }
+
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden select-none">
       <PageBackground src="/cat2.webp" />
@@ -407,10 +411,6 @@ function SkillTreeInner() {
               }}
               className="relative"
             >
-              {isEmpty && (
-                <TreeEmptyState onCreate={handleCreateRoot} />
-              )}
-
               {selectedNode && (
                 <div className="absolute left-3 bottom-3 z-40 w-[296px] max-w-[calc(100%-0.75rem)] pointer-events-none animate-in fade-in zoom-in-95 duration-200 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden shadow-2xl">
                   <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />

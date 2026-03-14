@@ -11,6 +11,7 @@ import CriticalNodesPanel from './features/insights/CriticalNodesPanel';
 import RecentActivityFeed from './features/activity/RecentActivityFeed';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { PageBackground } from '@/components/shared/PageBackground';
+import { WorkspaceEmptyState } from '@/components/shared/WorkspaceEmptyState';
 import LazyMount from './ui/LazyMount';
 import { buildOverviewSnapshot } from './lib/overviewMetrics';
 
@@ -91,6 +92,17 @@ export default function OverviewContent() {
           </p>
         </div>
       </div>
+    );
+  }
+
+  if (!isLoading && nodes.length === 0) {
+    return (
+      <WorkspaceEmptyState
+        title="Sem estatísticas para mostrar"
+        description="Crie sua árvore para começar e o resumo do seu progresso aparecerá aqui."
+        actionLabel="Ir para árvore"
+        actionHref="/tree"
+      />
     );
   }
 

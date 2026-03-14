@@ -11,6 +11,7 @@ import { useJournal } from '@/shared/contexts/JournalContext';
 import { useOverview } from '@/shared/contexts/OverviewContext';
 import { useConfirmDialog } from '@/shared/contexts/ConfirmDialogContext';
 import { saveJournalEntry, deleteJournalEntry } from '@/app/actions/journal';
+import { WorkspaceEmptyState } from '@/components/shared/WorkspaceEmptyState';
 
 export default function JournalPage() {
   const { nodes, isLoading: isLoadingNexus, refreshGlobalStats } = useNexus();
@@ -143,6 +144,17 @@ export default function JournalPage() {
           Sincronizando Pawspace...
         </p>
       </div>
+    );
+  }
+
+  if (!isLoadingNexus && nodes.length === 0) {
+    return (
+      <WorkspaceEmptyState
+        title="Diário vazio"
+        description="Crie sua árvore para começar a registrar progresso e revisões por módulo."
+        actionLabel="Ir para árvore"
+        actionHref="/tree"
+      />
     );
   }
 

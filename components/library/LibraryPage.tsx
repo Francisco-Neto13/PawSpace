@@ -15,6 +15,7 @@ import { useNexus } from '@/contexts/NexusContext';
 import { useLibrary } from '@/contexts/LibraryContext';
 import { useOverview } from '@/contexts/OverviewContext';
 import { deleteContent } from '@/app/actions/library';
+import { WorkspaceEmptyState } from '@/components/shared/WorkspaceEmptyState';
 
 export default function LibraryPage() {
   const searchParams = useSearchParams();
@@ -147,30 +148,12 @@ export default function LibraryPage() {
 
   if (!isLoadingNexus && nodes.length === 0) {
     return (
-      <div
-        className="relative w-full bg-[var(--bg-base)] overflow-hidden"
-        style={{
-          height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))',
-        }}
-      >
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 text-center pointer-events-none">
-          <div className="space-y-2">
-            <p className="text-[var(--text-primary)] text-[11px] font-black uppercase tracking-[0.4em]">
-              Árvore Vazia
-            </p>
-            <p className="text-[var(--text-secondary)] text-[11px] font-normal max-w-[260px] leading-relaxed">
-              Crie sua Árvore primeiro para começar a organizar conteúdos por módulo.
-            </p>
-          </div>
-          <a
-            href="/tree"
-            className="pointer-events-auto flex items-center gap-2 px-6 py-3 border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] transition-all duration-200 active:scale-95"
-          >
-            Ir para Árvore
-          </a>
-          <div className="w-8 h-px bg-gradient-to-r from-transparent via-[var(--border-muted)] to-transparent" />
-        </div>
-      </div>
+      <WorkspaceEmptyState
+        title="Biblioteca vazia"
+        description="Crie sua árvore para começar a organizar conteúdos por módulo."
+        actionLabel="Ir para árvore"
+        actionHref="/tree"
+      />
     );
   }
 

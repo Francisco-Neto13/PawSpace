@@ -7,9 +7,10 @@ import { computeAchievements } from './lib/achievements';
 import { AchievementStats } from './features/stats/AchievementStats';
 import { AchievementFilters, FilterCategory } from './features/filters/AchievementFilters';
 import { AchievementGrid } from './features/list/AchievementGrid';
+import { WorkspaceEmptyState } from '@/components/shared/WorkspaceEmptyState';
 
 export function AchievementsPage() {
-  const { nodes, globalStats, refreshGlobalStats } = useNexus();
+  const { nodes, globalStats, refreshGlobalStats, isLoading } = useNexus();
   const [filter, setFilter] = useState<FilterCategory>('all');
 
   useEffect(() => {
@@ -46,6 +47,30 @@ export function AchievementsPage() {
   );
   const totalCount = achievements.length;
   const progressPct = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
+
+  if (isLoading && nodes.length === 0) {
+    return (
+      <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
+        <div className="relative flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
+          <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
+            Sincronizando Pawspace...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isLoading && nodes.length === 0) {
+    return (
+      <WorkspaceEmptyState
+        title="Nenhuma conquista ainda"
+        description="Crie sua árvore e adicione conteúdos para começar a desbloquear conquistas."
+        actionLabel="Ir para árvore"
+        actionHref="/tree"
+      />
+    );
+  }
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
