@@ -4,6 +4,21 @@ import { useEffect, useState } from 'react';
 import { Check, Loader2 } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { createClient } from '@/shared/supabase/client';
+import { LIMITS } from '@/lib/limits';
+
+const EMAIL_MAX = LIMITS.auth.email;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function RemainingWarning({ current, max }: { current: number; max: number }) {
+  const remaining = max - current;
+  if (current === 0 || remaining > 10) return null;
+
+  return (
+    <span className="text-[9px] font-bold text-[var(--text-muted)]">
+      {remaining}
+    </span>
+  );
+}
 
 export default function EmailSection() {
   const [email, setEmail] = useState('');
@@ -69,6 +84,14 @@ export default function EmailSection() {
       setError('Informe um email valido.');
       return;
     }
+    if (nextEmail.length > EMAIL_MAX) {
+      setError(`Email pode ter no maximo ${EMAIL_MAX} caracteres.`);
+      return;
+    }
+    if (!EMAIL_PATTERN.test(nextEmail)) {
+      setError('Informe um email valido.');
+      return;
+    }
 
     if (nextEmail === initialEmail.toLowerCase()) {
       setSaved(true);
@@ -122,13 +145,17 @@ export default function EmailSection() {
 
       <div className="space-y-4">
         <div>
-          <label className="text-[8px] font-black uppercase tracking-widest text-[var(--text-muted)] block mb-2">
-            Email Atual
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-[8px] font-black uppercase tracking-widest text-[var(--text-muted)] block">
+              Email Atual
+            </label>
+            <RemainingWarning current={email.length} max={EMAIL_MAX} />
+          </div>
           <input
             type="email"
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            maxLength={EMAIL_MAX}
+            onChange={(event) => setEmail(event.target.value.slice(0, EMAIL_MAX))}
             disabled={isLoadingUser || isSaving}
             className="library-input h-10 px-3.5 text-[11px] font-bold tracking-wide placeholder:text-[var(--text-faint)] disabled:opacity-60"
             placeholder={isLoadingUser ? 'Carregando...' : 'seu@email.com'}

@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/shared/supabase/client';
 
 export default function AuthCallbackPage() {
-  const [message, setMessage] = useState('Validando acesso...');
+  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [message, setMessage] = useState('Criando conta...');
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -18,6 +19,12 @@ export default function AuthCallbackPage() {
       if (!isActive) return;
       router.replace(destination);
       router.refresh();
+    }
+
+    function finishSignupSuccess() {
+      if (!isActive) return;
+      setStatus('success');
+      setMessage('Conta criada com sucesso. Pode fechar essa pagina.');
     }
 
     async function handleCallback() {
@@ -35,7 +42,6 @@ export default function AuthCallbackPage() {
         hashType === 'recovery';
 
       if (tokenHash && type === 'recovery') {
-        setMessage('Confirmando link de redefinicao...');
         const { error } = await supabase.auth.verifyOtp({
           type: 'recovery',
           token_hash: tokenHash,
@@ -51,7 +57,6 @@ export default function AuthCallbackPage() {
       }
 
       if (code) {
-        setMessage('Trocando codigo por sessao...');
         const { error } = await supabase.auth.exchangeCodeForSession(code);
 
         if (error) {
@@ -59,12 +64,16 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        await finish(isRecoveryFlow ? '/reset-password' : next);
+        if (isRecoveryFlow) {
+          await finish('/reset-password');
+          return;
+        }
+
+        finishSignupSuccess();
         return;
       }
 
       if (accessToken && refreshToken) {
-        setMessage('Restaurando sessao segura...');
         const { error } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
@@ -75,11 +84,15 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        await finish(isRecoveryFlow ? '/reset-password' : next);
+        if (isRecoveryFlow) {
+          await finish('/reset-password');
+          return;
+        }
+
+        finishSignupSuccess();
         return;
       }
 
-      setMessage('Aguardando autenticacao...');
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange((event, session) => {
@@ -88,7 +101,7 @@ export default function AuthCallbackPage() {
           void finish('/reset-password');
           return;
         }
-        void finish(next);
+        finishSignupSuccess();
       });
 
       const {
@@ -97,7 +110,12 @@ export default function AuthCallbackPage() {
 
       if (session) {
         subscription.unsubscribe();
-        await finish(isRecoveryFlow ? '/reset-password' : next);
+        if (isRecoveryFlow) {
+          await finish('/reset-password');
+          return;
+        }
+
+        finishSignupSuccess();
         return;
       }
 
@@ -117,13 +135,21 @@ export default function AuthCallbackPage() {
   }, [router, searchParams, supabase]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)] px-6">
-      <div className="w-full max-w-md rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-strong)] p-8 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
-        <div className="mx-auto mb-5 h-12 w-12 rounded-full border-4 border-[var(--border-subtle)] border-t-[var(--text-primary)] animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[var(--text-muted)]">
-          {message}
-        </p>
-      </div>
+    <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)] px-6 text-center">
+      {status === 'loading' ? (
+        <>
+          <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
+          <p className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] animate-pulse">
+            {message}
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)]">
+            {message}
+          </p>
+        </>
+      )}
     </div>
   );
 }

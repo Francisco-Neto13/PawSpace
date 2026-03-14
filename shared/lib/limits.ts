@@ -1,4 +1,9 @@
 export const LIMITS = {
+  auth: {
+    displayName: 40,
+    email: 254,
+    password: 72,
+  },
   skill: {
     name:        50,
     description: 200,

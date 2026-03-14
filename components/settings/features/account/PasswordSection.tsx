@@ -4,17 +4,22 @@ import { useEffect, useState } from 'react';
 import { Eye, EyeOff, Check, Loader2 } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { createClient } from '@/shared/supabase/client';
+import { LIMITS } from '@/lib/limits';
+
+const PASSWORD_MAX = LIMITS.auth.password;
 
 function PasswordInput({
   label,
   value,
   onChange,
   placeholder,
+  maxLength,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  maxLength?: number;
 }) {
   const [show, setShow] = useState(false);
 
@@ -25,7 +30,8 @@ function PasswordInput({
         <input
           type={show ? 'text' : 'password'}
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          maxLength={maxLength}
+          onChange={(event) => onChange(maxLength ? event.target.value.slice(0, maxLength) : event.target.value)}
           placeholder={placeholder ?? '********'}
           className="library-input h-10 px-3.5 pr-10 text-[11px] font-bold tracking-wide placeholder:text-[var(--text-faint)]"
         />
@@ -106,6 +112,10 @@ export default function PasswordSection() {
       setError('A nova senha deve ter ao menos 8 caracteres.');
       return;
     }
+    if (next.length > PASSWORD_MAX) {
+      setError(`A nova senha pode ter no maximo ${PASSWORD_MAX} caracteres.`);
+      return;
+    }
     if (next !== confirm) {
       setError('As senhas nao coincidem.');
       return;
@@ -167,9 +177,9 @@ export default function PasswordSection() {
       <p className="library-subtitle mb-5 ml-3">alterar senha de acesso</p>
 
       <div className="space-y-4">
-        <PasswordInput label="Senha Atual" value={current} onChange={setCurrent} />
-        <PasswordInput label="Nova Senha" value={next} onChange={setNext} />
-        <PasswordInput label="Confirmar Nova Senha" value={confirm} onChange={setConfirm} />
+        <PasswordInput label="Senha Atual" value={current} onChange={setCurrent} maxLength={PASSWORD_MAX} />
+        <PasswordInput label="Nova Senha" value={next} onChange={setNext} maxLength={PASSWORD_MAX} />
+        <PasswordInput label="Confirmar Nova Senha" value={confirm} onChange={setConfirm} maxLength={PASSWORD_MAX} />
 
         <div className="flex items-center justify-between pt-1 gap-3">
           <div>

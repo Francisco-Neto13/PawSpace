@@ -5,6 +5,20 @@ import Image from 'next/image';
 import { Camera, Check, Loader2 } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { createClient } from '@/shared/supabase/client';
+import { LIMITS } from '@/lib/limits';
+
+const USERNAME_MAX = LIMITS.auth.displayName;
+
+function RemainingWarning({ current, max }: { current: number; max: number }) {
+  const remaining = max - current;
+  if (current === 0 || remaining > 10) return null;
+
+  return (
+    <span className="text-[9px] font-bold text-[var(--text-muted)]">
+      {remaining}
+    </span>
+  );
+}
 
 export default function ProfileSection() {
   const [username, setUsername] = useState('');
@@ -69,6 +83,10 @@ export default function ProfileSection() {
     const nextName = username.trim();
     if (!nextName) {
       setError('Informe um nome de usuario valido.');
+      return;
+    }
+    if (nextName.length > USERNAME_MAX) {
+      setError(`Nome de usuario pode ter no maximo ${USERNAME_MAX} caracteres.`);
       return;
     }
 
@@ -146,13 +164,17 @@ export default function ProfileSection() {
 
         <div className="flex-1 space-y-4">
           <div>
-            <label className="text-[8px] font-black uppercase tracking-widest text-[var(--text-muted)] block mb-2">
-              Nome de Usuario
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[8px] font-black uppercase tracking-widest text-[var(--text-muted)] block">
+                Nome de Usuario
+              </label>
+              <RemainingWarning current={username.length} max={USERNAME_MAX} />
+            </div>
             <input
               type="text"
               value={username}
-              onChange={(event) => setUsername(event.target.value)}
+              maxLength={USERNAME_MAX}
+              onChange={(event) => setUsername(event.target.value.slice(0, USERNAME_MAX))}
               disabled={isLoadingUser || isSaving}
               className="library-input h-10 px-3.5 text-[11px] font-bold tracking-wide placeholder:text-[var(--text-faint)] disabled:opacity-60"
               placeholder={isLoadingUser ? 'Carregando...' : 'Seu nome'}

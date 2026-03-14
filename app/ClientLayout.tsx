@@ -5,10 +5,12 @@ import Footer from '@/components/shared/Footer';
 import AppSidebar from '@/components/shared/AppSidebar';
 
 const SIDEBAR_ROUTES = ['/overview', '/tree', '/library', '/journal', '/achievements', '/settings'];
+const FULL_BLEED_ROUTES = ['/login', '/reset-password', '/auth/callback'];
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hasSidebarLayout = SIDEBAR_ROUTES.some(route => pathname.startsWith(route));
+  const hasFullBleedLayout = FULL_BLEED_ROUTES.some(route => pathname.startsWith(route));
 
   useEffect(() => {
     const update = () => {
@@ -32,6 +34,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         </div>
       </div>
     );
+  }
+
+  if (hasFullBleedLayout) {
+    return <div className="min-h-screen w-full">{children}</div>;
   }
 
   return (

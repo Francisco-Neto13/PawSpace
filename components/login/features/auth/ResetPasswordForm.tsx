@@ -2,7 +2,12 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Eye, EyeOff, LockKeyhole } from 'lucide-react';
+import { PawIcon } from '@/components/shared/PawIcon';
+import { LIMITS } from '@/lib/limits';
 import { createClient } from '@/shared/supabase/client';
+
+const PASSWORD_MAX_LENGTH = LIMITS.auth.password;
 
 export default function ResetPasswordForm() {
   const [password, setPassword] = useState('');
@@ -26,6 +31,7 @@ export default function ResetPasswordForm() {
     async function checkSession() {
       if (code) {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+
         if (exchangeError) {
           router.replace('/login');
           return;
@@ -65,7 +71,7 @@ export default function ResetPasswordForm() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('As senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return;
     }
 
@@ -79,7 +85,7 @@ export default function ResetPasswordForm() {
     const { error: updateError } = await supabase.auth.updateUser({ password });
 
     if (updateError) {
-      setError('Link expirado ou invalido. Solicite um novo link.');
+      setError('Link expirado ou inválido. Solicite um novo link.');
       setLoading(false);
       return;
     }
@@ -98,63 +104,45 @@ export default function ResetPasswordForm() {
 
   if (verifying) {
     return (
-      <div className="flex w-full max-w-md flex-col items-center gap-5">
-        <div className="h-12 w-12 rounded-full border-4 border-[var(--border-subtle)] border-t-[var(--text-primary)] animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[var(--text-muted)]">
-          Verificando link...
+      <div className="flex w-full flex-col items-center gap-5">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--border-visible)] border-t-[var(--text-primary)]" />
+        <p className="animate-pulse text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)]">
+          Sincronizando PawSpace...
         </p>
       </div>
     );
   }
 
   return (
-    <div
-      className={`relative z-10 w-full max-w-md overflow-hidden rounded-2xl border border-[var(--border-muted)] bg-[linear-gradient(180deg,rgba(20,20,24,0.96),rgba(10,10,12,0.92))] shadow-[0_28px_90px_rgba(0,0,0,0.45)] ring-1 ring-white/[0.025] ${reveal()}`}
-    >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-
+    <div className={`relative z-10 w-full ${reveal()}`}>
       {!success ? (
         <>
-          <div className="border-b border-[var(--border-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.012))] p-8 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--border-visible)] bg-[var(--bg-elevated)]">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-[var(--text-secondary)]"
-              >
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
+          <div className="mb-8">
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--border-visible)] bg-[var(--bg-elevated)]">
+              <PawIcon className="h-5 w-5 text-[var(--text-primary)]" />
             </div>
             <p className="mb-2 text-[9px] font-black uppercase tracking-[0.34em] text-[var(--text-secondary)]">
               Redefinição de acesso
             </p>
-            <h3 className="overview-title mb-2 text-2xl">
-              Definir nova senha
-            </h3>
-            <p className="text-[11px] leading-6 text-[var(--text-secondary)]">
+            <h3 className="overview-title mb-2 text-2xl sm:text-[2rem]">Definir nova senha</h3>
+            <p className="max-w-sm text-[11px] leading-6 text-[var(--text-secondary)]">
               Escolha uma nova senha para continuar usando seu workspace com segurança.
             </p>
           </div>
 
-          <form onSubmit={handleUpdate} className="space-y-5 p-8">
+          <form onSubmit={handleUpdate} className="space-y-5">
             <div>
-              <label className="ml-1 mb-2 block text-[9px] font-black uppercase tracking-[0.25em] text-[var(--text-muted)]">
-                Nova Senha
+              <label className="mb-2 ml-1 block text-[9px] font-black uppercase tracking-[0.25em] text-[var(--text-muted)]">
+                Nova senha
               </label>
               <div className="relative">
+                <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
+                  maxLength={PASSWORD_MAX_LENGTH}
                   placeholder="Digite a nova senha"
-                  className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-input)] p-3.5 pr-20 text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-faint)] focus:border-[var(--border-visible)] focus:ring-2 focus:ring-white/10"
+                  className="w-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] py-3.5 pl-11 pr-28 text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-faint)] focus:border-[var(--border-visible)] focus:bg-[var(--bg-elevated)] focus:ring-2 focus:ring-white/10"
                   value={password}
                   onChange={(event) => {
                     setPassword(event.target.value);
@@ -164,32 +152,37 @@ export default function ResetPasswordForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((value) => !value)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer rounded-md px-2 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]"
-                  >
-                    {showPassword ? 'Ocultar' : 'Exibir'}
-                  </button>
+                  className="absolute right-3 top-1/2 inline-flex -translate-y-1/2 cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]"
+                >
+                  {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  <span>{showPassword ? 'Ocultar' : 'Exibir'}</span>
+                </button>
               </div>
             </div>
 
             <div>
-              <label className="ml-1 mb-2 block text-[9px] font-black uppercase tracking-[0.25em] text-[var(--text-muted)]">
-                Confirmar Senha
+              <label className="mb-2 ml-1 block text-[9px] font-black uppercase tracking-[0.25em] text-[var(--text-muted)]">
+                Confirmar senha
               </label>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                placeholder="Confirme a nova senha"
-                className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-input)] p-3.5 text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-faint)] focus:border-[var(--border-visible)] focus:ring-2 focus:ring-white/10"
-                value={confirmPassword}
-                onChange={(event) => {
-                  setConfirmPassword(event.target.value);
-                  setError('');
-                }}
-              />
+              <div className="relative">
+                <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  maxLength={PASSWORD_MAX_LENGTH}
+                  placeholder="Confirme a nova senha"
+                  className="w-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] py-3.5 pl-11 pr-4 text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-faint)] focus:border-[var(--border-visible)] focus:bg-[var(--bg-elevated)] focus:ring-2 focus:ring-white/10"
+                  value={confirmPassword}
+                  onChange={(event) => {
+                    setConfirmPassword(event.target.value);
+                    setError('');
+                  }}
+                />
+              </div>
             </div>
 
             {error && (
-              <div className="flex items-center gap-2.5 rounded-xl border border-[#4e2331] bg-[#1b1017] px-4 py-3 text-[10px] font-bold text-[#ffb4c4]">
+              <div className="flex items-center gap-2.5 rounded-2xl border border-[#4e2331] bg-[#1b1017] px-4 py-3 text-[10px] font-bold text-[#ffb4c4]">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="14"
@@ -212,15 +205,15 @@ export default function ResetPasswordForm() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl bg-[var(--text-primary)] py-4 text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-base)] shadow-[0_10px_30px_rgba(255,255,255,0.08)] transition-all hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl bg-[var(--text-primary)] py-4 text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-base)] shadow-[0_10px_30px_rgba(255,255,255,0.08)] transition-all hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? 'Atualizando...' : 'Atualizar Senha'}
+              {loading ? 'Atualizando...' : 'Atualizar senha'}
             </button>
           </form>
         </>
       ) : (
-        <div className="p-8 text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]">
+        <div className="w-full">
+          <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-[1.4rem] border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="28"
@@ -236,13 +229,11 @@ export default function ResetPasswordForm() {
             </svg>
           </div>
           <p className="mb-2 text-[9px] font-black uppercase tracking-[0.34em] text-[var(--text-secondary)]">
-            Atualização concluída
+            Alteração concluída
           </p>
-          <h3 className="overview-title mb-3 text-xl">
-            Senha atualizada
-          </h3>
+          <h3 className="overview-title mb-3 text-xl">Senha alterada com sucesso</h3>
           <p className="text-[11px] leading-6 text-[var(--text-secondary)]">
-            Redirecionando para o login...
+            Sua nova senha já foi salva. Você será redirecionado para a tela de login em instantes.
           </p>
         </div>
       )}
