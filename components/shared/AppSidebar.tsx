@@ -48,7 +48,7 @@ export default function AppSidebar() {
 
     if (isDirty) {
       const confirmExit = window.confirm(
-        'Voce tem alteracoes nao salvas na sua arvore. Se sair agora, essas pegadas serao perdidas. Deseja continuar?'
+        'Você tem alterações não salvas na sua árvore. Se sair agora, essas pegadas serão perdidas. Deseja continuar?'
       );
       if (!confirmExit) return;
       discardLocalChanges();
@@ -62,7 +62,7 @@ export default function AppSidebar() {
 
   const handleLogout = async () => {
     if (isDirty) {
-      const confirmExit = window.confirm('Sair do PawSpace e perder alteracoes nao salvas?');
+      const confirmExit = window.confirm('Sair do PawSpace e perder alterações não salvas?');
       if (!confirmExit) return;
       setIsDirty(false);
     }
@@ -83,7 +83,7 @@ export default function AppSidebar() {
     try {
       window.localStorage.setItem(SIDEBAR_STORAGE_KEY, next ? '1' : '0');
     } catch {
-      // Falha de escrita de storage nao impede o layout.
+      // Falha de escrita de storage não impede o layout.
     }
   };
 

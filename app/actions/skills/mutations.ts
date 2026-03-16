@@ -41,7 +41,7 @@ async function resolveParentIdForUser(
   if (!parentId) return { parentId: null };
 
   if (skillId && parentId === skillId) {
-    return { parentId: null, error: 'Um modulo nao pode ser pai de si mesmo.' };
+    return { parentId: null, error: 'Um módulo não pode ser pai de si mesmo.' };
   }
 
   const parent = await prisma.skill.findFirst({
@@ -50,7 +50,7 @@ async function resolveParentIdForUser(
   });
 
   if (!parent) {
-    return { parentId: null, error: 'Modulo pai invalido para este usuario.' };
+    return { parentId: null, error: 'Módulo pai inválido para este usuário.' };
   }
 
   return { parentId: parent.id };
@@ -58,16 +58,16 @@ async function resolveParentIdForUser(
 
 export async function addSkill(data: SkillMutationInput) {
   const userId = await getAuthUser();
-  if (!userId) return { success: false, error: 'Nao autorizado' };
+  if (!userId) return { success: false, error: 'Não autorizado' };
 
   const name = (data.name || data.label || '').trim();
   const description = (data.description || '').trim();
 
   if (name.length > NAME_MAX) {
-    return { success: false, error: `Nome pode ter no maximo ${NAME_MAX} caracteres.` };
+    return { success: false, error: `Nome pode ter no máximo ${NAME_MAX} caracteres.` };
   }
   if (description.length > DESC_MAX) {
-    return { success: false, error: `Descricao pode ter no maximo ${DESC_MAX} caracteres.` };
+    return { success: false, error: `Descrição pode ter no máximo ${DESC_MAX} caracteres.` };
   }
 
   const count = await prisma.skill.count({ where: { userId } });
@@ -112,10 +112,10 @@ export async function updateSkill(skillId: string, data: SkillMutationInput) {
   const description = (data.description || '').trim();
 
   if (hasName && name.length > NAME_MAX) {
-    return { success: false, error: `Nome pode ter no maximo ${NAME_MAX} caracteres.` };
+    return { success: false, error: `Nome pode ter no máximo ${NAME_MAX} caracteres.` };
   }
   if (hasDescription && description.length > DESC_MAX) {
-    return { success: false, error: `Descricao pode ter no maximo ${DESC_MAX} caracteres.` };
+    return { success: false, error: `Descrição pode ter no máximo ${DESC_MAX} caracteres.` };
   }
 
   try {
@@ -202,7 +202,7 @@ export async function saveNexusChanges(nodes: NexusSkillNodeInput[]) {
       `
     );
 
-    console.log(`[Pawspace Mutation] Sincronizacao: ${Date.now() - start}ms`);
+    console.log(`[Pawspace Mutation] Sincronização: ${Date.now() - start}ms`);
     return { success: true };
   } catch (error) {
     console.error('[Pawspace Mutation] Erro no salvamento global:', error);
@@ -241,7 +241,7 @@ export async function updateManySkillPositions(positions: { skillId: string; x: 
 
     return { success: true };
   } catch (error) {
-    console.error('[Pawspace Mutation] Erro ao atualizar posicoes:', error);
+    console.error('[Pawspace Mutation] Erro ao atualizar posições:', error);
     return { success: false };
   }
 }

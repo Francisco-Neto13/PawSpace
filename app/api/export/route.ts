@@ -109,7 +109,7 @@ export async function GET(request: Request) {
 
     const userId = await getAuthenticatedUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Nao autorizado.' }, { status: 401 });
+      return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
     }
 
     const includeTree = scope === 'tree' || scope === 'all';

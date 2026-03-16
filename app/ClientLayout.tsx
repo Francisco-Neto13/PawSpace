@@ -6,11 +6,13 @@ import AppSidebar from '@/components/shared/AppSidebar';
 
 const SIDEBAR_ROUTES = ['/overview', '/tree', '/library', '/journal', '/achievements', '/settings'];
 const FULL_BLEED_ROUTES = ['/login', '/reset-password', '/auth/callback'];
+const MARKETING_ROUTES = ['/'];
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hasSidebarLayout = SIDEBAR_ROUTES.some(route => pathname.startsWith(route));
   const hasFullBleedLayout = FULL_BLEED_ROUTES.some(route => pathname.startsWith(route));
+  const hasMarketingLayout = MARKETING_ROUTES.includes(pathname);
 
   useEffect(() => {
     const update = () => {
@@ -38,6 +40,17 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   if (hasFullBleedLayout) {
     return <div className="min-h-screen w-full">{children}</div>;
+  }
+
+  if (hasMarketingLayout) {
+    return (
+      <div className="flex flex-col min-h-screen w-full">
+        <main className="relative flex-1 w-full">
+          {children}
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (

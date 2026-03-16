@@ -162,7 +162,7 @@ function SkillTreeInner() {
         invalidateOverview();
       }
     } catch (error) {
-      console.error('[Árvore] Erro critico na sincronizacao:', error);
+      console.error('[Árvore] Erro crítico na sincronização:', error);
     } finally {
       setIsSaving(false);
     }
@@ -349,7 +349,7 @@ function SkillTreeInner() {
           <div className="flex items-center gap-3 reveal-fade delay-0">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
             <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
-              PawSpace / Arvore
+              PawSpace / Árvore
             </span>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
           </div>
@@ -358,14 +358,14 @@ function SkillTreeInner() {
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
               <div>
-                <p className="library-kicker mb-2">Territorio de Estudo</p>
-                <h1 className="overview-title text-2xl md:text-3xl mb-2">Arvore do PawSpace</h1>
+                <p className="library-kicker mb-2">Território de estudo</p>
+                <h1 className="overview-title text-2xl md:text-3xl mb-2">Árvore do PawSpace</h1>
                 <p className="library-subtitle max-w-2xl">
-                  Modele seu mapa de estudos por dependencia, organize os modulos no canvas e deixe o territorio pronto para crescer.
+                  Modele seu mapa de estudos por dependência, organize os módulos no canvas e deixe o território pronto para crescer.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
                   <span className="library-chip">Trilhas: {nodes.length}</span>
-                  <span className="library-chip">Raizes: {rootNodesCount}</span>
+                  <span className="library-chip">Raízes: {rootNodesCount}</span>
                   <span className="library-chip">Com Material: {nodesWithContentCount}</span>
                   <span className="library-chip">
                     Selecionado: {selectedNode?.data.label || selectedNode?.data.name || 'Nenhum'}
@@ -377,7 +377,7 @@ function SkillTreeInner() {
                 <div className="h-8 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center gap-2">
                   <AlertCircle size={11} className={canSave ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'} />
                   <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">
-                    {canSave ? 'Pegadas Pendentes' : 'Territorio Sincronizado'}
+                    {canSave ? 'Pegadas pendentes' : 'Território sincronizado'}
                   </span>
                 </div>
 
@@ -392,7 +392,7 @@ function SkillTreeInner() {
                     }`}
                 >
                   {isSaving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
-                  {isSaving ? 'Salvando...' : 'Salvar Alteracoes'}
+                  {isSaving ? 'Salvando...' : 'Salvar alterações'}
                 </button>
               </div>
             </div>
@@ -416,7 +416,7 @@ function SkillTreeInner() {
                   <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
                   <div className="relative z-10 p-3">
-                    <p className="text-[7px] text-[var(--text-secondary)] uppercase tracking-[0.2em] font-black mb-1.5">Trilha Selecionada</p>
+                    <p className="text-[7px] text-[var(--text-secondary)] uppercase tracking-[0.2em] font-black mb-1.5">Trilha selecionada</p>
                     <h3 className="text-[11px] text-[var(--text-primary)] font-black uppercase tracking-[0.16em] leading-snug mb-2 truncate">
                       {selectedNode.data.label || selectedNode.data.name || 'Sem nome'}
                     </h3>
@@ -430,7 +430,7 @@ function SkillTreeInner() {
                       </div>
                       <div className="relative rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-2 overflow-hidden">
                         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-                        <p className="text-[7px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black mb-1">Conteudos</p>
+                        <p className="text-[7px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black mb-1">Conteúdos</p>
                         <p className="text-[12px] leading-none text-[var(--text-primary)] font-black font-mono tabular-nums">{selectedContentsCount}</p>
                         <div className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b border-r border-[var(--border-muted)]" />
                       </div>
@@ -529,7 +529,7 @@ function SkillTreeInner() {
                       zoom: viewport.zoom,
                     }));
                   } catch {
-                    // Se armazenamento falhar, apenas segue sem persistencia.
+                    // Se armazenamento falhar, apenas segue sem persistência.
                   }
                 }}
                 style={{ background: 'transparent' }}

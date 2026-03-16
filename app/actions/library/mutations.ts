@@ -13,14 +13,14 @@ const PDF_MAX_BYTES = LIMITS.library.pdfMaxBytes;
 
 async function resolveOwnedSkillId(skillIdInput: string, userId: string) {
   const skillId = (skillIdInput || '').trim();
-  if (!skillId) return { skillId: null as string | null, error: 'Skill invalida.' };
+  if (!skillId) return { skillId: null as string | null, error: 'Skill inválida.' };
 
   const skill = await prisma.skill.findFirst({
     where: { id: skillId, userId },
     select: { id: true },
   });
 
-  if (!skill) return { skillId: null as string | null, error: 'Skill nao encontrada para este usuario.' };
+  if (!skill) return { skillId: null as string | null, error: 'Skill não encontrada para este usuário.' };
   return { skillId: skill.id };
 }
 
@@ -28,32 +28,32 @@ export async function addContent(data: ContentInput) {
   const totalStart = Date.now();
   try {
     const userId = await getAuthUser();
-    if (!userId) throw new Error('Usuario nao identificado.');
+    if (!userId) throw new Error('Usuário não identificado.');
 
     const title = (data.title || '').trim();
     const url = (data.url || '').trim();
     const body = (data.body || '').trim();
 
     if (title.length > TITLE_MAX) {
-      return { success: false, error: `Titulo pode ter no maximo ${TITLE_MAX} caracteres.` };
+      return { success: false, error: `Título pode ter no máximo ${TITLE_MAX} caracteres.` };
     }
     if (url && url.length > URL_MAX) {
-      return { success: false, error: `URL pode ter no maximo ${URL_MAX} caracteres.` };
+      return { success: false, error: `URL pode ter no máximo ${URL_MAX} caracteres.` };
     }
     if (body && body.length > BODY_MAX) {
-      return { success: false, error: `Nota pode ter no maximo ${BODY_MAX} caracteres.` };
+      return { success: false, error: `Nota pode ter no máximo ${BODY_MAX} caracteres.` };
     }
 
     const skillResolution = await resolveOwnedSkillId(data.skillId, userId);
     if (skillResolution.error || !skillResolution.skillId) {
-      return { success: false, error: skillResolution.error || 'Skill invalida.' };
+      return { success: false, error: skillResolution.error || 'Skill inválida.' };
     }
 
     const count = await prisma.libraryContent.count({
       where: { skillId: skillResolution.skillId, userId },
     });
     if (count >= MAX_CONTENTS) {
-      return { success: false, error: `Limite de ${MAX_CONTENTS} conteudos por no atingido.` };
+      return { success: false, error: `Limite de ${MAX_CONTENTS} conteúdos por nó atingido.` };
     }
 
     const content = await prisma.libraryContent.create({
@@ -80,12 +80,12 @@ export async function deleteContent(contentId: string) {
   const totalStart = Date.now();
   try {
     const userId = await getAuthUser();
-    if (!userId) return { success: false, error: 'Nao autorizado' };
+    if (!userId) return { success: false, error: 'Não autorizado' };
 
     const content = await prisma.libraryContent.findFirst({
       where: { id: contentId, userId },
     });
-    if (!content) throw new Error('Conteudo nao encontrado.');
+    if (!content) throw new Error('Conteúdo não encontrado.');
 
     if (content.fileKey) {
       const supabase = await createClient();
@@ -105,12 +105,12 @@ export async function uploadPdf(formData: FormData) {
   const totalStart = Date.now();
   try {
     const userId = await getAuthUser();
-    if (!userId) return { success: false, error: 'Nao autorizado' };
+    if (!userId) return { success: false, error: 'Não autorizado' };
 
     const file = formData.get('file') as File;
     if (!file) return { success: false, error: 'Nenhum arquivo enviado' };
     const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-    if (!isPdf) return { success: false, error: 'Apenas arquivos PDF sao permitidos.' };
+    if (!isPdf) return { success: false, error: 'Apenas arquivos PDF são permitidos.' };
     if (file.size > PDF_MAX_BYTES) {
       return {
         success: false,

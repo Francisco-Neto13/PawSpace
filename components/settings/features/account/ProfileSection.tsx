@@ -35,7 +35,7 @@ export default function ProfileSection() {
     const loadingTimeout = window.setTimeout(() => {
       if (!mounted) return;
       setIsLoadingUser(false);
-      setError((prev) => prev ?? 'Nao foi possivel carregar o perfil.');
+      setError((prev) => prev ?? 'Não foi possível carregar o perfil.');
     }, 8000);
 
     const loadUser = async () => {
@@ -48,7 +48,7 @@ export default function ProfileSection() {
 
         if (!mounted) return;
         if (userError || !user) {
-          setError('Sessao nao encontrada.');
+          setError('Sessão não encontrada.');
           return;
         }
 
@@ -58,7 +58,7 @@ export default function ProfileSection() {
         setInitialUsername(resolvedName);
       } catch {
         if (!mounted) return;
-        setError('Falha ao carregar dados do usuario.');
+        setError('Falha ao carregar dados do usuário.');
       } finally {
         if (!mounted) return;
         window.clearTimeout(loadingTimeout);
@@ -82,11 +82,11 @@ export default function ProfileSection() {
 
     const nextName = username.trim();
     if (!nextName) {
-      setError('Informe um nome de usuario valido.');
+      setError('Informe um nome de usuário válido.');
       return;
     }
     if (nextName.length > USERNAME_MAX) {
-      setError(`Nome de usuario pode ter no maximo ${USERNAME_MAX} caracteres.`);
+      setError(`Nome de usuário pode ter no máximo ${USERNAME_MAX} caracteres.`);
       return;
     }
 
@@ -139,7 +139,7 @@ export default function ProfileSection() {
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Perfil
       </p>
-      <p className="library-subtitle mb-5 ml-3">nome de exibicao e avatar da sua patinha</p>
+      <p className="library-subtitle mb-5 ml-3">nome de exibição e avatar da sua patinha</p>
 
       <div className="flex items-start gap-5">
         <div className="shrink-0">
@@ -177,7 +177,7 @@ export default function ProfileSection() {
               onChange={(event) => setUsername(event.target.value.slice(0, USERNAME_MAX))}
               disabled={isLoadingUser || isSaving}
               className="library-input h-10 px-3.5 text-[11px] font-bold tracking-wide placeholder:text-[var(--text-faint)] disabled:opacity-60"
-              placeholder={isLoadingUser ? 'Carregando...' : 'Como voce quer aparecer'}
+              placeholder={isLoadingUser ? 'Carregando...' : 'Como você quer aparecer'}
             />
           </div>
 

@@ -26,7 +26,7 @@ export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
       const response = await fetch('https://emojihub.yurace.pro/api/all/category/objects');
       const data: unknown = await response.json();
       if (!Array.isArray(data)) {
-        throw new Error('Formato de resposta invalido para emojis');
+        throw new Error('Formato de resposta inválido para emojis');
       }
 
       const parsed = data.filter(

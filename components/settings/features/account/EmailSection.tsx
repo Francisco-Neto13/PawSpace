@@ -34,7 +34,7 @@ export default function EmailSection() {
     const loadingTimeout = window.setTimeout(() => {
       if (!mounted) return;
       setIsLoadingUser(false);
-      setError((prev) => prev ?? 'Nao foi possivel carregar o email.');
+      setError((prev) => prev ?? 'Não foi possível carregar o e-mail.');
     }, 8000);
 
     const loadUser = async () => {
@@ -47,7 +47,7 @@ export default function EmailSection() {
 
         if (!mounted) return;
         if (userError || !user) {
-          setError('Sessao nao encontrada.');
+          setError('Sessão não encontrada.');
           return;
         }
 
@@ -56,7 +56,7 @@ export default function EmailSection() {
         setInitialEmail(currentEmail);
       } catch {
         if (!mounted) return;
-        setError('Falha ao carregar dados do usuario.');
+        setError('Falha ao carregar dados do usuário.');
       } finally {
         if (!mounted) return;
         window.clearTimeout(loadingTimeout);
@@ -81,21 +81,21 @@ export default function EmailSection() {
 
     const nextEmail = email.trim().toLowerCase();
     if (!nextEmail) {
-      setError('Informe um email valido.');
+      setError('Informe um e-mail válido.');
       return;
     }
     if (nextEmail.length > EMAIL_MAX) {
-      setError(`Email pode ter no maximo ${EMAIL_MAX} caracteres.`);
+      setError(`E-mail pode ter no máximo ${EMAIL_MAX} caracteres.`);
       return;
     }
     if (!EMAIL_PATTERN.test(nextEmail)) {
-      setError('Informe um email valido.');
+      setError('Informe um e-mail válido.');
       return;
     }
 
     if (nextEmail === initialEmail.toLowerCase()) {
       setSaved(true);
-      setMessage('Nenhuma alteracao detectada.');
+      setMessage('Nenhuma alteração detectada.');
       return;
     }
 
@@ -105,7 +105,7 @@ export default function EmailSection() {
     const savingWatchdog = window.setTimeout(() => {
       timedOut = true;
       setIsSaving(false);
-      setError('A atualizacao esta demorando. Verifique seu email e tente novamente.');
+      setError('A atualização está demorando. Verifique seu e-mail e tente novamente.');
     }, 20000);
 
     try {
@@ -121,11 +121,11 @@ export default function EmailSection() {
       setSaved(true);
       setMessage(
         timedOut
-          ? 'Atualizacao concluida. Confira seu email para confirmar.'
-          : 'Verifique seu email para confirmar a alteracao.'
+          ? 'Atualização concluída. Confira seu e-mail para confirmar.'
+          : 'Verifique seu e-mail para confirmar a alteração.'
       );
     } catch (saveError) {
-      const text = saveError instanceof Error ? saveError.message : 'Falha ao atualizar email.';
+      const text = saveError instanceof Error ? saveError.message : 'Falha ao atualizar e-mail.';
       setError(text);
     } finally {
       window.clearTimeout(savingWatchdog);
@@ -141,13 +141,13 @@ export default function EmailSection() {
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Email
       </p>
-      <p className="library-subtitle mb-5 ml-3">email que protege o acesso a sua toca</p>
+      <p className="library-subtitle mb-5 ml-3">e-mail que protege o acesso à sua toca</p>
 
       <div className="space-y-4">
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="text-[8px] font-black uppercase tracking-widest text-[var(--text-muted)] block">
-              Email Atual
+              E-mail atual
             </label>
             <RemainingWarning current={email.length} max={EMAIL_MAX} />
           </div>
@@ -165,7 +165,7 @@ export default function EmailSection() {
         <div className="flex items-center justify-between pt-1 gap-4">
           <div>
             <p className="text-[8px] text-[var(--text-faint)] uppercase tracking-wider font-bold">
-              Enviaremos um link de confirmacao para a nova caixa de entrada.
+              Enviaremos um link de confirmação para a nova caixa de entrada.
             </p>
             {error && <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold mt-1">{error}</p>}
             {message && !error && (
@@ -185,7 +185,7 @@ export default function EmailSection() {
           >
             {isSaving ? <Loader2 size={10} className="animate-spin" /> : null}
             {!isSaving && saved ? <Check size={10} /> : null}
-            {isSaving ? 'Salvando...' : saved ? 'Enviado' : 'Atualizar email'}
+            {isSaving ? 'Salvando...' : saved ? 'Enviado' : 'Atualizar e-mail'}
           </button>
         </div>
       </div>

@@ -9,27 +9,27 @@ const SECTION_META: Record<
   account: {
     label: 'Perfil',
     title: 'Perfil do PawSpace',
-    description: 'Ajuste nome, email e senha da sua base de estudos.',
+    description: 'Ajuste nome, e-mail e senha da sua base de estudos.',
   },
   appearance: {
     label: 'Clima',
     title: 'Clima do PawSpace',
-    description: 'Escolha o visual mais confortavel para estudar, revisar e circular pelo espaco.',
+    description: 'Escolha o visual mais confortável para estudar, revisar e circular pelo espaço.',
   },
   data: {
     label: 'Dados',
     title: 'Dados da sua trilha',
-    description: 'Veja limites, acompanhe o uso e exporte uma copia do seu espaco quando quiser.',
+    description: 'Veja limites, acompanhe o uso e exporte uma cópia do seu espaço quando quiser.',
   },
   privacy: {
     label: 'Acesso',
     title: 'Pegadas de acesso',
-    description: 'Gerencie os dispositivos com acesso a sua conta e feche sessoes antigas com calma.',
+    description: 'Gerencie os dispositivos com acesso à sua conta e feche sessões antigas com calma.',
   },
   danger: {
     label: 'Zona de risco',
-    title: 'Acoes permanentes',
-    description: 'Revise com cuidado qualquer mudanca irreversivel antes de confirmar.',
+    title: 'Ações permanentes',
+    description: 'Revise com cuidado qualquer mudança irreversível antes de confirmar.',
   },
 };
 

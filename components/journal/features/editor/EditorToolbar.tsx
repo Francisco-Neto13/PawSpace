@@ -8,9 +8,9 @@ export function EditorToolbar() {
 
   const tools = [
     { icon: <Bold size={13} />, action: () => cmd('bold'), title: 'Negrito (Ctrl+B)' },
-    { icon: <Italic size={13} />, action: () => cmd('italic'), title: 'Italico (Ctrl+I)' },
-    { icon: <Quote size={13} />, action: () => cmd('formatBlock', 'blockquote'), title: 'Citacao' },
-    { icon: <Code size={13} />, action: () => cmd('formatBlock', 'pre'), title: 'Bloco de Codigo' },
+    { icon: <Italic size={13} />, action: () => cmd('italic'), title: 'Itálico (Ctrl+I)' },
+    { icon: <Quote size={13} />, action: () => cmd('formatBlock', 'blockquote'), title: 'Citação' },
+    { icon: <Code size={13} />, action: () => cmd('formatBlock', 'pre'), title: 'Bloco de código' },
     { isSeparator: true },
     { icon: <List size={13} />, action: () => cmd('insertUnorderedList'), title: 'Lista' },
     { icon: <ListOrdered size={13} />, action: () => cmd('insertOrderedList'), title: 'Lista numerada' },

@@ -73,7 +73,7 @@ export function PdfForm({ mode, url, file, maxFileSizeBytes, onModeChange, onUrl
             </div>
           </button>
           <p className={`mt-2 text-[9px] font-mono ${isOverLimit ? 'text-red-400' : 'text-[var(--text-secondary)]'}`}>
-            {isOverLimit ? `Arquivo acima do limite de ${maxMb} MB.` : `Tamanho maximo: ${maxMb} MB`}
+            {isOverLimit ? `Arquivo acima do limite de ${maxMb} MB.` : `Tamanho máximo: ${maxMb} MB`}
           </p>
         </div>
       ) : (

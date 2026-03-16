@@ -38,6 +38,7 @@ export async function proxy(request: NextRequest) {
   const user = session?.user ?? null
 
   const url = request.nextUrl.clone()
+  const isHomeRoute = url.pathname === '/'
   const isLoginRoute = url.pathname.startsWith('/login')
   const isResetPasswordRoute = url.pathname.startsWith('/reset-password')
   const isAuthCallbackRoute = url.pathname.startsWith('/auth/callback')
@@ -56,17 +57,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (!user && !isLoginRoute && !isResetPasswordRoute && !isAuthCallbackRoute) {
+  if (!user && !isHomeRoute && !isLoginRoute && !isResetPasswordRoute && !isAuthCallbackRoute) {
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
   if (user && isLoginRoute) {
-    url.pathname = '/overview'
-    return NextResponse.redirect(url)
-  }
-
-  if (user && url.pathname === '/') {
     url.pathname = '/overview'
     return NextResponse.redirect(url)
   }

@@ -52,18 +52,18 @@ export function useSkillActions() {
     const hasChildren = nodes.some((item) => item.data.parentId === nodeId);
 
     if (isRoot) {
-      alert('Nao e possivel remover a trilha raiz do mapa.');
+      alert('Não é possível remover a trilha raiz do mapa.');
       return false;
     }
 
     if (hasChildren) {
-      alert('Nao e possivel remover uma trilha que ainda possui subtrilhas.');
+      alert('Não é possível remover uma trilha que ainda possui subtrilhas.');
       return false;
     }
 
     const isConfirmed = await confirmDialog({
       title: 'Remover trilha',
-      description: `A trilha "${node?.data.label || node?.data.name || 'Sem nome'}" e suas conexoes serao removidas.`,
+      description: `A trilha "${node?.data.label || node?.data.name || 'Sem nome'}" e suas conexões serão removidas.`,
       confirmLabel: 'Remover',
       cancelLabel: 'Cancelar',
       tone: 'danger',
@@ -211,7 +211,7 @@ export function useSkillActions() {
 
       return true;
     } catch (error) {
-      console.error('[SkillActions] Erro no save global:', error);
+      console.error('[SkillActions] Erro no salvamento global:', error);
       alert('Erro ao sincronizar as pegadas do mapa.');
       return false;
     }

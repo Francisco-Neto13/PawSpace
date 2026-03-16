@@ -99,8 +99,8 @@ export default function OverviewContent() {
     return (
       <WorkspaceEmptyState
         title="Painel sem pegadas"
-        description="Crie sua arvore para abrir o radar do seu territorio de estudos."
-        actionLabel="Ir para a arvore"
+        description="Crie sua árvore para abrir o radar do seu território de estudos."
+        actionLabel="Ir para a árvore"
         actionHref="/tree"
       />
     );
@@ -111,21 +111,21 @@ export default function OverviewContent() {
     if (pending <= 0) {
       return {
         title: 'Cobertura completa atingida',
-        body: 'Todas as trilhas ja tem material. Agora vale revisar, atualizar e podar o que ficou antigo.',
-        tag: 'Manutencao',
+        body: 'Todas as trilhas já têm material. Agora vale revisar, atualizar e podar o que ficou antigo.',
+        tag: 'Manutenção',
       };
     }
     if (criticalUncovered > 0) {
       return {
-        title: `${criticalUncovered} trilha${criticalUncovered > 1 ? 's criticas sem' : ' critica sem'} material`,
-        body: 'Comece por elas. Essas trilhas sustentam mais avancos no mapa do que trilhas isoladas.',
+        title: `${criticalUncovered} trilha${criticalUncovered > 1 ? 's críticas sem' : ' crítica sem'} material`,
+        body: 'Comece por elas. Essas trilhas sustentam mais avanços no mapa do que trilhas isoladas.',
         tag: 'Prioridade',
       };
     }
     return {
       title: `${pending} trilha${pending > 1 ? 's aguardando' : ''} material`,
-      body: 'Avance por area para manter a estante equilibrada em todo o mapa.',
-      tag: 'Proxima passada',
+      body: 'Avance por área para manter a estante equilibrada em todo o mapa.',
+      tag: 'Próxima passada',
     };
   })();
 
@@ -160,7 +160,7 @@ export default function OverviewContent() {
               <div className="flex items-center justify-between mb-4">
                 <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
                   <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-                  Proxima passada
+                  Próxima passada
                 </p>
                 <span className="overview-chip">
                   {nextAction.tag}
@@ -174,7 +174,7 @@ export default function OverviewContent() {
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <span className="overview-chip">Pendentes: {pending}</span>
-                <span className="overview-chip">Criticas: {criticalUncovered}</span>
+                <span className="overview-chip">Críticas: {criticalUncovered}</span>
                 <span className="overview-chip">Cobertura: {stats.progress}%</span>
               </div>
             </div>

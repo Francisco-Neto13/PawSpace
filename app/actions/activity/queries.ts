@@ -110,7 +110,7 @@ export async function getRecentActivityPageForUserId(
         key: `journal:${row.id}:${isoDate}`,
         type: 'journal',
         id: row.id,
-        title: row.title?.trim() || 'Sem titulo',
+        title: row.title?.trim() || 'Sem título',
         date: isoDate,
       };
     });
@@ -121,7 +121,7 @@ export async function getRecentActivityPageForUserId(
         key: `skill:${row.id}:${isoDate}`,
         type: 'skill',
         id: row.id,
-        title: row.name?.trim() || 'Modulo sem nome',
+        title: row.name?.trim() || 'Módulo sem nome',
         icon: row.icon || '*',
         date: isoDate,
       };
@@ -129,12 +129,12 @@ export async function getRecentActivityPageForUserId(
 
     const libraryItems: ActivityFeedItem[] = libraryRows.map((row) => {
       const isoDate = row.updatedAt.toISOString();
-      const contentType = row.type || 'conteudo';
+      const contentType = row.type || 'conteúdo';
       return {
         key: `library:${row.id}:${isoDate}`,
         type: 'library',
         id: row.id,
-        title: row.title?.trim() || 'Conteudo sem titulo',
+        title: row.title?.trim() || 'Conteúdo sem título',
         icon: 'L',
         date: isoDate,
         contentType,

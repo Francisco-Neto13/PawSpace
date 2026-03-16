@@ -4,10 +4,10 @@ import { Download } from 'lucide-react';
 import { PawIcon } from '@/components/shared/PawIcon';
 
 const EXPORT_ITEMS = [
-  { key: 'tree', label: 'Arvore do PawSpace', sub: 'modulos e conexoes em JSON' },
-  { key: 'journal', label: 'Diario', sub: 'todas as notas em JSON' },
+  { key: 'tree', label: 'Árvore do PawSpace', sub: 'módulos e conexões em JSON' },
+  { key: 'journal', label: 'Diário', sub: 'todas as notas em JSON' },
   { key: 'library', label: 'Estante', sub: 'materiais e links em JSON' },
-  { key: 'all', label: 'Tudo', sub: 'backup completo do espaco' },
+  { key: 'all', label: 'Tudo', sub: 'backup completo do espaço' },
 ] as const;
 
 type ExportKey = (typeof EXPORT_ITEMS)[number]['key'];
@@ -22,8 +22,8 @@ function getFileNameFromResponse(response: Response, fallbackScope: ExportKey) {
 }
 
 function getExportErrorMessage(scope: ExportKey) {
-  if (scope === 'tree') return 'Falha ao exportar arvore.';
-  if (scope === 'journal') return 'Falha ao exportar diario.';
+  if (scope === 'tree') return 'Falha ao exportar árvore.';
+  if (scope === 'journal') return 'Falha ao exportar diário.';
   if (scope === 'library') return 'Falha ao exportar biblioteca.';
   return 'Falha ao exportar dados completos.';
 }
@@ -73,7 +73,7 @@ export default function ExportSection() {
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Mochila de Backup
       </p>
-      <p className="library-subtitle mb-5 ml-3">leve uma copia do seu PawSpace em formato JSON</p>
+      <p className="library-subtitle mb-5 ml-3">leve uma cópia do seu PawSpace em formato JSON</p>
 
       <div className="space-y-2">
         {EXPORT_ITEMS.map((item) => {

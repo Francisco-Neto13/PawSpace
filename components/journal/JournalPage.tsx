@@ -96,7 +96,7 @@ export default function JournalPage() {
     const entry = entries.find((item) => item.id === id);
     const isConfirmed = await confirmDialog({
       title: 'Excluir nota',
-      description: `Esta nota sera removida do diario: "${entry?.title ?? 'Sem titulo'}".`,
+      description: `Esta nota será removida do diário: "${entry?.title ?? 'Sem título'}".`,
       confirmLabel: 'Excluir',
       cancelLabel: 'Cancelar',
       tone: 'danger',
@@ -150,9 +150,9 @@ export default function JournalPage() {
   if (!isLoadingNexus && nodes.length === 0) {
     return (
       <WorkspaceEmptyState
-        title="Diario sem pegadas"
-        description="Crie sua arvore para comecar a registrar progresso e revisoes por modulo."
-        actionLabel="Ir para a arvore"
+        title="Diário sem pegadas"
+        description="Crie sua árvore para começar a registrar progresso e revisões por módulo."
+        actionLabel="Ir para a árvore"
         actionHref="/tree"
       />
     );
@@ -167,7 +167,7 @@ export default function JournalPage() {
           <div className="flex items-center gap-3 reveal-fade delay-0">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
             <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
-              PawSpace / Diario
+              PawSpace / Diário
             </span>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
           </div>
@@ -177,9 +177,9 @@ export default function JournalPage() {
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
               <div>
                 <p className="library-kicker mb-2">Rastro de Estudos</p>
-                <h1 className="overview-title text-2xl md:text-3xl mb-2">Diario do PawSpace</h1>
+                <h1 className="overview-title text-2xl md:text-3xl mb-2">Diário do PawSpace</h1>
                 <p className="library-subtitle max-w-2xl">
-                  Registre sessoes, decisoes e revisoes. Vincule cada nota aos modulos para manter o rastro do aprendizado sempre acessivel.
+                  Registre sessões, decisões e revisões. Vincule cada nota aos módulos para manter o rastro do aprendizado sempre acessível.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
                   <span className="library-chip">Notas: {isLoadingEntries ? '--' : entries.length}</span>

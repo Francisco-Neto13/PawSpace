@@ -141,6 +141,10 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
+html {
+  scroll-behavior: auto;
+}
+
 h1, h2, h3, h4, h5, h6, button, .skill-label-text {
   font-family: var(--font-main);
   font-weight: 600;
@@ -360,6 +364,12 @@ h1, h2, h3, h4, h5, h6, button, .skill-label-text {
   .page-background-img {
     filter: none;
     mix-blend-mode: normal;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
   }
 }
 

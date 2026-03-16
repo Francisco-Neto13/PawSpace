@@ -44,7 +44,7 @@ async function canDeleteAuthUserViaDatabase(userId: string) {
       return true;
     }
 
-    console.error('[Account Delete] Falha no teste de exclusao via banco:', error);
+    console.error('[Account Delete] Falha no teste de exclusão via banco:', error);
     return false;
   }
 }
@@ -55,7 +55,7 @@ async function removeStoredFiles(fileKeys: string[], userClient: Awaited<ReturnT
   for (const batch of chunkArray(fileKeys, STORAGE_DELETE_BATCH_SIZE)) {
     const { error } = await userClient.storage.from(PDF_BUCKET).remove(batch);
     if (error) {
-      console.warn('[Account Delete] Nao foi possivel remover alguns PDFs da estante:', error.message);
+      console.warn('[Account Delete] Não foi possível remover alguns PDFs da estante:', error.message);
     }
   }
 }
@@ -66,10 +66,10 @@ async function deleteAuthUser(userId: string) {
   if (adminClient) {
     const { error } = await adminClient.auth.admin.deleteUser(userId);
     if (error) {
-      console.error('[Account Delete] Falha ao remover usuario via admin:', error);
+      console.error('[Account Delete] Falha ao remover usuário via admin:', error);
       return {
         success: false as const,
-        error: 'Nao foi possivel remover a conta de acesso no Supabase.',
+        error: 'Não foi possível remover a conta de acesso no Supabase.',
       };
     }
 
@@ -80,10 +80,10 @@ async function deleteAuthUser(userId: string) {
     await prisma.$executeRawUnsafe('DELETE FROM auth.users WHERE id = $1::uuid', userId);
     return { success: true as const };
   } catch (error) {
-    console.error('[Account Delete] Falha ao remover usuario via banco:', error);
+    console.error('[Account Delete] Falha ao remover usuário via banco:', error);
     return {
       success: false as const,
-      error: 'Nao foi possivel remover a autenticacao da conta. Configure SUPABASE_SERVICE_ROLE_KEY para habilitar a exclusao completa.',
+      error: 'Não foi possível remover a autenticação da conta. Configure SUPABASE_SERVICE_ROLE_KEY para habilitar a exclusão completa.',
     };
   }
 }
@@ -97,7 +97,7 @@ export async function deleteCurrentAccount() {
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return { success: false, error: 'Sessao nao encontrada.' };
+      return { success: false, error: 'Sessão não encontrada.' };
     }
 
     const adminClient = createAdminClient();
@@ -106,7 +106,7 @@ export async function deleteCurrentAccount() {
       if (!canDeleteViaDatabase) {
         return {
           success: false,
-          error: 'Exclusao de conta nao configurada. Adicione SUPABASE_SERVICE_ROLE_KEY no ambiente para habilitar essa acao.',
+          error: 'Exclusão de conta não configurada. Adicione SUPABASE_SERVICE_ROLE_KEY no ambiente para habilitar essa ação.',
         };
       }
     }
@@ -142,6 +142,6 @@ export async function deleteCurrentAccount() {
     return { success: true };
   } catch (error) {
     console.error('[Account Delete] Falha inesperada:', error);
-    return { success: false, error: 'Nao foi possivel deletar sua conta agora.' };
+    return { success: false, error: 'Não foi possível deletar sua conta agora.' };
   }
 }

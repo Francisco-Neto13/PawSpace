@@ -41,7 +41,7 @@ export default function RecoveryModal({ onClose }: RecoveryModalProps) {
         setError('Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.');
         setIsBlocked(true);
       } else {
-        setError('Não foi possível enviar o link. Verifique o endereço de email.');
+        setError('Não foi possível enviar o link. Verifique o endereço de e-mail.');
       }
       return;
     }
@@ -76,14 +76,14 @@ export default function RecoveryModal({ onClose }: RecoveryModalProps) {
               </p>
               <h3 className="overview-title mb-2 text-2xl">Redefinir senha</h3>
               <p className="max-w-sm text-[11px] leading-6 text-[var(--text-secondary)]">
-                Digite seu email para receber um link seguro de redefinição.
+                Digite seu e-mail para receber um link seguro de redefinição.
               </p>
             </div>
 
             <form onSubmit={handleReset} className="space-y-5 p-8 sm:p-9">
               <div>
                 <label className="ml-1 mb-2 block text-[9px] font-black uppercase tracking-[0.25em] text-[var(--text-muted)]">
-                  Endereço de email
+                  Endereço de e-mail
                 </label>
                 <div className="relative">
                   <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
@@ -171,7 +171,7 @@ export default function RecoveryModal({ onClose }: RecoveryModalProps) {
             <p className="mb-2 text-[9px] font-black uppercase tracking-[0.34em] text-[var(--text-secondary)]">
               Link enviado
             </p>
-            <h3 className="overview-title mb-3 text-xl">Verifique seu email</h3>
+            <h3 className="overview-title mb-3 text-xl">Verifique seu e-mail</h3>
             <p className="mb-8 max-w-sm text-[11px] leading-6 text-[var(--text-secondary)]">
               Se existir uma conta para <span className="text-[var(--text-primary)]">{email.toLowerCase()}</span>, você receberá um link em breve.
             </p>

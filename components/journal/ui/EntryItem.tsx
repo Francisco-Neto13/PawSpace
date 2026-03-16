@@ -13,7 +13,7 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
   const skill = getSkill(entry.skillId, skills);
   const plainText = entry.body ? entry.body.replace(/<[^>]+>/g, '') : '';
   const previewLimit = 72;
-  const preview = plainText ? plainText.slice(0, previewLimit) : 'Sem anotacoes por enquanto';
+  const preview = plainText ? plainText.slice(0, previewLimit) : 'Sem anotações por enquanto';
   const hasMorePreview = plainText.length > previewLimit;
 
   return (
@@ -37,7 +37,7 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
           isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'
         }`}
       >
-        {entry.title || 'Nota sem titulo'}
+        {entry.title || 'Nota sem título'}
       </p>
 
       <p className="text-[10px] text-[var(--text-secondary)] font-medium leading-relaxed line-clamp-2 min-h-[30px]">

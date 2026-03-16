@@ -24,7 +24,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
   const handleDelete = async () => {
     const isConfirmed = await confirmDialog({
       title: 'Remover material',
-      description: `Este material sera retirado da estante: "${content.title}".`,
+      description: `Este material será retirado da estante: "${content.title}".`,
       confirmLabel: 'Remover',
       cancelLabel: 'Manter',
       tone: 'danger',

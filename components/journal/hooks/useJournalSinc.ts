@@ -96,7 +96,7 @@ export function useJournalSinc(entry: JournalEntry, onUpdate: (updated: JournalE
         onUpdateRef.current(result.entry as unknown as JournalEntry);
       }
     } catch (error) {
-      console.error('[Journal] Erro na sincronizacao:', error);
+      console.error('[Journal] Erro na sincronização:', error);
     } finally {
       isSavingRef.current = false;
       setIsSaving(false);

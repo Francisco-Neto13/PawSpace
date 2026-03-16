@@ -24,7 +24,7 @@ export default function DangerZone() {
 
     const result = await deleteCurrentAccount();
     if (!result.success) {
-      setError(result.error || 'Nao foi possivel deletar sua conta agora.');
+      setError(result.error || 'Não foi possível deletar sua conta agora.');
       setIsDeleting(false);
       return;
     }
@@ -33,7 +33,7 @@ export default function DangerZone() {
       const supabase = createClient();
       await supabase.auth.signOut();
     } catch (signOutError) {
-      console.error('[Danger Zone] Falha ao encerrar sessao apos exclusao:', signOutError);
+      console.error('[Danger Zone] Falha ao encerrar sessão após exclusão:', signOutError);
     }
 
     router.replace('/login');
@@ -48,14 +48,14 @@ export default function DangerZone() {
         <AlertTriangle className="w-3 h-3 shrink-0" />
         Zona de Risco
       </p>
-      <p className="library-subtitle mb-5 ml-3">acoes permanentes que apagam o seu espaco</p>
+      <p className="library-subtitle mb-5 ml-3">ações permanentes que apagam o seu espaço</p>
 
       <div className="border border-red-500/[0.16] rounded-xl bg-[var(--bg-elevated)] p-4">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[11px] text-[var(--text-primary)] font-bold uppercase tracking-wider mb-1">Deletar Conta</p>
             <p className="text-[9px] text-[var(--text-muted)] leading-relaxed max-w-sm">
-              Todos os seus dados serao removidos: arvore, diario, biblioteca e configuracoes. Esta acao nao pode ser desfeita.
+              Todos os seus dados serão removidos: árvore, diário, biblioteca e configurações. Esta ação não pode ser desfeita.
             </p>
           </div>
           <button

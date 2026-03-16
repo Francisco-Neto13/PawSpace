@@ -54,7 +54,7 @@ function createCurrentSessionFallback(): SessionItem {
   return {
     id: 'current',
     device: `${platform} - ${detectBrowser(ua)}`,
-    location: 'Sessao atual',
+    location: 'Sessão atual',
     lastSeen: 'Agora',
     isCurrent: true,
     type: isMobile ? 'mobile' : 'desktop',
@@ -140,7 +140,7 @@ export default function SessionsSection() {
           setSessions([createCurrentSessionFallback()]);
           setFeedback({
             tone: 'info',
-            message: 'Modo basico ativo: lista completa de sessoes indisponivel neste banco.',
+            message: 'Modo básico ativo: lista completa de sessões indisponível neste banco.',
           });
           return;
         }
@@ -151,11 +151,11 @@ export default function SessionsSection() {
       const normalized = normalizeSessions((data ?? []) as SessionRow[]);
       setSessions(normalized);
     } catch (error) {
-      console.error('[Sessions] Falha ao carregar sessoes:', error);
+      console.error('[Sessions] Falha ao carregar sessões:', error);
       setSessions((prev) => (prev.length > 0 ? prev : [createCurrentSessionFallback()]));
       setFeedback({
         tone: 'error',
-        message: 'Nao foi possivel atualizar as sessoes agora.',
+        message: 'Não foi possível atualizar as sessões agora.',
       });
     } finally {
       setIsLoading(false);
@@ -172,7 +172,7 @@ export default function SessionsSection() {
     if (isSessionTableSupported === false) {
       setFeedback({
         tone: 'info',
-        message: 'Revogacao individual indisponivel sem tabela de sessoes.',
+        message: 'Revogação individual indisponível sem tabela de sessões.',
       });
       return;
     }
@@ -185,16 +185,16 @@ export default function SessionsSection() {
 
     if (!error) {
       setSessions((prev) => prev.filter((session) => session.id !== id));
-      setFeedback({ tone: 'ok', message: 'Sessao encerrada com sucesso.' });
+      setFeedback({ tone: 'ok', message: 'Sessão encerrada com sucesso.' });
     } else if (isSessionsTableUnavailable(error as SupabaseErrorLike)) {
       setIsSessionTableSupported(false);
       setSessions([createCurrentSessionFallback()]);
       setFeedback({
         tone: 'info',
-        message: 'Modo basico ativo: revogacao individual indisponivel.',
+        message: 'Modo básico ativo: revogação individual indisponível.',
       });
     } else {
-      setFeedback({ tone: 'error', message: 'Falha ao encerrar a sessao selecionada.' });
+      setFeedback({ tone: 'error', message: 'Falha ao encerrar a sessão selecionada.' });
     }
 
     setRevoking(null);
@@ -209,10 +209,10 @@ export default function SessionsSection() {
     if (isSessionTableSupported === false) {
       const { error } = await supabase.auth.signOut({ scope: 'others' });
       if (!error) {
-        setFeedback({ tone: 'ok', message: 'Todas as outras sessoes foram encerradas.' });
+        setFeedback({ tone: 'ok', message: 'Todas as outras sessões foram encerradas.' });
         void loadSessions('manual');
       } else {
-        setFeedback({ tone: 'error', message: 'Falha ao encerrar as outras sessoes.' });
+        setFeedback({ tone: 'error', message: 'Falha ao encerrar as outras sessões.' });
       }
       setRevoking(null);
       return;
@@ -222,7 +222,7 @@ export default function SessionsSection() {
 
     if (!error) {
       setSessions((prev) => prev.filter((session) => session.isCurrent));
-      setFeedback({ tone: 'ok', message: 'Todas as outras sessoes foram encerradas.' });
+      setFeedback({ tone: 'ok', message: 'Todas as outras sessões foram encerradas.' });
     } else if (isSessionsTableUnavailable(error as SupabaseErrorLike)) {
       setIsSessionTableSupported(false);
       const revokeResult = await supabase.auth.signOut({ scope: 'others' });
@@ -230,13 +230,13 @@ export default function SessionsSection() {
         setSessions([createCurrentSessionFallback()]);
         setFeedback({
           tone: 'ok',
-          message: 'Outras sessoes encerradas (modo basico).',
+          message: 'Outras sessões encerradas (modo básico).',
         });
       } else {
-        setFeedback({ tone: 'error', message: 'Falha ao encerrar as outras sessoes.' });
+        setFeedback({ tone: 'error', message: 'Falha ao encerrar as outras sessões.' });
       }
     } else {
-      setFeedback({ tone: 'error', message: 'Falha ao encerrar as outras sessoes.' });
+      setFeedback({ tone: 'error', message: 'Falha ao encerrar as outras sessões.' });
     }
 
     setRevoking(null);
@@ -252,9 +252,9 @@ export default function SessionsSection() {
         <div>
           <p className="library-kicker flex items-center gap-2">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-            Sessoes Ativas
+            Sessões ativas
           </p>
-          <p className="library-subtitle mt-2 ml-3">dispositivos com acesso a sua conta</p>
+          <p className="library-subtitle mt-2 ml-3">dispositivos com acesso à sua conta</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -335,7 +335,7 @@ export default function SessionsSection() {
                     <p className="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider truncate">{session.device}</p>
                     {session.isCurrent && (
                       <span className="text-[7px] font-black uppercase tracking-wider px-1.5 py-0.5 border rounded border-[var(--border-visible)] text-[var(--text-secondary)]">
-                        Esta sessao
+                        Esta sessão
                       </span>
                     )}
                   </div>
@@ -365,7 +365,7 @@ export default function SessionsSection() {
 
           {others.length === 0 && sessions.length > 0 && (
             <p className="text-[9px] text-[var(--text-faint)] uppercase tracking-wider font-bold ml-1">
-              Nenhuma outra sessao ativa.
+              Nenhuma outra sessão ativa.
             </p>
           )}
         </div>

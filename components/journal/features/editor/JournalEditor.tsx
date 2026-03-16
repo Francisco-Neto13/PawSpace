@@ -75,7 +75,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             value={title}
             disabled={isTemporaryEntry}
             onChange={(e) => setTitle(e.target.value.slice(0, TITLE_MAX))}
-            placeholder="Titulo da nota..."
+            placeholder="Título da nota..."
             maxLength={TITLE_MAX}
             className={`w-full bg-transparent text-[var(--text-primary)] text-xl font-black outline-none placeholder:text-[var(--text-muted)] tracking-wide pr-16 ${
               isTemporaryEntry ? 'opacity-60 cursor-not-allowed' : ''
@@ -122,7 +122,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                 <div className="absolute top-full left-0 mt-2 w-60 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] z-50 overflow-hidden">
                   <div className="px-3 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
                     <span className="text-[7px] text-[var(--text-secondary)] font-black uppercase tracking-[0.2em]">
-                      Trilhas disponiveis
+                      Trilhas disponíveis
                     </span>
                   </div>
 

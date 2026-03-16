@@ -45,7 +45,7 @@ export function AchievementStats({ achievements }: AchievementStatsProps) {
 
       <article className="library-panel p-5 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-        <p className="library-kicker mb-3">Em Andamento</p>
+        <p className="library-kicker mb-3">Em andamento</p>
         <p className="text-[var(--text-primary)] text-4xl font-black font-mono tabular-nums leading-none mb-2">
           {String(inProgressCount).padStart(2, '0')}
         </p>

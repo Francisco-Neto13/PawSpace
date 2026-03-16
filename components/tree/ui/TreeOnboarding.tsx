@@ -7,32 +7,32 @@ const steps = [
   {
     icon: <Plus size={13} />,
     title: 'Primeira Trilha',
-    desc: "Use o botao central 'Iniciar Arvore' para abrir o tronco do seu mapa.",
+    desc: "Use o botão central 'Iniciar Árvore' para abrir o tronco do seu mapa.",
   },
   {
     icon: <MousePointer2 size={13} />,
-    title: 'Selecao',
-    desc: 'Clique esquerdo em uma trilha para destacar conexoes e abrir o resumo lateral.',
+    title: 'Seleção',
+    desc: 'Clique esquerdo em uma trilha para destacar conexões e abrir o resumo lateral.',
   },
   {
     icon: <MousePointer2 size={13} />,
     title: 'Menu da Trilha',
-    desc: "Botao direito em uma trilha para criar subtrilhas, editar detalhes e remover o que nao serve mais.",
+    desc: "Botão direito em uma trilha para criar subtrilhas, editar detalhes e remover o que não serve mais.",
   },
   {
     icon: <Edit3 size={13} />,
-    title: 'Personalizacao',
-    desc: "Use 'Editar trilha' para ajustar nome, icone, cor e a identidade desse ponto do mapa.",
+    title: 'Personalização',
+    desc: "Use 'Editar trilha' para ajustar nome, ícone, cor e a identidade desse ponto do mapa.",
   },
   {
     icon: <Move size={13} />,
-    title: 'Navegacao',
-    desc: 'Arraste as trilhas para organizar o territorio. Scroll faz zoom e o fundo move a camera.',
+    title: 'Navegação',
+    desc: 'Arraste as trilhas para organizar o território. Scroll faz zoom e o fundo move a câmera.',
   },
   {
     icon: <Save size={13} />,
     title: 'Salvar Pegadas',
-    desc: "O botao 'Salvar Alteracoes' aparece na base quando o mapa tem mudancas pendentes.",
+    desc: "O botão 'Salvar alterações' aparece na base quando o mapa tem mudanças pendentes.",
   },
 ];
 
@@ -64,7 +64,7 @@ export function TreeOnboarding({
         }`}
       >
         <Info size={13} />
-        <span className="text-[9px] font-black uppercase tracking-[0.25em]">Guia da Arvore</span>
+        <span className="text-[9px] font-black uppercase tracking-[0.25em]">Guia da Árvore</span>
       </button>
 
       {isOpen && (
@@ -80,7 +80,7 @@ export function TreeOnboarding({
 
             <div className="flex items-center justify-between mb-5 pb-3 border-b border-[var(--border-subtle)]">
               <div>
-                <p className="library-kicker mb-1">Guia rapido</p>
+                <p className="library-kicker mb-1">Guia rápido</p>
                 <div className="flex items-center gap-2">
                   <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
                   <h3 className="text-[var(--text-primary)] text-[11px] font-black uppercase tracking-[0.3em]">Manual PawSpace</h3>

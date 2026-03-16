@@ -15,11 +15,11 @@ interface OverviewHeaderProps {
 const MARKS = [0, 20, 40, 60, 80, 100];
 
 function getProgressMessage(progress: number, unlocked: number, total: number, criticalUncovered: number): string {
-  if (total === 0) return 'Abra sua arvore para comecar a mapear as trilhas do PawSpace.';
-  if (progress === 0) return 'Sua arvore ainda nao tem material. Comece pela trilha mais importante.';
-  if (progress === 100) return 'Todas as trilhas tem material. Seu PawSpace esta completo.';
+  if (total === 0) return 'Abra sua árvore para começar a mapear as trilhas do PawSpace.';
+  if (progress === 0) return 'Sua árvore ainda não tem material. Comece pela trilha mais importante.';
+  if (progress === 100) return 'Todas as trilhas têm material. Seu PawSpace está completo.';
   if (criticalUncovered > 0) {
-    return `${criticalUncovered} trilha${criticalUncovered > 1 ? 's criticas sem' : ' critica sem'} material - elas sustentam boa parte do seu territorio.`;
+    return `${criticalUncovered} trilha${criticalUncovered > 1 ? 's críticas sem' : ' crítica sem'} material. Elas sustentam boa parte do seu território.`;
   }
   const remaining = total - unlocked;
   if (remaining <= 3) return `Faltam apenas ${remaining} trilha${remaining > 1 ? 's' : ''} para cobertura total.`;
@@ -38,7 +38,7 @@ export default function OverviewHeader({
 
   const [firstName, restName] = useMemo(() => {
     const parts = displayName.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return ['Usuario', ''];
+    if (parts.length === 0) return ['Usuário', ''];
     if (parts.length === 1) return [parts[0], ''];
     return [parts[0], parts.slice(1).join(' ')];
   }, [displayName]);
@@ -78,7 +78,7 @@ export default function OverviewHeader({
           <div className="mb-5">
             <p className="overview-kicker mb-2">Radar da Patinha</p>
             <h1 className="overview-title text-3xl md:text-4xl mb-2">
-              Ola, {firstName}
+              Olá, {firstName}
               {restName && <span className="text-[var(--text-secondary)]"> {restName}</span>}
             </h1>
             <p className="overview-subtitle max-w-2xl">{message}</p>
@@ -135,11 +135,11 @@ export default function OverviewHeader({
               </p>
             </div>
             <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2">
-              <p className="text-[8px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black mb-1">Criticos em aberto</p>
+              <p className="text-[8px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black mb-1">Críticos em aberto</p>
               <p className="text-[var(--text-primary)] text-lg font-black font-mono tabular-nums leading-none">{criticalUncovered}</p>
             </div>
             <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2">
-              <p className="text-[8px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black mb-1">Notas do mes</p>
+              <p className="text-[8px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black mb-1">Notas do mês</p>
               <p className="text-[var(--text-primary)] text-lg font-black font-mono tabular-nums leading-none">{currentMonthEntries}</p>
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function OverviewHeader({
           <div>
             <p className="text-[9px] font-black uppercase tracking-[0.36em] text-[var(--text-secondary)] mb-3">Neste ciclo</p>
             <p className="text-4xl font-black font-mono text-[var(--text-primary)] tabular-nums leading-none">{currentMonthEntries}</p>
-            <p className="text-[9px] text-[var(--text-muted)] uppercase tracking-wider font-bold mt-1">notas no diario</p>
+            <p className="text-[9px] text-[var(--text-muted)] uppercase tracking-wider font-bold mt-1">notas no diário</p>
           </div>
 
           <div className="w-full h-px bg-[var(--border-subtle)]" />
@@ -176,7 +176,7 @@ export default function OverviewHeader({
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-[var(--text-secondary)] animate-pulse shrink-0" />
                 <p className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-wider leading-snug">
-                  {criticalUncovered} critico{criticalUncovered > 1 ? 's' : ''} sem material
+                  {criticalUncovered} crítico{criticalUncovered > 1 ? 's' : ''} sem material
                 </p>
               </div>
             </>

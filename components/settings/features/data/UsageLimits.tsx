@@ -19,16 +19,16 @@ export default function UsageLimits() {
 
     return [
       {
-        label: 'Notas no Diario',
+        label: 'Notas no Diário',
         current: globalStats.totalJournalEntries,
         max: journalLimit,
         unit: 'entradas',
       },
       {
-        label: 'Trilhas na Arvore',
+        label: 'Trilhas na Árvore',
         current: totalModules,
         max: moduleLimit,
-        unit: 'modulos',
+        unit: 'módulos',
       },
       {
         label: 'Materiais na Estante',
@@ -47,7 +47,7 @@ export default function UsageLimits() {
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Ritmo do PawSpace
       </p>
-      <p className="library-subtitle mb-5 ml-3">uso atual versus o espaco disponivel na sua trilha</p>
+      <p className="library-subtitle mb-5 ml-3">uso atual versus o espaço disponível na sua trilha</p>
 
       <div className="space-y-5">
         {usageItems.map((item) => {

@@ -62,7 +62,7 @@ export default function PasswordSection() {
     const loadingTimeout = window.setTimeout(() => {
       if (!mounted) return;
       setIsLoadingUser(false);
-      setError((prev) => prev ?? 'Nao foi possivel carregar o usuario.');
+      setError((prev) => prev ?? 'Não foi possível carregar o usuário.');
     }, 8000);
 
     const loadEmail = async () => {
@@ -75,14 +75,14 @@ export default function PasswordSection() {
 
         if (!mounted) return;
         if (userError || !user?.email) {
-          setError('Sessao nao encontrada.');
+          setError('Sessão não encontrada.');
           return;
         }
 
         setUserEmail(user.email);
       } catch {
         if (!mounted) return;
-        setError('Falha ao carregar dados do usuario.');
+        setError('Falha ao carregar dados do usuário.');
       } finally {
         if (!mounted) return;
         window.clearTimeout(loadingTimeout);
@@ -113,22 +113,22 @@ export default function PasswordSection() {
       return;
     }
     if (next.length > PASSWORD_MAX) {
-      setError(`A nova senha pode ter no maximo ${PASSWORD_MAX} caracteres.`);
+      setError(`A nova senha pode ter no máximo ${PASSWORD_MAX} caracteres.`);
       return;
     }
     if (next !== confirm) {
-      setError('As senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return;
     }
     if (!userEmail) {
-      setError('Nao foi possivel validar o usuario atual.');
+      setError('Não foi possível validar o usuário atual.');
       return;
     }
 
     setIsSaving(true);
     const savingWatchdog = window.setTimeout(() => {
       setIsSaving(false);
-      setError('A atualizacao esta demorando. Verifique se a senha mudou e tente novamente.');
+      setError('A atualização está demorando. Verifique se a senha mudou e tente novamente.');
     }, 20000);
 
     const supabase = createClient();
@@ -174,7 +174,7 @@ export default function PasswordSection() {
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Senha
       </p>
-      <p className="library-subtitle mb-5 ml-3">seguranca da sua toca no PawSpace</p>
+      <p className="library-subtitle mb-5 ml-3">segurança da sua toca no PawSpace</p>
 
       <div className="space-y-4">
         <PasswordInput label="Senha Atual" value={current} onChange={setCurrent} maxLength={PASSWORD_MAX} />

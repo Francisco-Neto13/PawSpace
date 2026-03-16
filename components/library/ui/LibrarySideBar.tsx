@@ -27,7 +27,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
 
       <div className="flex items-center justify-between gap-2">
         <p className="library-kicker">
-          Trilhas da Arvore
+          Trilhas da Árvore
         </p>
         <span className="library-chip">{nodes.length}</span>
       </div>

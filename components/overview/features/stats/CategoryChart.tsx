@@ -45,13 +45,13 @@ function CategoryChart({ data }: Props) {
       <div className="flex items-start justify-between mb-1 gap-3">
         <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          Cobertura por Area
+          Cobertura por Área
         </p>
         <span className="text-[8px] uppercase tracking-[0.15em] font-black text-[var(--text-muted)] border border-[var(--border-subtle)] px-2 py-1 rounded-lg">
           Mapa
         </span>
       </div>
-      <p className="overview-subtitle mb-6 ml-3">Quanto de cada area ja ganhou material na estante</p>
+      <p className="overview-subtitle mb-6 ml-3">Quanto de cada área já ganhou material na estante</p>
 
       <ResponsiveContainer width="100%" height={200}>
         <BarChart
@@ -150,7 +150,7 @@ function CategoryChart({ data }: Props) {
             <p className="text-[8px] text-[var(--text-muted)] font-mono">{bestCategory.pct}% cobertura</p>
           </div>
           <div className="flex-1 border border-[var(--border-subtle)] rounded px-2 py-1.5">
-            <p className="text-[7px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">Pedindo atencao</p>
+            <p className="text-[7px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">Pedindo atenção</p>
             <p className="text-[9px] text-[var(--text-primary)] font-bold truncate">{worstCategory.category}</p>
             <p className="text-[8px] text-[var(--text-muted)] font-mono">{worstCategory.pct}% cobertura</p>
           </div>

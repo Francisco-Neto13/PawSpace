@@ -64,7 +64,7 @@ export function EditSkillModal({
           <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="library-kicker mb-1">Trilha do Territorio</p>
+                <p className="library-kicker mb-1">Trilha do território</p>
                 <h2 className="text-[var(--text-primary)] text-lg font-black tracking-tight">Ajustar trilha</h2>
               </div>
               <button

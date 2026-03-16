@@ -53,7 +53,7 @@ function TreeMiniMapComponent({ selectedNodeId }: TreeMiniMapProps) {
         <div className="relative box-border rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden shadow-xl" style={{ width: MINIMAP_WIDTH }}>
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
           <div className="relative z-10 h-10 px-2.5 flex items-center justify-between gap-2">
-            <p className="text-[7px] uppercase tracking-[0.2em] font-black text-[var(--text-secondary)]">Navegacao</p>
+            <p className="text-[7px] uppercase tracking-[0.2em] font-black text-[var(--text-secondary)]">Navegação</p>
             <button
               type="button"
               onClick={handleCenter}

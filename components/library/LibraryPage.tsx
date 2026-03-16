@@ -150,8 +150,8 @@ export default function LibraryPage() {
     return (
       <WorkspaceEmptyState
         title="Estante vazia"
-        description="Crie sua arvore para comecar a guardar materiais por modulo."
-        actionLabel="Ir para a arvore"
+        description="Crie sua árvore para começar a guardar materiais por módulo."
+        actionLabel="Ir para a árvore"
         actionHref="/tree"
       />
     );
@@ -179,7 +179,7 @@ export default function LibraryPage() {
                 <p className="library-kicker mb-2">Estante da Patinha</p>
                 <h1 className="overview-title text-2xl md:text-3xl mb-2">Estante do PawSpace</h1>
                 <p className="library-subtitle max-w-2xl">
-                  Guarde links, videos, PDFs e notas por trilha. Escolha um caminho na lateral e mantenha cada material no lugar certo.
+                  Guarde links, vídeos, PDFs e notas por trilha. Escolha um caminho na lateral e mantenha cada material no lugar certo.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
                   <span className="library-chip">Trilhas: {nodes.length}</span>

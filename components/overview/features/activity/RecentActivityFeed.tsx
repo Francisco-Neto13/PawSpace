@@ -187,13 +187,13 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Rastro Recente
       </p>
-      <p className="overview-subtitle mb-4 ml-3">Ultimas movimentacoes pela arvore, diario e estante</p>
+      <p className="overview-subtitle mb-4 ml-3">Últimas movimentações pela árvore, diário e estante</p>
 
       <div className="flex gap-1 mb-4 ml-3 shrink-0">
         {([
           ['all', 'Tudo', counters.all],
-          ['journal', 'Diario', counters.journal],
-          ['skill', 'Arvore', counters.skill],
+          ['journal', 'Diário', counters.journal],
+          ['skill', 'Árvore', counters.skill],
           ['library', 'Estante', counters.library],
         ] as const).map(([key, label, count]) => (
           <button
@@ -244,7 +244,7 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
                         className="text-[7px] font-black uppercase tracking-wider"
                         style={{ color: isJournal ? 'var(--text-secondary)' : 'var(--text-muted)' }}
                       >
-                        {item.type === 'journal' ? 'Diario' : item.type === 'skill' ? 'Trilha' : 'Estante'}
+                        {item.type === 'journal' ? 'Diário' : item.type === 'skill' ? 'Trilha' : 'Estante'}
                       </span>
                     </div>
                     <span className="text-[10px] text-[var(--text-secondary)] font-medium truncate block group-hover:text-[var(--text-primary)] transition-colors duration-200">

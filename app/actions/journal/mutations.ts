@@ -20,7 +20,7 @@ async function resolveOwnedSkillId(skillIdInput: string | null | undefined, user
     select: { id: true },
   });
 
-  if (!skill) return { skillId: null as string | null, error: 'Skill invalida para este usuario.' };
+  if (!skill) return { skillId: null as string | null, error: 'Skill inválida para este usuário.' };
   return { skillId: skill.id };
 }
 
@@ -32,22 +32,22 @@ export async function saveJournalEntry(data: JournalInput) {
   console.log(`[Journal] Iniciando POST: ${shouldUpdate ? 'UPDATE' : 'CREATE'}`);
 
   const userId = await getAuthUser();
-  if (!userId) return { success: false, error: 'Nao autorizado' };
+  if (!userId) return { success: false, error: 'Não autorizado' };
 
   const title = (data.title || '').trim();
   const body = (data.body || '').trim();
 
   if (title.length > TITLE_MAX) {
-    return { success: false, error: `Titulo pode ter no maximo ${TITLE_MAX} caracteres.` };
+    return { success: false, error: `Título pode ter no máximo ${TITLE_MAX} caracteres.` };
   }
   if (body.length > BODY_MAX) {
-    return { success: false, error: `Conteudo pode ter no maximo ${BODY_MAX} caracteres.` };
+    return { success: false, error: `Conteúdo pode ter no máximo ${BODY_MAX} caracteres.` };
   }
 
   if (!shouldUpdate) {
     const count = await prisma.journalEntry.count({ where: { userId } });
     if (count >= MAX_ENTRIES) {
-      return { success: false, error: `Limite de ${MAX_ENTRIES} entradas no diario atingido.` };
+      return { success: false, error: `Limite de ${MAX_ENTRIES} entradas no diário atingido.` };
     }
   }
 
@@ -67,9 +67,9 @@ export async function saveJournalEntry(data: JournalInput) {
           data: { title, body, userId, skillId: skillResolution.skillId },
         });
 
-    console.log(`[DB] Persistencia Prisma: ${Date.now() - dbStart}ms`);
+    console.log(`[DB] Persistência Prisma: ${Date.now() - dbStart}ms`);
     revalidatePath('/journal');
-    console.log(`[Journal] Operacao TOTAL finalizada em: ${Date.now() - totalStart}ms`);
+    console.log(`[Journal] Operação total finalizada em: ${Date.now() - totalStart}ms`);
     return { success: true, entry };
   } catch (error) {
     console.error('[Journal Mutation] Erro ao salvar entrada:', error);
@@ -86,7 +86,7 @@ export async function deleteJournalEntry(id: string) {
     revalidatePath('/journal');
     console.log(`[DB] Delete Journal: ${Date.now() - start}ms`);
     if (result.count === 0) {
-      console.warn(`[Journal Mutation] Entrada nao encontrada para delete (id=${id}).`);
+      console.warn(`[Journal Mutation] Entrada não encontrada para delete (id=${id}).`);
       return { success: true, alreadyDeleted: true };
     }
     return { success: true };

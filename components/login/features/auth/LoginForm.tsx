@@ -60,7 +60,7 @@ function mapSignUpError(message: string) {
   }
 
   if (normalized.includes('rate limit')) {
-    return 'O Supabase bloqueou temporariamente novos emails de confirmação. Tente novamente mais tarde.';
+    return 'O Supabase bloqueou temporariamente novos e-mails de confirmação. Tente novamente mais tarde.';
   }
 
   return `Falha ao criar conta: ${message}`;
@@ -293,7 +293,7 @@ export default function LoginForm() {
 
           <p className="max-w-sm text-[11px] leading-6 text-[var(--text-secondary)]">
             {isSignup
-              ? 'Crie sua conta com e-mail e senha para montar sua arvore, sua estante e o diario do PawSpace.'
+              ? 'Crie sua conta com e-mail e senha para montar sua árvore, sua estante e o diário do PawSpace.'
               : 'Entre para continuar cuidando das trilhas, materiais e pegadas do seu PawSpace.'}
           </p>
         </div>

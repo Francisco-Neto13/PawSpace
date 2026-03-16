@@ -21,7 +21,7 @@ interface CustomTooltipProps {
 
 function getTypeLabel(type: string) {
   const labels: Record<string, string> = {
-    video: 'Videos',
+    video: 'Vídeos',
     article: 'Artigos',
     pdf: 'PDFs',
     link: 'Links',
@@ -62,9 +62,9 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
 
   const emptyMessage = useMemo(() => {
     if (isBootstrapLoading || stats === null) return 'Carregando dados da estante...';
-    if (stats.status === 'error') return 'Nao foi possivel carregar os dados da estante.';
-    if (stats.status === 'unauthorized') return 'Sessao expirada. Faca login novamente.';
-    return 'Sua estante ainda nao tem materiais guardados.';
+    if (stats.status === 'error') return 'Não foi possível carregar os dados da estante.';
+    if (stats.status === 'unauthorized') return 'Sessão expirada. Faça login novamente.';
+    return 'Sua estante ainda não tem materiais guardados.';
   }, [stats, isBootstrapLoading]);
 
   if (totalContents === 0) {
@@ -95,7 +95,7 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
           Estante
         </span>
       </div>
-      <p className="overview-subtitle mb-6 ml-3">Tipos de material guardados e distribuicao na estante</p>
+      <p className="overview-subtitle mb-6 ml-3">Tipos de material guardados e distribuição na estante</p>
 
       <div className="flex-1 flex items-center">
         <div className="flex items-center gap-6 w-full">

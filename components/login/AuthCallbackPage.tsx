@@ -24,7 +24,7 @@ export default function AuthCallbackPage() {
     function finishSignupSuccess() {
       if (!isActive) return;
       setStatus('success');
-      setMessage('Conta criada com sucesso. Pode fechar essa pagina.');
+      setMessage('Conta criada com sucesso. Pode fechar esta página.');
     }
 
     async function handleCallback() {

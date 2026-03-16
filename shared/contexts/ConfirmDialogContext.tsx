@@ -33,7 +33,7 @@ const ConfirmDialogContext = createContext<ConfirmDialogFn | null>(null);
 
 function withDefaults(options: ConfirmDialogOptions): Omit<ConfirmRequest, 'resolve'> {
   return {
-    title: options.title ?? 'Confirmar acao',
+    title: options.title ?? 'Confirmar ação',
     description: options.description,
     confirmLabel: options.confirmLabel ?? 'Confirmar',
     cancelLabel: options.cancelLabel ?? 'Cancelar',
@@ -134,7 +134,7 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
                         <AlertTriangle size={14} className={`mt-0.5 ${toneClasses.accent}`} />
                         <div>
                           <p className="text-[9px] text-[var(--text-secondary)] uppercase tracking-[0.3em] font-black mb-1">
-                            Confirmacao
+                            Confirmação
                           </p>
                           <h2 className="text-[var(--text-primary)] text-[13px] font-black uppercase tracking-[0.2em]">
                             {activeRequest.title}
@@ -145,7 +145,7 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
                       <button
                         onClick={() => resolveAndClose(false)}
                         className="w-8 h-8 rounded-lg flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-200 cursor-pointer"
-                        aria-label="Fechar confirmacao"
+                        aria-label="Fechar confirmação"
                       >
                         <X size={12} />
                       </button>

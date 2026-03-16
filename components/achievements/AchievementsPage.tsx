@@ -66,9 +66,9 @@ export function AchievementsPage() {
   if (!isLoading && nodes.length === 0) {
     return (
       <WorkspaceEmptyState
-        title="Sem trofeus por enquanto"
-        description="Monte sua arvore e adicione materiais para comecar a desbloquear marcos."
-        actionLabel="Ir para a arvore"
+        title="Sem troféus por enquanto"
+        description="Monte sua árvore e adicione materiais para começar a desbloquear marcos."
+        actionLabel="Ir para a árvore"
         actionHref="/tree"
       />
     );
@@ -83,7 +83,7 @@ export function AchievementsPage() {
           <div className="flex items-center gap-3 reveal-fade delay-0">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
             <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
-              PawSpace / Trofeus
+              PawSpace / Troféus
             </span>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
           </div>
@@ -92,15 +92,15 @@ export function AchievementsPage() {
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
               <div>
-                <p className="library-kicker mb-2">Sala de Trofeus</p>
+                <p className="library-kicker mb-2">Sala de Troféus</p>
                 <h1 className="overview-title text-2xl md:text-3xl mb-2">Conquistas do PawSpace</h1>
                 <p className="library-subtitle max-w-2xl">
-                  Acompanhe marcos da arvore, do diario e da estante. Use os filtros para cacar o proximo desbloqueio.
+                  Acompanhe marcos da árvore, do diário e da estante. Use os filtros para caçar o próximo desbloqueio.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
                   <span className="library-chip">Desbloqueadas: {unlockedCount}</span>
                   <span className="library-chip">Total: {totalCount}</span>
-                  <span className="library-chip">Conclusao: {progressPct}%</span>
+                  <span className="library-chip">Conclusão: {progressPct}%</span>
                 </div>
               </div>
             </div>

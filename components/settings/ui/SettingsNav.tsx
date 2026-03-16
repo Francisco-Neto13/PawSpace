@@ -15,11 +15,11 @@ const NAV_ITEMS: {
   icon: React.ElementType;
   danger?: boolean;
 }[] = [
-  { key: 'account', label: 'Perfil', sub: 'nome, email e senha', icon: User },
-  { key: 'appearance', label: 'Clima', sub: 'tema do espaco', icon: Palette },
+  { key: 'account', label: 'Perfil', sub: 'nome, e-mail e senha', icon: User },
+  { key: 'appearance', label: 'Clima', sub: 'tema do espaço', icon: Palette },
   { key: 'data', label: 'Dados', sub: 'limites e backup', icon: Database },
-  { key: 'privacy', label: 'Acesso', sub: 'sessoes abertas', icon: Shield },
-  { key: 'danger', label: 'Zona de risco', sub: 'acoes permanentes', icon: AlertTriangle, danger: true },
+  { key: 'privacy', label: 'Acesso', sub: 'sessões abertas', icon: Shield },
+  { key: 'danger', label: 'Zona de risco', sub: 'ações permanentes', icon: AlertTriangle, danger: true },
 ];
 
 export default function SettingsNav({ active, onChange }: Props) {

@@ -86,7 +86,6 @@ function JournalActivityChart() {
     <div className="h-full overview-card overview-card-hover p-6 relative overflow-hidden group flex flex-col">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      {/* Header */}
       <div className="flex items-start justify-between mb-1">
         <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
@@ -107,7 +106,6 @@ function JournalActivityChart() {
       </div>
       <p className="overview-subtitle mb-6 ml-3">Entradas por mês nos últimos 6 meses</p>
 
-      {/* Gráfico cresce para preencher o espaço disponível */}
       <div className="flex-1 min-h-[220px] min-w-0">
         <ResponsiveContainer width="100%" height={220} minWidth={0}>
           <BarChart data={data} barSize={20}>
@@ -139,7 +137,6 @@ function JournalActivityChart() {
         </ResponsiveContainer>
       </div>
 
-      {/* Footer fixo na base */}
       <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between">
         <span className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">
           Total: {totalEntries} entradas
