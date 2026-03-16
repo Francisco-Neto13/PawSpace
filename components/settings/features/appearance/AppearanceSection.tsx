@@ -7,7 +7,7 @@ const THEME_OPTIONS = [
   {
     key: 'dark' as const,
     label: 'Escuro',
-    sub: 'fundo preto, padrao do Pawspace',
+    sub: 'fundo preto, clima padrao do PawSpace',
     icon: Moon,
     preview: {
       bg: '#0a0a0a',
@@ -20,7 +20,7 @@ const THEME_OPTIONS = [
   {
     key: 'light' as const,
     label: 'Claro',
-    sub: 'fundo claro, alto contraste',
+    sub: 'fundo claro, leitura com alto contraste',
     icon: Sun,
     preview: {
       bg: '#f4f4f5',
@@ -62,7 +62,7 @@ export default function AppearanceSection() {
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Aparencia
       </p>
-      <p className="library-subtitle mb-5 ml-3">tema da interface</p>
+      <p className="library-subtitle mb-5 ml-3">o clima visual do seu espaco de estudo</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {THEME_OPTIONS.map((option) => {

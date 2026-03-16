@@ -1,4 +1,4 @@
-﻿import { Achievement } from '../types';
+import { Achievement } from '../types';
 
 interface AchievementInput {
   activeNodes: number;
@@ -21,7 +21,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'first_node',
     title: 'Primeiro Passo',
-    description: 'Adicione conteúdo ao primeiro módulo da Árvore.',
+    description: 'Adicione material a sua primeira trilha na arvore.',
     icon: 'P1',
     category: 'tree',
     check: ({ activeNodes }) => activeNodes >= 1,
@@ -30,7 +30,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'architect',
     title: 'Arquiteto',
-    description: 'Adicione conteúdo em 10 módulos da Árvore.',
+    description: 'Preencha 10 trilhas da sua arvore com material.',
     icon: 'A10',
     category: 'tree',
     check: ({ activeNodes }) => activeNodes >= 10,
@@ -38,18 +38,17 @@ const DEFINITIONS: AchievementDefinition[] = [
   },
   {
     id: 'nexus_master',
-    title: 'Mestre do Pawspace',
-    description: 'Adicione conteúdo em 25 módulos da Árvore.',
+    title: 'Mestre do PawSpace',
+    description: 'Preencha 25 trilhas da sua arvore com material.',
     icon: 'N25',
     category: 'tree',
     check: ({ activeNodes }) => activeNodes >= 25,
     progress: ({ activeNodes }) => ({ current: Math.min(activeNodes, 25), total: 25 }),
   },
-
   {
     id: 'first_entry',
-    title: 'Primeira Entrada',
-    description: 'Registre sua primeira entrada no Diário.',
+    title: 'Primeira Nota',
+    description: 'Registre sua primeira nota no diario.',
     icon: 'E1',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 1,
@@ -58,7 +57,7 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'chronicler',
     title: 'Cronista',
-    description: 'Registre 10 entradas no Diário de Bordo.',
+    description: 'Registre 10 notas no diario do PawSpace.',
     icon: 'C10',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 10,
@@ -67,17 +66,16 @@ const DEFINITIONS: AchievementDefinition[] = [
   {
     id: 'archivist',
     title: 'Arquivista',
-    description: 'Registre 20 entradas no Diário de Bordo.',
+    description: 'Registre 20 notas no diario do PawSpace.',
     icon: 'A20',
     category: 'journal',
     check: ({ journalEntries }) => journalEntries >= 20,
     progress: ({ journalEntries }) => ({ current: Math.min(journalEntries, 20), total: 20 }),
   },
-
   {
     id: 'first_content',
-    title: 'Primeiro Conhecimento',
-    description: 'Adicione seu primeiro conteúdo à Biblioteca.',
+    title: 'Primeiro Achado',
+    description: 'Guarde seu primeiro material na estante.',
     icon: 'B1',
     category: 'library',
     check: ({ libraryContents }) => libraryContents >= 1,
@@ -85,21 +83,20 @@ const DEFINITIONS: AchievementDefinition[] = [
   },
   {
     id: 'librarian',
-    title: 'Bibliotecário',
-    description: 'Adicione 20 conteúdos à Biblioteca.',
+    title: 'Guardiao da Estante',
+    description: 'Guarde 20 materiais na estante do PawSpace.',
     icon: 'L20',
     category: 'library',
     check: ({ libraryContents }) => libraryContents >= 20,
     progress: ({ libraryContents }) => ({ current: Math.min(libraryContents, 20), total: 20 }),
   },
-
   {
     id: 'initiated',
     title: 'Iniciado',
-    description: 'Atinja 25% de cobertura da Árvore.',
+    description: 'Atinja 25% de cobertura da sua arvore.',
     icon: '25%',
     category: 'progress',
-    check: ({ activeNodes, totalNodes }) => totalNodes > 0 && (activeNodes / totalNodes) >= 0.25,
+    check: ({ activeNodes, totalNodes }) => totalNodes > 0 && activeNodes / totalNodes >= 0.25,
     progress: ({ activeNodes, totalNodes }) => ({
       current: Math.round((activeNodes / Math.max(totalNodes, 1)) * 100),
       total: 25,
@@ -107,11 +104,11 @@ const DEFINITIONS: AchievementDefinition[] = [
   },
   {
     id: 'advanced',
-    title: 'Avançado',
-    description: 'Atinja 50% de cobertura da Árvore.',
+    title: 'Avancado',
+    description: 'Atinja 50% de cobertura da sua arvore.',
     icon: '50%',
     category: 'progress',
-    check: ({ activeNodes, totalNodes }) => totalNodes > 0 && (activeNodes / totalNodes) >= 0.5,
+    check: ({ activeNodes, totalNodes }) => totalNodes > 0 && activeNodes / totalNodes >= 0.5,
     progress: ({ activeNodes, totalNodes }) => ({
       current: Math.round((activeNodes / Math.max(totalNodes, 1)) * 100),
       total: 50,
@@ -119,8 +116,8 @@ const DEFINITIONS: AchievementDefinition[] = [
   },
   {
     id: 'nexus_complete',
-    title: 'Pawspace Completo',
-    description: 'Tenha conteúdo em todos os módulos da Árvore.',
+    title: 'PawSpace Completo',
+    description: 'Tenha material em todas as trilhas da sua arvore.',
     icon: '100%',
     category: 'progress',
     check: ({ activeNodes, totalNodes }) => totalNodes > 0 && activeNodes >= totalNodes,
@@ -132,7 +129,7 @@ const DEFINITIONS: AchievementDefinition[] = [
 ];
 
 export function computeAchievements(input: AchievementInput): Achievement[] {
-  return DEFINITIONS.map(def => ({
+  return DEFINITIONS.map((def) => ({
     id: def.id,
     title: def.title,
     description: def.description,
@@ -144,8 +141,8 @@ export function computeAchievements(input: AchievementInput): Achievement[] {
 }
 
 export const CATEGORY_LABELS: Record<Achievement['category'], string> = {
-  tree: 'Árvore',
-  journal: 'Diário',
-  library: 'Biblioteca',
+  tree: 'Arvore',
+  journal: 'Diario',
+  library: 'Estante',
   progress: 'Progresso',
 };

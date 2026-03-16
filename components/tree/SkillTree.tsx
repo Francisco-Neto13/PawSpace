@@ -335,7 +335,7 @@ function SkillTreeInner() {
           <div className="relative flex flex-col items-center gap-4">
             <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
             <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
-              Sincronizando Pawspace...
+              Sincronizando PawSpace...
             </p>
           </div>
         </div>
@@ -349,7 +349,7 @@ function SkillTreeInner() {
           <div className="flex items-center gap-3 reveal-fade delay-0">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
             <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
-              Pawspace / Arvore
+              PawSpace / Arvore
             </span>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
           </div>
@@ -358,15 +358,15 @@ function SkillTreeInner() {
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
               <div>
-                <p className="library-kicker mb-2">Nucleo Estrutural</p>
-                <h1 className="overview-title text-2xl md:text-3xl mb-2">Arvore de Habilidades</h1>
+                <p className="library-kicker mb-2">Territorio de Estudo</p>
+                <h1 className="overview-title text-2xl md:text-3xl mb-2">Arvore do PawSpace</h1>
                 <p className="library-subtitle max-w-2xl">
-                  Organize seus modulos por dependencia, ajuste a hierarquia no canvas e mantenha a base de conhecimento sincronizada.
+                  Modele seu mapa de estudos por dependencia, organize os modulos no canvas e deixe o territorio pronto para crescer.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
-                  <span className="library-chip">Modulos: {nodes.length}</span>
+                  <span className="library-chip">Trilhas: {nodes.length}</span>
                   <span className="library-chip">Raizes: {rootNodesCount}</span>
-                  <span className="library-chip">Com Conteudo: {nodesWithContentCount}</span>
+                  <span className="library-chip">Com Material: {nodesWithContentCount}</span>
                   <span className="library-chip">
                     Selecionado: {selectedNode?.data.label || selectedNode?.data.name || 'Nenhum'}
                   </span>
@@ -377,7 +377,7 @@ function SkillTreeInner() {
                 <div className="h-8 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center gap-2">
                   <AlertCircle size={11} className={canSave ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'} />
                   <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">
-                    {canSave ? 'Alteracoes Pendentes' : 'Arvore Sincronizada'}
+                    {canSave ? 'Pegadas Pendentes' : 'Territorio Sincronizado'}
                   </span>
                 </div>
 
@@ -416,7 +416,7 @@ function SkillTreeInner() {
                   <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
                   <div className="relative z-10 p-3">
-                    <p className="text-[7px] text-[var(--text-secondary)] uppercase tracking-[0.2em] font-black mb-1.5">Modulo Selecionado</p>
+                    <p className="text-[7px] text-[var(--text-secondary)] uppercase tracking-[0.2em] font-black mb-1.5">Trilha Selecionada</p>
                     <h3 className="text-[11px] text-[var(--text-primary)] font-black uppercase tracking-[0.16em] leading-snug mb-2 truncate">
                       {selectedNode.data.label || selectedNode.data.name || 'Sem nome'}
                     </h3>

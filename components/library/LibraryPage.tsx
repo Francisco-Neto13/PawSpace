@@ -139,8 +139,8 @@ export default function LibraryPage() {
         <div className="relative flex flex-col items-center gap-4">
           <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
           <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
-            Sincronizando Pawspace...
-          </p>
+            Sincronizando PawSpace...
+            </p>
         </div>
       </div>
     );
@@ -149,9 +149,9 @@ export default function LibraryPage() {
   if (!isLoadingNexus && nodes.length === 0) {
     return (
       <WorkspaceEmptyState
-        title="Biblioteca vazia"
-        description="Crie sua árvore para começar a organizar conteúdos por módulo."
-        actionLabel="Ir para árvore"
+        title="Estante vazia"
+        description="Crie sua arvore para comecar a guardar materiais por modulo."
+        actionLabel="Ir para a arvore"
         actionHref="/tree"
       />
     );
@@ -163,27 +163,27 @@ export default function LibraryPage() {
 
       <div className="relative z-10 py-8 pb-20">
         <div className="relative max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 space-y-5">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 reveal-fade delay-0">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
             <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
-              Pawspace / Biblioteca
+              PawSpace / Estante
             </span>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
           </div>
 
-          <section className="library-panel library-panel-hover p-6 relative overflow-hidden">
+          <section className="library-panel library-panel-hover p-6 relative overflow-hidden reveal-up delay-100">
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
               <div>
-                <p className="library-kicker mb-2">Repositório de Conhecimento</p>
-                <h1 className="overview-title text-2xl md:text-3xl mb-2">Biblioteca da Árvore</h1>
+                <p className="library-kicker mb-2">Estante da Patinha</p>
+                <h1 className="overview-title text-2xl md:text-3xl mb-2">Estante do PawSpace</h1>
                 <p className="library-subtitle max-w-2xl">
-                  Organize links, vídeos, PDFs e notas por módulo. Selecione um módulo na lateral e mantenha tudo indexado em um único fluxo.
+                  Guarde links, videos, PDFs e notas por trilha. Escolha um caminho na lateral e mantenha cada material no lugar certo.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
-                  <span className="library-chip">Módulos: {nodes.length}</span>
-                  <span className="library-chip">Conteúdos: {totalContents}</span>
+                  <span className="library-chip">Trilhas: {nodes.length}</span>
+                  <span className="library-chip">Materiais: {totalContents}</span>
                   <span className="library-chip">
                     Selecionado: {selectedNode?.name ?? 'Nenhum'}
                   </span>
@@ -194,19 +194,21 @@ export default function LibraryPage() {
           </section>
 
           <div className="grid grid-cols-1 xl:grid-cols-[300px_minmax(0,1fr)] gap-4 items-start">
-            <LibrarySidebar
-              nodes={mappedNodes}
-              selectedNodeId={resolvedSelectedNodeId || ''}
-              onSelect={(id) => {
-                setSelectedNodeId(id);
-                setSearch('');
-                setTypeFilter('all');
-                void loadNodeContents(id);
-              }}
-            />
+            <div className="reveal-up delay-200">
+              <LibrarySidebar
+                nodes={mappedNodes}
+                selectedNodeId={resolvedSelectedNodeId || ''}
+                onSelect={(id) => {
+                  setSelectedNodeId(id);
+                  setSearch('');
+                  setTypeFilter('all');
+                  void loadNodeContents(id);
+                }}
+              />
+            </div>
 
             <main
-              className="library-panel relative overflow-hidden flex flex-col min-h-[calc(100dvh-var(--navbar-height)-140px)]"
+              className="library-panel relative overflow-hidden flex flex-col min-h-[calc(100dvh-var(--navbar-height)-140px)] reveal-up delay-300"
             >
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
               <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04] pointer-events-none" />
@@ -283,4 +285,3 @@ export default function LibraryPage() {
     </div>
   );
 }
-

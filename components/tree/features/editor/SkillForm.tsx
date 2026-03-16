@@ -40,7 +40,7 @@ function getInitialFormData(
   return {
     label: initialData?.label || initialData?.name || '',
     description: initialData?.description || '',
-    icon: initialData?.icon || '✦',
+    icon: initialData?.icon || '*',
     color: normalizeHexColor(initialData?.color || '#22d3ee'),
     shape: (initialData?.shape as SkillShape) || DEFAULT_SHAPE,
     parentId: initialData?.parentId || initialParentId || '',
@@ -90,7 +90,7 @@ export function SkillForm({
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className={labelClass}>Identificacao *</label>
+          <label className={labelClass}>Nome da Trilha *</label>
           <CharCounter current={formData.label.length} max={NAME_MAX} />
         </div>
         <input
@@ -104,7 +104,7 @@ export function SkillForm({
             emitPreview({ label });
           }}
           className={inputClass}
-          placeholder="Ex: TypeScript Avancado"
+          placeholder="Ex: Fundamentos de TypeScript"
         />
       </div>
 
@@ -132,7 +132,7 @@ export function SkillForm({
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className={labelClass}>Manifesto</label>
+          <label className={labelClass}>Resumo da Trilha</label>
           <CharCounter current={formData.description.length} max={DESC_MAX} />
         </div>
         <textarea
@@ -142,20 +142,20 @@ export function SkillForm({
             setFormData((prev) => ({ ...prev, description: event.target.value.slice(0, DESC_MAX) }))
           }
           className={`${inputClass} resize-none`}
-          placeholder="O que sera dominado neste nivel..."
+          placeholder="O que esta trilha precisa dominar..."
           rows={3}
         />
       </div>
 
       {!isEditing && initialParentId === undefined && (
         <div>
-          <label className={`${labelClass} block mb-2`}>Modulo pai (opcional)</label>
+          <label className={`${labelClass} block mb-2`}>Trilha pai (opcional)</label>
           <select
             value={formData.parentId}
             onChange={(event) => setFormData((prev) => ({ ...prev, parentId: event.target.value }))}
             className={`${inputClass} appearance-none cursor-pointer uppercase text-[10px]`}
           >
-            <option value="">Raiz</option>
+            <option value="">Sem trilha pai</option>
             {existingSkills.map((skill) => (
               <option key={skill.id} value={skill.id}>
                 {skill.name}
@@ -180,7 +180,7 @@ export function SkillForm({
           disabled={isLoading || !formData.label.trim()}
           className="flex-1 h-11 rounded-xl border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer"
         >
-          {isLoading ? 'Sincronizando...' : isEditing ? 'Salvar Pawspace' : 'Confirmar'}
+          {isLoading ? 'Sincronizando...' : isEditing ? 'Salvar trilha' : 'Criar trilha'}
         </button>
       </div>
     </form>

@@ -122,11 +122,11 @@ export default function ResetPasswordForm() {
               <PawIcon className="h-5 w-5 text-[var(--text-primary)]" />
             </div>
             <p className="mb-2 text-[9px] font-black uppercase tracking-[0.34em] text-[var(--text-secondary)]">
-              Redefinição de acesso
+              Entrada segura
             </p>
             <h3 className="overview-title mb-2 text-2xl sm:text-[2rem]">Definir nova senha</h3>
             <p className="max-w-sm text-[11px] leading-6 text-[var(--text-secondary)]">
-              Escolha uma nova senha para continuar usando seu workspace com segurança.
+              Escolha uma nova senha para continuar protegendo sua toca no PawSpace.
             </p>
           </div>
 

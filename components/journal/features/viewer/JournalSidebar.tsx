@@ -26,7 +26,7 @@ export function JournalSidebar({ entries, skills, selectedId, onSelect }: Journa
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
       <div className="flex items-center justify-between gap-2">
-        <p className="library-kicker">Arquivo de Notas</p>
+        <p className="library-kicker">Caderno de Pegadas</p>
         <span className="library-chip">{entries.length}</span>
       </div>
 
@@ -36,7 +36,7 @@ export function JournalSidebar({ entries, skills, selectedId, onSelect }: Journa
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar entrada..."
+          placeholder="Buscar nota..."
           className="library-input h-10 pl-8 pr-3 text-[10px] font-mono text-[var(--text-secondary)] placeholder:text-[var(--text-muted)]"
         />
       </div>
@@ -46,11 +46,11 @@ export function JournalSidebar({ entries, skills, selectedId, onSelect }: Journa
           <div className="flex flex-col items-center justify-center py-16 border border-dashed border-[var(--border-subtle)] rounded-xl">
             <BookOpen size={16} className="text-[var(--text-muted)] mb-3" />
             <p className="text-[var(--text-muted)] text-[8px] font-black uppercase tracking-[0.2em] text-center px-4">
-              Aguardando nova entrada
+              Aguardando nova nota
             </p>
           </div>
         ) : filtered.length === 0 ? (
-          <p className="text-[10px] text-[var(--text-muted)] font-mono text-center py-8">Nenhuma entrada encontrada</p>
+          <p className="text-[10px] text-[var(--text-muted)] font-mono text-center py-8">Nenhuma nota encontrada</p>
         ) : (
           <div className="flex flex-col gap-1">
             {filtered.map((entry) => (

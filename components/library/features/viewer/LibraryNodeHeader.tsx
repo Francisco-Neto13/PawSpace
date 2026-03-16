@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { Plus } from 'lucide-react';
 import { SkillNode } from '../../types';
 
@@ -27,12 +27,12 @@ export function LibraryNodeHeader({
             {node.icon}
           </div>
           <div className="min-w-0">
-            <p className="library-kicker mb-1">Módulo Selecionado</p>
+            <p className="library-kicker mb-1">Trilha selecionada</p>
             <h2 className="text-[var(--text-primary)] text-lg font-black truncate">{node.name}</h2>
             <p className="text-[var(--text-secondary)] text-[10px] font-medium mt-1">
               {isLoading
-                ? 'Carregando conteúdos...'
-                : `${contentsCount} conteúdo${contentsCount !== 1 ? 's' : ''} registrado${contentsCount !== 1 ? 's' : ''}`}
+                ? 'Abrindo a estante...'
+                : `${contentsCount} ${contentsCount === 1 ? 'material guardado' : 'materiais guardados'} nesta trilha`}
             </p>
           </div>
         </div>
@@ -42,10 +42,9 @@ export function LibraryNodeHeader({
           className="h-10 shrink-0 flex items-center justify-center gap-2 px-4 border border-[var(--border-visible)] rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] transition-all duration-200 cursor-pointer"
         >
           <Plus size={13} />
-          <span className="text-[9px] font-black uppercase tracking-widest">Adicionar Conteúdo</span>
+          <span className="text-[9px] font-black uppercase tracking-widest">Adicionar material</span>
         </button>
       </div>
     </div>
   );
 }
-

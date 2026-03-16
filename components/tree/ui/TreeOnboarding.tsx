@@ -6,33 +6,33 @@ import { PawIcon } from '@/components/shared/PawIcon';
 const steps = [
   {
     icon: <Plus size={13} />,
-    title: 'Inicio do Pawspace',
-    desc: "Use o botao central 'Iniciar Arvore' para criar o no raiz.",
+    title: 'Primeira Trilha',
+    desc: "Use o botao central 'Iniciar Arvore' para abrir o tronco do seu mapa.",
   },
   {
     icon: <MousePointer2 size={13} />,
-    title: 'Selecao de No',
-    desc: 'Clique esquerdo em um no para selecionar. As conexoes relacionadas sao destacadas e um resumo aparece no canto.',
+    title: 'Selecao',
+    desc: 'Clique esquerdo em uma trilha para destacar conexoes e abrir o resumo lateral.',
   },
   {
     icon: <MousePointer2 size={13} />,
-    title: 'Menu do Modulo',
-    desc: "Botao direito em um no para abrir acoes como 'Adicionar Submodulo', 'Configurar Modulo' e remocao.",
+    title: 'Menu da Trilha',
+    desc: "Botao direito em uma trilha para criar subtrilhas, editar detalhes e remover o que nao serve mais.",
   },
   {
     icon: <Edit3 size={13} />,
-    title: 'Customizacao',
-    desc: "Botao direito > 'Configurar Modulo' para alterar nome, icone e cor.",
+    title: 'Personalizacao',
+    desc: "Use 'Editar trilha' para ajustar nome, icone, cor e a identidade desse ponto do mapa.",
   },
   {
     icon: <Move size={13} />,
     title: 'Navegacao',
-    desc: 'Arraste nos para organizar. Scroll para zoom e arraste o fundo para mover a camera.',
+    desc: 'Arraste as trilhas para organizar o territorio. Scroll faz zoom e o fundo move a camera.',
   },
   {
     icon: <Save size={13} />,
-    title: 'Sincronizacao',
-    desc: "O botao 'Salvar Alteracoes' aparece na base apenas quando ha mudancas pendentes.",
+    title: 'Salvar Pegadas',
+    desc: "O botao 'Salvar Alteracoes' aparece na base quando o mapa tem mudancas pendentes.",
   },
 ];
 
@@ -57,20 +57,19 @@ export function TreeOnboarding({
     <div className={containerClassName}>
       <button
         onClick={() => setIsOpen((value) => !value)}
-        className={`h-10 flex items-center gap-2 px-3 rounded-xl border transition-all duration-200 backdrop-blur-md cursor-pointer
-          ${
-            isOpen
-              ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
-              : 'border-[var(--border-subtle)] bg-[var(--bg-strong)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)]'
-          }`}
+        className={`h-10 flex items-center gap-2 px-3 rounded-xl border transition-all duration-200 cursor-pointer ${
+          isOpen
+            ? 'border-[var(--border-visible)] bg-[var(--bg-base)] text-[var(--text-primary)]'
+            : 'border-[var(--border-subtle)] bg-[var(--bg-base)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)]'
+        }`}
       >
         <Info size={13} />
-        <span className="text-[9px] font-black uppercase tracking-[0.25em]">Guia de Comandos</span>
+        <span className="text-[9px] font-black uppercase tracking-[0.25em]">Guia da Arvore</span>
       </button>
 
       {isOpen && (
         <div
-          className={`w-72 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 shadow-2xl relative flex flex-col ${
+          className={`w-72 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-base)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 shadow-2xl relative flex flex-col ${
             direction === 'up' ? 'origin-bottom-right' : 'origin-top-right'
           }`}
           style={panelMaxHeight ? { maxHeight: panelMaxHeight, height: panelMaxHeight } : undefined}
@@ -81,10 +80,10 @@ export function TreeOnboarding({
 
             <div className="flex items-center justify-between mb-5 pb-3 border-b border-[var(--border-subtle)]">
               <div>
-                <p className="library-kicker mb-1">Documentacao</p>
+                <p className="library-kicker mb-1">Guia rapido</p>
                 <div className="flex items-center gap-2">
                   <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-                  <h3 className="text-[var(--text-primary)] text-[11px] font-black uppercase tracking-[0.3em]">Manual Pawspace</h3>
+                  <h3 className="text-[var(--text-primary)] text-[11px] font-black uppercase tracking-[0.3em]">Manual PawSpace</h3>
                 </div>
               </div>
               <button

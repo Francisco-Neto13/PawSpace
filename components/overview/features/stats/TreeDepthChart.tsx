@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { memo, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { PawIcon } from '@/components/shared/PawIcon';
@@ -21,10 +21,10 @@ function CustomTooltip({ active, payload }: TooltipProps) {
   const pct = d.total > 0 ? Math.round((d.withContent / d.total) * 100) : 0;
   return (
     <div className="bg-[var(--bg-base)] border border-[var(--border-muted)] rounded-lg px-3 py-2 text-[10px] space-y-0.5 shadow-xl">
-      <p className="text-[var(--text-secondary)] text-[8px] uppercase tracking-wider font-black">Nível {d.level}</p>
-      <p className="text-[var(--text-primary)] font-bold">{d.total} módulos</p>
-      <p className="text-[var(--text-secondary)] font-bold">{d.withContent} com conteúdo</p>
-      {gap > 0 && <p className="text-[var(--text-secondary)]">{gap} sem conteúdo</p>}
+      <p className="text-[var(--text-secondary)] text-[8px] uppercase tracking-wider font-black">Nivel {d.level}</p>
+      <p className="text-[var(--text-primary)] font-bold">{d.total} trilhas</p>
+      <p className="text-[var(--text-secondary)] font-bold">{d.withContent} com material</p>
+      {gap > 0 && <p className="text-[var(--text-secondary)]">{gap} sem material</p>}
       <div className="flex items-center gap-2 mt-1">
         <div className="h-[2px] flex-1 bg-[var(--border-muted)] overflow-hidden">
           <div className="h-full bg-[var(--text-secondary)] transition-all" style={{ width: `${pct}%` }} />
@@ -51,20 +51,20 @@ function TreeDepthChart({ data, maxGapLevel }: Props) {
       <div className="flex items-start justify-between mb-1">
         <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          Distribuição por Nível
+          Mapa por Nivel
         </p>
         <button
-          onClick={() => setHighlightGap(v => !v)}
+          onClick={() => setHighlightGap((v) => !v)}
           className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 border border-[var(--border-muted)] transition-all"
           style={{
             backgroundColor: highlightGap ? 'var(--bg-elevated)' : 'transparent',
             color: highlightGap ? 'var(--text-primary)' : 'var(--text-muted)',
           }}
         >
-          {highlightGap ? 'Gap ativo' : 'Ver gaps'}
+          {highlightGap ? 'Lacunas ativas' : 'Ver lacunas'}
         </button>
       </div>
-      <p className="overview-subtitle mb-6 ml-3">Profundidade da árvore e lacunas entre níveis</p>
+      <p className="overview-subtitle mb-6 ml-3">Profundidade da arvore e espacos ainda vazios entre niveis</p>
 
       <ResponsiveContainer width="100%" height={200}>
         <AreaChart data={data}>
@@ -100,7 +100,7 @@ function TreeDepthChart({ data, maxGapLevel }: Props) {
               stroke="var(--chart-soft)"
               strokeDasharray="3 3"
               label={{
-                value: 'maior gap',
+                value: 'maior lacuna',
                 position: 'top',
                 fill: 'var(--text-secondary)',
                 fontSize: 8,
@@ -149,7 +149,7 @@ function TreeDepthChart({ data, maxGapLevel }: Props) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <div className="w-4 h-[2px] bg-[var(--text-secondary)]" />
-            <span className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold">Com conteúdo</span>
+            <span className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold">Com material</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-4 h-[2px] bg-[var(--border-muted)]" />
@@ -158,11 +158,11 @@ function TreeDepthChart({ data, maxGapLevel }: Props) {
           {highlightGap && (
             <div className="flex items-center gap-1.5">
               <div className="w-4 h-[1px] border-t border-dashed border-[var(--border-visible)]" />
-              <span className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold">Gap</span>
+              <span className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold">Lacunas</span>
             </div>
           )}
         </div>
-        <span className="text-[8px] text-[var(--text-secondary)] font-mono font-bold">{overallPct}% geral</span>
+        <span className="text-[8px] text-[var(--text-secondary)] font-mono font-bold">{overallPct}% do mapa</span>
       </div>
     </div>
   );

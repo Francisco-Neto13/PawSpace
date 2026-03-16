@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { memo, useMemo } from 'react';
 import { Zap, Target, Layout, LucideIcon } from 'lucide-react';
 
@@ -19,32 +19,32 @@ interface StatItem {
 
 function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
   const stats = useMemo<StatItem[]>(() => {
-    const pending      = Math.max(totalCount - unlockedCount, 0);
+    const pending = Math.max(totalCount - unlockedCount, 0);
     const progressSafe = totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
-    const pendingSafe  = totalCount > 0 ? (pending / totalCount) * 100 : 0;
+    const pendingSafe = totalCount > 0 ? (pending / totalCount) * 100 : 0;
     return [
       {
-        label:    'Patas com Conteúdo',
-        value:    unlockedCount,
-        sub:      `de ${totalCount} no mapa`,
-        hint:     'Continue por blocos de dependência.',
-        icon:     Zap,
+        label: 'Trilhas com Material',
+        value: unlockedCount,
+        sub: `de ${totalCount} no mapa`,
+        hint: 'Avance por blocos que se conectam.',
+        icon: Zap,
         barWidth: progressSafe,
       },
       {
-        label:    'Cobertura',
-        value:    `${progress}%`,
-        sub:      'da árvore de conhecimento',
-        hint:     progress >= 80 ? 'Faixa alta de cobertura.' : 'Ainda há espaço para evolução.',
-        icon:     Target,
+        label: 'Cobertura do Mapa',
+        value: `${progress}%`,
+        sub: 'do territorio de estudo',
+        hint: progress >= 80 ? 'Seu territorio esta bem abastecido.' : 'Ainda ha espaco para crescer.',
+        icon: Target,
         barWidth: progress,
       },
       {
-        label:    'Sem Conteúdo',
-        value:    pending,
-        sub:      'módulos ainda vazios',
-        hint:     pending > 0 ? 'Priorize os críticos primeiro.' : 'Sem pendências estruturais.',
-        icon:     Layout,
+        label: 'Trilhas Vazias',
+        value: pending,
+        sub: 'espacos ainda sem material',
+        hint: pending > 0 ? 'Comece pelas trilhas criticas.' : 'Sem pendencias estruturais.',
+        icon: Layout,
         barWidth: pendingSafe,
       },
     ];
@@ -64,7 +64,7 @@ function StatsGrid({ unlockedCount, totalCount, progress }: StatsGridProps) {
               <div className="w-8 h-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center justify-center">
                 <item.icon size={14} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors duration-300" />
               </div>
-              <span className="text-[8px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black">Métricas</span>
+              <span className="text-[8px] uppercase tracking-[0.14em] text-[var(--text-muted)] font-black">Radar</span>
             </div>
 
             <div className="mb-4">

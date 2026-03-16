@@ -1,12 +1,14 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { PanelLeftClose, PanelLeftOpen, Menu, X, LogOut } from 'lucide-react';
 import { createClient } from '@/shared/supabase/client';
 import { useNexusMeta } from '@/shared/contexts/NexusContext';
 import { useJournal } from '@/shared/contexts/JournalContext';
+import { useTheme } from '@/shared/contexts/ThemeContext';
 import { useAuthDisplayName } from '@/shared/hooks/useAuthDisplayName';
 import { APP_NAV_LINKS } from './appNavigation';
 
@@ -16,6 +18,7 @@ export default function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
+  const { theme } = useTheme();
 
   const { displayName, isLoading: isLoadingDisplayName } = useAuthDisplayName();
   const { isDirty, setIsDirty, discardLocalChanges } = useNexusMeta();
@@ -45,7 +48,7 @@ export default function AppSidebar() {
 
     if (isDirty) {
       const confirmExit = window.confirm(
-        'Você tem alterações não salvas na sua Árvore. Se sair agora, elas serão perdidas. Deseja sair mesmo assim?'
+        'Voce tem alteracoes nao salvas na sua arvore. Se sair agora, essas pegadas serao perdidas. Deseja continuar?'
       );
       if (!confirmExit) return;
       discardLocalChanges();
@@ -59,7 +62,7 @@ export default function AppSidebar() {
 
   const handleLogout = async () => {
     if (isDirty) {
-      const confirmExit = window.confirm('Sair e perder alterações não salvas?');
+      const confirmExit = window.confirm('Sair do PawSpace e perder alteracoes nao salvas?');
       if (!confirmExit) return;
       setIsDirty(false);
     }
@@ -94,17 +97,43 @@ export default function AppSidebar() {
             href={link.href}
             onClick={(e) => void handleSafeNavigation(e, link.href)}
             title={collapsed ? link.name : undefined}
-            className={`relative h-10 rounded-xl border transition-all duration-200 overflow-hidden ${
+            className={`relative ${collapsed ? 'h-11' : 'h-12'} rounded-xl border transition-all duration-200 overflow-hidden ${
               isActive
                 ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
                 : 'border-transparent bg-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]'
             }`}
           >
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent opacity-60" />
-            <div className={`relative z-10 h-full flex items-center ${collapsed ? 'justify-center' : 'px-3'}`}>
-              <span className="text-[9px] font-black uppercase tracking-[0.2em]">
-                {collapsed ? link.name.charAt(0) : link.name}
-              </span>
+            <div className={`relative z-10 h-full flex items-center ${collapsed ? 'justify-center px-2' : 'px-3 gap-3'}`}>
+              <div
+                className={`relative shrink-0 rounded-lg border transition-colors duration-200 ${
+                  isActive
+                    ? 'border-[var(--border-visible)] bg-[var(--bg-base)]'
+                    : 'border-[var(--border-subtle)] bg-[var(--bg-surface)]'
+                } ${collapsed ? 'h-8 w-8' : 'h-9 w-9'}`}
+              >
+                <Image
+                  src={link.iconSrc}
+                  alt={`${link.name} icon`}
+                  fill
+                  sizes={collapsed ? '32px' : '36px'}
+                  className="object-contain p-1.5"
+                  style={{
+                    filter:
+                      theme === 'dark'
+                        ? isActive
+                          ? 'invert(1) brightness(1.25)'
+                          : 'invert(1) brightness(1.1)'
+                        : 'none',
+                  }}
+                />
+              </div>
+
+              {!collapsed && (
+                <span className="text-[9px] font-black uppercase tracking-[0.2em]">
+                  {link.name}
+                </span>
+              )}
             </div>
           </Link>
         );
@@ -116,20 +145,20 @@ export default function AppSidebar() {
     <>
       <aside
         className={`hidden lg:flex h-screen sticky top-0 z-[95] border-r border-[var(--border-subtle)] bg-[var(--bg-strong)] backdrop-blur-md transition-[width] duration-250 ${
-          isCollapsed ? 'w-[92px]' : 'w-[280px]'
+          isCollapsed ? 'w-[112px]' : 'w-[280px]'
         }`}
       >
         <div className="w-full p-4 flex flex-col gap-4">
           <div className="library-panel p-3 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-            <div className={`relative z-10 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} gap-2`}>
+            <div className={`relative z-10 flex items-center ${isCollapsed ? 'flex-col justify-center' : 'justify-between'} gap-2`}>
               {!isCollapsed && (
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="h-8 w-8 rounded-full border border-[var(--border-muted)] bg-[var(--bg-elevated)] flex items-center justify-center shrink-0">
                     <span className="text-[var(--text-primary)] text-[11px] font-black">{avatarLetter}</span>
                   </div>
                   <div className="min-w-0">
-                    <p className="library-kicker">Pawspace</p>
+                    <p className="library-kicker">PawSpace</p>
                     <p className="text-[10px] font-black text-[var(--text-primary)] truncate">
                       {isLoadingDisplayName ? 'Carregando' : displayName}
                     </p>
@@ -138,9 +167,14 @@ export default function AppSidebar() {
               )}
 
               {isCollapsed && (
-                <div className="h-8 w-8 rounded-full border border-[var(--border-muted)] bg-[var(--bg-elevated)] flex items-center justify-center">
-                  <span className="text-[var(--text-primary)] text-[11px] font-black">{avatarLetter}</span>
-                </div>
+                <>
+                  <div className="h-9 w-9 rounded-full border border-[var(--border-muted)] bg-[var(--bg-elevated)] flex items-center justify-center">
+                    <span className="text-[var(--text-primary)] text-[11px] font-black">{avatarLetter}</span>
+                  </div>
+                  <p className="text-[8px] font-black uppercase tracking-[0.22em] text-[var(--text-secondary)] text-center">
+                    Paw
+                  </p>
+                </>
               )}
 
               <button
@@ -164,13 +198,13 @@ export default function AppSidebar() {
 
           <button
             onClick={() => void handleLogout()}
-            className={`h-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-colors duration-200 cursor-pointer flex items-center ${
+            className={`${isCollapsed ? 'h-11' : 'h-10'} rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-colors duration-200 cursor-pointer flex items-center ${
               isCollapsed ? 'justify-center px-2' : 'justify-center gap-2 px-4'
             }`}
-            title={isCollapsed ? 'Logout' : undefined}
+            title={isCollapsed ? 'Sair' : undefined}
           >
             <LogOut size={14} />
-            {!isCollapsed && <span className="text-[9px] font-black uppercase tracking-[0.2em]">Logout</span>}
+            {!isCollapsed && <span className="text-[9px] font-black uppercase tracking-[0.2em]">Sair</span>}
           </button>
         </div>
       </aside>
@@ -200,7 +234,7 @@ export default function AppSidebar() {
                     <span className="text-[var(--text-primary)] text-[11px] font-black">{avatarLetter}</span>
                   </div>
                   <div className="min-w-0">
-                    <p className="library-kicker">Pawspace</p>
+                    <p className="library-kicker">PawSpace</p>
                     <p className="text-[10px] font-black text-[var(--text-primary)] truncate">
                       {isLoadingDisplayName ? 'Carregando' : displayName}
                     </p>
@@ -228,7 +262,7 @@ export default function AppSidebar() {
               className="h-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2 px-4"
             >
               <LogOut size={14} />
-              <span className="text-[9px] font-black uppercase tracking-[0.2em]">Logout</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em]">Sair</span>
             </button>
           </aside>
         </div>

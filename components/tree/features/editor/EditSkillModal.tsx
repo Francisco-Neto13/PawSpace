@@ -1,5 +1,6 @@
 'use client';
 import { createPortal } from 'react-dom';
+import { X } from 'lucide-react';
 import { SkillForm, type SkillFormData } from './SkillForm';
 import { useNexus } from '@/contexts/NexusContext';
 import type { SkillData } from '../../types';
@@ -63,14 +64,14 @@ export function EditSkillModal({
           <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="library-kicker mb-1">Configuracao de Modulo</p>
-                <h2 className="text-[var(--text-primary)] text-lg font-black tracking-tight">Ajustar Modulo</h2>
+                <p className="library-kicker mb-1">Trilha do Territorio</p>
+                <h2 className="text-[var(--text-primary)] text-lg font-black tracking-tight">Ajustar trilha</h2>
               </div>
               <button
                 onClick={onClose}
                 className="w-8 h-8 rounded-xl flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-200 cursor-pointer bg-[var(--bg-elevated)]"
               >
-                ✕
+                <X size={13} />
               </button>
             </div>
             <div className="h-[1px] bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />

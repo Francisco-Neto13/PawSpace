@@ -284,7 +284,7 @@ export default function LoginForm() {
           </div>
 
           <p className="mb-2 text-[9px] font-black uppercase tracking-[0.34em] text-[var(--text-secondary)]">
-            Acesso ao workspace
+            Entrada na toca
           </p>
 
           <h1 className="overview-title mb-2 text-2xl sm:text-[2rem]">
@@ -293,8 +293,8 @@ export default function LoginForm() {
 
           <p className="max-w-sm text-[11px] leading-6 text-[var(--text-secondary)]">
             {isSignup
-              ? 'Crie sua conta com e-mail e senha para começar a organizar sua árvore e seus conteúdos.'
-              : 'Entre com sua conta existente para acessar a árvore, a biblioteca e o progresso do seu workspace.'}
+              ? 'Crie sua conta com e-mail e senha para montar sua arvore, sua estante e o diario do PawSpace.'
+              : 'Entre para continuar cuidando das trilhas, materiais e pegadas do seu PawSpace.'}
           </p>
         </div>
 

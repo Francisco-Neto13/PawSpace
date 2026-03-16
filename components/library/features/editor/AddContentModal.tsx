@@ -148,7 +148,7 @@ export function AddContentModal({
 
       const result = await addContent(payload);
       if (!result.success) {
-        setSubmitError('Falha ao salvar o conteudo.');
+        setSubmitError('Falha ao guardar o material na estante.');
         if (tempId) onOptimisticRollback?.(tempId);
         return;
       }
@@ -161,7 +161,7 @@ export function AddContentModal({
       }
     } catch (err) {
       console.error('❌ [AddContentModal] Erro:', err);
-      setSubmitError('Erro inesperado ao salvar o conteudo.');
+      setSubmitError('Erro inesperado ao guardar o material.');
       if (tempId) {
         onOptimisticRollback?.(tempId);
       }
@@ -182,8 +182,8 @@ export function AddContentModal({
           <div className="mb-6">
             <div className="flex items-center justify-between gap-4 mb-3">
               <div>
-                <p className="library-kicker mb-1">Repositório de Conhecimento</p>
-                <h2 className="text-[var(--text-primary)] text-lg font-black tracking-tight">Adicionar Conteúdo</h2>
+                <p className="library-kicker mb-1">Estante da Patinha</p>
+                <h2 className="text-[var(--text-primary)] text-lg font-black tracking-tight">Adicionar material</h2>
               </div>
               <button
                 onClick={handleClose}
@@ -231,7 +231,7 @@ export function AddContentModal({
                   activeTab === 'link'  ? 'Ex: Documentação oficial'   :
                   activeTab === 'video' ? 'Ex: Aula completa de React' :
                   activeTab === 'pdf'   ? 'Ex: Clean Code - Resumo'    :
-                  'Ex: Anotações sobre Generics'
+                  'Ex: Rascunho sobre generics'
                 }
               />
             </div>
@@ -269,7 +269,7 @@ export function AddContentModal({
               {activeTab === 'note' && (
                 <div>
                   <div className="flex items-center justify-between mb-2.5">
-                    <label className={labelClass.replace('mb-2.5', '')}>Conteúdo *</label>
+                    <label className={labelClass.replace('mb-2.5', '')}>Material *</label>
                     <CharCounter current={form.body.length} max={BODY_MAX} />
                   </div>
                   <NoteForm body={form.body} onChange={body => setForm({ ...form, body: body.slice(0, BODY_MAX) })} />
@@ -298,7 +298,7 @@ export function AddContentModal({
               disabled={!isValid() || isLoading}
               className="h-11 flex-1 border border-[var(--border-visible)] rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer"
             >
-              {isLoading ? 'Sincronizando...' : 'Confirmar Registro'}
+              {isLoading ? 'Sincronizando...' : 'Guardar na estante'}
             </button>
           </div>
         </div>

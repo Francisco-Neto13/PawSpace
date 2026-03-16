@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { memo, useMemo, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
@@ -19,12 +19,23 @@ interface CustomTooltipProps {
   payload?: TooltipPayloadItem[];
 }
 
+function getTypeLabel(type: string) {
+  const labels: Record<string, string> = {
+    video: 'Videos',
+    article: 'Artigos',
+    pdf: 'PDFs',
+    link: 'Links',
+    note: 'Notas',
+  };
+  return labels[type] ?? type;
+}
+
 function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
     <div className="bg-[var(--bg-base)] border border-[var(--border-muted)] rounded-lg px-3 py-2 text-[10px]">
-      <p className="text-[var(--text-primary)] uppercase tracking-wider font-black">{d.name}</p>
+      <p className="text-[var(--text-primary)] uppercase tracking-wider font-black">{getTypeLabel(d.name)}</p>
       <p className="text-[var(--text-secondary)] font-bold">{d.value} itens</p>
     </div>
   );
@@ -50,10 +61,10 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
   const totalNodes = stats?.status === 'ok' ? stats.totalNodes : 0;
 
   const emptyMessage = useMemo(() => {
-    if (isBootstrapLoading || stats === null) return 'Carregando dados da biblioteca...';
-    if (stats.status === 'error') return 'Nao foi possivel carregar os dados da biblioteca.';
+    if (isBootstrapLoading || stats === null) return 'Carregando dados da estante...';
+    if (stats.status === 'error') return 'Nao foi possivel carregar os dados da estante.';
     if (stats.status === 'unauthorized') return 'Sessao expirada. Faca login novamente.';
-    return 'Ainda nao ha conteudos cadastrados na biblioteca.';
+    return 'Sua estante ainda nao tem materiais guardados.';
   }, [stats, isBootstrapLoading]);
 
   if (totalContents === 0) {
@@ -62,7 +73,7 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
         <p className="overview-kicker text-[var(--text-primary)] mb-1 flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          Caixinha de Areia
+          Radar da Estante
         </p>
         <p className="overview-subtitle mt-6 ml-3">{emptyMessage}</p>
       </div>
@@ -76,15 +87,15 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
       <div className="flex items-start justify-between gap-3 mb-1">
-      <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
-        <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-        Caixinha de Areia
-      </p>
-      <span className="text-[8px] uppercase tracking-[0.15em] font-black text-[var(--text-muted)] border border-[var(--border-subtle)] px-2 py-1 rounded-lg">
-        Biblioteca
-      </span>
+        <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
+          <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+          Radar da Estante
+        </p>
+        <span className="text-[8px] uppercase tracking-[0.15em] font-black text-[var(--text-muted)] border border-[var(--border-subtle)] px-2 py-1 rounded-lg">
+          Estante
+        </span>
       </div>
-      <p className="overview-subtitle mb-6 ml-3">Conteúdos por tipo e distribuição no acervo</p>
+      <p className="overview-subtitle mb-6 ml-3">Tipos de material guardados e distribuicao na estante</p>
 
       <div className="flex-1 flex items-center">
         <div className="flex items-center gap-6 w-full">
@@ -122,7 +133,7 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
                 {activeType ? activeType.value : totalContents}
               </span>
               <span className="text-[var(--text-secondary)] text-[7px] uppercase tracking-wider font-bold mt-0.5">
-                {activeType ? activeType.name : 'itens'}
+                {activeType ? getTypeLabel(activeType.name) : 'itens'}
               </span>
             </div>
           </div>
@@ -157,7 +168,7 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
                       transition: 'color 0.15s ease',
                     }}
                   >
-                    {t.name}
+                    {getTypeLabel(t.name)}
                   </span>
                   <span className="text-[9px] text-[var(--text-secondary)] font-mono min-w-[64px] text-right">
                     {pct}% ({t.value})
@@ -168,7 +179,7 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
 
             <div className="pt-2 border-t border-[var(--border-subtle)]">
               <span className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">
-                {totalContents} itens em {totalNodes} modulos
+                {totalContents} itens em {totalNodes} trilhas
               </span>
             </div>
           </div>

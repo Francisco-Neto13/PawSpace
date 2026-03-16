@@ -139,7 +139,7 @@ export default function ProfileSection() {
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Perfil
       </p>
-      <p className="library-subtitle mb-5 ml-3">nome de usuario e foto</p>
+      <p className="library-subtitle mb-5 ml-3">nome de exibicao e avatar da sua patinha</p>
 
       <div className="flex items-start gap-5">
         <div className="shrink-0">
@@ -159,14 +159,14 @@ export default function ProfileSection() {
             </div>
           </button>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
-          <p className="text-[7px] text-[var(--text-faint)] uppercase tracking-wider font-bold text-center mt-1.5">Foto</p>
+          <p className="text-[7px] text-[var(--text-faint)] uppercase tracking-wider font-bold text-center mt-1.5">Avatar</p>
         </div>
 
         <div className="flex-1 space-y-4">
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-[8px] font-black uppercase tracking-widest text-[var(--text-muted)] block">
-                Nome de Usuario
+                Nome no PawSpace
               </label>
               <RemainingWarning current={username.length} max={USERNAME_MAX} />
             </div>
@@ -177,14 +177,14 @@ export default function ProfileSection() {
               onChange={(event) => setUsername(event.target.value.slice(0, USERNAME_MAX))}
               disabled={isLoadingUser || isSaving}
               className="library-input h-10 px-3.5 text-[11px] font-bold tracking-wide placeholder:text-[var(--text-faint)] disabled:opacity-60"
-              placeholder={isLoadingUser ? 'Carregando...' : 'Seu nome'}
+              placeholder={isLoadingUser ? 'Carregando...' : 'Como voce quer aparecer'}
             />
           </div>
 
           <div className="flex items-center justify-between gap-3">
             <div>
               {error && <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold">{error}</p>}
-              {saved && !error && <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">Perfil atualizado.</p>}
+              {saved && !error && <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold">Perfil do PawSpace atualizado.</p>}
             </div>
             <button
               onClick={() => void handleSave()}
@@ -198,7 +198,7 @@ export default function ProfileSection() {
             >
               {isSaving ? <Loader2 size={10} className="animate-spin" /> : null}
               {!isSaving && saved ? <Check size={10} /> : null}
-              {isSaving ? 'Salvando...' : saved ? 'Salvo' : 'Salvar'}
+              {isSaving ? 'Salvando...' : saved ? 'Salvo' : 'Salvar perfil'}
             </button>
           </div>
         </div>

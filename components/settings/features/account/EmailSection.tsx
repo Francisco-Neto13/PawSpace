@@ -141,7 +141,7 @@ export default function EmailSection() {
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Email
       </p>
-      <p className="library-subtitle mb-5 ml-3">endereco de email da conta</p>
+      <p className="library-subtitle mb-5 ml-3">email que protege o acesso a sua toca</p>
 
       <div className="space-y-4">
         <div>
@@ -165,7 +165,7 @@ export default function EmailSection() {
         <div className="flex items-center justify-between pt-1 gap-4">
           <div>
             <p className="text-[8px] text-[var(--text-faint)] uppercase tracking-wider font-bold">
-              Um link de confirmacao sera enviado para o novo email.
+              Enviaremos um link de confirmacao para a nova caixa de entrada.
             </p>
             {error && <p className="text-[8px] text-red-400/80 uppercase tracking-wider font-bold mt-1">{error}</p>}
             {message && !error && (
@@ -185,7 +185,7 @@ export default function EmailSection() {
           >
             {isSaving ? <Loader2 size={10} className="animate-spin" /> : null}
             {!isSaving && saved ? <Check size={10} /> : null}
-            {isSaving ? 'Salvando...' : saved ? 'Enviado' : 'Atualizar'}
+            {isSaving ? 'Salvando...' : saved ? 'Enviado' : 'Atualizar email'}
           </button>
         </div>
       </div>

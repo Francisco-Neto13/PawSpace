@@ -174,7 +174,7 @@ export default function PasswordSection() {
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
         Senha
       </p>
-      <p className="library-subtitle mb-5 ml-3">alterar senha de acesso</p>
+      <p className="library-subtitle mb-5 ml-3">seguranca da sua toca no PawSpace</p>
 
       <div className="space-y-4">
         <PasswordInput label="Senha Atual" value={current} onChange={setCurrent} maxLength={PASSWORD_MAX} />
@@ -198,7 +198,7 @@ export default function PasswordSection() {
           >
             {isSaving ? <Loader2 size={10} className="animate-spin" /> : null}
             {!isSaving && saved ? <Check size={10} /> : null}
-            {isSaving ? 'Salvando...' : saved ? 'Salvo' : 'Alterar Senha'}
+            {isSaving ? 'Salvando...' : saved ? 'Salvo' : 'Atualizar senha'}
           </button>
         </div>
       </div>

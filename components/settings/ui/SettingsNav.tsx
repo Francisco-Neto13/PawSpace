@@ -15,11 +15,11 @@ const NAV_ITEMS: {
   icon: React.ElementType;
   danger?: boolean;
 }[] = [
-  { key: 'account', label: 'Conta', sub: 'perfil e credenciais', icon: User },
-  { key: 'appearance', label: 'Aparencia', sub: 'tema da interface', icon: Palette },
-  { key: 'data', label: 'Dados', sub: 'uso e exportacao', icon: Database },
-  { key: 'privacy', label: 'Privacidade', sub: 'sessoes e acesso', icon: Shield },
-  { key: 'danger', label: 'Zona de Perigo', sub: 'acoes irreversiveis', icon: AlertTriangle, danger: true },
+  { key: 'account', label: 'Perfil', sub: 'nome, email e senha', icon: User },
+  { key: 'appearance', label: 'Clima', sub: 'tema do espaco', icon: Palette },
+  { key: 'data', label: 'Dados', sub: 'limites e backup', icon: Database },
+  { key: 'privacy', label: 'Acesso', sub: 'sessoes abertas', icon: Shield },
+  { key: 'danger', label: 'Zona de risco', sub: 'acoes permanentes', icon: AlertTriangle, danger: true },
 ];
 
 export default function SettingsNav({ active, onChange }: Props) {
@@ -29,7 +29,7 @@ export default function SettingsNav({ active, onChange }: Props) {
 
       <p className="library-kicker px-2.5 pt-2 pb-3 flex items-center gap-2">
         <PawIcon className="w-2.5 h-2.5 shrink-0" />
-        Menu
+        Menu da Toca
       </p>
 
       <div className="space-y-1">
@@ -53,8 +53,8 @@ export default function SettingsNav({ active, onChange }: Props) {
                       ? 'rgba(239,68,68,0.95)'
                       : 'rgba(239,68,68,0.55)'
                     : isActive
-                    ? 'var(--text-primary)'
-                    : 'var(--text-faint)',
+                      ? 'var(--text-primary)'
+                      : 'var(--text-faint)',
                 }}
               />
               <div className="min-w-0">
@@ -66,8 +66,8 @@ export default function SettingsNav({ active, onChange }: Props) {
                         ? 'rgba(239,68,68,0.95)'
                         : 'rgba(239,68,68,0.55)'
                       : isActive
-                      ? 'var(--text-primary)'
-                      : 'var(--text-muted)',
+                        ? 'var(--text-primary)'
+                        : 'var(--text-muted)',
                   }}
                 >
                   {item.label}

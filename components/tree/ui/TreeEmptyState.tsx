@@ -9,9 +9,9 @@ interface TreeEmptyStateProps {
 export function TreeEmptyState({ onCreate }: TreeEmptyStateProps) {
   return (
     <WorkspaceEmptyState
-      title="Árvore vazia"
-      description="Crie sua árvore para começar a organizar conteúdos por módulo."
-      actionLabel="Criar árvore"
+      title="Territorio vazio"
+      description="Crie sua arvore para abrir o mapa de estudos do PawSpace."
+      actionLabel="Criar arvore"
       onAction={onCreate}
     />
   );

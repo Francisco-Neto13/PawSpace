@@ -27,7 +27,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
 
       <div className="flex items-center justify-between gap-2">
         <p className="library-kicker">
-          Módulos da Árvore
+          Trilhas da Arvore
         </p>
         <span className="library-chip">{nodes.length}</span>
       </div>
@@ -38,7 +38,7 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar módulo..."
+          placeholder="Buscar trilha..."
           className="library-input h-10 pl-8 pr-3 text-[10px] font-mono text-[var(--text-secondary)] placeholder:text-[var(--text-muted)]"
         />
       </div>
@@ -50,12 +50,12 @@ export function LibrarySidebar({ nodes, selectedNodeId, onSelect }: LibrarySideb
           <div className="flex flex-col items-center justify-center py-16 border border-dashed border-[var(--border-subtle)] rounded-xl">
             <Library size={16} className="text-[var(--text-muted)] mb-3" />
             <p className="text-[var(--text-muted)] text-[8px] font-black uppercase tracking-[0.2em] text-center px-4">
-              Aguardando nova indexação de dados
+              Aguardando novas trilhas
             </p>
           </div>
         ) : filtered.length === 0 ? (
           <p className="text-[10px] text-[var(--text-muted)] font-mono text-center py-8">
-            Nenhum módulo encontrado
+            Nenhuma trilha encontrada
           </p>
         ) : (
           filtered.map(node => {

@@ -7,29 +7,29 @@ const SECTION_META: Record<
   { label: string; title: string; description: string }
 > = {
   account: {
-    label: 'Conta',
-    title: 'Identidade e Credenciais',
-    description: 'Atualize perfil, email e senha da sua conta.',
+    label: 'Perfil',
+    title: 'Perfil do PawSpace',
+    description: 'Ajuste nome, email e senha da sua base de estudos.',
   },
   appearance: {
-    label: 'Aparencia',
-    title: 'Tema da Interface',
-    description: 'Escolha o modo visual que melhor se adapta ao seu fluxo.',
+    label: 'Clima',
+    title: 'Clima do PawSpace',
+    description: 'Escolha o visual mais confortavel para estudar, revisar e circular pelo espaco.',
   },
   data: {
     label: 'Dados',
-    title: 'Uso e Exportacao',
-    description: 'Acompanhe limites e exporte seus dados quando precisar.',
+    title: 'Dados da sua trilha',
+    description: 'Veja limites, acompanhe o uso e exporte uma copia do seu espaco quando quiser.',
   },
   privacy: {
-    label: 'Privacidade',
-    title: 'Sessoes Ativas',
-    description: 'Gerencie os dispositivos com acesso a sua conta.',
+    label: 'Acesso',
+    title: 'Pegadas de acesso',
+    description: 'Gerencie os dispositivos com acesso a sua conta e feche sessoes antigas com calma.',
   },
   danger: {
-    label: 'Zona de Perigo',
-    title: 'Acoes Irreversiveis',
-    description: 'Controle operacoes permanentes com confirmacao explicita.',
+    label: 'Zona de risco',
+    title: 'Acoes permanentes',
+    description: 'Revise com cuidado qualquer mudanca irreversivel antes de confirmar.',
   },
 };
 
@@ -43,7 +43,7 @@ export default function SettingsHeader({ active }: SettingsHeaderProps) {
   return (
     <section className="library-panel library-panel-hover p-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
-      <p className="library-kicker mb-2">Configuracoes / {meta.label}</p>
+      <p className="library-kicker mb-2">Ajustes / {meta.label}</p>
       <h1 className="overview-title text-2xl md:text-3xl mb-2">{meta.title}</h1>
       <p className="library-subtitle max-w-2xl">{meta.description}</p>
     </section>

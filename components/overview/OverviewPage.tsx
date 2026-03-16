@@ -48,7 +48,7 @@ const JournalActivityChart = dynamic(() => import('./features/activity/JournalAc
 
 const LibraryStatsPanel = dynamic(() => import('./features/insights/LibraryStatsPanel'), {
   ssr: false,
-  loading: () => <ChartLoadingCard message="Carregando biblioteca..." />,
+  loading: () => <ChartLoadingCard message="Carregando estante..." />,
 });
 
 export default function OverviewContent() {
@@ -88,7 +88,7 @@ export default function OverviewContent() {
         <div className="relative flex flex-col items-center gap-4">
           <div className="w-7 h-7 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
           <p className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.5em] animate-pulse">
-            Sincronizando Pawspace...
+            Sincronizando PawSpace...
           </p>
         </div>
       </div>
@@ -98,9 +98,9 @@ export default function OverviewContent() {
   if (!isLoading && nodes.length === 0) {
     return (
       <WorkspaceEmptyState
-        title="Sem estatísticas para mostrar"
-        description="Crie sua árvore para começar e o resumo do seu progresso aparecerá aqui."
-        actionLabel="Ir para árvore"
+        title="Painel sem pegadas"
+        description="Crie sua arvore para abrir o radar do seu territorio de estudos."
+        actionLabel="Ir para a arvore"
         actionHref="/tree"
       />
     );
@@ -111,21 +111,21 @@ export default function OverviewContent() {
     if (pending <= 0) {
       return {
         title: 'Cobertura completa atingida',
-        body: 'Todos os módulos têm conteúdo. Foque agora em revisão e atualização dos itens mais antigos.',
-        tag: 'Manutenção',
+        body: 'Todas as trilhas ja tem material. Agora vale revisar, atualizar e podar o que ficou antigo.',
+        tag: 'Manutencao',
       };
     }
     if (criticalUncovered > 0) {
       return {
-        title: `${criticalUncovered} módulo${criticalUncovered > 1 ? 's críticos sem' : ' crítico sem'} conteúdo`,
-        body: 'Preencha esses módulos primeiro. Eles destravam mais avanço na árvore do que módulos isolados.',
-        tag: 'Prioridade alta',
+        title: `${criticalUncovered} trilha${criticalUncovered > 1 ? 's criticas sem' : ' critica sem'} material`,
+        body: 'Comece por elas. Essas trilhas sustentam mais avancos no mapa do que trilhas isoladas.',
+        tag: 'Prioridade',
       };
     }
     return {
-      title: `${pending} módulo${pending > 1 ? 's ainda sem' : ' ainda sem'} conteúdo`,
-      body: 'Continue por categoria para aumentar cobertura geral sem perder consistência entre níveis.',
-      tag: 'Próximo passo',
+      title: `${pending} trilha${pending > 1 ? 's aguardando' : ''} material`,
+      body: 'Avance por area para manter a estante equilibrada em todo o mapa.',
+      tag: 'Proxima passada',
     };
   })();
 
@@ -139,7 +139,7 @@ export default function OverviewContent() {
           <div className="flex items-center gap-3 reveal-fade delay-0">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
             <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
-              Pawspace / Visão Geral
+              PawSpace / Painel
             </span>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--border-subtle)] to-transparent" />
           </div>
@@ -160,7 +160,7 @@ export default function OverviewContent() {
               <div className="flex items-center justify-between mb-4">
                 <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
                   <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-                  Decisão Imediata
+                  Proxima passada
                 </p>
                 <span className="overview-chip">
                   {nextAction.tag}
@@ -174,7 +174,7 @@ export default function OverviewContent() {
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <span className="overview-chip">Pendentes: {pending}</span>
-                <span className="overview-chip">Críticos: {criticalUncovered}</span>
+                <span className="overview-chip">Criticas: {criticalUncovered}</span>
                 <span className="overview-chip">Cobertura: {stats.progress}%</span>
               </div>
             </div>
@@ -182,12 +182,12 @@ export default function OverviewContent() {
             <div className="overview-card overview-card-hover p-6 flex flex-col justify-center gap-5 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
               <div>
-                <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Total na árvore</p>
+                <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Trilhas no mapa</p>
                 <p className="text-[var(--text-primary)] text-3xl font-black font-mono tabular-nums leading-none">{stats.total}</p>
               </div>
               <div className="w-full h-px bg-[var(--border-subtle)]" />
               <div>
-                <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Com conteúdo</p>
+                <p className="text-[8px] text-[var(--text-muted)] uppercase tracking-widest mb-1">Com material</p>
                 <p className="text-[var(--text-primary)] text-3xl font-black font-mono tabular-nums leading-none">{stats.unlocked}</p>
               </div>
               <div className="w-full h-px bg-[var(--border-subtle)]" />
@@ -222,7 +222,7 @@ export default function OverviewContent() {
 
           <div className="reveal-fade delay-500 pt-0.5">
             <div className="flex items-center gap-3">
-              <span className="overview-kicker">Análises</span>
+              <span className="overview-kicker">Leituras do mapa</span>
               <div className="flex-1 overview-subtle-divider" />
             </div>
           </div>

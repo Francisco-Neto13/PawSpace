@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { Loader2 } from 'lucide-react';
 import { Content, ContentType } from '../../types';
 import { TYPE_CONFIG } from '../../constants';
@@ -23,7 +23,7 @@ export function LibraryContentList({
       <div className="flex flex-col items-center justify-center py-24 gap-4">
         <Loader2 size={20} className="text-[var(--text-secondary)] animate-spin" />
         <p className="text-[var(--text-muted)] text-[9px] font-black uppercase tracking-widest">
-          Carregando conteúdos...
+          Abrindo a estante...
         </p>
       </div>
     );
@@ -35,8 +35,8 @@ export function LibraryContentList({
 
   return (
     <div className="flex flex-col gap-4">
-      {(['link', 'video', 'pdf', 'note'] as ContentType[]).map(type => {
-        const items = contents.filter(c => c.type === type);
+      {(['link', 'video', 'pdf', 'note'] as ContentType[]).map((type) => {
+        const items = contents.filter((c) => c.type === type);
         if (items.length === 0) return null;
         const cfg = TYPE_CONFIG[type];
         return (
@@ -57,7 +57,7 @@ export function LibraryContentList({
               <span className="library-chip">{items.length}</span>
             </div>
             <div className="flex flex-col gap-2.5">
-              {items.map(c => (
+              {items.map((c) => (
                 <ContentCard key={c.id} content={c} onDelete={onDelete} />
               ))}
             </div>
@@ -67,4 +67,3 @@ export function LibraryContentList({
     </div>
   );
 }
-

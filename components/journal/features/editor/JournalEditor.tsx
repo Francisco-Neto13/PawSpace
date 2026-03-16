@@ -75,7 +75,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             value={title}
             disabled={isTemporaryEntry}
             onChange={(e) => setTitle(e.target.value.slice(0, TITLE_MAX))}
-            placeholder="Título da entrada..."
+            placeholder="Titulo da nota..."
             maxLength={TITLE_MAX}
             className={`w-full bg-transparent text-[var(--text-primary)] text-xl font-black outline-none placeholder:text-[var(--text-muted)] tracking-wide pr-16 ${
               isTemporaryEntry ? 'opacity-60 cursor-not-allowed' : ''
@@ -112,7 +112,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
               style={{ color: skill?.color ?? 'var(--text-muted)' }}
             >
               <Tag size={9} />
-              <span className="max-w-[190px] truncate">{skill ? `${skill.icon} ${skill.name}` : 'Vincular módulo'}</span>
+              <span className="max-w-[190px] truncate">{skill ? `${skill.icon} ${skill.name}` : 'Vincular trilha'}</span>
               <ChevronDown size={8} className={`transition-transform duration-200 ${showSkillPicker ? 'rotate-180' : ''}`} />
             </button>
 
@@ -122,7 +122,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                 <div className="absolute top-full left-0 mt-2 w-60 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] z-50 overflow-hidden">
                   <div className="px-3 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
                     <span className="text-[7px] text-[var(--text-secondary)] font-black uppercase tracking-[0.2em]">
-                      Módulos disponíveis
+                      Trilhas disponiveis
                     </span>
                   </div>
 
@@ -133,7 +133,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
                     }}
                     className="w-full px-3 py-2 text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] text-left transition-colors font-bold uppercase"
                   >
-                    Nenhum vínculo
+                    Nota solta
                   </button>
 
                   <div className="max-h-48 overview-scroll-area p-1.5 pt-0.5">
@@ -161,17 +161,17 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             {isTemporaryEntry ? (
               <span className="flex items-center gap-1.5 text-[8px] text-[var(--text-primary)] font-black uppercase animate-pulse">
                 <Loader2 size={10} className="animate-spin" />
-                Criando entrada...
+                Criando nota...
               </span>
             ) : isSaving ? (
               <span className="flex items-center gap-1.5 text-[8px] text-[var(--text-primary)] font-black uppercase animate-pulse">
                 <Loader2 size={10} className="animate-spin" />
-                Sincronizando...
+                Salvando rastro...
               </span>
             ) : (
               <span className="flex items-center gap-1.5 text-[8px] text-[var(--text-secondary)] font-black uppercase">
                 <CloudCheck size={10} className="text-[var(--text-muted)]" />
-                Sincronizado
+                Rastro salvo
               </span>
             )}
 
@@ -180,7 +180,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
               className="h-8 px-2.5 rounded-lg border border-[var(--border-subtle)] flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)] text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer"
             >
               <Trash2 size={10} />
-              Excluir
+              Apagar nota
             </button>
           </div>
         </div>

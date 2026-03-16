@@ -57,7 +57,7 @@ export default function JournalPage() {
     const now = new Date().toISOString();
     const placeholder: JournalEntry = {
       id: tempId,
-      title: 'Nova Entrada',
+      title: 'Nova Nota',
       body: '',
       skillId: null,
       createdAt: now,
@@ -95,8 +95,8 @@ export default function JournalPage() {
   const handleDelete = async (id: string) => {
     const entry = entries.find((item) => item.id === id);
     const isConfirmed = await confirmDialog({
-      title: 'Excluir entrada',
-      description: `Esta entrada será removida do diário: "${entry?.title ?? 'Sem título'}".`,
+      title: 'Excluir nota',
+      description: `Esta nota sera removida do diario: "${entry?.title ?? 'Sem titulo'}".`,
       confirmLabel: 'Excluir',
       cancelLabel: 'Cancelar',
       tone: 'danger',
@@ -141,7 +141,7 @@ export default function JournalPage() {
       <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
         <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
         <p className="text-[var(--text-primary)] text-[10px] font-black uppercase tracking-[0.4em] mt-4 animate-pulse">
-          Sincronizando Pawspace...
+          Sincronizando PawSpace...
         </p>
       </div>
     );
@@ -150,9 +150,9 @@ export default function JournalPage() {
   if (!isLoadingNexus && nodes.length === 0) {
     return (
       <WorkspaceEmptyState
-        title="Diário vazio"
-        description="Crie sua árvore para começar a registrar progresso e revisões por módulo."
-        actionLabel="Ir para árvore"
+        title="Diario sem pegadas"
+        description="Crie sua arvore para comecar a registrar progresso e revisoes por modulo."
+        actionLabel="Ir para a arvore"
         actionHref="/tree"
       />
     );
@@ -164,27 +164,27 @@ export default function JournalPage() {
 
       <div className="relative z-10 py-8 pb-20">
         <div className="relative max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 space-y-5">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 reveal-fade delay-0">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
             <span className="text-[var(--text-primary)] text-[9px] font-black uppercase tracking-[0.4em]">
-              Pawspace / Diário
+              PawSpace / Diario
             </span>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
           </div>
 
-          <section className="library-panel library-panel-hover p-6 relative overflow-hidden">
+          <section className="library-panel library-panel-hover p-6 relative overflow-hidden reveal-up delay-100">
             <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
               <div>
-                <p className="library-kicker mb-2">Central de Escrita</p>
-                <h1 className="overview-title text-2xl md:text-3xl mb-2">Diário de Aprendizado</h1>
+                <p className="library-kicker mb-2">Rastro de Estudos</p>
+                <h1 className="overview-title text-2xl md:text-3xl mb-2">Diario do PawSpace</h1>
                 <p className="library-subtitle max-w-2xl">
-                  Registre progresso, decisões e revisões. Vincule entradas aos módulos para manter histórico contextual dentro da árvore.
+                  Registre sessoes, decisoes e revisoes. Vincule cada nota aos modulos para manter o rastro do aprendizado sempre acessivel.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
-                  <span className="library-chip">Registros: {isLoadingEntries ? '--' : entries.length}</span>
-                  <span className="library-chip">Vinculados: {linkedEntriesCount}</span>
-                  <span className="library-chip">Sem vínculo: {Math.max(entries.length - linkedEntriesCount, 0)}</span>
+                  <span className="library-chip">Notas: {isLoadingEntries ? '--' : entries.length}</span>
+                  <span className="library-chip">Com trilha: {linkedEntriesCount}</span>
+                  <span className="library-chip">Soltas: {Math.max(entries.length - linkedEntriesCount, 0)}</span>
                 </div>
               </div>
 
@@ -194,20 +194,22 @@ export default function JournalPage() {
                 className="h-10 shrink-0 flex items-center justify-center gap-2 px-4 border border-[var(--border-visible)] rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] text-[9px] font-black uppercase tracking-widest hover:bg-[var(--bg-input)] transition-all cursor-pointer active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Plus size={11} />
-                Nova Entrada
+                Nova Nota
               </button>
             </div>
           </section>
 
           <div className="grid grid-cols-1 xl:grid-cols-[340px_minmax(0,1fr)] gap-4 items-start">
-            <JournalSidebar
-              entries={entries}
-              skills={skillList}
-              selectedId={selectedId || ''}
-              onSelect={handleSelectEntry}
-            />
+            <div className="reveal-up delay-200">
+              <JournalSidebar
+                entries={entries}
+                skills={skillList}
+                selectedId={selectedId || ''}
+                onSelect={handleSelectEntry}
+              />
+            </div>
 
-            <main className="library-panel relative overflow-hidden flex flex-col min-h-[calc(100dvh-var(--navbar-height)-140px)]">
+            <main className="library-panel relative overflow-hidden flex flex-col min-h-[calc(100dvh-var(--navbar-height)-140px)] reveal-up delay-300">
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
               <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04] pointer-events-none" />
 
@@ -227,7 +229,7 @@ export default function JournalPage() {
                 <div className="flex-1 flex flex-col items-center justify-center gap-4 py-20">
                   <BookOpen size={32} className="text-[var(--text-muted)]" />
                   <p className="text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-[0.3em]">
-                    Nenhum registro selecionado
+                    Nenhuma nota selecionada
                   </p>
                 </div>
               )}

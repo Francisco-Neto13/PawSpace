@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useRef } from 'react';
 import { Upload } from 'lucide-react';
 
@@ -23,18 +23,18 @@ export function PdfForm({ mode, url, file, maxFileSizeBytes, onModeChange, onUrl
   return (
     <div className="space-y-5">
       <div className="flex gap-2">
-        {(['upload', 'link'] as const).map(m => (
+        {(['upload', 'link'] as const).map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => { onModeChange(m); onFileChange(null); onUrlChange(''); }}
-            className={`h-10 flex-1 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer
-              ${mode === m
+            className={`h-10 flex-1 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all duration-200 cursor-pointer ${
+              mode === m
                 ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)]'
-              }`}
+            }`}
           >
-            {m === 'upload' ? 'Fazer Upload' : 'Link Externo'}
+            {m === 'upload' ? 'Enviar PDF' : 'Link Externo'}
           </button>
         ))}
       </div>
@@ -47,23 +47,23 @@ export function PdfForm({ mode, url, file, maxFileSizeBytes, onModeChange, onUrl
             type="file"
             accept=".pdf"
             className="hidden"
-            onChange={e => onFileChange(e.target.files?.[0] ?? null)}
+            onChange={(e) => onFileChange(e.target.files?.[0] ?? null)}
           />
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className={`w-full flex flex-col items-center justify-center gap-3 py-8 rounded-xl border border-dashed transition-all duration-200 cursor-pointer
-              ${isOverLimit
+            className={`w-full flex flex-col items-center justify-center gap-3 py-8 rounded-xl border border-dashed transition-all duration-200 cursor-pointer ${
+              isOverLimit
                 ? 'border-red-500/70 bg-red-500/10 text-[var(--text-primary)]'
                 : file
-                ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
-                : 'border-[var(--border-muted)] text-[var(--text-secondary)] hover:border-[var(--border-visible)] hover:text-[var(--text-primary)]'
-              }`}
+                  ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                  : 'border-[var(--border-muted)] text-[var(--text-secondary)] hover:border-[var(--border-visible)] hover:text-[var(--text-primary)]'
+            }`}
           >
             <Upload size={16} className={file ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'} />
             <div className="flex flex-col items-center gap-1">
               <span className="text-[10px] font-black uppercase tracking-widest">
-                {file ? file.name : 'Selecionar Documento PDF'}
+                {file ? file.name : 'Selecionar PDF'}
               </span>
               {file && (
                 <span className="text-[9px] text-[var(--text-secondary)] font-mono">
@@ -78,11 +78,11 @@ export function PdfForm({ mode, url, file, maxFileSizeBytes, onModeChange, onUrl
         </div>
       ) : (
         <div className="animate-in fade-in duration-300">
-          <label className={labelClass}>URL do Arquivo PDF *</label>
+          <label className={labelClass}>Link do PDF *</label>
           <input
             type="url"
             value={url}
-            onChange={e => onUrlChange(e.target.value)}
+            onChange={(e) => onUrlChange(e.target.value)}
             className={inputClass}
             placeholder="https://exemplo.com/arquivo.pdf"
           />

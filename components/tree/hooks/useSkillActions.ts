@@ -52,18 +52,18 @@ export function useSkillActions() {
     const hasChildren = nodes.some((item) => item.data.parentId === nodeId);
 
     if (isRoot) {
-      alert('Nao e possivel remover o modulo raiz da arvore.');
+      alert('Nao e possivel remover a trilha raiz do mapa.');
       return false;
     }
 
     if (hasChildren) {
-      alert('Nao e possivel remover um modulo que ainda possui submodulos.');
+      alert('Nao e possivel remover uma trilha que ainda possui subtrilhas.');
       return false;
     }
 
     const isConfirmed = await confirmDialog({
-      title: 'Remover módulo',
-      description: `O módulo "${node?.data.label || node?.data.name || 'Sem nome'}" e todas as conexões serão removidos.`,
+      title: 'Remover trilha',
+      description: `A trilha "${node?.data.label || node?.data.name || 'Sem nome'}" e suas conexoes serao removidas.`,
       confirmLabel: 'Remover',
       cancelLabel: 'Cancelar',
       tone: 'danger',
@@ -90,9 +90,9 @@ export function useSkillActions() {
 
     const newData: SkillData = {
       id: tempId,
-      name: 'Novo Módulo',
-      label: 'Novo Módulo',
-      description: 'Defina os objetivos deste módulo.',
+      name: 'Nova Trilha',
+      label: 'Nova Trilha',
+      description: 'Defina o foco desta trilha no PawSpace.',
       icon: '*',
       color: null,
       shape: 'circle' as SkillShape,
@@ -177,7 +177,7 @@ export function useSkillActions() {
         if (!result.success) {
           const msg = 'error' in result && typeof result.error === 'string'
             ? result.error
-            : 'Erro ao criar módulo.';
+            : 'Erro ao criar trilha.';
           alert(msg);
           return false;
         }
@@ -212,7 +212,7 @@ export function useSkillActions() {
       return true;
     } catch (error) {
       console.error('[SkillActions] Erro no save global:', error);
-      alert('Erro ao sincronizar mudancas.');
+      alert('Erro ao sincronizar as pegadas do mapa.');
       return false;
     }
   }, [nodes, setNodes, setEdges, originalNodeIds]);

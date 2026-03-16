@@ -13,16 +13,17 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
   const skill = getSkill(entry.skillId, skills);
   const plainText = entry.body ? entry.body.replace(/<[^>]+>/g, '') : '';
   const previewLimit = 72;
-  const preview = plainText ? plainText.slice(0, previewLimit) : 'Sem conteúdo adicional';
+  const preview = plainText ? plainText.slice(0, previewLimit) : 'Sem anotacoes por enquanto';
   const hasMorePreview = plainText.length > previewLimit;
 
   return (
     <button
       onClick={onSelect}
-      className={`group relative w-full flex flex-col gap-2.5 px-3 py-3 border rounded-xl overflow-hidden text-left transition-all duration-200
-        ${isSelected
+      className={`group relative w-full flex flex-col gap-2.5 px-3 py-3 border rounded-xl overflow-hidden text-left transition-all duration-200 ${
+        isSelected
           ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)]'
-          : 'border-[var(--border-subtle)] hover:border-[var(--border-muted)] hover:bg-[var(--bg-surface)]'}`}
+          : 'border-[var(--border-subtle)] hover:border-[var(--border-muted)] hover:bg-[var(--bg-surface)]'
+      }`}
     >
       {isSelected && (
         <>
@@ -36,7 +37,7 @@ export function EntryItem({ entry, skills, isSelected, onSelect }: EntryItemProp
           isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'
         }`}
       >
-        {entry.title || 'Sem Título'}
+        {entry.title || 'Nota sem titulo'}
       </p>
 
       <p className="text-[10px] text-[var(--text-secondary)] font-medium leading-relaxed line-clamp-2 min-h-[30px]">

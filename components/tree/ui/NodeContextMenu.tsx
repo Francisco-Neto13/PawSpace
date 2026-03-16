@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import React, { useEffect, useRef } from 'react';
 import { Plus, Trash2, Edit3 } from 'lucide-react';
 
@@ -7,19 +7,19 @@ interface NodeContextMenuProps {
   y: number;
   nodeName: string;
   onAddChild: () => void;
-  onEdit: () => void; 
+  onEdit: () => void;
   onDelete?: () => void;
   onClose: () => void;
 }
 
-export function NodeContextMenu({ 
-  x, 
-  y, 
-  nodeName, 
-  onAddChild, 
-  onEdit, 
-  onDelete, 
-  onClose 
+export function NodeContextMenu({
+  x,
+  y,
+  nodeName,
+  onAddChild,
+  onEdit,
+  onDelete,
+  onClose,
 }: NodeContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -55,7 +55,7 @@ export function NodeContextMenu({
           <div className="flex items-center gap-2 mb-1">
             <div className="w-1 h-3 bg-[var(--text-secondary)]" />
             <p className="text-[8px] text-[var(--text-secondary)] uppercase font-black tracking-[0.25em]">
-              Módulo Selecionado
+              Trilha selecionada
             </p>
           </div>
           <p className="text-[var(--text-primary)] text-[11px] font-bold truncate pl-3">{nodeName}</p>
@@ -67,7 +67,7 @@ export function NodeContextMenu({
             className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-all duration-200 group cursor-pointer"
           >
             <Edit3 size={13} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors shrink-0" />
-            <span className="text-[9px] font-black uppercase tracking-widest">Configurar Módulo</span>
+            <span className="text-[9px] font-black uppercase tracking-widest">Editar trilha</span>
           </button>
 
           <button
@@ -75,7 +75,7 @@ export function NodeContextMenu({
             className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-all duration-200 group cursor-pointer"
           >
             <Plus size={13} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors shrink-0" />
-            <span className="text-[9px] font-black uppercase tracking-widest">Adicionar Submódulo</span>
+            <span className="text-[9px] font-black uppercase tracking-widest">Adicionar subtrilha</span>
           </button>
 
           {onDelete && (
@@ -86,7 +86,7 @@ export function NodeContextMenu({
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-all duration-200 group cursor-pointer"
               >
                 <Trash2 size={13} className="shrink-0 group-hover:text-[var(--text-primary)] transition-colors" />
-                <span className="text-[9px] font-black uppercase tracking-widest">Remover Módulo</span>
+                <span className="text-[9px] font-black uppercase tracking-widest">Remover trilha</span>
               </button>
             </>
           )}

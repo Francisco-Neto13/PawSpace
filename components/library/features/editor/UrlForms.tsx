@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 const inputClass = 'library-input p-3.5 text-sm font-normal placeholder:text-[var(--text-muted)] cursor-text';
 const labelClass = 'text-[9px] text-[var(--text-secondary)] uppercase font-black tracking-[0.25em] block mb-2.5';
@@ -11,13 +11,13 @@ interface UrlFormProps {
 export function LinkForm({ url, onChange }: UrlFormProps) {
   return (
     <div className="animate-in fade-in duration-300">
-      <label className={labelClass}>Endereço URL *</label>
+      <label className={labelClass}>Link de Referencia *</label>
       <input
         type="url"
         value={url}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         className={inputClass}
-        placeholder="https://link-de-referencia.com"
+        placeholder="https://material-de-apoio.com"
       />
     </div>
   );
@@ -26,11 +26,11 @@ export function LinkForm({ url, onChange }: UrlFormProps) {
 export function VideoForm({ url, onChange }: UrlFormProps) {
   return (
     <div className="animate-in fade-in duration-300">
-      <label className={labelClass}>URL da Mídia de Vídeo *</label>
+      <label className={labelClass}>Link do Video *</label>
       <input
         type="url"
         value={url}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         className={inputClass}
         placeholder="https://www.youtube.com/watch?v=..."
       />

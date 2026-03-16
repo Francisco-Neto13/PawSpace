@@ -18,10 +18,10 @@ function CriticalNodesPanel({ critical }: Props) {
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
         <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          Módulos Críticos
+          Trilhas Criticas
         </p>
         <p className="overview-subtitle mt-6 ml-3">
-          Adicione dependências entre módulos para identificar os mais importantes.
+          Conecte trilhas na arvore para descobrir o que sustenta mais progresso.
         </p>
       </div>
     );
@@ -37,12 +37,12 @@ function CriticalNodesPanel({ critical }: Props) {
       <div className="flex items-start justify-between mb-1 shrink-0">
         <p className="overview-kicker text-[var(--text-primary)] flex items-center gap-2">
           <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-          Módulos Críticos
+          Trilhas Criticas
         </p>
         <div className="flex gap-1.5">
           {covered > 0 && (
             <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 bg-[var(--bg-elevated)] border border-[var(--border-muted)] text-[var(--text-secondary)]">
-              {covered} coberto{covered > 1 ? 's' : ''}
+              {covered} coberta{covered > 1 ? 's' : ''}
             </span>
           )}
           {uncovered > 0 && (
@@ -53,7 +53,7 @@ function CriticalNodesPanel({ critical }: Props) {
         </div>
       </div>
       <p className="overview-subtitle mb-6 ml-3 shrink-0">
-        Módulos que mais destravam progresso quando recebem conteúdo
+        Trilhas que mais destravam o territorio quando recebem material
       </p>
 
       <div className="flex-1 min-h-0 overview-scroll-area">
@@ -114,19 +114,19 @@ function CriticalNodesPanel({ critical }: Props) {
                     <div className="grid grid-cols-3 gap-4 mb-3">
                       <div>
                         <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
-                          Links externos
+                          Links
                         </p>
                         <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.linksCount}</p>
                       </div>
                       <div>
                         <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
-                          Conteúdos
+                          Materiais
                         </p>
                         <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.contentsCount}</p>
                       </div>
                       <div>
                         <p className="text-[8px] text-[var(--text-secondary)] uppercase tracking-wider font-bold mb-0.5">
-                          Módulos que dependem
+                          Trilhas dependentes
                         </p>
                         <p className="text-[var(--text-primary)] font-mono font-black text-lg">{n.dependents}</p>
                       </div>
@@ -143,9 +143,8 @@ function CriticalNodesPanel({ critical }: Props) {
                         style={{ color: n.hasContent ? 'var(--text-secondary)' : 'var(--text-muted)' }}
                       >
                         {n.hasContent
-                          ? 'Este módulo já tem conteúdo cadastrado'
-                          : 'Sem conteúdo — adicionar aqui impacta vários módulos'
-                        }
+                          ? 'Esta trilha ja tem material na estante'
+                          : 'Sem material ainda - preencher aqui libera outras trilhas'}
                       </p>
                     </div>
                   </div>
@@ -158,14 +157,14 @@ function CriticalNodesPanel({ critical }: Props) {
 
       <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex flex-col gap-2 shrink-0">
         <p className="text-[8px] text-[var(--text-muted)] font-bold uppercase tracking-wider">
-          dep. — quantidade de módulos que dependem deste para avançar
+          dep. - quantas trilhas dependem desta para avancar
         </p>
         {uncovered > 0 && (
           <div className="flex items-center gap-2">
             <AlertCircle size={8} className="text-[var(--text-secondary)] shrink-0" />
             <p className="text-[8px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">
-              {uncovered} módulo{uncovered > 1 ? 's críticos sem' : ' crítico sem'} conteúdo —
-              preencher estes desbloqueia o avanço de outros
+              {uncovered} trilha{uncovered > 1 ? 's criticas sem' : ' critica sem'} material -
+              priorizar aqui destrava o resto do mapa
             </p>
           </div>
         )}

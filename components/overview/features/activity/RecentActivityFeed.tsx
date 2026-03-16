@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { BookOpen } from 'lucide-react';
@@ -185,16 +185,16 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
 
       <p className="overview-kicker text-[var(--text-primary)] mb-1 flex items-center gap-2">
         <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-        Atividade Recente
+        Rastro Recente
       </p>
-      <p className="overview-subtitle mb-4 ml-3">Log das alteraÃ§Ãµes mais recentes no sistema</p>
+      <p className="overview-subtitle mb-4 ml-3">Ultimas movimentacoes pela arvore, diario e estante</p>
 
       <div className="flex gap-1 mb-4 ml-3 shrink-0">
         {([
           ['all', 'Tudo', counters.all],
           ['journal', 'Diario', counters.journal],
-          ['skill', 'Modulos', counters.skill],
-          ['library', 'Biblioteca', counters.library],
+          ['skill', 'Arvore', counters.skill],
+          ['library', 'Estante', counters.library],
         ] as const).map(([key, label, count]) => (
           <button
             key={key}
@@ -212,59 +212,59 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
       </div>
 
       {isLoading ? (
-        <p className="text-[9px] text-[var(--text-muted)] ml-3">Carregando atividade...</p>
+        <p className="text-[9px] text-[var(--text-muted)] ml-3">Carregando rastros...</p>
       ) : items.length === 0 ? (
-        <p className="text-[9px] text-[var(--text-muted)] ml-3">Nenhuma patinha por aqui ainda.</p>
+        <p className="text-[9px] text-[var(--text-muted)] ml-3">Nenhuma pegada recente por aqui.</p>
       ) : (
         <div className="flex-1 min-h-0 overview-scroll-area">
           <div className="pr-1">
-          {items.map((item) => {
-            const isJournal = item.type === 'journal';
-            return (
-              <div
-                key={item.key}
-                className="flex items-center gap-3 py-2.5 border-b border-[var(--border-subtle)] last:border-0 group"
-              >
+            {items.map((item) => {
+              const isJournal = item.type === 'journal';
+              return (
                 <div
-                  className="w-6 h-6 flex items-center justify-center shrink-0 border transition-colors duration-200"
-                  style={{
-                    borderColor: isJournal ? 'var(--border-visible)' : 'var(--border-subtle)',
-                    backgroundColor: isJournal ? 'var(--bg-elevated)' : 'transparent',
-                  }}
+                  key={item.key}
+                  className="flex items-center gap-3 py-2.5 border-b border-[var(--border-subtle)] last:border-0 group"
                 >
-                  {isJournal
-                    ? <BookOpen size={10} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
-                    : <span className="text-xs leading-none">{item.icon}</span>
-                  }
-                </div>
+                  <div
+                    className="w-6 h-6 flex items-center justify-center shrink-0 border transition-colors duration-200"
+                    style={{
+                      borderColor: isJournal ? 'var(--border-visible)' : 'var(--border-subtle)',
+                      backgroundColor: isJournal ? 'var(--bg-elevated)' : 'transparent',
+                    }}
+                  >
+                    {isJournal
+                      ? <BookOpen size={10} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
+                      : <span className="text-xs leading-none">{item.icon}</span>
+                    }
+                  </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <span
-                      className="text-[7px] font-black uppercase tracking-wider"
-                      style={{ color: isJournal ? 'var(--text-secondary)' : 'var(--text-muted)' }}
-                    >
-                      {item.type === 'journal' ? 'Diario' : item.type === 'skill' ? 'Modulo' : 'Biblioteca'}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span
+                        className="text-[7px] font-black uppercase tracking-wider"
+                        style={{ color: isJournal ? 'var(--text-secondary)' : 'var(--text-muted)' }}
+                      >
+                        {item.type === 'journal' ? 'Diario' : item.type === 'skill' ? 'Trilha' : 'Estante'}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-[var(--text-secondary)] font-medium truncate block group-hover:text-[var(--text-primary)] transition-colors duration-200">
+                      {item.title}
                     </span>
                   </div>
-                  <span className="text-[10px] text-[var(--text-secondary)] font-medium truncate block group-hover:text-[var(--text-primary)] transition-colors duration-200">
-                    {item.title}
+
+                  <span className="text-[8px] text-[var(--text-muted)] font-mono shrink-0 group-hover:text-[var(--text-secondary)] transition-colors">
+                    {timeAgo(item.date)}
                   </span>
                 </div>
-
-                <span className="text-[8px] text-[var(--text-muted)] font-mono shrink-0 group-hover:text-[var(--text-secondary)] transition-colors">
-                  {timeAgo(item.date)}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
           </div>
         </div>
       )}
 
       <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between shrink-0">
         <span className="text-[8px] text-[var(--text-muted)] uppercase tracking-wider font-bold">
-          {items.length} eventos carregados
+          {items.length} rastros carregados
         </span>
         <button
           onClick={() => void loadMorePage()}
@@ -279,6 +279,3 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
 }
 
 export default memo(RecentActivityFeed);
-
-
-

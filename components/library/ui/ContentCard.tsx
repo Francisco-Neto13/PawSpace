@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { ExternalLink, Clock, Trash2 } from 'lucide-react';
 import { Content } from '../types';
 import { TYPE_CONFIG } from '../constants';
@@ -23,8 +23,8 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
 
   const handleDelete = async () => {
     const isConfirmed = await confirmDialog({
-      title: 'Remover conteúdo',
-      description: `Este item será removido da biblioteca: "${content.title}".`,
+      title: 'Remover material',
+      description: `Este material sera retirado da estante: "${content.title}".`,
       confirmLabel: 'Remover',
       cancelLabel: 'Manter',
       tone: 'danger',
