@@ -63,7 +63,6 @@ function buildCounters(source: ActivityFeedItem[]): ActivityCounters {
 function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentActivityFeedProps) {
   const hasInitialPage = initialPage?.status === 'ok';
   const skipFirstResetFetchRef = useRef(false);
-  const hasBootstrappedRef = useRef(false);
   const [filter, setFilter] = useState<ActivityFilter>('all');
   const [items, setItems] = useState<ActivityFeedItem[]>(
     hasInitialPage ? (initialPage?.items ?? []) : []
@@ -146,8 +145,8 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
   }, [filter, hasMore, nextCursor, isLoadingMore, items.length]);
 
   useEffect(() => {
-    if (hasBootstrappedRef.current) return;
     if (isBootstrapLoading || initialPage === null) return;
+    if (filter !== 'all') return;
 
     if (initialPage.status === 'ok') {
       setItems(initialPage.items);
@@ -162,9 +161,7 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
       setHasMore(false);
       skipFirstResetFetchRef.current = false;
     }
-
-    hasBootstrappedRef.current = true;
-  }, [initialPage, isBootstrapLoading]);
+  }, [initialPage, isBootstrapLoading, filter]);
 
   useEffect(() => {
     if (isBootstrapLoading) return;

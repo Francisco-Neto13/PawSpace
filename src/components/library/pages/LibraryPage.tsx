@@ -135,7 +135,7 @@ export default function LibraryPage() {
     removeNodeContent(resolvedSelectedNodeId, id);
     const result = await deleteContent(id);
     if (result.success) {
-      invalidateOverview();
+      invalidateOverview({ refetch: true });
       void refreshGlobalStats();
       return;
     }
@@ -276,7 +276,7 @@ export default function LibraryPage() {
           if (createdContent) {
             addNodeContent(nodeId, createdContent);
           }
-          invalidateOverview();
+          invalidateOverview({ refetch: true });
           void refreshGlobalStats();
         }}
         onOptimisticRollback={(tempId) => {
@@ -289,7 +289,7 @@ export default function LibraryPage() {
           if (resolvedSelectedNodeId) {
             if (createdContent) {
               addNodeContent(resolvedSelectedNodeId, createdContent);
-              invalidateOverview();
+              invalidateOverview({ refetch: true });
               void refreshGlobalStats();
             }
           }

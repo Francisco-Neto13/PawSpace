@@ -56,7 +56,9 @@ export default function OverviewContent() {
   const { bootstrap, isLoading: isBootstrapLoading, refreshOverview } = useOverview();
   const { entries } = useJournal();
 
-  useEffect(() => { void refreshOverview(); }, [refreshOverview]);
+  useEffect(() => {
+    void refreshOverview({ force: true });
+  }, [refreshOverview]);
 
   const libraryStats   = bootstrap?.libraryStats   ?? null;
   const recentActivity = bootstrap?.recentActivity ?? null;

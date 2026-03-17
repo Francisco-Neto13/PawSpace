@@ -1,10 +1,12 @@
 'use client';
 
+import Image from 'next/image';
 import { PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
 
 interface SidebarIdentityCardProps {
   collapsed: boolean;
   avatarLetter: string;
+  avatarUrl: string | null;
   displayName: string;
   isLoadingDisplayName: boolean;
   onToggleCollapsed?: () => void;
@@ -14,6 +16,7 @@ interface SidebarIdentityCardProps {
 export function SidebarIdentityCard({
   collapsed,
   avatarLetter,
+  avatarUrl,
   displayName,
   isLoadingDisplayName,
   onToggleCollapsed,
@@ -27,8 +30,19 @@ export function SidebarIdentityCard({
       <div className={`relative z-10 flex items-center ${collapsed ? 'flex-col justify-center' : 'justify-between'} gap-2`}>
         {!collapsed && (
           <div className="flex items-center gap-2 min-w-0">
-            <div className="h-8 w-8 rounded-full border border-[var(--border-muted)] bg-[var(--bg-elevated)] flex items-center justify-center shrink-0">
-              <span className="text-[var(--text-primary)] text-[11px] font-black">{avatarLetter}</span>
+            <div className="relative h-8 w-8 rounded-full border border-[var(--border-muted)] bg-[var(--bg-elevated)] flex items-center justify-center shrink-0 overflow-hidden">
+              {avatarUrl ? (
+                <Image
+                  src={avatarUrl}
+                  alt={displayName}
+                  fill
+                  sizes="32px"
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <span className="text-[var(--text-primary)] text-[11px] font-black">{avatarLetter}</span>
+              )}
             </div>
             <div className="min-w-0">
               <p className="library-kicker">PawSpace</p>
@@ -41,8 +55,19 @@ export function SidebarIdentityCard({
 
         {collapsed && (
           <>
-            <div className="h-9 w-9 rounded-full border border-[var(--border-muted)] bg-[var(--bg-elevated)] flex items-center justify-center">
-              <span className="text-[var(--text-primary)] text-[11px] font-black">{avatarLetter}</span>
+            <div className="relative h-9 w-9 rounded-full border border-[var(--border-muted)] bg-[var(--bg-elevated)] flex items-center justify-center overflow-hidden">
+              {avatarUrl ? (
+                <Image
+                  src={avatarUrl}
+                  alt={displayName}
+                  fill
+                  sizes="36px"
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <span className="text-[var(--text-primary)] text-[11px] font-black">{avatarLetter}</span>
+              )}
             </div>
             <p className="ui-label text-center">Paw</p>
           </>

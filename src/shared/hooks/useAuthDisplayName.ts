@@ -26,18 +26,32 @@ function resolveDisplayName(user: {
   return 'Usuario';
 }
 
+function resolveAvatarUrl(user: {
+  user_metadata?: Record<string, unknown>;
+} | null): string | null {
+  const rawAvatar = user?.user_metadata?.avatar_url;
+  if (typeof rawAvatar === 'string' && rawAvatar.trim().length > 0) {
+    return rawAvatar.trim();
+  }
+
+  return null;
+}
+
 interface UseAuthDisplayNameResult {
   displayName: string;
+  avatarUrl: string | null;
   isLoading: boolean;
 }
 
 type DisplayNameSnapshot = {
   displayName: string;
+  avatarUrl: string | null;
   isLoading: boolean;
 };
 
 const DEFAULT_SNAPSHOT: DisplayNameSnapshot = {
   displayName: 'Usuario',
+  avatarUrl: null,
   isLoading: true,
 };
 
@@ -69,6 +83,7 @@ function ensureAuthSync() {
     supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
       setSnapshot({
         displayName: resolveDisplayName(session?.user ?? null),
+        avatarUrl: resolveAvatarUrl(session?.user ?? null),
         isLoading: false,
       });
     });
@@ -83,6 +98,24 @@ function ensureAuthSync() {
         });
       }
     }) as EventListener);
+
+    window.addEventListener('auth-profile-updated', ((event: Event) => {
+      const custom = event as CustomEvent<{ displayName?: string; avatarUrl?: string | null }>;
+      const detail = custom.detail ?? {};
+      const nextSnapshot: Partial<DisplayNameSnapshot> = { isLoading: false };
+
+      if (typeof detail.displayName === 'string' && detail.displayName.trim().length > 0) {
+        nextSnapshot.displayName = detail.displayName.trim();
+      }
+
+      if (Object.prototype.hasOwnProperty.call(detail, 'avatarUrl')) {
+        nextSnapshot.avatarUrl = typeof detail.avatarUrl === 'string' && detail.avatarUrl.trim().length > 0
+          ? detail.avatarUrl.trim()
+          : null;
+      }
+
+      setSnapshot(nextSnapshot);
+    }) as EventListener);
   }
 
   if (!hydratePromise && snapshot.isLoading) {
@@ -94,11 +127,13 @@ function ensureAuthSync() {
 
         setSnapshot({
           displayName: resolveDisplayName(user),
+          avatarUrl: resolveAvatarUrl(user),
           isLoading: false,
         });
       } catch {
         setSnapshot({
           displayName: 'Usuario',
+          avatarUrl: null,
           isLoading: false,
         });
       } finally {

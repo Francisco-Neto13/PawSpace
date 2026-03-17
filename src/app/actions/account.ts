@@ -5,6 +5,7 @@ import prisma from '@/shared/lib/prisma';
 import { createClient } from '@/shared/supabase/server';
 
 const PDF_BUCKET = 'biblioteca-pdfs';
+const AVATAR_BUCKET = 'profile-avatars';
 const STORAGE_DELETE_BATCH_SIZE = 100;
 const DELETE_TEST_ROLLBACK = '__ACCOUNT_DELETE_ROLLBACK__';
 
@@ -57,6 +58,24 @@ async function removeStoredFiles(fileKeys: string[], userClient: Awaited<ReturnT
     if (error) {
       console.warn('[Account Delete] Não foi possível remover alguns PDFs da estante:', error.message);
     }
+  }
+}
+
+async function removeAvatarFile(avatarPath: string | null, userClient: Awaited<ReturnType<typeof createClient>>) {
+  if (!avatarPath) return;
+
+  const adminClient = createAdminClient();
+  if (adminClient) {
+    const { error } = await adminClient.storage.from(AVATAR_BUCKET).remove([avatarPath]);
+    if (error) {
+      console.warn('[Account Delete] Não foi possível remover o avatar do perfil:', error.message);
+    }
+    return;
+  }
+
+  const { error } = await userClient.storage.from(AVATAR_BUCKET).remove([avatarPath]);
+  if (error) {
+    console.warn('[Account Delete] Não foi possível remover o avatar do perfil:', error.message);
   }
 }
 
@@ -125,6 +144,11 @@ export async function deleteCurrentAccount() {
 
     const fileKeys = [...new Set(storedFiles.map((item) => item.fileKey).filter(Boolean) as string[])];
     await removeStoredFiles(fileKeys, supabase);
+    const avatarPath =
+      typeof user.user_metadata?.avatar_path === 'string' && user.user_metadata.avatar_path.trim().length > 0
+        ? user.user_metadata.avatar_path.trim()
+        : null;
+    await removeAvatarFile(avatarPath, supabase);
 
     await prisma.$transaction([
       prisma.journalEntry.deleteMany({ where: { userId: user.id } }),

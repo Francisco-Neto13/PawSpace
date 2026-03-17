@@ -115,7 +115,7 @@ function SkillTreeInner() {
         setHasStructuralChanges(false);
         setIsDirty(false);
         await refreshPawSpace(false);
-        invalidateOverview();
+        invalidateOverview({ refetch: true });
       }
     } catch (error) {
       console.error('[Árvore] Erro crítico na sincronização:', error);

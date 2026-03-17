@@ -79,7 +79,7 @@ export default function JournalPage() {
         const realEntry = result.entry as unknown as JournalEntry;
         setEntries((prev) => prev.map((e) => (e.id === tempId ? realEntry : e)));
         setSelectedId(realEntry.id);
-        invalidateOverview();
+        invalidateOverview({ refetch: true });
         void refreshGlobalStats();
       } else {
         throw new Error('failed to create');
@@ -115,7 +115,7 @@ export default function JournalPage() {
     try {
       const result = await deleteJournalEntry(id);
       if (!result.success) throw new Error('failed to delete');
-      invalidateOverview();
+      invalidateOverview({ refetch: true });
       void refreshGlobalStats();
     } catch {
       setEntries(previousEntries);

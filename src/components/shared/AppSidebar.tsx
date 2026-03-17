@@ -21,7 +21,7 @@ export default function AppSidebar() {
   const supabase = createClient();
   const { theme } = useTheme();
 
-  const { displayName, isLoading: isLoadingDisplayName } = useAuthDisplayName();
+  const { displayName, avatarUrl, isLoading: isLoadingDisplayName } = useAuthDisplayName();
   const { isDirty, setIsDirty, discardLocalChanges } = usePawSpaceMeta();
   const { flushPending } = useJournal();
 
@@ -101,6 +101,7 @@ export default function AppSidebar() {
           <SidebarIdentityCard
             collapsed={isCollapsed}
             avatarLetter={avatarLetter}
+            avatarUrl={avatarUrl}
             displayName={displayName}
             isLoadingDisplayName={isLoadingDisplayName}
             onToggleCollapsed={toggleCollapsed}
@@ -146,6 +147,7 @@ export default function AppSidebar() {
             <SidebarIdentityCard
               collapsed={false}
               avatarLetter={avatarLetter}
+              avatarUrl={avatarUrl}
               displayName={displayName}
               isLoadingDisplayName={isLoadingDisplayName}
               onCloseMobile={() => setIsMobileOpen(false)}

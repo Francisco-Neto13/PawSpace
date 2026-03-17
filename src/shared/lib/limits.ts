@@ -3,6 +3,9 @@ export const LIMITS = {
     displayName: 40,
     email: 254,
     password: 72,
+    avatarSourceMaxBytes: 6 * 1024 * 1024,
+    avatarMaxBytes: 500 * 1024,
+    avatarMaxDimension: 512,
   },
   skill: {
     name:        50,
