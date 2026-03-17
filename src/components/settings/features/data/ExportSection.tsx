@@ -81,7 +81,7 @@ export default function ExportSection() {
           return (
             <div
               key={item.key}
-              className="flex items-center justify-between px-4 py-3 border border-[var(--border-subtle)] rounded-xl bg-[var(--bg-elevated)] group hover:border-[var(--border-muted)] transition-colors"
+              className="group flex flex-col gap-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-3 transition-colors hover:border-[var(--border-muted)] sm:flex-row sm:items-center sm:justify-between"
             >
               <div>
                 <p className="sidebar-title text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
@@ -92,7 +92,7 @@ export default function ExportSection() {
               <button
                 onClick={() => void handleExport(item.key)}
                 disabled={!!loading}
-                className="h-8 px-3 rounded-lg flex items-center gap-1.5 border border-[var(--border-muted)] button-label text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-200 disabled:opacity-40"
+                className="flex h-8 w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--border-muted)] button-label text-[var(--text-muted)] transition-all duration-200 hover:border-[var(--border-visible)] hover:text-[var(--text-primary)] disabled:opacity-40 sm:w-auto"
               >
                 {isLoading ? (
                   <div className="w-2.5 h-2.5 border border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />

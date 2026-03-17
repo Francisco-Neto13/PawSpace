@@ -71,7 +71,7 @@ export default function OverviewHeader({
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-      <div className="lg:col-span-3 overview-card overview-card-hover p-8 relative overflow-hidden render-isolate">
+      <div className="lg:col-span-3 overview-card overview-card-hover relative overflow-hidden p-5 sm:p-6 lg:p-8 render-isolate">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
         <div className="relative z-10">
@@ -85,7 +85,7 @@ export default function OverviewHeader({
           </div>
 
           <div className="space-y-3 border border-[var(--border-subtle)] rounded-xl p-4 bg-[var(--bg-surface)]">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span className="ui-label flex items-center gap-2">
                 <PawIcon className="w-3 h-3 text-[var(--text-secondary)]" />
                 Cobertura atual
@@ -145,7 +145,7 @@ export default function OverviewHeader({
         </div>
       </div>
 
-      <div className="overview-card overview-card-hover p-6 flex flex-col justify-between relative overflow-hidden render-isolate">
+      <div className="overview-card overview-card-hover relative flex flex-col justify-between overflow-hidden p-5 sm:p-6 render-isolate">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
         <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04]" />
 

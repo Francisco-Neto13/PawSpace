@@ -37,7 +37,7 @@ export function LibraryFilters({
         )}
       </div>
 
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 pr-1">
         <Filter size={12} className="text-[var(--text-muted)] shrink-0" />
         {FILTER_OPTIONS.map((f) => (
           <button

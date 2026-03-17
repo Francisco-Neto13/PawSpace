@@ -24,7 +24,7 @@ export function WorkspaceEmptyState({
     <div
       className="relative w-full bg-[var(--bg-base)] overflow-hidden"
       style={{
-        height: 'calc(100dvh - var(--navbar-height) - var(--footer-height))',
+        minHeight: 'calc(100dvh - var(--navbar-height) - var(--footer-height))',
       }}
     >
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 px-6 text-center pointer-events-none">

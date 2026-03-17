@@ -129,7 +129,7 @@ export default function AppSidebar() {
 
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-[110] h-10 w-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-strong)] text-[var(--text-primary)] flex items-center justify-center"
+        className="lg:hidden fixed left-3 top-3 z-[110] flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-strong)] text-[var(--text-primary)] shadow-[0_14px_40px_rgba(0,0,0,0.2)] sm:left-4 sm:top-4"
         aria-label="Abrir menu lateral"
       >
         <Menu size={18} />
@@ -143,7 +143,7 @@ export default function AppSidebar() {
             aria-label="Fechar menu lateral"
           />
 
-          <aside className="absolute top-0 left-0 h-full w-[280px] border-r border-[var(--border-subtle)] bg-[var(--bg-strong)] p-4 flex flex-col gap-4">
+          <aside className="absolute left-0 top-0 flex h-full w-[min(20rem,calc(100vw-0.75rem))] max-w-full flex-col gap-4 border-r border-[var(--border-subtle)] bg-[var(--bg-base)] p-3.5 shadow-[0_24px_60px_rgba(0,0,0,0.45)] sm:w-[280px] sm:p-4">
             <SidebarIdentityCard
               collapsed={false}
               avatarLetter={avatarLetter}
@@ -153,7 +153,7 @@ export default function AppSidebar() {
               onCloseMobile={() => setIsMobileOpen(false)}
             />
 
-            <nav className="flex-1 min-h-0 library-panel p-2 relative overflow-hidden">
+            <nav className="relative flex-1 min-h-0 overflow-hidden library-panel p-2">
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
               <div className="relative z-10 h-full overflow-y-auto overview-scroll-area pr-1">
                 <SidebarNavLinks

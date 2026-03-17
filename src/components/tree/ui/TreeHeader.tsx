@@ -32,7 +32,7 @@ export function TreeHeader({
         <div className="h-[1px] flex-1 bg-gradient-to-r from-[var(--shimmer-via)] to-transparent" />
       </div>
 
-      <section className="library-panel library-panel-hover p-6 relative overflow-hidden reveal-up delay-100">
+      <section className="library-panel library-panel-hover p-5 sm:p-6 relative overflow-hidden reveal-up delay-100">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
           <div>
@@ -41,18 +41,18 @@ export function TreeHeader({
             <p className="page-summary">
               Modele seu mapa de estudos por dependência, organize os módulos no canvas e deixe o território pronto para crescer.
             </p>
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="flex flex-wrap gap-2.5 mt-4">
               <span className="library-chip">Trilhas: {nodesCount}</span>
               <span className="library-chip">Raízes: {rootNodesCount}</span>
               <span className="library-chip">Com Material: {nodesWithContentCount}</span>
-              <span className="library-chip">
+              <span className="library-chip max-w-full truncate">
                 Selecionado: {selectedNode?.data.label || selectedNode?.data.name || 'Nenhum'}
               </span>
             </div>
           </div>
 
           <div className="flex flex-col items-stretch gap-2 w-full sm:w-auto sm:min-w-[230px]">
-            <div className="h-8 px-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center gap-2">
+            <div className="min-h-9 px-3 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] flex items-center gap-2">
               <AlertCircle
                 size={11}
                 className={canSave ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}

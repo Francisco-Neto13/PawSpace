@@ -32,14 +32,14 @@ export default function SettingsNav({ active, onChange }: Props) {
         Menu da Toca
       </p>
 
-      <div className="space-y-1">
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 xl:mx-0 xl:block xl:space-y-1 xl:overflow-visible xl:px-0 xl:pb-0">
         {NAV_ITEMS.map((item) => {
           const isActive = active === item.key;
           return (
             <button
               key={item.key}
               onClick={() => onChange(item.key)}
-              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left border transition-all duration-200 ${
+              className={`flex min-w-[180px] items-center gap-3 rounded-xl border px-3 py-3 text-left transition-all duration-200 xl:w-full xl:min-w-0 ${
                 isActive
                   ? 'border-[var(--border-visible)] bg-[var(--bg-elevated)]'
                   : 'border-transparent hover:border-[var(--border-subtle)] hover:bg-[var(--bg-surface)]'

@@ -160,10 +160,10 @@ export default function JournalPage() {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
-      <PageBackground src="/cat4.webp" />
+      <PageBackground src="/backgrounds/pages/cat4.webp" />
 
       <div className="relative z-10 py-8 pb-20">
-        <div className="relative max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 space-y-5">
+        <div className="relative mx-auto max-w-6xl space-y-5 px-4 sm:px-6 xl:max-w-7xl xl:px-10 2xl:max-w-[1600px] 2xl:px-16">
           <div className="flex items-center gap-3 reveal-fade delay-0">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
             <span className="app-breadcrumb">
@@ -209,7 +209,7 @@ export default function JournalPage() {
               />
             </div>
 
-            <main className="library-panel relative overflow-hidden flex flex-col min-h-[calc(100dvh-var(--navbar-height)-140px)] reveal-up delay-300">
+            <main className="library-panel relative overflow-hidden flex flex-col min-h-[60dvh] xl:min-h-[calc(100dvh-var(--navbar-height)-140px)] reveal-up delay-300">
               <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
               <PawIcon className="absolute bottom-4 right-4 w-10 h-10 text-[var(--text-primary)] opacity-[0.04] pointer-events-none" />
 

@@ -284,7 +284,7 @@ function SkillTreeInner() {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden select-none">
-      <PageBackground src="/cat2.webp" />
+      <PageBackground src="/backgrounds/pages/cat2.webp" />
 
       {isLoadingTree && nodes.length === 0 && (
         <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)]">
@@ -301,7 +301,7 @@ function SkillTreeInner() {
       <EdgeDefs />
 
       <main className="relative z-10 py-8 pb-20">
-        <div className="relative max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 space-y-5">
+        <div className="relative mx-auto max-w-6xl space-y-5 px-4 sm:px-6 xl:max-w-7xl xl:px-10 2xl:max-w-[1600px] 2xl:px-16">
           <TreeHeader
             nodesCount={nodes.length}
             rootNodesCount={rootNodesCount}
@@ -318,12 +318,11 @@ function SkillTreeInner() {
             <div
               style={{
                 width: '100%',
-                height: 'calc(100dvh - var(--navbar-height) - 200px)',
-                minHeight: '620px',
+                height: 'clamp(520px, calc(100dvh - var(--navbar-height) - 184px), 920px)',
                 opacity: isCanvasVisible ? 1 : 0,
                 transition: 'opacity 250ms ease',
               }}
-              className="relative"
+              className="relative p-2 sm:p-3 lg:p-4"
             >
               {selectedNode && (
                 <SelectedNodeSummary
@@ -335,7 +334,7 @@ function SkillTreeInner() {
               )}
 
               <TreeOnboarding
-                className="absolute top-4 right-4 z-[60]"
+                className="absolute right-3 top-3 z-[60] sm:right-4 sm:top-4"
                 direction="down"
                 panelMaxHeight="min(60vh, 460px)"
               />

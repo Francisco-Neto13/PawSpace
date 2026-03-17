@@ -54,22 +54,25 @@ export function EditSkillModal({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 isolate">
+    <div className="fixed inset-0 z-[9999] flex items-end justify-center p-3 isolate sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-md cursor-pointer" onClick={onClose} />
 
-      <div className="relative w-full max-w-xl rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-base)] overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-200 z-10 pointer-events-auto">
+      <div className="relative z-10 pointer-events-auto w-full max-w-[34rem] overflow-hidden rounded-[1.75rem] border border-[var(--border-subtle)] bg-[var(--bg-base)] shadow-2xl animate-in zoom-in-95 fade-in duration-200 sm:rounded-[2rem]">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-        <div className="flex flex-col p-6 md:p-7 relative max-h-[90vh] overflow-y-auto">
-          <div className="mb-6">
+        <div className="relative flex max-h-[92dvh] flex-col overflow-y-auto p-4 sm:p-5 md:p-7">
+          <div className="mb-5 sm:mb-6">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="library-kicker mb-1">Trilha do território</p>
                 <h2 className="surface-title">Ajustar trilha</h2>
+                <p className="ui-copy mt-2 max-w-md text-[var(--text-muted)]">
+                  Refine nome, identidade visual e contexto da trilha com mais conforto.
+                </p>
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-xl flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-200 cursor-pointer bg-[var(--bg-elevated)]"
+                className="w-9 h-9 rounded-xl flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-all duration-200 cursor-pointer bg-[var(--bg-elevated)] shrink-0"
               >
                 <X size={13} />
               </button>

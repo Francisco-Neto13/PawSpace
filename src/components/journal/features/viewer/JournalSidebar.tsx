@@ -20,8 +20,7 @@ export function JournalSidebar({ entries, skills, selectedId, onSelect }: Journa
 
   return (
     <aside
-      className="library-panel self-start relative overflow-hidden p-4 flex flex-col gap-3 xl:sticky xl:top-[calc(var(--navbar-height)+24px)]"
-      style={{ height: 'calc(100dvh - var(--navbar-height) - 140px)' }}
+      className="library-panel relative flex max-h-[26rem] flex-col gap-3 self-start overflow-hidden p-4 xl:sticky xl:top-[calc(var(--navbar-height)+24px)] xl:h-[calc(100dvh-var(--navbar-height)-140px)] xl:max-h-none"
     >
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 

@@ -186,7 +186,7 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
       </p>
       <p className="overview-subtitle mb-4 ml-3">Últimas movimentações pela árvore, diário e estante</p>
 
-      <div className="flex gap-1 mb-4 ml-3 shrink-0">
+      <div className="mb-4 ml-3 flex gap-1 overflow-x-auto pb-1 pr-1 shrink-0">
         {([
           ['all', 'Tudo', counters.all],
           ['journal', 'Diário', counters.journal],
@@ -259,7 +259,7 @@ function RecentActivityFeed({ initialPage, isBootstrapLoading = false }: RecentA
         </div>
       )}
 
-      <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between shrink-0">
+      <div className="mt-4 flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-3 sm:flex-row sm:items-center sm:justify-between shrink-0">
         <span className="caption-meta uppercase">
           {items.length} rastros carregados
         </span>

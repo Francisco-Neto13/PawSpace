@@ -42,7 +42,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       <div className="min-h-screen w-full">
         <div className="flex min-h-screen w-full">
           <AppSidebar />
-          <main className="relative flex-1 min-w-0 pt-14 lg:pt-0">
+          <main className="relative flex-1 min-w-0 pt-16 sm:pt-[4.5rem] lg:pt-0">
             {children}
           </main>
         </div>
@@ -68,7 +68,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <div className="flex flex-col min-h-screen w-full">
       <main className="relative flex-1 w-full">
-        <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 h-full">
+        <div className="mx-auto h-full max-w-6xl px-4 sm:px-6 xl:max-w-7xl xl:px-10 2xl:max-w-[1600px] 2xl:px-16">
           {children}
         </div>
       </main>

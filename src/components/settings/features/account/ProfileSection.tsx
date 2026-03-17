@@ -61,6 +61,49 @@ function loadImageDimensions(src: string) {
   });
 }
 
+function loadImageElement(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new window.Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error('avatar_preview_failed'));
+    image.src = src;
+  });
+}
+
+async function createCroppedAvatarPreview(sourceUrl: string, selection: AvatarCropSelection) {
+  const image = await loadImageElement(sourceUrl);
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+
+  if (!context) {
+    throw new Error('avatar_preview_context_failed');
+  }
+
+  const scaleX = image.naturalWidth / selection.renderedWidth;
+  const scaleY = image.naturalHeight / selection.renderedHeight;
+  const cropLeft = Math.max(0, Math.round(selection.crop.x * scaleX));
+  const cropTop = Math.max(0, Math.round(selection.crop.y * scaleY));
+  const cropWidth = Math.max(1, Math.round(selection.crop.width * scaleX));
+  const cropHeight = Math.max(1, Math.round(selection.crop.height * scaleY));
+
+  canvas.width = AVATAR_MAX_DIMENSION;
+  canvas.height = AVATAR_MAX_DIMENSION;
+
+  context.drawImage(
+    image,
+    cropLeft,
+    cropTop,
+    cropWidth,
+    cropHeight,
+    0,
+    0,
+    AVATAR_MAX_DIMENSION,
+    AVATAR_MAX_DIMENSION
+  );
+
+  return canvas.toDataURL('image/webp', 0.92);
+}
+
 async function validateAvatarSourceFile(file: File) {
   if (!ALLOWED_AVATAR_MIME_TYPES.includes(file.type)) {
     return { success: false as const, error: 'Use uma imagem JPG, PNG ou WEBP.' };
@@ -93,6 +136,7 @@ export default function ProfileSection() {
   const [pendingAvatarCrop, setPendingAvatarCrop] = useState<AvatarCropSelection | null>(null);
   const [cropSource, setCropSource] = useState<{ file: File; previewUrl: string } | null>(null);
   const [shouldRemoveAvatar, setShouldRemoveAvatar] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -151,6 +195,14 @@ export default function ProfileSection() {
 
   const avatarLetter = useMemo(() => getDisplayNameFallback(username || initialUsername), [username, initialUsername]);
   const showsLocalPreview = isLocalPreview(avatarUrl);
+
+  const resetAvatarPicker = () => {
+    if (fileRef.current) {
+      fileRef.current.value = '';
+    }
+
+    setFileInputKey((current) => current + 1);
+  };
 
   const emitProfileUpdate = (nextDisplayName: string, nextAvatarUrl: string | null) => {
     window.dispatchEvent(
@@ -235,7 +287,7 @@ export default function ProfileSection() {
           setPendingAvatarFile(null);
           setCropSource(null);
           setShouldRemoveAvatar(false);
-          if (fileRef.current) fileRef.current.value = '';
+          resetAvatarPicker();
           hasSuccessfulChange = true;
         }
       } else if (pendingAvatarFile) {
@@ -258,7 +310,7 @@ export default function ProfileSection() {
           setPendingAvatarCrop(null);
           setCropSource(null);
           setShouldRemoveAvatar(false);
-          if (fileRef.current) fileRef.current.value = '';
+          resetAvatarPicker();
           hasSuccessfulChange = true;
         }
       }
@@ -307,20 +359,23 @@ export default function ProfileSection() {
         file,
         previewUrl: validation.previewUrl,
       });
+      setShouldRemoveAvatar(false);
     } catch {
       setError('Nao foi possivel preparar o avatar para edicao.');
     } finally {
-      event.target.value = '';
+      resetAvatarPicker();
     }
   };
 
   const handleCropApply = async ({ selection }: { selection: AvatarCropSelection }) => {
     if (!cropSource) return;
 
+    const previewUrl = await createCroppedAvatarPreview(cropSource.previewUrl, selection);
+
     setPendingAvatarFile(cropSource.file);
     setPendingAvatarCrop(selection);
     setShouldRemoveAvatar(false);
-    setAvatarUrl(cropSource.previewUrl);
+    setAvatarUrl(previewUrl);
     setCropSource(null);
     setError(null);
     setSaved(false);
@@ -340,7 +395,7 @@ export default function ProfileSection() {
     }
 
     setAvatarUrl(null);
-    if (fileRef.current) fileRef.current.value = '';
+    resetAvatarPicker();
   };
 
   return (
@@ -354,8 +409,8 @@ export default function ProfileSection() {
         </p>
         <p className="library-subtitle mb-5 ml-3">identidade visual e nome da sua conta</p>
 
-        <div className="grid gap-4 lg:grid-cols-[auto_1fr]">
-          <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)] lg:gap-6">
+          <div className="flex flex-col gap-4 border-b border-[var(--border-subtle)] pb-5 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-6">
             <div className="flex items-start gap-4">
               <div className="shrink-0">
                 <button
@@ -381,6 +436,7 @@ export default function ProfileSection() {
                   </div>
                 </button>
                 <input
+                  key={fileInputKey}
                   ref={fileRef}
                   type="file"
                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
@@ -396,73 +452,74 @@ export default function ProfileSection() {
                 <p className="ui-copy text-sm text-[var(--text-muted)]">
                   A imagem aparece no perfil e ao lado do seu nome na sidebar.
                 </p>
-                <p className="ui-meta mt-3">
-                  Edite uma imagem de ate {formatAvatarSize(AVATAR_SOURCE_MAX_BYTES)}. O app salva uma versao final em WEBP com
-                  ate {formatAvatarSize(AVATAR_MAX_BYTES)} e {AVATAR_MAX_DIMENSION}x{AVATAR_MAX_DIMENSION}px.
-                </p>
-                {pendingAvatarFile ? (
-                  <p className="feedback-text mt-3 text-[var(--text-secondary)]">Avatar pronto para salvar depois do recorte.</p>
-                ) : null}
-                {(avatarUrl || initialAvatarUrl) ? (
-                  <button
-                    type="button"
-                    onClick={handleRemoveAvatar}
-                    disabled={isLoadingUser || isSaving}
-                    className="mt-4 inline-flex items-center gap-1.5 button-label text-[var(--text-muted)] transition-colors hover:text-red-400/80 disabled:opacity-50"
-                  >
-                    <Trash2 size={10} />
-                    Remover avatar
-                  </button>
-                ) : null}
               </div>
+            </div>
+
+            <div className="space-y-3">
+              <p className="ui-meta">
+                Edite uma imagem de ate {formatAvatarSize(AVATAR_SOURCE_MAX_BYTES)}. O app salva uma versao final em WEBP com
+                ate {formatAvatarSize(AVATAR_MAX_BYTES)} e {AVATAR_MAX_DIMENSION}x{AVATAR_MAX_DIMENSION}px.
+              </p>
+              {pendingAvatarFile ? (
+                <p className="feedback-text text-[var(--text-secondary)]">Avatar pronto para salvar depois do recorte.</p>
+              ) : null}
+              {(avatarUrl || initialAvatarUrl) ? (
+                <button
+                  type="button"
+                  onClick={handleRemoveAvatar}
+                  disabled={isLoadingUser || isSaving}
+                  className="inline-flex items-center gap-1.5 button-label text-[var(--text-muted)] transition-colors hover:text-red-400/80 disabled:opacity-50"
+                >
+                  <Trash2 size={10} />
+                  Remover avatar
+                </button>
+              ) : null}
             </div>
           </div>
 
-          <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4">
-            <div className="mb-4">
+          <div className="space-y-4 lg:pl-1">
+            <div>
               <p className="sidebar-title mb-1">Nome de exibicao</p>
               <p className="ui-copy text-sm text-[var(--text-muted)]">Esse nome aparece nas areas principais do app.</p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <label className="field-label block">Nome no PawSpace</label>
-                  <RemainingWarning current={username.length} max={USERNAME_MAX} />
-                </div>
-                <input
-                  type="text"
-                  value={username}
-                  maxLength={USERNAME_MAX}
-                  onChange={(event) => setUsername(event.target.value.slice(0, USERNAME_MAX))}
-                  disabled={isLoadingUser || isSaving}
-                  className="library-input field-input h-10 px-3.5 placeholder:text-[var(--text-faint)] disabled:opacity-60"
-                  placeholder={isLoadingUser ? 'Carregando...' : 'Como voce quer aparecer'}
-                />
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <label className="field-label block">Nome no PawSpace</label>
+                <RemainingWarning current={username.length} max={USERNAME_MAX} />
               </div>
+              <input
+                type="text"
+                value={username}
+                maxLength={USERNAME_MAX}
+                onChange={(event) => setUsername(event.target.value.slice(0, USERNAME_MAX))}
+                disabled={isLoadingUser || isSaving}
+                className="library-input field-input h-10 px-3.5 placeholder:text-[var(--text-faint)] disabled:opacity-60"
+                placeholder={isLoadingUser ? 'Carregando...' : 'Como voce quer aparecer'}
+              />
+            </div>
 
-              <div className="flex items-center justify-between gap-3 border-t border-[var(--border-subtle)] pt-4">
-                <div className="min-h-[20px]">
-                  {error ? <p className="feedback-text text-red-400/80">{error}</p> : null}
-                  {saved && !error ? (
-                    <p className="feedback-text text-[var(--text-secondary)]">Perfil do PawSpace atualizado.</p>
-                  ) : null}
-                </div>
-                <button
-                  onClick={() => void handleSave()}
-                  disabled={isLoadingUser || isSaving}
-                  className="button-label flex h-10 items-center gap-2 rounded-xl border px-4 transition-all duration-200 disabled:opacity-60"
-                  style={{
-                    borderColor: saved ? 'var(--border-visible)' : 'var(--border-muted)',
-                    color: saved ? 'var(--text-primary)' : 'var(--text-secondary)',
-                    backgroundColor: saved ? 'var(--bg-panel)' : 'transparent',
-                  }}
-                >
-                  {isSaving ? <Loader2 size={10} className="animate-spin" /> : null}
-                  {!isSaving && saved ? <Check size={10} /> : null}
-                  {isSaving ? 'Salvando...' : saved ? 'Salvo' : 'Salvar perfil'}
-                </button>
+            <div className="flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-h-[20px]">
+                {error ? <p className="feedback-text text-red-400/80">{error}</p> : null}
+                {saved && !error ? (
+                  <p className="feedback-text text-[var(--text-secondary)]">Perfil do PawSpace atualizado.</p>
+                ) : null}
               </div>
+              <button
+                onClick={() => void handleSave()}
+                disabled={isLoadingUser || isSaving}
+                className="button-label flex h-10 w-full items-center justify-center gap-2 rounded-xl border px-4 transition-all duration-200 disabled:opacity-60 sm:w-auto"
+                style={{
+                  borderColor: saved ? 'var(--border-visible)' : 'var(--border-muted)',
+                  color: saved ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  backgroundColor: saved ? 'var(--bg-panel)' : 'transparent',
+                }}
+              >
+                {isSaving ? <Loader2 size={10} className="animate-spin" /> : null}
+                {!isSaving && saved ? <Check size={10} /> : null}
+                {isSaving ? 'Salvando...' : saved ? 'Salvo' : 'Salvar perfil'}
+              </button>
             </div>
           </div>
         </div>

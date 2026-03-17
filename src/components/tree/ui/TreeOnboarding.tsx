@@ -51,25 +51,25 @@ export function TreeOnboarding({
   const directionClass = direction === 'up' ? 'flex-col-reverse' : 'flex-col';
   const containerClassName = className
     ? `${className} flex ${directionClass} items-end gap-2`
-    : `fixed top-24 right-6 z-[60] flex ${directionClass} items-end gap-2`;
+    : `fixed right-3 top-20 z-[60] flex ${directionClass} items-end gap-2 sm:right-6 sm:top-24`;
 
   return (
     <div className={containerClassName}>
       <button
         onClick={() => setIsOpen((value) => !value)}
-        className={`h-10 flex items-center gap-2 px-3 rounded-xl border transition-all duration-200 cursor-pointer ${
+        className={`h-11 w-11 sm:h-10 sm:w-auto flex items-center justify-center sm:justify-start gap-2 px-0 sm:px-3 rounded-xl border transition-all duration-200 cursor-pointer ${
           isOpen
             ? 'border-[var(--border-visible)] bg-[var(--bg-base)] text-[var(--text-primary)]'
             : 'border-[var(--border-subtle)] bg-[var(--bg-base)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)]'
         }`}
       >
         <Info size={13} />
-        <span className="button-label">Guia da Árvore</span>
+        <span className="hidden sm:inline button-label">Guia da Árvore</span>
       </button>
 
       {isOpen && (
         <div
-          className={`w-72 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-base)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 shadow-2xl relative flex flex-col ${
+          className={`relative flex w-[min(15.5rem,calc(100vw-1rem))] flex-col overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-base)] animate-in fade-in zoom-in-95 duration-200 shadow-2xl sm:w-72 ${
             direction === 'up' ? 'origin-bottom-right' : 'origin-top-right'
           }`}
           style={panelMaxHeight ? { maxHeight: panelMaxHeight, height: panelMaxHeight } : undefined}

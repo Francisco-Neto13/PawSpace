@@ -68,7 +68,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="shrink-0 px-5 md:px-7 pt-5 md:pt-6 pb-4 border-b border-[var(--border-subtle)]">
+      <div className="shrink-0 border-b border-[var(--border-subtle)] px-4 pb-4 pt-5 md:px-7 md:pt-6">
         <div className="relative">
           <input
             type="text"
@@ -92,7 +92,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
           <span className="flex items-center gap-1.5 ui-meta text-[var(--text-secondary)] font-mono">
             <Calendar size={10} className="opacity-70" />
             {formatDate(entry.createdAt)}
@@ -119,7 +119,7 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             {showSkillPicker && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowSkillPicker(false)} />
-                <div className="absolute top-full left-0 mt-2 w-60 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] z-50 overflow-hidden">
+                <div className="absolute left-0 top-full z-50 mt-2 w-[min(15rem,calc(100vw-3rem))] overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-base)]">
                   <div className="px-3 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
                     <span className="field-label text-[var(--text-secondary)]">
                       Trilhas disponíveis
@@ -195,14 +195,14 @@ export function JournalEditor({ entry, skills, onDelete, onUpdate }: JournalEdit
             suppressContentEditableWarning
             onInput={isTemporaryEntry ? undefined : handleBodyInput}
             onBlur={isTemporaryEntry ? undefined : save}
-            className={`h-full overflow-y-auto px-5 md:px-7 py-7 text-[var(--text-primary)] text-base font-normal leading-8 outline-none prose max-w-none prose-headings:text-[var(--text-primary)] prose-p:text-[var(--text-primary)] prose-strong:text-[var(--text-primary)] prose-li:text-[var(--text-primary)] prose-code:text-[var(--text-primary)] prose-blockquote:text-[var(--text-secondary)] ${
+            className={`h-full overflow-y-auto px-4 py-6 text-base font-normal leading-8 text-[var(--text-primary)] outline-none prose max-w-none prose-headings:text-[var(--text-primary)] prose-p:text-[var(--text-primary)] prose-strong:text-[var(--text-primary)] prose-li:text-[var(--text-primary)] prose-code:text-[var(--text-primary)] prose-blockquote:text-[var(--text-secondary)] md:px-7 md:py-7 ${
               isTemporaryEntry ? 'opacity-70 cursor-wait' : ''
             }`}
             style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--border-visible) transparent' }}
           />
 
           {showBodyCounter && (
-            <div className="absolute bottom-4 right-6 pointer-events-none">
+            <div className="pointer-events-none absolute bottom-4 right-4 md:right-6">
               <span
                 className={`ui-meta font-mono font-bold tabular-nums ${
                   bodyRemaining <= 200 ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'

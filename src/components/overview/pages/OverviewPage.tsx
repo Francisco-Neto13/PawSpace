@@ -133,10 +133,10 @@ export default function OverviewContent() {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
-      <PageBackground src="/cat.webp" />
+      <PageBackground src="/backgrounds/pages/cat.webp" />
 
       <main className="relative z-10 py-8 pb-20">
-        <div className="relative max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 space-y-5">
+        <div className="relative mx-auto max-w-6xl space-y-5 px-4 sm:px-6 xl:max-w-7xl xl:px-10 2xl:max-w-[1600px] 2xl:px-16">
 
           <div className="flex items-center gap-3 reveal-fade delay-0">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />

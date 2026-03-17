@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowRight, BookMarked, Compass, NotebookPen } from 'lucide-react';
+
 import { SectionHeading } from './SectionHeading';
 
 const STEPS = [
@@ -22,12 +23,12 @@ const STEPS = [
     description: 'Anote sessões, revisões e insights para que o seu processo possa ser retomado sem atrito.',
     icon: NotebookPen,
   },
-];
+] as const;
 
 export function WorkflowSection() {
   return (
-    <section id="fluxo" className="scroll-mt-28 py-24 md:scroll-mt-32 md:py-28 xl:py-32">
-      <div className="mx-auto max-w-6xl px-6 xl:max-w-7xl xl:px-10 2xl:max-w-[1600px] 2xl:px-16">
+    <section id="fluxo" className="scroll-mt-24 py-16 md:scroll-mt-32 md:py-24 xl:py-28">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 xl:max-w-7xl xl:px-10 2xl:max-w-[1600px] 2xl:px-16">
         <SectionHeading
           eyebrow="Fluxo"
           title="Três passos para estudar com intenção."
@@ -36,11 +37,11 @@ export function WorkflowSection() {
         />
 
         <div className="grid gap-4 md:gap-5 xl:grid-cols-[1.2fr_0.8fr]">
-          <div className="grid gap-4 md:gap-5 md:grid-cols-3">
+          <div className="grid gap-4 md:gap-5 md:grid-cols-2 xl:grid-cols-3">
             {STEPS.map((step, index) => (
               <article
                 key={step.number}
-                className={`relative rounded-[1.5rem] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 reveal-up md:p-6 ${index === 0 ? 'delay-100' : index === 1 ? 'delay-200' : 'delay-300'}`}
+                className={`relative rounded-[1.3rem] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 reveal-up md:rounded-[1.5rem] md:p-6 ${index === 0 ? 'delay-100' : index === 1 ? 'delay-200' : 'delay-300'} ${index === 2 ? 'md:col-span-2 xl:col-span-1' : ''}`}
               >
                 <div className="mb-6 flex items-center justify-between">
                   <span className="text-3xl font-black tracking-[-0.04em] text-[var(--text-primary)]/20">
@@ -60,16 +61,16 @@ export function WorkflowSection() {
             ))}
           </div>
 
-          <aside className="relative overflow-hidden rounded-[1.5rem] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 reveal-up delay-400 md:p-7">
+          <aside className="relative overflow-hidden rounded-[1.3rem] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 reveal-up delay-400 md:rounded-[1.5rem] md:p-7">
             <div className="absolute right-[-3rem] top-[-3rem] h-36 w-36 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.06),transparent_70%)] blur-xl" />
 
             <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[var(--text-secondary)]">
               Por que funciona
             </p>
-            <h3 className="mt-3 text-2xl font-black leading-tight tracking-[-0.035em] text-[var(--text-primary)] [font-family:Georgia,serif]">
+            <h3 className="mt-3 text-xl font-black leading-tight tracking-[-0.035em] text-[var(--text-primary)] sm:text-2xl [font-family:Georgia,serif]">
               Você para de gerenciar ferramentas e volta a estudar.
             </h3>
-            <p className="mt-3.5 text-[13px] leading-7 text-[var(--text-secondary)]">
+            <p className="mt-3.5 text-[12px] leading-6 text-[var(--text-secondary)] sm:text-[13px] sm:leading-7">
               Quando árvore, materiais, notas e progresso vivem juntos, a cabeça para de guardar logística e começa a guardar conhecimento.
             </p>
 

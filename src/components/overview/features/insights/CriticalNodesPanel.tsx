@@ -66,7 +66,7 @@ function CriticalNodesPanel({ critical }: Props) {
             return (
               <div key={n.id}>
                 <button
-                  className="w-full flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-lg transition-all duration-200 text-left"
+                  className="mx-[-0.5rem] flex w-full items-center gap-2 rounded-lg px-2 py-2.5 text-left transition-all duration-200 sm:gap-3"
                   style={{ backgroundColor: isExpanded ? 'var(--bg-elevated)' : 'transparent' }}
                   onClick={() => setExpandedId(isExpanded ? null : n.id)}
                 >
@@ -89,7 +89,7 @@ function CriticalNodesPanel({ critical }: Props) {
                     : <AlertCircle size={11} className="text-[var(--text-muted)] shrink-0" />
                   }
 
-                  <div className="w-16 h-[3px] bg-[var(--bg-elevated)] overflow-hidden rounded-full shrink-0">
+                  <div className="hidden h-[3px] w-16 overflow-hidden rounded-full bg-[var(--bg-elevated)] shrink-0 sm:block">
                     <div
                       className="h-full rounded-full"
                       style={{
@@ -108,10 +108,10 @@ function CriticalNodesPanel({ critical }: Props) {
 
                 {isExpanded && (
                   <div
-                    className="ml-7 mb-2 px-4 py-3 border border-[var(--border-subtle)] bg-[var(--bg-surface)] rounded-lg"
+                    className="mb-2 ml-5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-3 sm:ml-7 sm:px-4"
                     style={{ animation: 'slideDown 0.2s ease-out' }}
                   >
-                    <div className="grid grid-cols-3 gap-4 mb-3">
+                    <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                       <div>
                         <p className="data-label mb-0.5">
                           Links

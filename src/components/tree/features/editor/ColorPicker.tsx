@@ -71,14 +71,21 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
           setHasTriedInvalidHex(false);
           setIsOpen((value) => !value);
         }}
-        className="w-12 h-12 rounded-xl flex items-center justify-center border border-[var(--border-subtle)] bg-[var(--bg-elevated)] hover:bg-[var(--bg-input)] hover:border-[var(--border-visible)] transition-all duration-200"
+        className="flex min-h-[76px] w-full items-center gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-3.5 text-left hover:bg-[var(--bg-input)] hover:border-[var(--border-visible)] transition-all duration-200 sm:min-h-[84px]"
         aria-label={`Cor atual ${safeValue}`}
       >
-        <span
-          className="block h-7 w-7 rounded-lg border border-[var(--border-visible)]"
-          style={{ backgroundColor: previewColor }}
-          aria-hidden="true"
-        />
+        <div className="min-w-0 flex-1">
+          <p className="ui-label mb-1 text-[var(--text-primary)]">Tom da trilha</p>
+          <p className="ui-meta text-[var(--text-muted)]">Cor de destaque no mapa.</p>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <span className="ui-meta font-mono uppercase">{safeValue}</span>
+          <span
+            className="block h-10 w-10 rounded-xl border border-[var(--border-visible)]"
+            style={{ backgroundColor: previewColor }}
+            aria-hidden="true"
+          />
+        </div>
       </button>
 
       {isOpen && (
@@ -120,7 +127,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
                 </div>
               </div>
 
-              <div className="mt-2 flex items-center justify-between gap-3">
+              <div className="mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <span className={`ui-meta ${showValidationError ? 'text-red-400/90' : ''}`}>
                   {showValidationError ? 'Use um HEX no formato #22d3ee.' : 'Escolha uma cor ou digite um HEX.'}
                 </span>
@@ -135,7 +142,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
             </div>
 
             <div className="p-3">
-              <div className="grid grid-cols-8 gap-2">
+              <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
                 {QUICK_SWATCHES.map((swatch) => {
                   const isSelected = safeValue === swatch;
 

@@ -181,7 +181,7 @@ export default function PasswordSection() {
         <PasswordInput label="Nova Senha" value={next} onChange={setNext} maxLength={PASSWORD_MAX} />
         <PasswordInput label="Confirmar Nova Senha" value={confirm} onChange={setConfirm} maxLength={PASSWORD_MAX} />
 
-        <div className="flex items-center justify-between pt-1 gap-3">
+        <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
           <div>
             {error && <p className="feedback-text text-red-400/80">{error}</p>}
             {saved && !error && <p className="feedback-text text-[var(--text-secondary)]">Senha atualizada.</p>}
@@ -189,7 +189,7 @@ export default function PasswordSection() {
           <button
             onClick={() => void handleSave()}
             disabled={isLoadingUser || isSaving}
-            className="h-10 px-4 rounded-xl border flex items-center gap-2 button-label transition-all duration-200 disabled:opacity-60"
+            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border px-4 button-label transition-all duration-200 disabled:opacity-60 sm:w-auto"
             style={{
               borderColor: saved ? 'var(--border-visible)' : 'var(--border-muted)',
               color: saved ? 'var(--text-primary)' : 'var(--text-secondary)',

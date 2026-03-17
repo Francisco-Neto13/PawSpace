@@ -101,15 +101,21 @@ export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
       <button
         type="button"
         onClick={() => void handleToggle()}
-        className="w-12 h-12 rounded-xl flex items-center justify-center border border-[var(--border-subtle)] bg-[var(--bg-elevated)] hover:bg-[var(--bg-input)] hover:border-[var(--border-visible)] transition-all duration-200 text-2xl"
+        className="flex min-h-[76px] w-full items-center gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-4 py-3.5 text-left hover:bg-[var(--bg-input)] hover:border-[var(--border-visible)] transition-all duration-200 sm:min-h-[84px]"
       >
-        {loading && !isOpen ? <span className="animate-pulse text-xs">...</span> : currentEmoji}
+        <div className="min-w-0 flex-1">
+          <p className="ui-label mb-1 text-[var(--text-primary)]">Emoji do nó</p>
+          <p className="ui-meta text-[var(--text-muted)]">Símbolo rápido para reconhecer a trilha.</p>
+        </div>
+        <div className="shrink-0 rounded-2xl border border-[var(--border-visible)] bg-[var(--bg-base)] px-3 py-2 text-2xl leading-none">
+          {loading && !isOpen ? <span className="animate-pulse text-xs">...</span> : currentEmoji}
+        </div>
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-[110]" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-14 left-0 z-[120] w-[19rem] rounded-2xl bg-[var(--bg-strong)] border border-[var(--border-subtle)] shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200 overflow-hidden">
+          <div className="absolute top-14 left-0 z-[120] w-[min(19rem,calc(100vw-2rem))] rounded-2xl bg-[var(--bg-strong)] border border-[var(--border-subtle)] shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200 overflow-hidden">
             <div className="border-b border-[var(--border-subtle)] p-3 space-y-3">
               <input
                 type="text"

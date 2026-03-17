@@ -51,7 +51,7 @@ export default function DangerZone() {
       <p className="library-subtitle mb-5 ml-3">ações permanentes que apagam o seu espaço</p>
 
       <div className="border border-red-500/[0.16] rounded-xl bg-[var(--bg-elevated)] p-4">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="sidebar-title mb-1">Deletar Conta</p>
             <p className="ui-copy max-w-sm">
@@ -76,7 +76,7 @@ export default function DangerZone() {
             <p className="field-label mb-3">
               Digite <span className="text-red-400/80 font-black">{CONFIRM_WORD}</span> para confirmar
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <input
                 type="text"
                 value={confirm}

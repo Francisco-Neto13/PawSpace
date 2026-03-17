@@ -150,7 +150,7 @@ export default function SessionsSection() {
     <section className="library-panel p-6 relative overflow-hidden reveal-up delay-300">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
-      <div className="flex items-start justify-between gap-3 mb-5">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="library-kicker flex items-center gap-2">
             <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
@@ -159,7 +159,7 @@ export default function SessionsSection() {
           <p className="library-subtitle mt-2 ml-3">dispositivos com acesso à sua conta</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => void loadSessions('manual')}

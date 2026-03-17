@@ -11,9 +11,9 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
       ref={ref}
       className="w-full border-t border-[var(--border-subtle)] bg-[var(--bg-strong)] transition-colors duration-300"
     >
-      <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 xl:px-10 2xl:px-16 py-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0 relative">
-          <div className="text-[var(--text-muted)] button-label flex items-center order-2 md:order-1">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 xl:max-w-7xl xl:px-10 2xl:max-w-[1600px] 2xl:px-16">
+        <div className="grid gap-5 text-center md:grid-cols-3 md:items-center md:text-left">
+          <div className="button-label flex items-center justify-center text-[var(--text-muted)] md:justify-start">
             Dev by
             <a
               href="https://github.com/Francisco-Neto13"
@@ -24,11 +24,11 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
               Francisco
             </a>
           </div>
-          <div className="ui-label order-1 md:order-2 md:absolute md:left-1/2 md:-translate-x-1/2 whitespace-nowrap">
+          <div className="ui-label whitespace-normal md:text-center">
             <span className="text-[var(--text-secondary)]">© {currentYear} • </span>
             <span className="text-[var(--text-primary)]">PawSpace</span>
           </div>
-          <div className="flex items-center gap-6 order-3">
+          <div className="flex items-center justify-center gap-6 md:justify-end">
             <a
               href="https://github.com/Francisco-Neto13"
               target="_blank"

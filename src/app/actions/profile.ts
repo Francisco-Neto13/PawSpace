@@ -7,6 +7,7 @@ import { LIMITS } from '@/shared/lib/limits';
 import { createClient } from '@/shared/supabase/server';
 
 const AVATAR_BUCKET = 'profile-avatars';
+const AVATAR_SOURCE_MAX_BYTES = LIMITS.auth.avatarSourceMaxBytes;
 const AVATAR_MAX_BYTES = LIMITS.auth.avatarMaxBytes;
 const ALLOWED_AVATAR_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -224,10 +225,10 @@ export async function uploadProfileAvatar(formData: FormData) {
       return { success: false as const, error: 'Use uma imagem JPG, PNG ou WEBP.' };
     }
 
-    if (file.size > AVATAR_MAX_BYTES) {
+    if (file.size > AVATAR_SOURCE_MAX_BYTES) {
       return {
         success: false as const,
-        error: `O avatar excede o limite de ${Math.floor(AVATAR_MAX_BYTES / 1024)} KB.`,
+        error: `A imagem original excede o limite de ${Math.floor(AVATAR_SOURCE_MAX_BYTES / (1024 * 1024))} MB.`,
       };
     }
 
@@ -240,6 +241,13 @@ export async function uploadProfileAvatar(formData: FormData) {
       fileBytes,
       cropPayload,
     });
+
+    if (processedAvatar.bytes.byteLength > AVATAR_MAX_BYTES) {
+      return {
+        success: false as const,
+        error: `O avatar final excede o limite de ${Math.floor(AVATAR_MAX_BYTES / 1024)} KB. Tente um recorte mais fechado ou uma imagem menor.`,
+      };
+    }
 
     const bucketResult = await ensureAvatarBucket();
     if (!bucketResult.success) {

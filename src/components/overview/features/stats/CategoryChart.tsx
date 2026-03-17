@@ -109,12 +109,12 @@ function CategoryChart({ data }: Props) {
       {activeCategory && (() => {
         const cat = data.find((d) => d.category === activeCategory)!;
         return (
-          <div className="mt-4 border border-[var(--border-muted)] bg-[var(--bg-surface)] rounded-xl px-4 py-3 flex items-center justify-between">
+          <div className="mt-4 flex flex-col gap-3 rounded-xl border border-[var(--border-muted)] bg-[var(--bg-surface)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="sidebar-title text-[var(--text-primary)]">{cat.category}</p>
               <p className="ui-meta mt-0.5">{cat.pending} trilhas sem material</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 self-start sm:self-auto">
               <div className="text-right">
                 <p className="data-label mb-1">Cobertura</p>
                 <p className="text-[var(--text-primary)] font-mono font-black text-base leading-none">{cat.pct}%</p>
@@ -128,8 +128,8 @@ function CategoryChart({ data }: Props) {
         );
       })()}
 
-      <div className="flex items-center justify-between mt-auto pt-4 ml-1">
-        <div className="flex items-center gap-4">
+      <div className="mt-auto ml-1 flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           {[['var(--chart-medium)', 'Com material'], ['var(--chart-faint)', 'Total']].map(([color, label]) => (
             <div key={label} className="flex items-center gap-1.5">
               <div className="w-2 h-2" style={{ backgroundColor: color }} />
@@ -143,7 +143,7 @@ function CategoryChart({ data }: Props) {
       </div>
 
       {data.length > 1 && (
-        <div className="flex gap-3 mt-3">
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div className="flex-1 border border-[var(--border-subtle)] rounded px-2 py-1.5">
             <p className="data-label mb-0.5">Mais abastecida</p>
             <p className="sidebar-title truncate">{bestCategory.category}</p>

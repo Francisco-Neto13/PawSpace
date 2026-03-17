@@ -137,7 +137,7 @@ function JournalActivityChart() {
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between">
+      <div className="mt-4 flex flex-col gap-2 border-t border-[var(--border-subtle)] pt-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <span className="ui-meta uppercase text-[var(--text-secondary)]">
           Total: {totalEntries} entradas
         </span>
@@ -149,7 +149,7 @@ function JournalActivityChart() {
         </span>
       </div>
 
-      <div className="flex items-center gap-2 mt-2">
+      <div className="mt-2 flex flex-wrap items-center gap-2">
         <div className="w-2 h-2 bg-[var(--text-primary)]" />
         <span className="ui-meta uppercase text-[var(--text-secondary)]">mês atual</span>
         <div className="w-2 h-2 bg-[var(--text-secondary)] ml-2" />

@@ -34,7 +34,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
   };
 
   return (
-    <article className="group flex items-start gap-4 p-4 border border-[var(--border-subtle)] rounded-xl bg-[var(--bg-surface)] hover:border-[var(--border-visible)] hover:bg-[var(--bg-elevated)] transition-all duration-200 relative overflow-hidden">
+    <article className="group relative flex flex-col gap-3 overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 transition-all duration-200 hover:border-[var(--border-visible)] hover:bg-[var(--bg-elevated)] sm:flex-row sm:items-start sm:gap-4">
       <div
         className="absolute left-0 top-0 bottom-0 w-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ backgroundColor: cfg.color }}
@@ -44,13 +44,13 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
         style={{ background: `linear-gradient(to right, ${cfg.color}33, transparent)` }}
       />
       <div
-        className="shrink-0 w-10 h-10 flex items-center justify-center border rounded-xl mt-0.5"
+        className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
         style={{ borderColor: `${cfg.color}30`, backgroundColor: `${cfg.color}0d`, color: cfg.color }}
       >
         {cfg.icon}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-3 mb-1.5">
+        <div className="mb-1.5 flex items-start justify-between gap-3">
           <p className="sidebar-title leading-tight">{content.title}</p>
           <div className="flex items-center gap-2.5 shrink-0 mt-0.5">
             {content.url && (
@@ -78,7 +78,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
             {content.body}
           </p>
         )}
-        <div className="flex items-center gap-2.5 mt-1.5">
+        <div className="mt-1.5 flex flex-wrap items-center gap-2.5">
           <span
             className="data-label px-2 py-1 border rounded-lg"
             style={{ color: cfg.color, borderColor: `${cfg.color}30`, backgroundColor: `${cfg.color}0d` }}

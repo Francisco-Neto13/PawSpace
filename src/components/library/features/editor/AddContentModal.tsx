@@ -195,7 +195,7 @@ export function AddContentModal({
             <div className="h-[1px] bg-gradient-to-r from-[var(--border-subtle)] to-transparent" />
           </div>
 
-          <div className="grid grid-cols-4 gap-1.5 mb-6">
+          <div className="mb-6 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
             {TABS.map(tab => (
               <button
                 key={tab.type}
@@ -284,7 +284,7 @@ export function AddContentModal({
 
           <div className="h-[1px] my-6 bg-gradient-to-r from-transparent via-[var(--border-subtle)] to-transparent" />
 
-          <div className="flex flex-col sm:flex-row gap-2.5">
+          <div className="flex flex-col gap-2.5 sm:flex-row">
             <button
               type="button"
               onClick={handleClose}

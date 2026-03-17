@@ -39,7 +39,7 @@ export function LibraryNodeHeader({
 
         <button
           onClick={onAddContent}
-          className="h-10 shrink-0 flex items-center justify-center gap-2 px-4 border border-[var(--border-visible)] rounded-xl bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] transition-all duration-200 cursor-pointer"
+          className="flex h-10 w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-[var(--border-visible)] bg-[var(--bg-elevated)] px-4 text-[var(--text-primary)] transition-all duration-200 hover:border-[var(--text-secondary)] hover:bg-[var(--bg-input)] cursor-pointer sm:w-auto"
         >
           <Plus size={13} />
           <span className="button-label">Adicionar material</span>

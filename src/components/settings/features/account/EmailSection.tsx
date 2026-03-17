@@ -162,7 +162,7 @@ export default function EmailSection() {
           />
         </div>
 
-        <div className="flex items-center justify-between pt-1 gap-4">
+        <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="helper-text">
               Enviaremos um link de confirmação para a nova caixa de entrada.
@@ -176,7 +176,7 @@ export default function EmailSection() {
           <button
             onClick={() => void handleSave()}
             disabled={isLoadingUser || isSaving}
-            className="h-10 px-4 rounded-xl border flex items-center gap-2 button-label transition-all duration-200 disabled:opacity-60"
+            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border px-4 button-label transition-all duration-200 disabled:opacity-60 sm:w-auto"
             style={{
               borderColor: saved ? 'var(--border-visible)' : 'var(--border-muted)',
               color: saved ? 'var(--text-primary)' : 'var(--text-secondary)',

@@ -57,19 +57,19 @@ export function LandingNavbar() {
           : 'border-[var(--border-subtle)] bg-[var(--bg-strong)]/88'
       }`}
     >
-      <div className="mx-auto max-w-6xl px-6 xl:max-w-7xl xl:px-10 2xl:max-w-[1600px] 2xl:px-16">
-        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 py-3 transition-all duration-300 md:py-4 lg:grid-cols-[1fr_auto_1fr]">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 xl:max-w-7xl xl:px-10 2xl:max-w-[1600px] 2xl:px-16">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 py-2.5 transition-all duration-300 sm:gap-4 sm:py-3 md:py-4 lg:grid-cols-[1fr_auto_1fr]">
           <Link href="/" onClick={handleTopClick} className="group flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-[var(--border-visible)] bg-[var(--bg-elevated)] transition-colors duration-200 group-hover:bg-[var(--bg-input)]">
+            <div className="flex h-8 w-8 items-center justify-center rounded-2xl border border-[var(--border-visible)] bg-[var(--bg-elevated)] transition-colors duration-200 group-hover:bg-[var(--bg-input)] sm:h-9 sm:w-9">
               <Image
                 src="/favicon.ico"
                 alt="PawSpace"
                 width={20}
                 height={20}
-                className="h-5 w-5 object-contain"
+                className="h-4 w-4 object-contain sm:h-5 sm:w-5"
               />
             </div>
-            <p className="text-[16px] font-black leading-none tracking-[-0.02em] text-[var(--text-primary)] [font-family:Georgia,serif]">
+            <p className="text-[15px] font-black leading-none tracking-[-0.02em] text-[var(--text-primary)] [font-family:Georgia,serif] sm:text-[16px]">
               PawSpace
             </p>
           </Link>
@@ -98,8 +98,8 @@ export function LandingNavbar() {
 
           <button
             type="button"
-            onClick={() => setIsOpen((v) => !v)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border-subtle)] text-[var(--text-primary)] transition-colors duration-200 hover:bg-[var(--bg-elevated)] lg:hidden"
+            onClick={() => setIsOpen((value) => !value)}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--border-subtle)] text-[var(--text-primary)] transition-colors duration-200 hover:bg-[var(--bg-elevated)] sm:h-10 sm:w-10 lg:hidden"
             aria-label="Alternar menu"
           >
             {isOpen ? <X size={17} /> : <Menu size={17} />}
@@ -107,14 +107,14 @@ export function LandingNavbar() {
         </div>
 
         {isOpen && (
-          <div className="border-t border-[var(--border-subtle)] py-4 lg:hidden">
+          <div className="border-t border-[var(--border-subtle)] py-3 sm:py-4 lg:hidden">
             <div className="flex flex-col gap-2">
               {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={(event) => handleAnchorClick(event, item.href)}
-                  className="rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)] transition-colors duration-200 hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
+                  className="rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)] transition-colors duration-200 hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] sm:py-3"
                 >
                   {item.label}
                 </Link>
@@ -123,7 +123,7 @@ export function LandingNavbar() {
                 <Link
                   href="/login"
                   onClick={() => setIsOpen(false)}
-                  className="block rounded-xl border border-[var(--border-subtle)] px-4 py-3 text-center text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]"
+                  className="block rounded-xl border border-[var(--border-subtle)] px-4 py-2.5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)] sm:py-3"
                 >
                   Entrar
                 </Link>

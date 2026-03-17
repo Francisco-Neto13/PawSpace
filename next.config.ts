@@ -14,6 +14,11 @@ if (supabaseUrl) {
 }
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '8mb',
+    },
+  },
   images: {
     qualities: [60, 75],
     remotePatterns,

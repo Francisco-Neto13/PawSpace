@@ -84,11 +84,11 @@ export function SkillForm({
   };
 
   const labelClass = 'field-label';
-  const inputClass = 'library-input field-input p-3.5 placeholder:text-[var(--text-muted)] cursor-text';
+  const inputClass = 'library-input field-input px-3.5 py-3 placeholder:text-[var(--text-muted)] cursor-text';
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-5">
         <div className="flex items-center justify-between mb-2">
           <label className={labelClass}>Nome da Trilha *</label>
           <CharCounter current={formData.label.length} max={NAME_MAX} />
@@ -108,9 +108,14 @@ export function SkillForm({
         />
       </div>
 
-      <div>
-        <label className={`${labelClass} block mb-2`}>Identidade Visual</label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 items-start gap-3">
+      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-5">
+        <div className="mb-3">
+          <label className={`${labelClass} block mb-1`}>Identidade Visual</label>
+          <p className="ui-copy text-[var(--text-muted)]">
+            Escolha um emoji e uma cor para reconhecer essa trilha mais rápido no mapa.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-start gap-3">
           <EmojiPicker
             currentEmoji={formData.icon}
             onSelect={(icon) => {
@@ -130,7 +135,7 @@ export function SkillForm({
 
       <input type="hidden" value={formData.shape} readOnly />
 
-      <div>
+      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-5">
         <div className="flex items-center justify-between mb-2">
           <label className={labelClass}>Resumo da Trilha</label>
           <CharCounter current={formData.description.length} max={DESC_MAX} />
@@ -148,7 +153,7 @@ export function SkillForm({
       </div>
 
       {!isEditing && initialParentId === undefined && (
-        <div>
+        <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-5">
           <label className={`${labelClass} block mb-2`}>Trilha pai (opcional)</label>
           <select
             value={formData.parentId}
@@ -167,18 +172,18 @@ export function SkillForm({
 
       <div className="h-[1px] bg-gradient-to-r from-transparent via-[var(--border-subtle)] to-transparent" />
 
-      <div className="flex gap-3 pt-1">
+      <div className="flex flex-col-reverse gap-3 pt-1 sm:flex-row">
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 h-11 rounded-xl border border-[var(--border-subtle)] text-[var(--text-secondary)] button-label hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)] transition-all duration-200 cursor-pointer"
+          className="h-11 w-full rounded-xl border border-[var(--border-subtle)] text-[var(--text-secondary)] button-label hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)] hover:border-[var(--border-muted)] transition-all duration-200 cursor-pointer sm:flex-1"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isLoading || !formData.label.trim()}
-          className="flex-1 h-11 rounded-xl border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] button-label hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer"
+          className="h-11 w-full rounded-xl border border-[var(--border-visible)] bg-[var(--bg-elevated)] text-[var(--text-primary)] button-label hover:bg-[var(--bg-input)] hover:border-[var(--text-secondary)] disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer sm:flex-1"
         >
           {isLoading ? 'Sincronizando...' : isEditing ? 'Salvar trilha' : 'Criar trilha'}
         </button>

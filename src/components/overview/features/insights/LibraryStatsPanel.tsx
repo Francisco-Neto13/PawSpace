@@ -97,8 +97,8 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
       </div>
       <p className="overview-subtitle mb-6 ml-3">Tipos de material guardados e distribuição na estante</p>
 
-      <div className="flex-1 flex items-center">
-        <div className="flex items-center gap-6 w-full">
+      <div className="flex flex-1 items-center">
+        <div className="flex w-full flex-col gap-5 sm:flex-row sm:items-center sm:gap-6">
           <div className="relative shrink-0" style={{ width: 120, height: 120 }}>
             <ResponsiveContainer width={120} height={120}>
               <PieChart>
@@ -138,7 +138,7 @@ function LibraryStatsPanel({ stats, isBootstrapLoading = false }: LibraryStatsPa
             </div>
           </div>
 
-          <div className="flex-1 space-y-2">
+          <div className="min-w-0 flex-1 space-y-2">
             {byType.map((t, i) => {
               const pct = totalContents > 0 ? Math.round((t.value / totalContents) * 100) : 0;
               const isActive = activeIndex === i;

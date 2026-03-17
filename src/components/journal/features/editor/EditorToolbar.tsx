@@ -18,10 +18,10 @@ export function EditorToolbar() {
   ];
 
   return (
-    <div className="flex items-center gap-0.5 px-4 md:px-6 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+    <div className="flex flex-wrap items-center gap-0.5 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2 md:px-6">
       {tools.map((t, i) => {
         if ('isSeparator' in t) {
-          return <div key={i} className="w-[1px] h-3 bg-[var(--border-muted)] mx-2" />;
+          return <div key={i} className="mx-2 hidden h-3 w-[1px] bg-[var(--border-muted)] sm:block" />;
         }
 
         return (
@@ -39,7 +39,7 @@ export function EditorToolbar() {
         );
       })}
 
-      <div className="ml-auto hidden md:block field-label text-[var(--text-muted)] pointer-events-none">
+      <div className="ml-auto hidden field-label text-[var(--text-muted)] pointer-events-none md:block">
         Editor ativo
       </div>
     </div>

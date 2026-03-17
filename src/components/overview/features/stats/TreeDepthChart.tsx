@@ -145,8 +145,8 @@ function TreeDepthChart({ data, maxGapLevel }: Props) {
         </AreaChart>
       </ResponsiveContainer>
 
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--border-subtle)]">
-        <div className="flex items-center gap-4">
+      <div className="mt-auto flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-1.5">
             <div className="w-4 h-[2px] bg-[var(--text-secondary)]" />
             <span className="ui-meta uppercase">Com material</span>
