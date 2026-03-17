@@ -55,7 +55,7 @@ export default function DangerZone() {
           <div>
             <p className="sidebar-title mb-1">Deletar Conta</p>
             <p className="ui-copy max-w-sm">
-              Todos os seus dados serão removidos: árvore, diário, biblioteca e configurações. Esta ação não pode ser desfeita.
+              Todos os seus dados serão removidos: árvore, estante, diário e ajustes. Esta ação não pode ser desfeita.
             </p>
           </div>
           <button

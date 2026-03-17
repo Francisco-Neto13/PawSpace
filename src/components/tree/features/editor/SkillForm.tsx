@@ -110,7 +110,7 @@ export function SkillForm({
 
       <div>
         <label className={`${labelClass} block mb-2`}>Identidade Visual</label>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 items-start gap-3">
           <EmojiPicker
             currentEmoji={formData.icon}
             onSelect={(icon) => {

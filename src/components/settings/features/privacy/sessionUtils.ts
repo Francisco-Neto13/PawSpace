@@ -7,23 +7,7 @@ export type SessionItem = {
   type: 'desktop' | 'mobile';
 };
 
-export type SessionRow = {
-  id: string;
-  device: string | null;
-  location: string | null;
-  last_seen: string | null;
-  is_current: boolean | null;
-  type: 'desktop' | 'mobile' | null;
-};
-
 export type FeedbackTone = 'ok' | 'error' | 'info';
-
-export interface SupabaseErrorLike {
-  code?: string;
-  message?: string;
-  details?: string | null;
-  hint?: string | null;
-}
 
 export function detectBrowser(ua: string): string {
   if (ua.includes('Edg/')) return 'Edge';
@@ -31,6 +15,41 @@ export function detectBrowser(ua: string): string {
   if (ua.includes('Safari/') && !ua.includes('Chrome/')) return 'Safari';
   if (ua.includes('Chrome/')) return 'Chrome';
   return 'Navegador';
+}
+
+export function detectPlatform(ua: string): string {
+  if (/Android/i.test(ua)) return 'Android';
+  if (/iPhone/i.test(ua)) return 'iPhone';
+  if (/iPad/i.test(ua)) return 'iPad';
+  if (/Mac OS X|Macintosh/i.test(ua)) return 'macOS';
+  if (/Windows/i.test(ua)) return 'Windows';
+  if (/Linux/i.test(ua)) return 'Linux';
+  return 'Dispositivo';
+}
+
+export function detectSessionType(ua: string): SessionItem['type'] {
+  return /Android|iPhone|iPad|iPod/i.test(ua) ? 'mobile' : 'desktop';
+}
+
+export function describeDeviceFromUserAgent(
+  userAgent: string | null | undefined
+): Pick<SessionItem, 'device' | 'type'> {
+  const ua = userAgent?.trim() ?? '';
+
+  if (!ua) {
+    return {
+      device: 'Dispositivo conectado',
+      type: 'desktop',
+    };
+  }
+
+  const browser = detectBrowser(ua);
+  const platform = detectPlatform(ua);
+
+  return {
+    device: `${browser} em ${platform}`,
+    type: detectSessionType(ua),
+  };
 }
 
 export function formatLastSeen(value: string | null): string {
@@ -43,7 +62,7 @@ export function formatLastSeen(value: string | null): string {
 export function createCurrentSessionFallback(): SessionItem {
   const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
   const platform = typeof navigator !== 'undefined' ? navigator.platform : 'Dispositivo';
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+  const isMobile = detectSessionType(ua) === 'mobile';
 
   return {
     id: 'current',
@@ -53,38 +72,6 @@ export function createCurrentSessionFallback(): SessionItem {
     isCurrent: true,
     type: isMobile ? 'mobile' : 'desktop',
   };
-}
-
-export function normalizeSessions(rows: SessionRow[]): SessionItem[] {
-  if (!rows.length) return [createCurrentSessionFallback()];
-
-  const mapped: SessionItem[] = rows.map((row) => ({
-    id: row.id,
-    device: row.device ?? 'Dispositivo',
-    location: row.location ?? 'Local desconhecido',
-    lastSeen: formatLastSeen(row.last_seen),
-    isCurrent: Boolean(row.is_current),
-    type: row.type === 'mobile' ? 'mobile' : 'desktop',
-  }));
-
-  if (mapped.some((session) => session.isCurrent)) {
-    return mapped;
-  }
-
-  return mapped.map((session, index) => (index === 0 ? { ...session, isCurrent: true } : session));
-}
-
-export function isSessionsTableUnavailable(error: SupabaseErrorLike): boolean {
-  const code = (error.code ?? '').toUpperCase();
-  if (code === '42P01' || code === '42501') return true;
-
-  const text = `${error.message ?? ''} ${error.details ?? ''} ${error.hint ?? ''}`.toLowerCase();
-  return (
-    text.includes('relation "sessions" does not exist') ||
-    text.includes("relation 'sessions' does not exist") ||
-    text.includes('permission denied') ||
-    text.includes('schema cache')
-  );
 }
 
 export function getFeedbackStyles(tone: FeedbackTone) {

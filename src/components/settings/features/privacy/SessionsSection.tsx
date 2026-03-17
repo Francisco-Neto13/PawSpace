@@ -10,21 +10,43 @@ import { SessionFeedback } from './SessionFeedback';
 import { SessionListItem } from './SessionListItem';
 import {
   createCurrentSessionFallback,
-  isSessionsTableUnavailable,
-  normalizeSessions,
   type FeedbackTone,
   type SessionItem,
-  type SessionRow,
-  type SupabaseErrorLike,
 } from './sessionUtils';
+
+const LIMITED_VISIBILITY_MESSAGE =
+  'Esta tela consegue mostrar apenas a sessão atual neste ambiente. Se houver outros acessos abertos, você pode encerrá-los de uma vez pelo botão acima.';
+
+type UserSessionsResponse =
+  | { status: 'ok'; sessions: SessionItem[] }
+  | { status: 'limited'; sessions: [] }
+  | { status: 'unauthorized'; sessions: [] }
+  | { status: 'error'; sessions: [] };
+
+function ensureSessionList(items: SessionItem[]) {
+  if (items.length === 0) {
+    return [createCurrentSessionFallback()];
+  }
+
+  if (items.length === 1 && !items[0].isCurrent) {
+    return [
+      {
+        ...items[0],
+        isCurrent: true,
+        location: 'Sessão atual',
+      },
+    ];
+  }
+
+  return items;
+}
 
 export default function SessionsSection() {
   const [sessions, setSessions] = useState<SessionItem[]>([]);
-  const [revoking, setRevoking] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [revoking, setRevoking] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isSessionTableSupported, setIsSessionTableSupported] = useState<boolean | null>(null);
+  const [hasLimitedSessionVisibility, setHasLimitedSessionVisibility] = useState(false);
   const [feedback, setFeedback] = useState<{ tone: FeedbackTone; message: string } | null>(null);
 
   const loadSessions = useCallback(async (source: 'initial' | 'manual' = 'initial') => {
@@ -35,47 +57,46 @@ export default function SessionsSection() {
     }
     setFeedback(null);
 
-    const supabase = createClient();
-
     try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+      const response = await fetch('/api/sessions', {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+      const result = (await response.json()) as UserSessionsResponse;
 
-      if (userError || !user) {
-        setUserId(null);
+      if (!response.ok && result.status !== 'unauthorized') {
+        throw new Error('sessions_request_failed');
+      }
+
+      if (result.status === 'ok') {
+        setHasLimitedSessionVisibility(false);
+        setSessions(ensureSessionList(result.sessions));
+        return;
+      }
+
+      if (result.status === 'limited') {
+        setHasLimitedSessionVisibility(true);
         setSessions([createCurrentSessionFallback()]);
         return;
       }
 
-      setUserId(user.id);
-
-      const { data, error } = await supabase
-        .from('sessions')
-        .select('id, device, location, last_seen, is_current, type')
-        .eq('user_id', user.id)
-        .order('is_current', { ascending: false })
-        .order('last_seen', { ascending: false });
-
-      if (error) {
-        const sessionError = error as SupabaseErrorLike;
-        if (isSessionsTableUnavailable(sessionError)) {
-          setIsSessionTableSupported(false);
-          setSessions([createCurrentSessionFallback()]);
-          setFeedback({
-            tone: 'info',
-            message: 'Modo básico ativo: lista completa de sessões indisponível neste banco.',
-          });
-          return;
-        }
-        throw error;
+      if (result.status === 'unauthorized') {
+        setHasLimitedSessionVisibility(true);
+        setSessions([createCurrentSessionFallback()]);
+        setFeedback({
+          tone: 'error',
+          message: 'Sessão não encontrada.',
+        });
+        return;
       }
 
-      setIsSessionTableSupported(true);
-      setSessions(normalizeSessions((data ?? []) as SessionRow[]));
+      throw new Error('unexpected_sessions_state');
     } catch (error) {
       console.error('[Sessions] Falha ao carregar sessões:', error);
+      setHasLimitedSessionVisibility(true);
       setSessions((prev) => (prev.length > 0 ? prev : [createCurrentSessionFallback()]));
       setFeedback({
         tone: 'error',
@@ -91,82 +112,39 @@ export default function SessionsSection() {
     void loadSessions('initial');
   }, [loadSessions]);
 
-  const handleRevoke = async (id: string) => {
-    if (!userId || id === 'current') return;
-    if (isSessionTableSupported === false) {
-      setFeedback({
-        tone: 'info',
-        message: 'Revogação individual indisponível sem tabela de sessões.',
-      });
-      return;
-    }
+  const handleRevokeOthers = async () => {
+    if (revoking) return;
 
-    setRevoking(id);
+    setRevoking(true);
     setFeedback(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.from('sessions').delete().eq('id', id).eq('user_id', userId);
-
-    if (!error) {
-      setSessions((prev) => prev.filter((session) => session.id !== id));
-      setFeedback({ tone: 'ok', message: 'Sessão encerrada com sucesso.' });
-    } else if (isSessionsTableUnavailable(error as SupabaseErrorLike)) {
-      setIsSessionTableSupported(false);
-      setSessions([createCurrentSessionFallback()]);
-      setFeedback({
-        tone: 'info',
-        message: 'Modo básico ativo: revogação individual indisponível.',
-      });
-    } else {
-      setFeedback({ tone: 'error', message: 'Falha ao encerrar a sessão selecionada.' });
-    }
-
-    setRevoking(null);
-  };
-
-  const handleRevokeAll = async () => {
-    if (!userId) return;
-    setRevoking('__all__');
-    setFeedback(null);
-
-    const supabase = createClient();
-    if (isSessionTableSupported === false) {
+    try {
+      const supabase = createClient();
       const { error } = await supabase.auth.signOut({ scope: 'others' });
-      if (!error) {
-        setFeedback({ tone: 'ok', message: 'Todas as outras sessões foram encerradas.' });
-        void loadSessions('manual');
-      } else {
+
+      if (error) {
         setFeedback({ tone: 'error', message: 'Falha ao encerrar as outras sessões.' });
+        return;
       }
-      setRevoking(null);
-      return;
-    }
 
-    const { error } = await supabase.from('sessions').delete().eq('user_id', userId).neq('is_current', true);
-
-    if (!error) {
-      setSessions((prev) => prev.filter((session) => session.isCurrent));
       setFeedback({ tone: 'ok', message: 'Todas as outras sessões foram encerradas.' });
-    } else if (isSessionsTableUnavailable(error as SupabaseErrorLike)) {
-      setIsSessionTableSupported(false);
-      const revokeResult = await supabase.auth.signOut({ scope: 'others' });
-      if (!revokeResult.error) {
-        setSessions([createCurrentSessionFallback()]);
-        setFeedback({
-          tone: 'ok',
-          message: 'Outras sessões encerradas (modo básico).',
-        });
-      } else {
-        setFeedback({ tone: 'error', message: 'Falha ao encerrar as outras sessões.' });
-      }
-    } else {
+      void loadSessions('manual');
+    } catch (error) {
+      console.error('[Sessions] Falha ao encerrar outras sessões:', error);
       setFeedback({ tone: 'error', message: 'Falha ao encerrar as outras sessões.' });
+    } finally {
+      setRevoking(false);
     }
-
-    setRevoking(null);
   };
 
-  const others = useMemo(() => sessions.filter((session) => !session.isCurrent), [sessions]);
+  const currentSessionCount = useMemo(
+    () => sessions.filter((session) => session.isCurrent).length,
+    [sessions]
+  );
+  const totalSessionCount = sessions.length;
+  const otherSessionCount = Math.max(0, totalSessionCount - currentSessionCount);
+  const canRevokeOthers =
+    hasLimitedSessionVisibility || totalSessionCount - currentSessionCount > 0 || totalSessionCount > 1;
 
   return (
     <section className="library-panel p-6 relative overflow-hidden reveal-up delay-300">
@@ -185,26 +163,32 @@ export default function SessionsSection() {
           <button
             type="button"
             onClick={() => void loadSessions('manual')}
-            disabled={isLoading || isRefreshing || !!revoking}
+            disabled={isLoading || isRefreshing || revoking}
             className="h-8 px-2.5 rounded-lg border border-[var(--border-subtle)] flex items-center gap-1 button-label text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-visible)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <RefreshCcw size={9} className={isRefreshing ? 'animate-spin' : ''} />
             Atualizar
           </button>
 
-          {others.length > 0 && (
+          {canRevokeOthers && (
             <button
-              onClick={() => void handleRevokeAll()}
-              disabled={!!revoking}
+              onClick={() => void handleRevokeOthers()}
+              disabled={revoking || isLoading}
               className="button-label text-[var(--text-muted)] hover:text-red-400/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Encerrar todas
+              {revoking ? 'Encerrando...' : 'Encerrar outras sessões'}
             </button>
           )}
         </div>
       </div>
 
       {feedback && <SessionFeedback tone={feedback.tone} message={feedback.message} />}
+
+      {hasLimitedSessionVisibility && !isLoading && (
+        <div className="mb-4 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-2">
+          <p className="feedback-text text-[var(--text-muted)]">{LIMITED_VISIBILITY_MESSAGE}</p>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="h-28 flex items-center justify-center">
@@ -213,19 +197,23 @@ export default function SessionsSection() {
       ) : (
         <div className="space-y-2">
           {sessions.map((session) => (
-            <SessionListItem
-              key={session.id}
-              session={session}
-              isRevoking={revoking === session.id}
-              hasRevokingAction={!!revoking}
-              onRevoke={(id) => {
-                void handleRevoke(id);
-              }}
-            />
+            <SessionListItem key={session.id} session={session} />
           ))}
 
-          {others.length === 0 && sessions.length > 0 && (
-            <p className="ui-meta uppercase ml-1">Nenhuma outra sessão ativa.</p>
+          {!hasLimitedSessionVisibility && totalSessionCount > 0 && (
+            <div className="ml-1 flex flex-wrap items-center gap-2 pt-1">
+              <p className="ui-meta uppercase">
+                {totalSessionCount === 1 ? '1 acesso identificado.' : `${totalSessionCount} acessos identificados.`}
+              </p>
+              <span className="data-label px-1.5 py-0.5 border border-[var(--border-subtle)] text-[var(--text-muted)]">
+                {currentSessionCount === 1 ? '1 sessao atual' : `${currentSessionCount} sessoes atuais`}
+              </span>
+              {otherSessionCount > 0 && (
+                <span className="data-label px-1.5 py-0.5 border border-[var(--border-subtle)] text-[var(--text-muted)]">
+                  {otherSessionCount === 1 ? '1 outro acesso' : `${otherSessionCount} outros acessos`}
+                </span>
+              )}
+            </div>
           )}
         </div>
       )}

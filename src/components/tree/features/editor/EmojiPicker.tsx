@@ -1,5 +1,6 @@
 'use client';
-import { useState, useCallback } from 'react';
+
+import { useState } from 'react';
 
 interface EmojiPickerProps {
   onSelect: (emoji: string) => void;
@@ -8,25 +9,49 @@ interface EmojiPickerProps {
 
 interface EmojiHubItem {
   htmlCode: string[];
+  name?: string;
+}
+
+const EMOJI_CATEGORIES = [
+  { id: 'smileys-and-people', label: 'Rostos' },
+  { id: 'animals-and-nature', label: 'Natureza' },
+  { id: 'food-and-drink', label: 'Comida' },
+  { id: 'activities', label: 'Atividades' },
+  { id: 'travel-and-places', label: 'Lugares' },
+  { id: 'objects', label: 'Objetos' },
+  { id: 'symbols', label: 'Simbolos' },
+  { id: 'flags', label: 'Bandeiras' },
+] as const;
+
+type EmojiCategoryId = (typeof EMOJI_CATEGORIES)[number]['id'];
+type EmojiCache = Partial<Record<EmojiCategoryId, EmojiHubItem[]>>;
+
+function parseEmoji(codes: string[]) {
+  return String.fromCodePoint(
+    ...codes.map((code) => parseInt(code.replace('&#', '').replace(';', ''), 10))
+  );
 }
 
 export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [emojis, setEmojis] = useState<EmojiHubItem[]>([]);
+  const [activeCategory, setActiveCategory] = useState<EmojiCategoryId>('smileys-and-people');
+  const [emojiCache, setEmojiCache] = useState<EmojiCache>({});
   const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchEmojis = useCallback(async () => {
-    if (emojis.length > 0) {
-      setIsOpen((value) => !value);
-      return;
-    }
+  const loadCategory = async (category: EmojiCategoryId) => {
+    if (emojiCache[category]?.length) return;
 
     setLoading(true);
+    setError(null);
+
     try {
-      const response = await fetch('https://emojihub.yurace.pro/api/all/category/objects');
+      const response = await fetch(`https://emojihub.yurace.pro/api/all/category/${category}`);
       const data: unknown = await response.json();
+
       if (!Array.isArray(data)) {
-        throw new Error('Formato de resposta inválido para emojis');
+        throw new Error('invalid_emoji_payload');
       }
 
       const parsed = data.filter(
@@ -36,49 +61,122 @@ export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
           'htmlCode' in item &&
           Array.isArray((item as { htmlCode: unknown }).htmlCode)
       );
-      setEmojis(parsed.slice(0, 50));
-      setIsOpen(true);
-    } catch (error) {
-      console.error('Falha ao acessar banco de emojis:', error);
+
+      setEmojiCache((prev) => ({
+        ...prev,
+        [category]: parsed,
+      }));
+    } catch (fetchError) {
+      console.error('Falha ao acessar banco de emojis:', fetchError);
+      setError('Nao foi possivel carregar os emojis agora.');
     } finally {
       setLoading(false);
     }
-  }, [emojis]);
+  };
 
-  const parseEmoji = (codes: string[]) =>
-    String.fromCodePoint(...codes.map((code) => parseInt(code.replace('&#', '').replace(';', ''), 10)));
+  const handleToggle = async () => {
+    const nextOpen = !isOpen;
+    setIsOpen(nextOpen);
+
+    if (nextOpen) {
+      await loadCategory(activeCategory);
+    }
+  };
+
+  const handleCategoryChange = async (category: EmojiCategoryId) => {
+    setActiveCategory(category);
+    setQuery('');
+    await loadCategory(category);
+  };
+
+  const emojis = emojiCache[activeCategory] ?? [];
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredEmojis = normalizedQuery
+    ? emojis.filter((emoji) => (emoji.name ?? '').toLowerCase().includes(normalizedQuery))
+    : emojis;
 
   return (
     <div className="relative">
       <label className="field-label block mb-2">Emoji</label>
       <button
         type="button"
-        onClick={() => void fetchEmojis()}
+        onClick={() => void handleToggle()}
         className="w-12 h-12 rounded-xl flex items-center justify-center border border-[var(--border-subtle)] bg-[var(--bg-elevated)] hover:bg-[var(--bg-input)] hover:border-[var(--border-visible)] transition-all duration-200 text-2xl"
       >
-        {loading ? <span className="animate-pulse text-xs">...</span> : currentEmoji}
+        {loading && !isOpen ? <span className="animate-pulse text-xs">...</span> : currentEmoji}
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-[110]" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-14 left-0 z-[120] w-64 h-56 overflow-y-auto rounded-xl bg-[var(--bg-strong)] border border-[var(--border-subtle)] p-3 grid grid-cols-5 gap-2 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200">
-            {emojis.map((emoji, index) => {
-              const char = parseEmoji(emoji.htmlCode);
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => {
-                    onSelect(char);
-                    setIsOpen(false);
-                  }}
-                  className="hover:bg-[var(--bg-elevated)] p-2 rounded-lg transition-colors text-xl flex items-center justify-center"
-                >
-                  {char}
-                </button>
-              );
-            })}
+          <div className="absolute top-14 left-0 z-[120] w-[19rem] rounded-2xl bg-[var(--bg-strong)] border border-[var(--border-subtle)] shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-200 overflow-hidden">
+            <div className="border-b border-[var(--border-subtle)] p-3 space-y-3">
+              <input
+                type="text"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Buscar emoji nesta categoria"
+                className="library-input field-input h-10 px-3 placeholder:text-[var(--text-muted)]"
+              />
+
+              <div className="flex flex-wrap gap-1.5">
+                {EMOJI_CATEGORIES.map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => void handleCategoryChange(category.id)}
+                    className="px-2 py-1 rounded-lg border data-label transition-colors"
+                    style={{
+                      borderColor:
+                        activeCategory === category.id ? 'var(--border-visible)' : 'var(--border-subtle)',
+                      backgroundColor:
+                        activeCategory === category.id ? 'var(--bg-elevated)' : 'transparent',
+                      color: activeCategory === category.id ? 'var(--text-primary)' : 'var(--text-muted)',
+                    }}
+                  >
+                    {category.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="h-72 overflow-y-auto p-3">
+              {loading ? (
+                <div className="h-full flex items-center justify-center">
+                  <span className="ui-meta">Carregando emojis...</span>
+                </div>
+              ) : error ? (
+                <div className="h-full flex items-center justify-center text-center">
+                  <span className="ui-meta">{error}</span>
+                </div>
+              ) : filteredEmojis.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-center">
+                  <span className="ui-meta">
+                    {normalizedQuery ? 'Nenhum emoji encontrado nesta busca.' : 'Nenhum emoji disponivel aqui.'}
+                  </span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-6 gap-2">
+                  {filteredEmojis.map((emoji, index) => {
+                    const char = parseEmoji(emoji.htmlCode);
+                    return (
+                      <button
+                        key={`${activeCategory}-${index}-${char}`}
+                        type="button"
+                        onClick={() => {
+                          onSelect(char);
+                          setIsOpen(false);
+                        }}
+                        className="hover:bg-[var(--bg-elevated)] p-2 rounded-lg transition-colors text-xl flex items-center justify-center"
+                        title={emoji.name ?? 'emoji'}
+                      >
+                        {char}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </>
       )}
