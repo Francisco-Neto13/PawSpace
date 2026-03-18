@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from '@/shared/lib/prisma';
-import { getAuthUser } from '../journal/auth-helper';
+import { getAuthUser } from '@/shared/server/auth';
 
 export type ActivityFilter = 'all' | 'journal' | 'skill' | 'library';
 

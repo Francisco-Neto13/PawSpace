@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 
 import prisma from '@/shared/lib/prisma';
+import { getCurrentUser } from '@/shared/server/auth';
 import { createClient } from '@/shared/supabase/server';
 import {
   describeDeviceFromUserAgent,
@@ -138,12 +139,9 @@ function toSessionItem(row: AuthSessionRow, currentSessionId: string | null): Se
 
 export async function getUserSessions(): Promise<UserSessionsResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser(supabase);
 
-  if (userError || !user) {
+  if (!user) {
     return { status: 'unauthorized', sessions: [] };
   }
 

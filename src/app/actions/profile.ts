@@ -1,9 +1,10 @@
 'use server';
 
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import sharp from 'sharp';
 
 import { LIMITS } from '@/shared/lib/limits';
+import { getCurrentUser } from '@/shared/server/auth';
+import { createAdminClient } from '@/shared/supabase/admin';
 import { createClient } from '@/shared/supabase/server';
 
 const AVATAR_BUCKET = 'profile-avatars';
@@ -12,20 +13,6 @@ const AVATAR_MAX_BYTES = LIMITS.auth.avatarMaxBytes;
 const ALLOWED_AVATAR_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 let hasEnsuredAvatarBucket = false;
-
-function createAdminClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) return null;
-
-  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  });
-}
 
 function isBucketAlreadyPresentError(message: string | undefined) {
   const text = (message ?? '').toLowerCase();
@@ -206,12 +193,9 @@ async function verifyUploadedAvatar(filePath: string) {
 export async function uploadProfileAvatar(formData: FormData) {
   try {
     const userClient = await createClient();
-    const {
-      data: { user },
-      error: userError,
-    } = await userClient.auth.getUser();
+    const user = await getCurrentUser(userClient);
 
-    if (userError || !user) {
+    if (!user) {
       return { success: false as const, error: 'Sessao nao encontrada.' };
     }
 
@@ -314,12 +298,9 @@ export async function uploadProfileAvatar(formData: FormData) {
 export async function removeProfileAvatar() {
   try {
     const userClient = await createClient();
-    const {
-      data: { user },
-      error: userError,
-    } = await userClient.auth.getUser();
+    const user = await getCurrentUser(userClient);
 
-    if (userError || !user) {
+    if (!user) {
       return { success: false as const, error: 'Sessao nao encontrada.' };
     }
 

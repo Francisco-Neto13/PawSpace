@@ -4,7 +4,7 @@ import type { Node } from '@xyflow/react';
 import { Prisma } from '@prisma/client';
 import type { SkillData } from '@/components/tree/types';
 import prisma from '@/lib/prisma';
-import { getAuthUser } from './auth-helper';
+import { getAuthUser } from '@/shared/server/auth';
 import { LIMITS } from '@/lib/limits';
 
 const MAX_SKILLS = LIMITS.quantity.skillsPerUser;

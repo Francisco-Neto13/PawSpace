@@ -1,27 +1,13 @@
 'use server';
 
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import prisma from '@/shared/lib/prisma';
+import { getCurrentUser, type ServerSupabaseClient } from '@/shared/server/auth';
+import { createAdminClient } from '@/shared/supabase/admin';
 import { createClient } from '@/shared/supabase/server';
 
 const PDF_BUCKET = 'biblioteca-pdfs';
 const AVATAR_BUCKET = 'profile-avatars';
 const STORAGE_DELETE_BATCH_SIZE = 100;
-const DELETE_TEST_ROLLBACK = '__ACCOUNT_DELETE_ROLLBACK__';
-
-function createAdminClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) return null;
-
-  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  });
-}
 
 function chunkArray<T>(items: T[], size: number) {
   const chunks: T[][] = [];
@@ -33,76 +19,52 @@ function chunkArray<T>(items: T[], size: number) {
   return chunks;
 }
 
-async function canDeleteAuthUserViaDatabase(userId: string) {
-  try {
-    await prisma.$transaction(async (tx) => {
-      await tx.$executeRawUnsafe('DELETE FROM auth.users WHERE id = $1::uuid', userId);
-      throw new Error(DELETE_TEST_ROLLBACK);
-    });
-    return false;
-  } catch (error) {
-    if (error instanceof Error && error.message === DELETE_TEST_ROLLBACK) {
-      return true;
-    }
-
-    console.error('[Account Delete] Falha no teste de exclusão via banco:', error);
-    return false;
-  }
-}
-
-async function removeStoredFiles(fileKeys: string[], userClient: Awaited<ReturnType<typeof createClient>>) {
+async function removeStoredFiles(fileKeys: string[], userClient: ServerSupabaseClient) {
   if (fileKeys.length === 0) return;
 
   for (const batch of chunkArray(fileKeys, STORAGE_DELETE_BATCH_SIZE)) {
     const { error } = await userClient.storage.from(PDF_BUCKET).remove(batch);
     if (error) {
-      console.warn('[Account Delete] Não foi possível remover alguns PDFs da estante:', error.message);
+      console.warn('[Account Delete] Nao foi possivel remover alguns PDFs da estante:', error.message);
     }
   }
 }
 
-async function removeAvatarFile(avatarPath: string | null, userClient: Awaited<ReturnType<typeof createClient>>) {
+async function removeAvatarFile(avatarPath: string | null, userClient: ServerSupabaseClient) {
   if (!avatarPath) return;
 
   const adminClient = createAdminClient();
   if (adminClient) {
     const { error } = await adminClient.storage.from(AVATAR_BUCKET).remove([avatarPath]);
     if (error) {
-      console.warn('[Account Delete] Não foi possível remover o avatar do perfil:', error.message);
+      console.warn('[Account Delete] Nao foi possivel remover o avatar do perfil:', error.message);
     }
     return;
   }
 
   const { error } = await userClient.storage.from(AVATAR_BUCKET).remove([avatarPath]);
   if (error) {
-    console.warn('[Account Delete] Não foi possível remover o avatar do perfil:', error.message);
+    console.warn('[Account Delete] Nao foi possivel remover o avatar do perfil:', error.message);
   }
 }
 
-async function deleteAuthUser(userId: string) {
-  const adminClient = createAdminClient();
-
-  if (adminClient) {
+async function deleteAuthUser(userId: string, adminClient: NonNullable<ReturnType<typeof createAdminClient>>) {
+  try {
     const { error } = await adminClient.auth.admin.deleteUser(userId);
     if (error) {
-      console.error('[Account Delete] Falha ao remover usuário via admin:', error);
+      console.error('[Account Delete] Falha ao remover usuario via admin:', error);
       return {
         success: false as const,
-        error: 'Não foi possível remover a conta de acesso no Supabase.',
+        error: 'Nao foi possivel remover a conta de acesso no Supabase.',
       };
     }
 
     return { success: true as const };
-  }
-
-  try {
-    await prisma.$executeRawUnsafe('DELETE FROM auth.users WHERE id = $1::uuid', userId);
-    return { success: true as const };
   } catch (error) {
-    console.error('[Account Delete] Falha ao remover usuário via banco:', error);
+    console.error('[Account Delete] Falha inesperada ao remover usuario via admin:', error);
     return {
       success: false as const,
-      error: 'Não foi possível remover a autenticação da conta. Configure SUPABASE_SERVICE_ROLE_KEY para habilitar a exclusão completa.',
+      error: 'Nao foi possivel remover a autenticacao da conta.',
     };
   }
 }
@@ -110,24 +72,18 @@ async function deleteAuthUser(userId: string) {
 export async function deleteCurrentAccount() {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+    const user = await getCurrentUser(supabase);
 
-    if (userError || !user) {
-      return { success: false, error: 'Sessão não encontrada.' };
+    if (!user) {
+      return { success: false, error: 'Sessao nao encontrada.' };
     }
 
     const adminClient = createAdminClient();
     if (!adminClient) {
-      const canDeleteViaDatabase = await canDeleteAuthUserViaDatabase(user.id);
-      if (!canDeleteViaDatabase) {
-        return {
-          success: false,
-          error: 'Exclusão de conta não configurada. Adicione SUPABASE_SERVICE_ROLE_KEY no ambiente para habilitar essa ação.',
-        };
-      }
+      return {
+        success: false,
+        error: 'Exclusao de conta nao configurada. Adicione SUPABASE_SERVICE_ROLE_KEY no ambiente para habilitar essa acao.',
+      };
     }
 
     const storedFiles = await prisma.libraryContent.findMany({
@@ -144,6 +100,7 @@ export async function deleteCurrentAccount() {
 
     const fileKeys = [...new Set(storedFiles.map((item) => item.fileKey).filter(Boolean) as string[])];
     await removeStoredFiles(fileKeys, supabase);
+
     const avatarPath =
       typeof user.user_metadata?.avatar_path === 'string' && user.user_metadata.avatar_path.trim().length > 0
         ? user.user_metadata.avatar_path.trim()
@@ -156,7 +113,7 @@ export async function deleteCurrentAccount() {
       prisma.skill.deleteMany({ where: { userId: user.id } }),
     ]);
 
-    const authDeletion = await deleteAuthUser(user.id);
+    const authDeletion = await deleteAuthUser(user.id, adminClient);
     if (!authDeletion.success) {
       return { success: false, error: authDeletion.error };
     }
@@ -166,6 +123,6 @@ export async function deleteCurrentAccount() {
     return { success: true };
   } catch (error) {
     console.error('[Account Delete] Falha inesperada:', error);
-    return { success: false, error: 'Não foi possível deletar sua conta agora.' };
+    return { success: false, error: 'Nao foi possivel deletar sua conta agora.' };
   }
 }

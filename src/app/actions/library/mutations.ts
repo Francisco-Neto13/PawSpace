@@ -1,7 +1,7 @@
 'use server';
 import prisma from '@/shared/lib/prisma';
 import { createClient } from '@/shared/supabase/server';
-import { getAuthUser } from './auth-helper';
+import { getAuthUser } from '@/shared/server/auth';
 import { ContentInput } from './types';
 import { LIMITS } from '@/shared/lib/limits';
 

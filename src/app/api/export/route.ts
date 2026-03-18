@@ -1,6 +1,7 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+
 import prisma from '@/shared/lib/prisma';
-import { createClient } from '@/shared/supabase/server';
+import { getAuthUser } from '@/shared/server/auth';
 
 type ExportScope = 'journal' | 'tree' | 'library' | 'all';
 
@@ -11,17 +12,6 @@ function getScope(raw: string | null): ExportScope {
     return raw as ExportScope;
   }
   return 'journal';
-}
-
-async function getAuthenticatedUserId() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) return null;
-  return user.id;
 }
 
 async function getTreeExport(userId: string) {
@@ -107,9 +97,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const scope = getScope(searchParams.get('scope'));
 
-    const userId = await getAuthenticatedUserId();
+    const userId = await getAuthUser();
     if (!userId) {
-      return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
+      return NextResponse.json({ error: 'Nao autorizado.' }, { status: 401 });
     }
 
     const includeTree = scope === 'tree' || scope === 'all';

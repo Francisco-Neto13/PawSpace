@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/shared/supabase/server';
+import { getCurrentUser } from '@/shared/server/auth';
 import {
   getLibraryTypeStatsByUserId,
   type LibraryTypeStatsResult,
@@ -34,12 +34,11 @@ const UNAUTHORIZED_RESULT: OverviewBootstrapResult = {
 
 export async function getOverviewBootstrap(): Promise<OverviewBootstrapResult> {
   const start = Date.now();
-  const supabase = await createClient();
   const authStart = Date.now();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const authDuration = Date.now() - authStart;
 
-  if (error || !user) {
+  if (!user) {
     return UNAUTHORIZED_RESULT;
   }
 

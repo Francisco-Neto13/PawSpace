@@ -9,6 +9,7 @@ import { AuthFormHeader } from '@/components/login/features/auth/AuthFormHeader'
 import RecoveryModal from '@/components/login/features/auth/RecoveryModal';
 import { RemainingWarning } from '@/components/login/features/auth/RemainingWarning';
 import { SignupNoticeCard } from '@/components/login/features/auth/SignupNoticeCard';
+import TurnstileWidget from '@/components/login/features/auth/TurnstileWidget';
 import {
   type AuthMode,
   getPasswordStrength,
@@ -23,6 +24,7 @@ const EMAIL_MAX_LENGTH = LIMITS.auth.email;
 const PASSWORD_MAX_LENGTH = LIMITS.auth.password;
 
 export default function LoginForm() {
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const [mode, setMode] = useState<AuthMode>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -34,10 +36,13 @@ export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [signupNoticeEmail, setSignupNoticeEmail] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const router = useRouter();
   const [supabase] = useState(() => createClient());
 
   const isSignup = mode === 'signup';
+  const shouldShowTurnstile = Boolean(turnstileSiteKey);
   const passwordStrength = getPasswordStrength(password);
   const fieldClassName =
     'w-full rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] py-3.5 pl-11 pr-4 text-[var(--text-primary)] outline-none transition-all placeholder:text-[var(--text-faint)] focus:border-[var(--border-visible)] focus:bg-[var(--bg-elevated)] focus:ring-2 focus:ring-white/10';
@@ -47,6 +52,8 @@ export default function LoginForm() {
     setError(null);
     setSignupNoticeEmail(null);
     setShowPasswordStrength(false);
+    setTurnstileToken(null);
+    setTurnstileResetKey((current) => current + 1);
   }
 
   useEffect(() => {
@@ -103,10 +110,49 @@ export default function LoginForm() {
     };
   }, [router, supabase]);
 
+  async function verifyTurnstileToken() {
+    if (!shouldShowTurnstile) {
+      return true;
+    }
+
+    if (!turnstileToken) {
+      setError('Confirme que você não é um robô para continuar.');
+      return false;
+    }
+
+    const verificationResponse = await fetch('/api/auth/turnstile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: turnstileToken }),
+    });
+
+    const verificationResult = (await verificationResponse.json().catch(() => null)) as
+      | { success?: boolean }
+      | null;
+
+    if (!verificationResponse.ok || !verificationResult?.success) {
+      setTurnstileToken(null);
+      setTurnstileResetKey((current) => current + 1);
+      setError('Não foi possível validar a verificação de segurança. Tente novamente.');
+      return false;
+    }
+
+    return true;
+  }
+
   async function handleLogin() {
+    const isTurnstileValid = await verifyTurnstileToken();
+    if (!isTurnstileValid) {
+      return;
+    }
+
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (signInError) {
+      if (shouldShowTurnstile) {
+        setTurnstileToken(null);
+        setTurnstileResetKey((current) => current + 1);
+      }
       setError(mapAuthError(signInError.message));
       return;
     }
@@ -133,6 +179,11 @@ export default function LoginForm() {
       return;
     }
 
+    const isTurnstileValid = await verifyTurnstileToken();
+    if (!isTurnstileValid) {
+      return;
+    }
+
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
@@ -146,6 +197,10 @@ export default function LoginForm() {
     });
 
     if (signUpError) {
+      if (shouldShowTurnstile) {
+        setTurnstileToken(null);
+        setTurnstileResetKey((current) => current + 1);
+      }
       setError(mapSignUpError(signUpError.message));
       return;
     }
@@ -311,9 +366,7 @@ export default function LoginForm() {
                     >
                       {passwordStrength.label}
                     </p>
-                    <p className="text-[9px] text-[var(--text-muted)]">
-                      Use letras, número e símbolo
-                    </p>
+                    <p className="text-[9px] text-[var(--text-muted)]">Use letras, número e símbolo</p>
                   </div>
                 </div>
               )}
@@ -369,9 +422,37 @@ export default function LoginForm() {
               </div>
             )}
 
+            {shouldShowTurnstile && turnstileSiteKey ? (
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="ml-1 block text-[9px] font-black uppercase tracking-[0.25em] text-[var(--text-muted)]">
+                    Verificação de segurança
+                  </label>
+                  <span className="text-[9px] text-[var(--text-faint)]">Obrigatória para continuar</span>
+                </div>
+                <div className="-mx-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-4 sm:-mx-5 sm:px-5">
+                  <TurnstileWidget
+                    siteKey={turnstileSiteKey}
+                    resetKey={turnstileResetKey}
+                    onVerify={(token) => {
+                      setTurnstileToken(token);
+                      setError(null);
+                    }}
+                    onExpire={() => {
+                      setTurnstileToken(null);
+                    }}
+                    onError={() => {
+                      setTurnstileToken(null);
+                      setError('A verificação de segurança falhou. Tente novamente.');
+                    }}
+                  />
+                </div>
+              </div>
+            ) : null}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (shouldShowTurnstile && !turnstileToken)}
               className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl bg-[var(--text-primary)] py-4 text-[11px] font-black uppercase tracking-[0.2em] text-[var(--bg-base)] shadow-[0_10px_30px_rgba(255,255,255,0.08)] transition-all hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Processando...' : isSignup ? 'Criar conta' : 'Entrar'}

@@ -1,6 +1,6 @@
 'use server';
 import prisma from '@/shared/lib/prisma';
-import { getAuthUser } from './auth-helper';
+import { getAuthUser } from '@/shared/server/auth';
 
 export type LibraryTypeStat = {
   name: string;

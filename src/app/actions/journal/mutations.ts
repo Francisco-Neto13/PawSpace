@@ -2,7 +2,7 @@
 import prisma from '@/shared/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { JournalInput } from './types';
-import { getAuthUser } from './auth-helper';
+import { getAuthUser } from '@/shared/server/auth';
 import { LIMITS } from '@/shared/lib/limits';
 
 const MAX_ENTRIES = LIMITS.quantity.journalEntries;
