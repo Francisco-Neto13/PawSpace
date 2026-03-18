@@ -14,8 +14,7 @@ type SessionColumn =
   | 'created_at'
   | 'updated_at'
   | 'not_after'
-  | 'user_agent'
-  | 'ip';
+  | 'user_agent';
 
 type SessionColumnRow = {
   column_name: string;
@@ -36,7 +35,6 @@ const SESSION_COLUMN_WHITELIST: readonly SessionColumn[] = [
   'updated_at',
   'not_after',
   'user_agent',
-  'ip',
 ];
 
 let cachedSessionColumns: {
@@ -125,12 +123,11 @@ function toSessionItem(row: AuthSessionRow, currentSessionId: string | null): Se
     typeof row.user_agent === 'string' ? row.user_agent : null
   );
   const lastSeenSource = toIsoString(row.updated_at) ?? toIsoString(row.created_at) ?? toIsoString(row.not_after);
-  const ip = typeof row.ip === 'string' && row.ip.trim() ? row.ip.trim() : null;
 
   return {
     id: row.id,
     device: deviceMeta.device,
-    location: ip ? `IP ${ip}` : 'Acesso registrado',
+    location: 'Acesso registrado',
     lastSeen: lastSeenSource ?? 'Agora',
     isCurrent: currentSessionId === row.id,
     type: deviceMeta.type,

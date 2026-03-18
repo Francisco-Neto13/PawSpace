@@ -101,7 +101,6 @@ export function useSkillActions() {
       positionX,
       positionY,
       progress: 0,
-      userId: '',
     };
 
     const tempNode: SkillNode = {

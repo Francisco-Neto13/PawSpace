@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link2, Video, FileText, StickyNote, X } from 'lucide-react';
-import { addContent, uploadPdf } from '@/app/actions/library';
+import { addContent, addPdfContent } from '@/app/actions/library';
 import type { ContentInput } from '@/app/actions/library/types';
 import { ContentType } from '../../types';
 import { LinkForm, VideoForm } from './UrlForms';
@@ -106,7 +106,6 @@ export function AddContentModal({
           title: form.title.trim(),
           url: form.url.trim() || null,
           body: form.body.trim() || null,
-          fileKey: null,
           createdAt: new Date().toISOString(),
         };
         onOptimisticCreate?.(optimisticContent);
@@ -130,15 +129,19 @@ export function AddContentModal({
           }
 
           const fd = new FormData();
+          fd.append('skillId', skillId);
+          fd.append('title', form.title.trim());
           fd.append('file', pdfFile);
-          const upload = await uploadPdf(fd);
-          if (!upload.success) {
-            setSubmitError(upload.error || 'Falha no upload de PDF.');
+          const result = await addPdfContent(fd);
+          if (!result.success) {
+            setSubmitError(result.error || 'Falha no upload de PDF.');
             if (!useOptimistic) setIsLoading(false);
             return;
           }
-          payload.url     = upload.publicUrl;
-          payload.fileKey = upload.fileKey;
+
+          onSuccess(result.content);
+          handleClose();
+          return;
         } else {
           payload.url = form.url.trim();
         }

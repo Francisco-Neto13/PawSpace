@@ -5,7 +5,6 @@ export interface Content {
   type: ContentType;
   title: string;
   url?: string | null;
-  fileKey?: string | null;
   body?: string | null;
   createdAt: string;
 }

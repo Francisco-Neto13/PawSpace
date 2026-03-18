@@ -131,7 +131,6 @@ export default function ProfileSection() {
   const [error, setError] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [initialAvatarUrl, setInitialAvatarUrl] = useState<string | null>(null);
-  const [avatarPath, setAvatarPath] = useState<string | null>(null);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
   const [pendingAvatarCrop, setPendingAvatarCrop] = useState<AvatarCropSelection | null>(null);
   const [cropSource, setCropSource] = useState<{ file: File; previewUrl: string } | null>(null);
@@ -163,18 +162,14 @@ export default function ProfileSection() {
 
         const rawName = user.user_metadata?.display_name ?? user.user_metadata?.name ?? '';
         const rawAvatarUrl = user.user_metadata?.avatar_url;
-        const rawAvatarPath = user.user_metadata?.avatar_path;
         const resolvedName = typeof rawName === 'string' ? rawName : '';
         const resolvedAvatarUrl =
           typeof rawAvatarUrl === 'string' && rawAvatarUrl.trim().length > 0 ? rawAvatarUrl.trim() : null;
-        const resolvedAvatarPath =
-          typeof rawAvatarPath === 'string' && rawAvatarPath.trim().length > 0 ? rawAvatarPath.trim() : null;
 
         setUsername(resolvedName);
         setInitialUsername(resolvedName);
         setAvatarUrl(resolvedAvatarUrl);
         setInitialAvatarUrl(resolvedAvatarUrl);
-        setAvatarPath(resolvedAvatarPath);
       } catch {
         if (!mounted) return;
         setError('Falha ao carregar dados do usuario.');
@@ -251,7 +246,6 @@ export default function ProfileSection() {
     const issues: string[] = [];
     let nextDisplayName = initialUsername;
     let nextAvatarUrl = initialAvatarUrl;
-    let nextAvatarPath = avatarPath;
     let hasSuccessfulChange = false;
 
     try {
@@ -261,7 +255,6 @@ export default function ProfileSection() {
             display_name: nextName,
             name: nextName,
             ...(initialAvatarUrl ? { avatar_url: initialAvatarUrl } : {}),
-            ...(avatarPath ? { avatar_path: avatarPath } : {}),
           },
         });
 
@@ -280,10 +273,8 @@ export default function ProfileSection() {
           issues.push(result.error ?? 'nao foi possivel remover o avatar');
         } else {
           nextAvatarUrl = null;
-          nextAvatarPath = null;
           setAvatarUrl(null);
           setInitialAvatarUrl(null);
-          setAvatarPath(null);
           setPendingAvatarFile(null);
           setCropSource(null);
           setShouldRemoveAvatar(false);
@@ -302,10 +293,8 @@ export default function ProfileSection() {
           issues.push(result.error ?? 'nao foi possivel salvar o avatar');
         } else {
           nextAvatarUrl = result.avatarUrl;
-          nextAvatarPath = result.avatarPath;
           setAvatarUrl(result.avatarUrl);
           setInitialAvatarUrl(result.avatarUrl);
-          setAvatarPath(result.avatarPath);
           setPendingAvatarFile(null);
           setPendingAvatarCrop(null);
           setCropSource(null);
@@ -331,7 +320,6 @@ export default function ProfileSection() {
       setInitialUsername(nextDisplayName);
       setUsername(nextDisplayName);
       setInitialAvatarUrl(nextAvatarUrl);
-      setAvatarPath(nextAvatarPath);
       setSaved(true);
     } catch (saveError) {
       const message = saveError instanceof Error ? saveError.message : 'Falha ao salvar perfil.';

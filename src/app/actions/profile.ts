@@ -68,6 +68,18 @@ function resolveAvatarMetadata(user: { user_metadata?: Record<string, unknown> }
   };
 }
 
+function getAvatarFilePath(userId: string) {
+  return `${userId}/avatar.webp`;
+}
+
+function getAvatarPublicUrl(filePath: string, adminClient: NonNullable<ReturnType<typeof createAdminClient>>) {
+  const {
+    data: { publicUrl },
+  } = adminClient.storage.from(AVATAR_BUCKET).getPublicUrl(filePath);
+
+  return `${publicUrl}?v=${Date.now()}`;
+}
+
 async function removeAvatarFile(filePath: string | null) {
   if (!filePath) return;
 
@@ -154,7 +166,6 @@ async function buildAvatarUploadPayload(params: {
   return {
     bytes: new Uint8Array(buffer),
     contentType: 'image/webp',
-    extension: 'webp',
   };
 }
 
@@ -244,11 +255,11 @@ export async function uploadProfileAvatar(formData: FormData) {
     }
 
     const currentAvatar = resolveAvatarMetadata(user);
-    const filePath = `${user.id}/avatar-${Date.now()}.${processedAvatar.extension}`;
+    const filePath = getAvatarFilePath(user.id);
 
     const { error: uploadError } = await adminClient.storage.from(AVATAR_BUCKET).upload(filePath, processedAvatar.bytes, {
       contentType: processedAvatar.contentType,
-      upsert: false,
+      upsert: true,
     });
 
     if (uploadError) {
@@ -262,14 +273,12 @@ export async function uploadProfileAvatar(formData: FormData) {
       return verification;
     }
 
-    const {
-      data: { publicUrl },
-    } = adminClient.storage.from(AVATAR_BUCKET).getPublicUrl(filePath);
+    const publicUrl = getAvatarPublicUrl(filePath, adminClient);
 
     const { error: updateError } = await userClient.auth.updateUser({
       data: {
         ...user.user_metadata,
-        avatar_path: filePath,
+        avatar_path: null,
         avatar_url: publicUrl,
       },
     });
@@ -287,7 +296,6 @@ export async function uploadProfileAvatar(formData: FormData) {
     return {
       success: true as const,
       avatarUrl: publicUrl,
-      avatarPath: filePath,
     };
   } catch (error) {
     console.error('[Profile Avatar] Falha inesperada no upload:', error);
@@ -305,6 +313,8 @@ export async function removeProfileAvatar() {
     }
 
     const currentAvatar = resolveAvatarMetadata(user);
+    const filePath = getAvatarFilePath(user.id);
+
     if (!currentAvatar.avatarPath && !currentAvatar.avatarUrl) {
       return { success: true as const };
     }
@@ -322,7 +332,10 @@ export async function removeProfileAvatar() {
       return { success: false as const, error: 'Nao foi possivel remover o avatar agora.' };
     }
 
-    await removeAvatarFile(currentAvatar.avatarPath);
+    await removeAvatarFile(filePath);
+    if (currentAvatar.avatarPath && currentAvatar.avatarPath !== filePath) {
+      await removeAvatarFile(currentAvatar.avatarPath);
+    }
     return { success: true as const };
   } catch (error) {
     console.error('[Profile Avatar] Falha inesperada na remocao:', error);

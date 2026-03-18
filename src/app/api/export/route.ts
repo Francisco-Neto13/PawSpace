@@ -19,7 +19,6 @@ async function getTreeExport(userId: string) {
     where: { userId },
     select: {
       id: true,
-      userId: true,
       name: true,
       description: true,
       icon: true,
@@ -57,7 +56,6 @@ async function getJournalExport(userId: string) {
     where: { userId },
     select: {
       id: true,
-      userId: true,
       skillId: true,
       title: true,
       body: true,
@@ -75,14 +73,11 @@ async function getLibraryExport(userId: string) {
     where: { userId },
     select: {
       id: true,
-      userId: true,
       skillId: true,
       type: true,
       title: true,
       url: true,
-      fileKey: true,
       body: true,
-      metadata: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -122,7 +117,6 @@ export async function GET(request: Request) {
       version: '1.0',
       exportedAt: new Date().toISOString(),
       scope,
-      user: { id: userId },
       data,
     };
 

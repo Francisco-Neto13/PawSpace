@@ -9,7 +9,6 @@ type LibraryContentRow = {
   type: Content['type'] | string;
   title: string;
   url?: string | null;
-  fileKey?: string | null;
   body?: string | null;
   createdAt: Date | string;
 };

@@ -76,7 +76,6 @@ export function generateTreeLayout(
       position: { x: finalX, y: finalY },
       data: {
         id: skill.id,
-        userId: skill.userId,
         name: skill.name,
         label: skill.name,
         description: skill.description,

@@ -2,7 +2,6 @@ export type SkillShape = 'circle';
 
 export interface SkillData {
   id: string;
-  userId: string;
   name: string;
   label?: string;
   description?: string | null;

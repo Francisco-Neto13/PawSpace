@@ -9,6 +9,24 @@ const MAX_ENTRIES = LIMITS.quantity.journalEntries;
 const TITLE_MAX = LIMITS.journal.title;
 const BODY_MAX = LIMITS.journal.body;
 
+function toClientJournalEntry(entry: {
+  id: string;
+  title: string;
+  body: string;
+  skillId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}) {
+  return {
+    id: entry.id,
+    title: entry.title,
+    body: entry.body,
+    skillId: entry.skillId,
+    createdAt: entry.createdAt,
+    updatedAt: entry.updatedAt,
+  };
+}
+
 async function resolveOwnedSkillId(skillIdInput: string | null | undefined, userId: string) {
   if (skillIdInput === undefined || skillIdInput === null) return { skillId: null as string | null };
 
@@ -62,15 +80,31 @@ export async function saveJournalEntry(data: JournalInput) {
       ? await prisma.journalEntry.update({
           where: { id: data.id, userId },
           data: { title, body, skillId: skillResolution.skillId },
+          select: {
+            id: true,
+            title: true,
+            body: true,
+            skillId: true,
+            createdAt: true,
+            updatedAt: true,
+          },
         })
       : await prisma.journalEntry.create({
           data: { title, body, userId, skillId: skillResolution.skillId },
+          select: {
+            id: true,
+            title: true,
+            body: true,
+            skillId: true,
+            createdAt: true,
+            updatedAt: true,
+          },
         });
 
     console.log(`[DB] Persistência Prisma: ${Date.now() - dbStart}ms`);
     revalidatePath('/journal');
     console.log(`[Journal] Operação total finalizada em: ${Date.now() - totalStart}ms`);
-    return { success: true, entry };
+    return { success: true, entry: toClientJournalEntry(entry) };
   } catch (error) {
     console.error('[Journal Mutation] Erro ao salvar entrada:', error);
     return { success: false };

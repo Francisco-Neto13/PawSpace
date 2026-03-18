@@ -26,6 +26,32 @@ export interface SkillMutationInput {
 
 export type PawSpaceSkillNodeInput = Node<SkillData>;
 
+function toClientSkill(skill: {
+  id: string;
+  name: string;
+  description: string | null;
+  icon: string | null;
+  color: string | null;
+  category: string;
+  shape: string;
+  parentId: string | null;
+  positionX: number;
+  positionY: number;
+}) {
+  return {
+    id: skill.id,
+    name: skill.name,
+    description: skill.description,
+    icon: skill.icon,
+    color: skill.color,
+    category: skill.category,
+    shape: skill.shape,
+    parentId: skill.parentId,
+    positionX: skill.positionX,
+    positionY: skill.positionY,
+  };
+}
+
 function hasOwn<T extends object>(obj: T, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(obj, key);
 }
@@ -94,8 +120,20 @@ export async function addSkill(data: SkillMutationInput) {
         positionX: Number.isFinite(data.positionX) ? Number(data.positionX) : 0,
         positionY: Number.isFinite(data.positionY) ? Number(data.positionY) : 0,
       },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        icon: true,
+        color: true,
+        category: true,
+        shape: true,
+        parentId: true,
+        positionX: true,
+        positionY: true,
+      },
     });
-    return { success: true, skill: newSkill };
+    return { success: true, skill: toClientSkill(newSkill) };
   } catch (error) {
     console.error('[Pawspace Mutation] Erro ao criar skill:', error);
     return { success: false };
@@ -141,8 +179,20 @@ export async function updateSkill(skillId: string, data: SkillMutationInput) {
     const updated = await prisma.skill.update({
       where: { id: skillId, userId },
       data: updateData,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        icon: true,
+        color: true,
+        category: true,
+        shape: true,
+        parentId: true,
+        positionX: true,
+        positionY: true,
+      },
     });
-    return { success: true, skill: updated };
+    return { success: true, skill: toClientSkill(updated) };
   } catch (error) {
     console.error(`[Pawspace Mutation] Erro ao atualizar skill ${skillId}:`, error);
     return { success: false };

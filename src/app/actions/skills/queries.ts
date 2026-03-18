@@ -13,7 +13,6 @@ export async function getSkillsFull() {
       where: { userId },
       select: {
         id: true,
-        userId: true,
         name: true,
         description: true,
         icon: true,

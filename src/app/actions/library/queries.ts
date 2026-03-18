@@ -15,6 +15,27 @@ type LibraryTypeStatsByUserResult =
   | { status: 'ok'; byType: LibraryTypeStat[]; totalContents: number; totalNodes: number }
   | { status: 'error'; byType: []; totalContents: 0; totalNodes: 0 };
 
+function toClientContent(content: {
+  id: string;
+  skillId: string;
+  type: string;
+  title: string;
+  url: string | null;
+  fileKey: string | null;
+  body: string | null;
+  createdAt: Date;
+}) {
+  return {
+    id: content.id,
+    skillId: content.skillId,
+    type: content.type,
+    title: content.title,
+    url: content.type === 'pdf' && content.fileKey ? `/api/library/files/${content.id}` : content.url,
+    body: content.body,
+    createdAt: content.createdAt,
+  };
+}
+
 export async function getContentsBySkill(skillId: string) {
   try {
     const userId = await getAuthUser();
@@ -35,7 +56,7 @@ export async function getContentsBySkill(skillId: string) {
       orderBy: { createdAt: 'asc' },
     });
     console.log(`⏱️  [Library DB] Fetch Contents: ${Date.now() - dbStart}ms`);
-    return contents;
+    return contents.map(toClientContent);
   } catch (error) {
     console.error('❌ [Library Query] Erro ao buscar conteúdos:', error);
     return [];
@@ -83,7 +104,7 @@ export async function getAllContentsForLibrary() {
       orderBy: { createdAt: 'asc' },
     });
     console.log(`⏱️  [Library DB] Fetch All Contents: ${Date.now() - dbStart}ms`);
-    return contents;
+    return contents.map(toClientContent);
   } catch (error) {
     console.error('❌ [Library Query] Erro ao buscar conteúdos da biblioteca:', error);
     return [];

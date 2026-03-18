@@ -50,7 +50,15 @@ export async function getJournalEntryById(id: string) {
   try {
     const start = Date.now();
     const entry = await prisma.journalEntry.findUnique({
-      where: { id, userId }
+      where: { id, userId },
+      select: {
+        id: true,
+        title: true,
+        body: true,
+        skillId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
     console.log(`⏱️  [DB] Fetch Unique Journal: ${Date.now() - start}ms`);
     return entry;

@@ -22,8 +22,11 @@ function chunkArray<T>(items: T[], size: number) {
 async function removeStoredFiles(fileKeys: string[], userClient: ServerSupabaseClient) {
   if (fileKeys.length === 0) return;
 
+  const adminClient = createAdminClient();
+  const storageClient = adminClient ?? userClient;
+
   for (const batch of chunkArray(fileKeys, STORAGE_DELETE_BATCH_SIZE)) {
-    const { error } = await userClient.storage.from(PDF_BUCKET).remove(batch);
+    const { error } = await storageClient.storage.from(PDF_BUCKET).remove(batch);
     if (error) {
       console.warn('[Account Delete] Nao foi possivel remover alguns PDFs da estante:', error.message);
     }
