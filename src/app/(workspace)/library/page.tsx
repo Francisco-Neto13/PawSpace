@@ -1,4 +1,4 @@
-﻿import { Suspense } from 'react';
+import { Suspense } from 'react';
 import LibraryContentPage from "@/components/library/pages/LibraryPage";
 
 export default function LibraryPage() {
@@ -12,4 +12,3 @@ export default function LibraryPage() {
     </Suspense>
   );
 }
-

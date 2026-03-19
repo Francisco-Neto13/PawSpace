@@ -44,6 +44,8 @@ export async function proxy(request: NextRequest) {
   const isResetPasswordRoute = url.pathname.startsWith('/reset-password')
   const isAuthCallbackRoute = url.pathname.startsWith('/auth/callback')
   const isPublicApiRoute = url.pathname.startsWith('/api/auth/')
+  const isRobotsRoute = url.pathname === '/robots.txt'
+  const isSitemapRoute = url.pathname === '/sitemap.xml'
   const hasRecoveryCode = Boolean(url.searchParams.get('code'))
   const hasRecoveryTokenHash = Boolean(url.searchParams.get('token_hash'))
   const isRecoveryFlow =
@@ -59,7 +61,17 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (!user && !isHomeRoute && !isLandingRoute && !isLoginRoute && !isResetPasswordRoute && !isAuthCallbackRoute && !isPublicApiRoute) {
+  if (
+    !user &&
+    !isHomeRoute &&
+    !isLandingRoute &&
+    !isLoginRoute &&
+    !isResetPasswordRoute &&
+    !isAuthCallbackRoute &&
+    !isPublicApiRoute &&
+    !isRobotsRoute &&
+    !isSitemapRoute
+  ) {
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }

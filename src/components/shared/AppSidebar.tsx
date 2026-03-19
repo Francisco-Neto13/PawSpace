@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/shared/supabase/client';
+import { useAuthTransition } from '@/shared/contexts/AuthTransitionContext';
 import { usePawSpaceMeta } from '@/shared/contexts/PawSpaceContext';
 import { useJournal } from '@/shared/contexts/JournalContext';
 import { useTheme } from '@/shared/contexts/ThemeContext';
@@ -20,6 +21,7 @@ export default function AppSidebar() {
   const router = useRouter();
   const supabase = createClient();
   const { theme } = useTheme();
+  const { beginAuthTransition, cancelAuthTransition } = useAuthTransition();
 
   const { displayName, avatarUrl, isLoading: isLoadingDisplayName } = useAuthDisplayName();
   const { isDirty, setIsDirty, discardLocalChanges } = usePawSpaceMeta();
@@ -70,11 +72,16 @@ export default function AppSidebar() {
     }
 
     try {
+      await beginAuthTransition({
+        kind: 'exit',
+        title: 'Saindo do PawSpace',
+      });
       await flushPending();
       await supabase.auth.signOut();
       router.push('/login');
       router.refresh();
     } catch (error) {
+      cancelAuthTransition();
       console.error('Erro ao sair:', error);
     }
   };

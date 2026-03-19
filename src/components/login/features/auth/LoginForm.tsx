@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, LockKeyhole, Mail, User } from 'lucide-react';
@@ -19,6 +19,7 @@ import {
   SIGNUP_PASSWORD_REQUIREMENTS,
 } from '@/components/login/features/auth/loginFormUtils';
 import { LIMITS } from '@/lib/limits';
+import { useAuthTransition } from '@/shared/contexts/AuthTransitionContext';
 import { reportAuthDebug } from '@/shared/lib/authDebug';
 import { createClient } from '@/shared/supabase/client';
 
@@ -43,6 +44,8 @@ export default function LoginForm() {
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const router = useRouter();
   const [supabase] = useState(() => createClient());
+  const { beginAuthTransition } = useAuthTransition();
+  const authRedirectStartedRef = useRef(false);
 
   const isSignup = mode === 'signup';
   const shouldShowTurnstile = Boolean(turnstileSiteKey);
@@ -58,6 +61,19 @@ export default function LoginForm() {
     setTurnstileToken(null);
     setTurnstileResetKey((current) => current + 1);
   }
+
+  const redirectToOverview = useCallback(async () => {
+    if (authRedirectStartedRef.current) return;
+    authRedirectStartedRef.current = true;
+
+    await beginAuthTransition({
+      kind: 'enter',
+      title: 'Entrando no PawSpace',
+    });
+
+    router.replace('/overview');
+    router.refresh();
+  }, [beginAuthTransition, router]);
 
   useEffect(() => {
     if (!isSignup || !password) {
@@ -83,8 +99,7 @@ export default function LoginForm() {
 
       if (!isActive || !session) return;
 
-      router.replace('/overview');
-      router.refresh();
+      await redirectToOverview();
     };
 
     const handleVisibilityChange = () => {
@@ -97,8 +112,7 @@ export default function LoginForm() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
       if (!isActive || !session) return;
-      router.replace('/overview');
-      router.refresh();
+      void redirectToOverview();
     });
 
     window.addEventListener('focus', syncIfSessionExists);
@@ -111,7 +125,7 @@ export default function LoginForm() {
       window.removeEventListener('focus', syncIfSessionExists);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [router, supabase]);
+  }, [redirectToOverview, supabase]);
 
   function resetCaptchaChallenge() {
     setTurnstileToken(null);
@@ -183,8 +197,7 @@ export default function LoginForm() {
       return;
     }
 
-    router.replace('/overview');
-    router.refresh();
+    await redirectToOverview();
   }
 
   async function handleSignUp() {
@@ -255,8 +268,7 @@ export default function LoginForm() {
     }
 
     if (data.session) {
-      router.replace('/overview');
-      router.refresh();
+      await redirectToOverview();
       return;
     }
 

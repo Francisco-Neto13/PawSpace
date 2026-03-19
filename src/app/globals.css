@@ -538,6 +538,24 @@ h1, h2, h3, h4, h5, h6, button, .skill-label-text {
 .reveal-up   { opacity: 0; animation: reveal-up   0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .reveal-fade { opacity: 0; animation: reveal-fade  0.8s ease forwards; }
 .reveal-line { transform-origin: left; animation: reveal-line 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@keyframes auth-transition-bar {
+  0% {
+    transform: translateX(-12%) scaleX(0.72);
+    opacity: 0.42;
+  }
+  50% {
+    transform: translateX(78%) scaleX(1.14);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(150%) scaleX(0.82);
+    opacity: 0.2;
+  }
+}
+.auth-transition-bar {
+  animation: auth-transition-bar 1.25s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  transform-origin: left center;
+}
 .delay-0   { animation-delay: 0ms; }
 .delay-100 { animation-delay: 150ms; }
 .delay-200 { animation-delay: 300ms; }

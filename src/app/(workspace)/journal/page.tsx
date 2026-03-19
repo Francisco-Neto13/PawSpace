@@ -1,4 +1,5 @@
 'use client';
+
 import { Suspense } from 'react';
 import JournalPage from '@/components/journal/pages/JournalPage';
 
