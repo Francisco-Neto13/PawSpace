@@ -8,7 +8,7 @@ type TurnstileWidgetProps = {
   resetKey: number;
   onVerify: (token: string) => void;
   onExpire: () => void;
-  onError: () => void;
+  onError: (errorCode?: string) => void;
 };
 
 type TurnstileInstance = {
@@ -20,7 +20,7 @@ type TurnstileInstance = {
       size?: 'normal' | 'flexible' | 'compact';
       callback?: (token: string) => void;
       'expired-callback'?: () => void;
-      'error-callback'?: () => void;
+      'error-callback'?: (errorCode?: string) => void;
     }
   ) => string;
   reset: (widgetId: string) => void;
@@ -62,7 +62,7 @@ export default function TurnstileWidget({
         size: 'flexible',
         callback: (token) => verifyRef.current(token),
         'expired-callback': () => expireRef.current(),
-        'error-callback': () => errorRef.current(),
+        'error-callback': (errorCode) => errorRef.current(errorCode),
       });
     };
 

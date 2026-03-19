@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { Check, Loader2 } from 'lucide-react';
+
+import { getEmailRateLimitMessage, isEmailRateLimitError } from '@/components/login/features/auth/loginFormUtils';
 import { PawIcon } from '@/components/shared/PawIcon';
 import { createClient } from '@/shared/supabase/client';
 import { LIMITS } from '@/lib/limits';
@@ -114,6 +116,11 @@ export default function EmailSection() {
       });
 
       if (updateError) {
+        if (isEmailRateLimitError(updateError.message)) {
+          setError(getEmailRateLimitMessage());
+          return;
+        }
+
         setError(updateError.message);
         return;
       }

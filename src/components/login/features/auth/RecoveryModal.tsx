@@ -2,8 +2,10 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { LockKeyhole, Mail } from 'lucide-react';
-import { createClient } from '@/shared/supabase/client';
+import TurnstileWidget from '@/components/login/features/auth/TurnstileWidget';
+import { getEmailRateLimitMessage, isEmailRateLimitError } from '@/components/login/features/auth/loginFormUtils';
 import { LIMITS } from '@/lib/limits';
+import { createClient } from '@/shared/supabase/client';
 
 interface RecoveryModalProps {
   onClose: () => void;
@@ -12,33 +14,58 @@ interface RecoveryModalProps {
 const EMAIL_MAX_LENGTH = LIMITS.auth.email;
 
 export default function RecoveryModal({ onClose }: RecoveryModalProps) {
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
   const [animate, setAnimate] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const supabase = createClient();
+  const shouldShowTurnstile = Boolean(turnstileSiteKey);
 
   useEffect(() => {
     const timer = setTimeout(() => setAnimate(true), 10);
     return () => clearTimeout(timer);
   }, []);
 
+  function resetCaptchaChallenge() {
+    setTurnstileToken(null);
+    setTurnstileResetKey((current) => current + 1);
+  }
+
   async function handleReset(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
     setError('');
 
+    if (shouldShowTurnstile && !turnstileToken) {
+      setError('Confirme que você não é um robô para continuar.');
+      setLoading(false);
+      return;
+    }
+
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=%2Freset-password`,
+      redirectTo: `${window.location.origin}/reset-password`,
+      ...(turnstileToken ? { captchaToken: turnstileToken } : {}),
     });
 
     setLoading(false);
 
     if (resetError) {
-      if (resetError.status === 429 || resetError.message.includes('rate limit')) {
-        setError('Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.');
+      if (shouldShowTurnstile) {
+        resetCaptchaChallenge();
+      }
+
+      if (resetError.message.toLowerCase().includes('captcha')) {
+        setError('Confirme a verificação de segurança e tente novamente.');
+        return;
+      }
+
+      if (resetError.status === 429 || isEmailRateLimitError(resetError.message)) {
+        setError(getEmailRateLimitMessage());
         setIsBlocked(true);
       } else {
         setError('Não foi possível enviar o link. Verifique o endereço de e-mail.');
@@ -103,6 +130,34 @@ export default function RecoveryModal({ onClose }: RecoveryModalProps) {
                 </div>
               </div>
 
+              {shouldShowTurnstile && turnstileSiteKey ? (
+                <div>
+                  <label className="ml-1 mb-2 block text-[9px] font-black uppercase tracking-[0.25em] text-[var(--text-muted)]">
+                    Verificação de segurança
+                  </label>
+                  <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-4">
+                    <TurnstileWidget
+                      siteKey={turnstileSiteKey}
+                      resetKey={turnstileResetKey}
+                      onVerify={(token) => {
+                        setTurnstileToken(token);
+                        setError('');
+                      }}
+                      onExpire={() => {
+                        setTurnstileToken(null);
+                      }}
+                      onError={(errorCode) => {
+                        console.error('[Auth][turnstile] Widget error during password recovery', {
+                          errorCode,
+                        });
+                        setTurnstileToken(null);
+                        setError('A verificação de segurança falhou. Tente novamente.');
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : null}
+
               {error && (
                 <div className="flex items-center gap-2.5 rounded-2xl border border-[#4e2331] bg-[#1b1017] px-4 py-3 text-[10px] font-bold text-[#ffb4c4]">
                   <svg
@@ -135,7 +190,7 @@ export default function RecoveryModal({ onClose }: RecoveryModalProps) {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading || isBlocked}
+                  disabled={loading || isBlocked || (shouldShowTurnstile && !turnstileToken)}
                   className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[var(--text-primary)] py-3 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--bg-base)] transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading ? (

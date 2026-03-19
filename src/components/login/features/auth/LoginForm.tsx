@@ -13,10 +13,13 @@ import TurnstileWidget from '@/components/login/features/auth/TurnstileWidget';
 import {
   type AuthMode,
   getPasswordStrength,
+  isPasswordAllowedForSignUp,
   mapAuthError,
   mapSignUpError,
+  SIGNUP_PASSWORD_REQUIREMENTS,
 } from '@/components/login/features/auth/loginFormUtils';
 import { LIMITS } from '@/lib/limits';
+import { reportAuthDebug } from '@/shared/lib/authDebug';
 import { createClient } from '@/shared/supabase/client';
 
 const NAME_MAX_LENGTH = LIMITS.auth.displayName;
@@ -110,6 +113,24 @@ export default function LoginForm() {
     };
   }, [router, supabase]);
 
+  function resetCaptchaChallenge() {
+    setTurnstileToken(null);
+    setTurnstileResetKey((current) => current + 1);
+  }
+
+  function getRequiredCaptchaToken() {
+    if (!shouldShowTurnstile) {
+      return null;
+    }
+
+    if (!turnstileToken) {
+      setError('Confirme que você não é um robô para continuar.');
+      return null;
+    }
+
+    return turnstileToken;
+  }
+
   async function verifyTurnstileToken() {
     if (!shouldShowTurnstile) {
       return true;
@@ -140,18 +161,23 @@ export default function LoginForm() {
     return true;
   }
 
+  void verifyTurnstileToken;
+
   async function handleLogin() {
-    const isTurnstileValid = await verifyTurnstileToken();
-    if (!isTurnstileValid) {
+    const captchaToken = getRequiredCaptchaToken();
+    if (shouldShowTurnstile && !captchaToken) {
       return;
     }
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: captchaToken ? { captchaToken } : undefined,
+    });
 
     if (signInError) {
       if (shouldShowTurnstile) {
-        setTurnstileToken(null);
-        setTurnstileResetKey((current) => current + 1);
+        resetCaptchaChallenge();
       }
       setError(mapAuthError(signInError.message));
       return;
@@ -174,13 +200,18 @@ export default function LoginForm() {
       return;
     }
 
+    if (!isPasswordAllowedForSignUp(password)) {
+      setError(SIGNUP_PASSWORD_REQUIREMENTS);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('As senhas não coincidem.');
       return;
     }
 
-    const isTurnstileValid = await verifyTurnstileToken();
-    if (!isTurnstileValid) {
+    const captchaToken = getRequiredCaptchaToken();
+    if (shouldShowTurnstile && !captchaToken) {
       return;
     }
 
@@ -188,6 +219,7 @@ export default function LoginForm() {
       email,
       password,
       options: {
+        ...(captchaToken ? { captchaToken } : {}),
         emailRedirectTo: `${window.location.origin}/auth/callback?next=%2Foverview`,
         data: {
           display_name: trimmedName,
@@ -197,9 +229,26 @@ export default function LoginForm() {
     });
 
     if (signUpError) {
+      const debugDetails = {
+        raw: signUpError,
+        name: signUpError.name,
+        message: signUpError.message,
+        status: signUpError.status,
+        code: 'code' in signUpError ? signUpError.code : undefined,
+        stringified: String(signUpError),
+        ownKeys: Object.getOwnPropertyNames(signUpError),
+        hasCaptchaToken: Boolean(captchaToken),
+        emailDomain: email.split('@')[1] ?? null,
+        redirectTo: `${window.location.origin}/auth/callback?next=%2Foverview`,
+      };
+
+      console.error('[Auth][signUp] Supabase sign up failed', debugDetails);
+      void reportAuthDebug({
+        stage: 'sign_up_failure',
+        details: debugDetails,
+      });
       if (shouldShowTurnstile) {
-        setTurnstileToken(null);
-        setTurnstileResetKey((current) => current + 1);
+        resetCaptchaChallenge();
       }
       setError(mapSignUpError(signUpError.message));
       return;
@@ -352,6 +401,12 @@ export default function LoginForm() {
                   <span>{showPassword ? 'Ocultar' : 'Exibir'}</span>
                 </button>
               </div>
+
+              {isSignup && (
+                <p className="mt-2 ml-1 text-[9px] leading-5 text-[var(--text-muted)]">
+                  Mínimo de 6 caracteres com letra maiúscula, letra minúscula, número e símbolo.
+                </p>
+              )}
 
               {isSignup && showPasswordStrength && password.length > 0 && (
                 <div className="mt-3">

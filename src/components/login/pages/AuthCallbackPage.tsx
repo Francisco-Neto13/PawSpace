@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
+
 import { createClient } from '@/shared/supabase/client';
 
 export default function AuthCallbackPage() {
   const [status, setStatus] = useState<'loading' | 'success'>('loading');
-  const [message, setMessage] = useState('Criando conta...');
+  const [message, setMessage] = useState('Criando seu PawSpace...');
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -139,17 +140,11 @@ export default function AuthCallbackPage() {
     <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[var(--bg-base)] px-6 text-center">
       {status === 'loading' ? (
         <>
-          <div className="w-8 h-8 border-2 border-[var(--border-visible)] border-t-[var(--text-primary)] rounded-full animate-spin" />
-          <p className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)] animate-pulse">
-            {message}
-          </p>
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--border-visible)] border-t-[var(--text-primary)]" />
+          <p className="button-label mt-4 animate-pulse text-[var(--text-primary)]">{message}</p>
         </>
       ) : (
-        <>
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-primary)]">
-            {message}
-          </p>
-        </>
+        <p className="button-label text-[var(--text-primary)]">{message}</p>
       )}
     </div>
   );

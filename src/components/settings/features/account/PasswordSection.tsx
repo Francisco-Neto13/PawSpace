@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff, Check, Loader2 } from 'lucide-react';
+
+import TurnstileWidget from '@/components/login/features/auth/TurnstileWidget';
 import { PawIcon } from '@/components/shared/PawIcon';
-import { createClient } from '@/shared/supabase/client';
 import { LIMITS } from '@/lib/limits';
+import { createClient } from '@/shared/supabase/client';
 
 const PASSWORD_MAX = LIMITS.auth.password;
 
@@ -25,20 +27,22 @@ function PasswordInput({
 
   return (
     <div>
-      <label className="field-label block mb-2">{label}</label>
+      <label className="field-label mb-2 block">{label}</label>
       <div className="relative">
         <input
           type={show ? 'text' : 'password'}
           value={value}
           maxLength={maxLength}
-          onChange={(event) => onChange(maxLength ? event.target.value.slice(0, maxLength) : event.target.value)}
+          onChange={(event) =>
+            onChange(maxLength ? event.target.value.slice(0, maxLength) : event.target.value)
+          }
           placeholder={placeholder ?? '********'}
           className="library-input field-input h-10 px-3.5 pr-10 placeholder:text-[var(--text-faint)]"
         />
         <button
           type="button"
-          onClick={() => setShow((value) => !value)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-faint)] hover:text-[var(--text-secondary)] transition-colors"
+          onClick={() => setShow((currentValue) => !currentValue)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-faint)] transition-colors hover:text-[var(--text-secondary)]"
         >
           {show ? <EyeOff size={12} /> : <Eye size={12} />}
         </button>
@@ -48,6 +52,8 @@ function PasswordInput({
 }
 
 export default function PasswordSection() {
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const shouldShowTurnstile = Boolean(turnstileSiteKey);
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -56,13 +62,20 @@ export default function PasswordSection() {
   const [isSaving, setIsSaving] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+
+  function resetCaptchaChallenge() {
+    setTurnstileToken(null);
+    setTurnstileResetKey((currentKey) => currentKey + 1);
+  }
 
   useEffect(() => {
     let mounted = true;
     const loadingTimeout = window.setTimeout(() => {
       if (!mounted) return;
       setIsLoadingUser(false);
-      setError((prev) => prev ?? 'Não foi possível carregar o usuário.');
+      setError((previousError) => previousError ?? 'Não foi possível carregar o usuário.');
     }, 8000);
 
     const loadEmail = async () => {
@@ -124,6 +137,10 @@ export default function PasswordSection() {
       setError('Não foi possível validar o usuário atual.');
       return;
     }
+    if (shouldShowTurnstile && !turnstileToken) {
+      setError('Confirme que você não é um robô para continuar.');
+      return;
+    }
 
     setIsSaving(true);
     const savingWatchdog = window.setTimeout(() => {
@@ -137,9 +154,19 @@ export default function PasswordSection() {
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: userEmail,
         password: current,
+        options: turnstileToken ? { captchaToken: turnstileToken } : undefined,
       });
 
       if (signInError) {
+        if (shouldShowTurnstile) {
+          resetCaptchaChallenge();
+        }
+
+        if (signInError.message.toLowerCase().includes('captcha')) {
+          setError('Confirme a verificação de segurança e tente novamente.');
+          return;
+        }
+
         setError('Senha atual incorreta.');
         return;
       }
@@ -157,8 +184,12 @@ export default function PasswordSection() {
       setCurrent('');
       setNext('');
       setConfirm('');
+      if (shouldShowTurnstile) {
+        resetCaptchaChallenge();
+      }
     } catch (saveError) {
-      const message = saveError instanceof Error ? saveError.message : 'Falha ao atualizar senha.';
+      const message =
+        saveError instanceof Error ? saveError.message : 'Falha ao atualizar senha.';
       setError(message);
     } finally {
       window.clearTimeout(savingWatchdog);
@@ -167,11 +198,11 @@ export default function PasswordSection() {
   };
 
   return (
-    <section className="library-panel p-6 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
+    <section className="library-panel relative overflow-hidden p-6">
+      <div className="absolute left-0 right-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--shimmer-via)] to-transparent" />
 
       <p className="library-kicker mb-1 flex items-center gap-2">
-        <PawIcon className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
+        <PawIcon className="h-3 w-3 shrink-0 text-[var(--text-secondary)]" />
         Senha
       </p>
       <p className="library-subtitle mb-5 ml-3">segurança da sua toca no PawSpace</p>
@@ -179,17 +210,50 @@ export default function PasswordSection() {
       <div className="space-y-4">
         <PasswordInput label="Senha Atual" value={current} onChange={setCurrent} maxLength={PASSWORD_MAX} />
         <PasswordInput label="Nova Senha" value={next} onChange={setNext} maxLength={PASSWORD_MAX} />
-        <PasswordInput label="Confirmar Nova Senha" value={confirm} onChange={setConfirm} maxLength={PASSWORD_MAX} />
+        <PasswordInput
+          label="Confirmar Nova Senha"
+          value={confirm}
+          onChange={setConfirm}
+          maxLength={PASSWORD_MAX}
+        />
+
+        {shouldShowTurnstile && turnstileSiteKey ? (
+          <div>
+            <label className="field-label mb-2 block">Verificação de segurança</label>
+            <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-4">
+              <TurnstileWidget
+                siteKey={turnstileSiteKey}
+                resetKey={turnstileResetKey}
+                onVerify={(token) => {
+                  setTurnstileToken(token);
+                  setError(null);
+                }}
+                onExpire={() => {
+                  setTurnstileToken(null);
+                }}
+                onError={(errorCode) => {
+                  console.error('[Auth][turnstile] Widget error during password update', {
+                    errorCode,
+                  });
+                  setTurnstileToken(null);
+                  setError('A verificação de segurança falhou. Tente novamente.');
+                }}
+              />
+            </div>
+          </div>
+        ) : null}
 
         <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            {error && <p className="feedback-text text-red-400/80">{error}</p>}
-            {saved && !error && <p className="feedback-text text-[var(--text-secondary)]">Senha atualizada.</p>}
+            {error ? <p className="feedback-text text-red-400/80">{error}</p> : null}
+            {saved && !error ? (
+              <p className="feedback-text text-[var(--text-secondary)]">Senha atualizada.</p>
+            ) : null}
           </div>
           <button
             onClick={() => void handleSave()}
-            disabled={isLoadingUser || isSaving}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border px-4 button-label transition-all duration-200 disabled:opacity-60 sm:w-auto"
+            disabled={isLoadingUser || isSaving || (shouldShowTurnstile && !turnstileToken)}
+            className="button-label flex h-10 w-full items-center justify-center gap-2 rounded-xl border px-4 transition-all duration-200 disabled:opacity-60 sm:w-auto"
             style={{
               borderColor: saved ? 'var(--border-visible)' : 'var(--border-muted)',
               color: saved ? 'var(--text-primary)' : 'var(--text-secondary)',
