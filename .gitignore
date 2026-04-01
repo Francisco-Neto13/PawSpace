@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# local planning artifacts
+/.planning/
+
 # production
 /build
 

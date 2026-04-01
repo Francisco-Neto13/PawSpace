@@ -3,6 +3,7 @@
 import sharp from 'sharp';
 
 import { LIMITS } from '@/shared/lib/limits';
+import { enforceUserActionRateLimit, isUserScopedStoragePath } from '@/shared/server/actionSecurity';
 import { getCurrentUser } from '@/shared/server/auth';
 import { createAdminClient } from '@/shared/supabase/admin';
 import { createClient } from '@/shared/supabase/server';
@@ -10,7 +11,12 @@ import { createClient } from '@/shared/supabase/server';
 const AVATAR_BUCKET = 'profile-avatars';
 const AVATAR_SOURCE_MAX_BYTES = LIMITS.auth.avatarSourceMaxBytes;
 const AVATAR_MAX_BYTES = LIMITS.auth.avatarMaxBytes;
+const AVATAR_CROP_MAX_CHARS = 2000;
 const ALLOWED_AVATAR_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const AVATAR_UPLOAD_RATE_LIMIT = 10;
+const AVATAR_UPLOAD_WINDOW_MS = 10 * 60 * 1000;
+const AVATAR_REMOVE_RATE_LIMIT = 10;
+const AVATAR_REMOVE_WINDOW_MS = 10 * 60 * 1000;
 
 let hasEnsuredAvatarBucket = false;
 
@@ -80,8 +86,9 @@ function getAvatarPublicUrl(filePath: string, adminClient: NonNullable<ReturnTyp
   return `${publicUrl}?v=${Date.now()}`;
 }
 
-async function removeAvatarFile(filePath: string | null) {
+async function removeAvatarFile(filePath: string | null, userId?: string) {
   if (!filePath) return;
+  if (userId && !isUserScopedStoragePath(filePath, userId)) return;
 
   const adminClient = createAdminClient();
   if (!adminClient) return;
@@ -115,15 +122,61 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function parseAvatarCrop(rawValue: FormDataEntryValue | null) {
-  if (typeof rawValue !== 'string' || rawValue.trim().length === 0) {
-    return null;
+  if (rawValue === null) {
+    return { crop: null as AvatarCropPayload | null, invalid: false };
+  }
+
+  if (typeof rawValue !== 'string') {
+    return { crop: null as AvatarCropPayload | null, invalid: true };
+  }
+
+  const value = rawValue.trim();
+  if (!value) {
+    return { crop: null as AvatarCropPayload | null, invalid: false };
+  }
+
+  if (value.length > AVATAR_CROP_MAX_CHARS) {
+    return { crop: null as AvatarCropPayload | null, invalid: true };
   }
 
   try {
-    return JSON.parse(rawValue) as AvatarCropPayload;
+    const parsed = JSON.parse(value) as AvatarCropPayload;
+    return isValidAvatarCropPayload(parsed)
+      ? { crop: parsed, invalid: false }
+      : { crop: null as AvatarCropPayload | null, invalid: true };
   } catch {
-    return null;
+    return { crop: null as AvatarCropPayload | null, invalid: true };
   }
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function isValidAvatarCropPayload(value: AvatarCropPayload | null) {
+  if (!value || typeof value !== 'object' || typeof value.crop !== 'object' || !value.crop) {
+    return false;
+  }
+
+  const crop = value.crop;
+  return (
+    isFiniteNumber(crop.x) &&
+    isFiniteNumber(crop.y) &&
+    isFiniteNumber(crop.width) &&
+    isFiniteNumber(crop.height) &&
+    isFiniteNumber(value.naturalWidth) &&
+    isFiniteNumber(value.naturalHeight) &&
+    isFiniteNumber(value.renderedWidth) &&
+    isFiniteNumber(value.renderedHeight) &&
+    crop.x >= 0 &&
+    crop.y >= 0 &&
+    crop.width > 0 &&
+    crop.height > 0 &&
+    value.naturalWidth > 0 &&
+    value.naturalHeight > 0 &&
+    value.renderedWidth > 0 &&
+    value.renderedHeight > 0
+  );
 }
 
 async function buildAvatarUploadPayload(params: {
@@ -211,7 +264,22 @@ export async function uploadProfileAvatar(formData: FormData) {
     }
 
     const file = formData.get('file');
-    const cropPayload = parseAvatarCrop(formData.get('avatar_crop'));
+    const cropResult = parseAvatarCrop(formData.get('avatar_crop'));
+    if (cropResult.invalid) {
+      return { success: false as const, error: 'Recorte de avatar invalido.' };
+    }
+
+    const rateLimit = enforceUserActionRateLimit({
+      scope: 'upload-avatar',
+      userId: user.id,
+      limit: AVATAR_UPLOAD_RATE_LIMIT,
+      windowMs: AVATAR_UPLOAD_WINDOW_MS,
+    });
+    if (!rateLimit.allowed) {
+      return { success: false as const, error: 'Muitos envios de avatar. Tente novamente em instantes.' };
+    }
+
+    const cropPayload = cropResult.crop;
     if (!(file instanceof File)) {
       return { success: false as const, error: 'Nenhum arquivo de avatar foi enviado.' };
     }
@@ -269,7 +337,7 @@ export async function uploadProfileAvatar(formData: FormData) {
 
     const verification = await verifyUploadedAvatar(filePath);
     if (!verification.success) {
-      await removeAvatarFile(filePath);
+      await removeAvatarFile(filePath, user.id);
       return verification;
     }
 
@@ -284,13 +352,13 @@ export async function uploadProfileAvatar(formData: FormData) {
     });
 
     if (updateError) {
-      await removeAvatarFile(filePath);
+      await removeAvatarFile(filePath, user.id);
       console.error('[Profile Avatar] Falha ao salvar metadata do avatar:', updateError);
       return { success: false as const, error: 'Nao foi possivel vincular o avatar ao perfil.' };
     }
 
     if (currentAvatar.avatarPath && currentAvatar.avatarPath !== filePath) {
-      await removeAvatarFile(currentAvatar.avatarPath);
+      await removeAvatarFile(currentAvatar.avatarPath, user.id);
     }
 
     return {
@@ -310,6 +378,16 @@ export async function removeProfileAvatar() {
 
     if (!user) {
       return { success: false as const, error: 'Sessao nao encontrada.' };
+    }
+
+    const rateLimit = enforceUserActionRateLimit({
+      scope: 'remove-avatar',
+      userId: user.id,
+      limit: AVATAR_REMOVE_RATE_LIMIT,
+      windowMs: AVATAR_REMOVE_WINDOW_MS,
+    });
+    if (!rateLimit.allowed) {
+      return { success: false as const, error: 'Muitas tentativas de remocao de avatar. Tente novamente em instantes.' };
     }
 
     const currentAvatar = resolveAvatarMetadata(user);
@@ -332,13 +410,17 @@ export async function removeProfileAvatar() {
       return { success: false as const, error: 'Nao foi possivel remover o avatar agora.' };
     }
 
-    await removeAvatarFile(filePath);
-    if (currentAvatar.avatarPath && currentAvatar.avatarPath !== filePath) {
-      await removeAvatarFile(currentAvatar.avatarPath);
+    await removeAvatarFile(filePath, user.id);
+    if (currentAvatar.avatarPath && currentAvatar.avatarPath !== filePath && isUserScopedStoragePath(currentAvatar.avatarPath, user.id)) {
+      await removeAvatarFile(currentAvatar.avatarPath, user.id);
     }
     return { success: true as const };
   } catch (error) {
     console.error('[Profile Avatar] Falha inesperada na remocao:', error);
     return { success: false as const, error: 'Falha inesperada ao remover o avatar.' };
   }
+}
+
+export async function resetAvatarBucketStateForTests() {
+  hasEnsuredAvatarBucket = false;
 }

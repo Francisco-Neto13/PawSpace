@@ -2,12 +2,15 @@
 
 import prisma from '@/shared/lib/prisma';
 import { getCurrentUser, type ServerSupabaseClient } from '@/shared/server/auth';
+import { enforceUserActionRateLimit, isUserScopedStoragePath } from '@/shared/server/actionSecurity';
 import { createAdminClient } from '@/shared/supabase/admin';
 import { createClient } from '@/shared/supabase/server';
 
 const PDF_BUCKET = 'biblioteca-pdfs';
 const AVATAR_BUCKET = 'profile-avatars';
 const STORAGE_DELETE_BATCH_SIZE = 100;
+const ACCOUNT_DELETE_RATE_LIMIT = 3;
+const ACCOUNT_DELETE_WINDOW_MS = 60 * 60 * 1000;
 
 function chunkArray<T>(items: T[], size: number) {
   const chunks: T[][] = [];
@@ -81,6 +84,19 @@ export async function deleteCurrentAccount() {
       return { success: false, error: 'Sessao nao encontrada.' };
     }
 
+    const rateLimit = enforceUserActionRateLimit({
+      scope: 'delete-account',
+      userId: user.id,
+      limit: ACCOUNT_DELETE_RATE_LIMIT,
+      windowMs: ACCOUNT_DELETE_WINDOW_MS,
+    });
+    if (!rateLimit.allowed) {
+      return {
+        success: false,
+        error: 'Muitas tentativas de exclusao de conta. Tente novamente mais tarde.',
+      };
+    }
+
     const adminClient = createAdminClient();
     if (!adminClient) {
       return {
@@ -101,11 +117,18 @@ export async function deleteCurrentAccount() {
       },
     });
 
-    const fileKeys = [...new Set(storedFiles.map((item) => item.fileKey).filter(Boolean) as string[])];
+    const fileKeys = [
+      ...new Set(
+        storedFiles
+          .map((item) => item.fileKey)
+          .filter((value): value is string => isUserScopedStoragePath(value, user.id))
+      ),
+    ];
     await removeStoredFiles(fileKeys, supabase);
 
     const avatarPath =
-      typeof user.user_metadata?.avatar_path === 'string' && user.user_metadata.avatar_path.trim().length > 0
+      typeof user.user_metadata?.avatar_path === 'string' &&
+      isUserScopedStoragePath(user.user_metadata.avatar_path, user.id)
         ? user.user_metadata.avatar_path.trim()
         : null;
     await removeAvatarFile(avatarPath, supabase);

@@ -110,6 +110,10 @@ function getOrderColumn(availableColumns: Set<SessionColumn>) {
   return 'id';
 }
 
+function toColumnFragment(column: SessionColumn) {
+  return Prisma.raw(`"${column}"`);
+}
+
 function toIsoString(value: string | Date | null | undefined) {
   if (!value) return null;
   if (value instanceof Date) return value.toISOString();
@@ -154,18 +158,16 @@ export async function getUserSessions(): Promise<UserSessionsResult> {
     }
 
     const orderColumn = getOrderColumn(available);
-    const selectedColumnsSql = selected.map((column) => `"${column}"`).join(', ');
+    const selectedColumnsSql = Prisma.join(selected.map((column) => toColumnFragment(column)), ', ');
+    const orderColumnSql = toColumnFragment(orderColumn);
 
-    const rows = await prisma.$queryRawUnsafe<AuthSessionRow[]>(
-      `
-        SELECT ${selectedColumnsSql}
-        FROM auth.sessions
-        WHERE "user_id" = $1::uuid
-        ORDER BY "${orderColumn}" DESC NULLS LAST
-        LIMIT 20
-      `,
-      user.id
-    );
+    const rows = await prisma.$queryRaw<AuthSessionRow[]>(Prisma.sql`
+      SELECT ${selectedColumnsSql}
+      FROM auth.sessions
+      WHERE "user_id" = CAST(${user.id} AS uuid)
+      ORDER BY ${orderColumnSql} DESC NULLS LAST
+      LIMIT 20
+    `);
 
     const sessions = rows
       .map((row) => toSessionItem(row, currentSessionId))
@@ -176,4 +178,8 @@ export async function getUserSessions(): Promise<UserSessionsResult> {
     console.error('[Sessions] Falha ao consultar auth.sessions:', error);
     return { status: 'limited', sessions: [] };
   }
+}
+
+export function resetSessionColumnCache() {
+  cachedSessionColumns = null;
 }

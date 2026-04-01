@@ -2,6 +2,13 @@
 
 import prisma from '@/shared/lib/prisma';
 import { createAdminClient } from '@/shared/supabase/admin';
+import {
+  enforceUserActionRateLimit,
+  isUserScopedStoragePath,
+  looksLikePdfBytes,
+  normalizeHttpUrl,
+  validateIdentifier,
+} from '@/shared/server/actionSecurity';
 import { getAuthUser } from '@/shared/server/auth';
 import { ContentInput } from './types';
 import { LIMITS } from '@/shared/lib/limits';
@@ -13,6 +20,15 @@ const BODY_MAX = LIMITS.library.body;
 const PDF_MAX_BYTES = LIMITS.library.pdfMaxBytes;
 const PDF_BUCKET = 'biblioteca-pdfs';
 const PDF_MIME_TYPES = ['application/pdf'];
+const CONTENT_ID_MAX = 128;
+const SKILL_ID_MAX = 128;
+const ADD_CONTENT_RATE_LIMIT = 30;
+const ADD_CONTENT_WINDOW_MS = 5 * 60 * 1000;
+const DELETE_CONTENT_RATE_LIMIT = 30;
+const DELETE_CONTENT_WINDOW_MS = 5 * 60 * 1000;
+const UPLOAD_PDF_RATE_LIMIT = 10;
+const UPLOAD_PDF_WINDOW_MS = 10 * 60 * 1000;
+const CONTENT_TYPES = new Set(['link', 'video', 'pdf', 'note']);
 
 function getLibraryContentUrl(content: {
   id: string;
@@ -94,11 +110,11 @@ function getPdfStorageClient() {
 }
 
 async function resolveOwnedSkillId(skillIdInput: string, userId: string) {
-  const skillId = (skillIdInput || '').trim();
-  if (!skillId) return { skillId: null as string | null, error: 'Skill invalida.' };
+  const validated = validateIdentifier(skillIdInput, { maxLength: SKILL_ID_MAX });
+  if (!validated.ok || !validated.value) return { skillId: null as string | null, error: 'Skill invalida.' };
 
   const skill = await prisma.skill.findFirst({
-    where: { id: skillId, userId },
+    where: { id: validated.value, userId },
     select: { id: true },
   });
 
@@ -112,18 +128,51 @@ export async function addContent(data: ContentInput) {
     const userId = await getAuthUser();
     if (!userId) throw new Error('Usuario nao identificado.');
 
+    const rateLimit = enforceUserActionRateLimit({
+      scope: 'library-add-content',
+      userId,
+      limit: ADD_CONTENT_RATE_LIMIT,
+      windowMs: ADD_CONTENT_WINDOW_MS,
+    });
+    if (!rateLimit.allowed) {
+      return { success: false, error: 'Muitas tentativas de salvar conteudo. Tente novamente em instantes.' };
+    }
+
     const title = (data.title || '').trim();
-    const url = (data.url || '').trim();
     const body = (data.body || '').trim();
+
+    if (!CONTENT_TYPES.has(data.type)) {
+      return { success: false, error: 'Tipo de conteudo invalido.' };
+    }
+    if (!title) {
+      return { success: false, error: 'Titulo obrigatorio.' };
+    }
 
     if (title.length > TITLE_MAX) {
       return { success: false, error: `Titulo pode ter no maximo ${TITLE_MAX} caracteres.` };
     }
-    if (url && url.length > URL_MAX) {
-      return { success: false, error: `URL pode ter no maximo ${URL_MAX} caracteres.` };
-    }
     if (body && body.length > BODY_MAX) {
       return { success: false, error: `Nota pode ter no maximo ${BODY_MAX} caracteres.` };
+    }
+    if (data.fileKey) {
+      return { success: false, error: 'File keys diretas nao sao permitidas nesta acao.' };
+    }
+    if (data.type === 'note' && !body) {
+      return { success: false, error: 'Nota obrigatoria.' };
+    }
+
+    let normalizedUrl: ReturnType<typeof normalizeHttpUrl> | null = null;
+    if (data.type !== 'note') {
+      normalizedUrl = normalizeHttpUrl(data.url, URL_MAX);
+      if (!normalizedUrl.ok && normalizedUrl.reason === 'missing') {
+        return { success: false, error: 'URL obrigatoria.' };
+      }
+      if (!normalizedUrl.ok && normalizedUrl.reason === 'too_long') {
+        return { success: false, error: `URL pode ter no maximo ${URL_MAX} caracteres.` };
+      }
+      if (!normalizedUrl.ok) {
+        return { success: false, error: 'URL invalida. Use apenas http ou https.' };
+      }
     }
 
     const skillResolution = await resolveOwnedSkillId(data.skillId, userId);
@@ -144,9 +193,8 @@ export async function addContent(data: ContentInput) {
         userId,
         type: data.type,
         title,
-        url: data.type === 'pdf' && data.fileKey ? undefined : url || undefined,
-        fileKey: data.fileKey || undefined,
-        body: body || undefined,
+        url: normalizedUrl?.ok ? normalizedUrl.value || undefined : undefined,
+        body: data.type === 'note' ? body || undefined : undefined,
       },
     });
 
@@ -164,17 +212,32 @@ export async function deleteContent(contentId: string) {
     const userId = await getAuthUser();
     if (!userId) return { success: false, error: 'Nao autorizado' };
 
-    const content = await prisma.libraryContent.findFirst({
-      where: { id: contentId, userId },
+    const rateLimit = enforceUserActionRateLimit({
+      scope: 'library-delete-content',
+      userId,
+      limit: DELETE_CONTENT_RATE_LIMIT,
+      windowMs: DELETE_CONTENT_WINDOW_MS,
     });
-    if (!content) throw new Error('Conteudo nao encontrado.');
+    if (!rateLimit.allowed) {
+      return { success: false, error: 'Muitas tentativas de exclusao. Tente novamente em instantes.' };
+    }
 
-    if (content.fileKey) {
+    const validatedContentId = validateIdentifier(contentId, { maxLength: CONTENT_ID_MAX });
+    if (!validatedContentId.ok || !validatedContentId.value) {
+      return { success: false, error: 'Conteudo invalido.' };
+    }
+
+    const content = await prisma.libraryContent.findFirst({
+      where: { id: validatedContentId.value, userId },
+    });
+    if (!content) return { success: false, error: 'Conteudo nao encontrado.' };
+
+    if (content.fileKey && isUserScopedStoragePath(content.fileKey, userId)) {
       const storageClient = getPdfStorageClient();
       await storageClient.storage.from(PDF_BUCKET).remove([content.fileKey]);
     }
 
-    await prisma.libraryContent.deleteMany({ where: { id: contentId, userId } });
+    await prisma.libraryContent.deleteMany({ where: { id: validatedContentId.value, userId } });
     console.log(`[Library Mutation] Content DELETE: ${Date.now() - totalStart}ms`);
     return { success: true };
   } catch (error) {
@@ -189,11 +252,24 @@ export async function addPdfContent(formData: FormData) {
     const userId = await getAuthUser();
     if (!userId) return { success: false, error: 'Nao autorizado' };
 
+    const rateLimit = enforceUserActionRateLimit({
+      scope: 'library-upload-pdf',
+      userId,
+      limit: UPLOAD_PDF_RATE_LIMIT,
+      windowMs: UPLOAD_PDF_WINDOW_MS,
+    });
+    if (!rateLimit.allowed) {
+      return { success: false, error: 'Muitos uploads de PDF. Tente novamente em instantes.' };
+    }
+
     const skillId = String(formData.get('skillId') ?? '');
     const title = String(formData.get('title') ?? '').trim();
     const file = formData.get('file');
 
     if (!(file instanceof File)) return { success: false, error: 'Nenhum arquivo enviado' };
+    if (!title) {
+      return { success: false, error: 'Titulo obrigatorio.' };
+    }
     if (title.length > TITLE_MAX) {
       return { success: false, error: `Titulo pode ter no maximo ${TITLE_MAX} caracteres.` };
     }
@@ -212,11 +288,19 @@ export async function addPdfContent(formData: FormData) {
 
     const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
     if (!isPdf) return { success: false, error: 'Apenas arquivos PDF sao permitidos.' };
+    if (file.size === 0) {
+      return { success: false, error: 'O arquivo PDF enviado esta vazio.' };
+    }
     if (file.size > PDF_MAX_BYTES) {
       return {
         success: false,
         error: `Arquivo excede o limite de ${Math.floor(PDF_MAX_BYTES / 1024 / 1024)} MB.`,
       };
+    }
+
+    const fileBytes = new Uint8Array(await file.arrayBuffer());
+    if (!looksLikePdfBytes(fileBytes)) {
+      return { success: false, error: 'O arquivo enviado nao possui assinatura PDF valida.' };
     }
 
     await ensurePdfBucketSecurity();
@@ -226,18 +310,24 @@ export async function addPdfContent(formData: FormData) {
 
     const { error } = await storageClient.storage
       .from(PDF_BUCKET)
-      .upload(fileKey, file, { contentType: file.type });
+      .upload(fileKey, fileBytes, { contentType: 'application/pdf' });
     if (error) throw error;
 
-    const content = await prisma.libraryContent.create({
-      data: {
-        skillId: skillResolution.skillId,
-        userId,
-        type: 'pdf',
-        title,
-        fileKey,
-      },
-    });
+    let content;
+    try {
+      content = await prisma.libraryContent.create({
+        data: {
+          skillId: skillResolution.skillId,
+          userId,
+          type: 'pdf',
+          title,
+          fileKey,
+        },
+      });
+    } catch (error) {
+      await storageClient.storage.from(PDF_BUCKET).remove([fileKey]);
+      throw error;
+    }
 
     console.log(`[Library Mutation] PDF upload: ${Date.now() - totalStart}ms`);
     return { success: true, content: toClientContent(content) };

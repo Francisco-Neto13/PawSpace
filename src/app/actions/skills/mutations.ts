@@ -2,14 +2,21 @@
 
 import type { Node } from '@xyflow/react';
 import { Prisma } from '@prisma/client';
+
 import type { SkillData } from '@/components/tree/types';
-import prisma from '@/lib/prisma';
-import { getAuthUser } from '@/shared/server/auth';
 import { LIMITS } from '@/lib/limits';
+import prisma from '@/lib/prisma';
+import { enforceUserActionRateLimit, validateIdentifier } from '@/shared/server/actionSecurity';
+import { getAuthUser } from '@/shared/server/auth';
 
 const MAX_SKILLS = LIMITS.quantity.skillsPerUser;
 const NAME_MAX = LIMITS.skill.name;
 const DESC_MAX = LIMITS.skill.description;
+const SKILL_ID_MAX = 128;
+const VALID_SKILL_SHAPES = new Set(['circle']);
+const VALID_CATEGORY_PATTERN = /^[A-Za-z0-9_-]{1,40}$/;
+const SKILL_MUTATION_RATE_LIMIT = 40;
+const SKILL_MUTATION_WINDOW_MS = 5 * 60 * 1000;
 
 export interface SkillMutationInput {
   name?: string;
@@ -56,6 +63,20 @@ function hasOwn<T extends object>(obj: T, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(obj, key);
 }
 
+function normalizeSkillCategory(value: string | null | undefined) {
+  const category = (value || '').trim();
+  return VALID_CATEGORY_PATTERN.test(category) ? category : 'keystone';
+}
+
+function normalizeSkillShape(value: string | null | undefined) {
+  const shape = (value || '').trim();
+  return VALID_SKILL_SHAPES.has(shape) ? shape : 'circle';
+}
+
+function createSkillRateLimitError(message: string) {
+  return { success: false as const, error: message };
+}
+
 async function resolveParentIdForUser(
   parentIdInput: string | null | undefined,
   userId: string,
@@ -63,37 +84,62 @@ async function resolveParentIdForUser(
 ): Promise<{ parentId: string | null; error?: string }> {
   if (parentIdInput === undefined || parentIdInput === null) return { parentId: null };
 
-  const parentId = parentIdInput.trim();
-  if (!parentId) return { parentId: null };
+  const validated = validateIdentifier(parentIdInput, { allowEmpty: true, maxLength: SKILL_ID_MAX });
+  if (!validated.ok) {
+    return { parentId: null, error: 'Modulo pai invalido para este usuario.' };
+  }
 
-  if (skillId && parentId === skillId) {
-    return { parentId: null, error: 'Um módulo não pode ser pai de si mesmo.' };
+  if (!validated.value) return { parentId: null };
+
+  if (skillId && validated.value === skillId) {
+    return { parentId: null, error: 'Um modulo nao pode ser pai de si mesmo.' };
   }
 
   const parent = await prisma.skill.findFirst({
-    where: { id: parentId, userId },
+    where: { id: validated.value, userId },
     select: { id: true },
   });
 
   if (!parent) {
-    return { parentId: null, error: 'Módulo pai inválido para este usuário.' };
+    return { parentId: null, error: 'Modulo pai invalido para este usuario.' };
   }
 
   return { parentId: parent.id };
 }
 
+function enforceSkillRateLimit(scope: string, userId: string, message: string) {
+  const result = enforceUserActionRateLimit({
+    scope,
+    userId,
+    limit: SKILL_MUTATION_RATE_LIMIT,
+    windowMs: SKILL_MUTATION_WINDOW_MS,
+  });
+
+  return result.allowed ? null : createSkillRateLimitError(message);
+}
+
 export async function addSkill(data: SkillMutationInput) {
   const userId = await getAuthUser();
-  if (!userId) return { success: false, error: 'Não autorizado' };
+  if (!userId) return { success: false, error: 'Nao autorizado' };
+
+  const rateLimitError = enforceSkillRateLimit(
+    'skill-add',
+    userId,
+    'Muitas alteracoes na arvore. Tente novamente em instantes.'
+  );
+  if (rateLimitError) return rateLimitError;
 
   const name = (data.name || data.label || '').trim();
   const description = (data.description || '').trim();
 
+  if (!name) {
+    return { success: false, error: 'Nome obrigatorio.' };
+  }
   if (name.length > NAME_MAX) {
-    return { success: false, error: `Nome pode ter no máximo ${NAME_MAX} caracteres.` };
+    return { success: false, error: `Nome pode ter no maximo ${NAME_MAX} caracteres.` };
   }
   if (description.length > DESC_MAX) {
-    return { success: false, error: `Descrição pode ter no máximo ${DESC_MAX} caracteres.` };
+    return { success: false, error: `Descricao pode ter no maximo ${DESC_MAX} caracteres.` };
   }
 
   const count = await prisma.skill.count({ where: { userId } });
@@ -114,8 +160,8 @@ export async function addSkill(data: SkillMutationInput) {
         description: description || null,
         icon: data.icon || null,
         color: data.color || null,
-        category: data.category || 'keystone',
-        shape: data.shape || 'circle',
+        category: normalizeSkillCategory(data.category),
+        shape: normalizeSkillShape(data.shape),
         parentId: parentResolution.parentId,
         positionX: Number.isFinite(data.positionX) ? Number(data.positionX) : 0,
         positionY: Number.isFinite(data.positionY) ? Number(data.positionY) : 0,
@@ -133,6 +179,7 @@ export async function addSkill(data: SkillMutationInput) {
         positionY: true,
       },
     });
+
     return { success: true, skill: toClientSkill(newSkill) };
   } catch (error) {
     console.error('[Pawspace Mutation] Erro ao criar skill:', error);
@@ -144,16 +191,31 @@ export async function updateSkill(skillId: string, data: SkillMutationInput) {
   const userId = await getAuthUser();
   if (!userId) return { success: false };
 
+  const rateLimitError = enforceSkillRateLimit(
+    'skill-update',
+    userId,
+    'Muitas alteracoes na arvore. Tente novamente em instantes.'
+  );
+  if (rateLimitError) return rateLimitError;
+
+  const validatedSkillId = validateIdentifier(skillId, { maxLength: SKILL_ID_MAX });
+  if (!validatedSkillId.ok || !validatedSkillId.value) {
+    return { success: false, error: 'Modulo invalido.' };
+  }
+
   const hasName = hasOwn(data, 'name') || hasOwn(data, 'label');
   const name = (data.name || data.label || '').trim();
   const hasDescription = hasOwn(data, 'description');
   const description = (data.description || '').trim();
 
+  if (hasName && !name) {
+    return { success: false, error: 'Nome obrigatorio.' };
+  }
   if (hasName && name.length > NAME_MAX) {
-    return { success: false, error: `Nome pode ter no máximo ${NAME_MAX} caracteres.` };
+    return { success: false, error: `Nome pode ter no maximo ${NAME_MAX} caracteres.` };
   }
   if (hasDescription && description.length > DESC_MAX) {
-    return { success: false, error: `Descrição pode ter no máximo ${DESC_MAX} caracteres.` };
+    return { success: false, error: `Descricao pode ter no maximo ${DESC_MAX} caracteres.` };
   }
 
   try {
@@ -162,14 +224,14 @@ export async function updateSkill(skillId: string, data: SkillMutationInput) {
       ...(hasDescription ? { description: description || null } : {}),
       ...(hasOwn(data, 'icon') ? { icon: data.icon || null } : {}),
       ...(hasOwn(data, 'color') ? { color: data.color || null } : {}),
-      ...(hasOwn(data, 'category') && data.category ? { category: data.category } : {}),
-      ...(hasOwn(data, 'shape') && data.shape ? { shape: data.shape } : {}),
+      ...(hasOwn(data, 'category') ? { category: normalizeSkillCategory(data.category) } : {}),
+      ...(hasOwn(data, 'shape') ? { shape: normalizeSkillShape(data.shape) } : {}),
       ...(hasOwn(data, 'positionX') && data.positionX !== undefined ? { positionX: data.positionX } : {}),
       ...(hasOwn(data, 'positionY') && data.positionY !== undefined ? { positionY: data.positionY } : {}),
     };
 
     if (hasOwn(data, 'parentId')) {
-      const parentResolution = await resolveParentIdForUser(data.parentId ?? null, userId, skillId);
+      const parentResolution = await resolveParentIdForUser(data.parentId ?? null, userId, validatedSkillId.value);
       if (parentResolution.error) {
         return { success: false, error: parentResolution.error };
       }
@@ -177,7 +239,7 @@ export async function updateSkill(skillId: string, data: SkillMutationInput) {
     }
 
     const updated = await prisma.skill.update({
-      where: { id: skillId, userId },
+      where: { id: validatedSkillId.value, userId },
       data: updateData,
       select: {
         id: true,
@@ -192,6 +254,7 @@ export async function updateSkill(skillId: string, data: SkillMutationInput) {
         positionY: true,
       },
     });
+
     return { success: true, skill: toClientSkill(updated) };
   } catch (error) {
     console.error(`[Pawspace Mutation] Erro ao atualizar skill ${skillId}:`, error);
@@ -203,9 +266,23 @@ export async function savePawSpaceChanges(nodes: PawSpaceSkillNodeInput[]) {
   const userId = await getAuthUser();
   if (!userId || !nodes.length) return { success: false };
 
+  const rateLimitError = enforceSkillRateLimit(
+    'skill-bulk-save',
+    userId,
+    'Muitas sincronizacoes da arvore. Tente novamente em instantes.'
+  );
+  if (rateLimitError) return rateLimitError;
+  if (nodes.length > MAX_SKILLS) {
+    return { success: false, error: `Limite de ${MAX_SKILLS} nos por sincronizacao excedido.` };
+  }
+
   const start = Date.now();
   try {
-    const validNodes = nodes.filter((n) => n.id && !n.id.startsWith('dndnode'));
+    const validNodes = nodes.filter((node) => {
+      if (!node.id || node.id.startsWith('dndnode')) return false;
+      const validatedId = validateIdentifier(node.id, { maxLength: SKILL_ID_MAX });
+      return validatedId.ok && Boolean(validatedId.value);
+    });
     if (!validNodes.length) return { success: true };
 
     const payload = validNodes.map((node) => {
@@ -213,19 +290,17 @@ export async function savePawSpaceChanges(nodes: PawSpaceSkillNodeInput[]) {
       const description = (node.data.description || '').slice(0, DESC_MAX).trim();
       const color = (node.data.color || '').trim();
       const icon = (node.data.icon || '').trim();
-      const category = (node.data.category || '').trim() || 'keystone';
-      const shape = (node.data.shape || 'circle').trim() || 'circle';
 
       return {
         id: node.id,
-        name: label,
+        name: label || 'Modulo',
         positionX: Number.isFinite(node.position.x) ? Math.round(node.position.x) : 0,
         positionY: Number.isFinite(node.position.y) ? Math.round(node.position.y) : 0,
         color: color || null,
-        category,
+        category: normalizeSkillCategory(node.data.category),
         description: description || null,
         icon: icon || null,
-        shape,
+        shape: normalizeSkillShape(node.data.shape),
       };
     });
 
@@ -252,7 +327,7 @@ export async function savePawSpaceChanges(nodes: PawSpaceSkillNodeInput[]) {
       `
     );
 
-    console.log(`[Pawspace Mutation] Sincronização: ${Date.now() - start}ms`);
+    console.log(`[Pawspace Mutation] Sincronizacao: ${Date.now() - start}ms`);
     return { success: true };
   } catch (error) {
     console.error('[Pawspace Mutation] Erro no salvamento global:', error);
@@ -263,18 +338,32 @@ export async function savePawSpaceChanges(nodes: PawSpaceSkillNodeInput[]) {
 export async function updateManySkillPositions(positions: { skillId: string; x: number; y: number }[]) {
   const userId = await getAuthUser();
   if (!userId || !positions.length) return { success: false };
+
+  const rateLimitError = enforceSkillRateLimit(
+    'skill-position-bulk',
+    userId,
+    'Muitas atualizacoes de posicao. Tente novamente em instantes.'
+  );
+  if (rateLimitError) return rateLimitError;
+  if (positions.length > MAX_SKILLS) {
+    return { success: false, error: `Limite de ${MAX_SKILLS} nos por lote excedido.` };
+  }
+
   try {
     const validPositions = positions
-      .filter((p) => typeof p.skillId === 'string' && p.skillId.trim().length > 0)
-      .map((p) => ({
-        skillId: p.skillId.trim(),
-        x: Number.isFinite(p.x) ? Math.round(p.x) : 0,
-        y: Number.isFinite(p.y) ? Math.round(p.y) : 0,
+      .filter((position) => {
+        const validatedId = validateIdentifier(position.skillId, { maxLength: SKILL_ID_MAX });
+        return validatedId.ok && Boolean(validatedId.value);
+      })
+      .map((position) => ({
+        skillId: position.skillId.trim(),
+        x: Number.isFinite(position.x) ? Math.round(position.x) : 0,
+        y: Number.isFinite(position.y) ? Math.round(position.y) : 0,
       }));
 
     if (!validPositions.length) return { success: false };
 
-    const rows = validPositions.map((p) => Prisma.sql`(${p.skillId}, ${p.x}, ${p.y})`);
+    const rows = validPositions.map((position) => Prisma.sql`(${position.skillId}, ${position.x}, ${position.y})`);
 
     await prisma.$executeRaw(
       Prisma.sql`
@@ -291,7 +380,7 @@ export async function updateManySkillPositions(positions: { skillId: string; x: 
 
     return { success: true };
   } catch (error) {
-    console.error('[Pawspace Mutation] Erro ao atualizar posições:', error);
+    console.error('[Pawspace Mutation] Erro ao atualizar posicoes:', error);
     return { success: false };
   }
 }
@@ -299,8 +388,21 @@ export async function updateManySkillPositions(positions: { skillId: string; x: 
 export async function deleteSkill(skillId: string) {
   const userId = await getAuthUser();
   if (!userId) return { success: false };
+
+  const rateLimitError = enforceSkillRateLimit(
+    'skill-delete',
+    userId,
+    'Muitas tentativas de exclusao. Tente novamente em instantes.'
+  );
+  if (rateLimitError) return rateLimitError;
+
+  const validatedSkillId = validateIdentifier(skillId, { maxLength: SKILL_ID_MAX });
+  if (!validatedSkillId.ok || !validatedSkillId.value) {
+    return { success: false, error: 'Modulo invalido.' };
+  }
+
   try {
-    await prisma.skill.delete({ where: { id: skillId, userId } });
+    await prisma.skill.delete({ where: { id: validatedSkillId.value, userId } });
     return { success: true };
   } catch {
     return { success: false };

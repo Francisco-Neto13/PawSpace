@@ -2,12 +2,20 @@
 import prisma from '@/shared/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { JournalInput } from './types';
+import { enforceUserActionRateLimit, validateIdentifier } from '@/shared/server/actionSecurity';
 import { getAuthUser } from '@/shared/server/auth';
+import { sanitizeJournalHtml } from '@/shared/server/journalSanitizer';
 import { LIMITS } from '@/shared/lib/limits';
 
 const MAX_ENTRIES = LIMITS.quantity.journalEntries;
 const TITLE_MAX = LIMITS.journal.title;
 const BODY_MAX = LIMITS.journal.body;
+const JOURNAL_ID_MAX = 128;
+const SKILL_ID_MAX = 128;
+const JOURNAL_SAVE_RATE_LIMIT = 40;
+const JOURNAL_SAVE_WINDOW_MS = 5 * 60 * 1000;
+const JOURNAL_DELETE_RATE_LIMIT = 20;
+const JOURNAL_DELETE_WINDOW_MS = 5 * 60 * 1000;
 
 function toClientJournalEntry(entry: {
   id: string;
@@ -30,15 +38,16 @@ function toClientJournalEntry(entry: {
 async function resolveOwnedSkillId(skillIdInput: string | null | undefined, userId: string) {
   if (skillIdInput === undefined || skillIdInput === null) return { skillId: null as string | null };
 
-  const skillId = skillIdInput.trim();
-  if (!skillId) return { skillId: null as string | null };
+  const validated = validateIdentifier(skillIdInput, { allowEmpty: true, maxLength: SKILL_ID_MAX });
+  if (!validated.ok) return { skillId: null as string | null, error: 'Skill invalida para este usuario.' };
+  if (!validated.value) return { skillId: null as string | null };
 
   const skill = await prisma.skill.findFirst({
-    where: { id: skillId, userId },
+    where: { id: validated.value, userId },
     select: { id: true },
   });
 
-  if (!skill) return { skillId: null as string | null, error: 'Skill inválida para este usuário.' };
+  if (!skill) return { skillId: null as string | null, error: 'Skill invalida para este usuario.' };
   return { skillId: skill.id };
 }
 
@@ -50,17 +59,36 @@ export async function saveJournalEntry(data: JournalInput) {
   console.log(`[Journal] Iniciando POST: ${shouldUpdate ? 'UPDATE' : 'CREATE'}`);
 
   const userId = await getAuthUser();
-  if (!userId) return { success: false, error: 'Não autorizado' };
+  if (!userId) return { success: false, error: 'Nao autorizado' };
+
+  const rateLimit = enforceUserActionRateLimit({
+    scope: 'journal-save',
+    userId,
+    limit: JOURNAL_SAVE_RATE_LIMIT,
+    windowMs: JOURNAL_SAVE_WINDOW_MS,
+  });
+  if (!rateLimit.allowed) {
+    return { success: false, error: 'Muitas alteracoes no diario. Tente novamente em instantes.' };
+  }
+
+  if (shouldUpdate) {
+    const validatedId = validateIdentifier(data.id, { maxLength: JOURNAL_ID_MAX });
+    if (!validatedId.ok || !validatedId.value) {
+      return { success: false, error: 'Entrada invalida.' };
+    }
+  }
 
   const title = (data.title || '').trim();
   const body = (data.body || '').trim();
 
   if (title.length > TITLE_MAX) {
-    return { success: false, error: `Título pode ter no máximo ${TITLE_MAX} caracteres.` };
+    return { success: false, error: `Titulo pode ter no maximo ${TITLE_MAX} caracteres.` };
   }
   if (body.length > BODY_MAX) {
-    return { success: false, error: `Conteúdo pode ter no máximo ${BODY_MAX} caracteres.` };
+    return { success: false, error: `Conteudo pode ter no maximo ${BODY_MAX} caracteres.` };
   }
+
+  const sanitizedBody = sanitizeJournalHtml(body);
 
   if (!shouldUpdate) {
     const count = await prisma.journalEntry.count({ where: { userId } });
@@ -79,7 +107,7 @@ export async function saveJournalEntry(data: JournalInput) {
     const entry = shouldUpdate
       ? await prisma.journalEntry.update({
           where: { id: data.id, userId },
-          data: { title, body, skillId: skillResolution.skillId },
+          data: { title, body: sanitizedBody, skillId: skillResolution.skillId },
           select: {
             id: true,
             title: true,
@@ -90,7 +118,7 @@ export async function saveJournalEntry(data: JournalInput) {
           },
         })
       : await prisma.journalEntry.create({
-          data: { title, body, userId, skillId: skillResolution.skillId },
+          data: { title, body: sanitizedBody, userId, skillId: skillResolution.skillId },
           select: {
             id: true,
             title: true,
@@ -114,9 +142,23 @@ export async function saveJournalEntry(data: JournalInput) {
 export async function deleteJournalEntry(id: string) {
   const userId = await getAuthUser();
   if (!userId) return { success: false };
+  const rateLimit = enforceUserActionRateLimit({
+    scope: 'journal-delete',
+    userId,
+    limit: JOURNAL_DELETE_RATE_LIMIT,
+    windowMs: JOURNAL_DELETE_WINDOW_MS,
+  });
+  if (!rateLimit.allowed) {
+    return { success: false, error: 'Muitas tentativas de exclusao. Tente novamente em instantes.' };
+  }
+
+  const validatedId = validateIdentifier(id, { maxLength: JOURNAL_ID_MAX });
+  if (!validatedId.ok || !validatedId.value) {
+    return { success: false, error: 'Entrada invalida.' };
+  }
   try {
     const start = Date.now();
-    const result = await prisma.journalEntry.deleteMany({ where: { id, userId } });
+    const result = await prisma.journalEntry.deleteMany({ where: { id: validatedId.value, userId } });
     revalidatePath('/journal');
     console.log(`[DB] Delete Journal: ${Date.now() - start}ms`);
     if (result.count === 0) {
