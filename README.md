@@ -73,6 +73,7 @@ DIRECT_URL=""
 NEXT_PUBLIC_SUPABASE_URL=""
 NEXT_PUBLIC_SUPABASE_ANON_KEY=""
 SUPABASE_SERVICE_ROLE_KEY=""
+CRON_SECRET=""
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=""
 ```
 
@@ -104,6 +105,7 @@ Em produção, configure as variáveis de ambiente na Vercel e alinhe o Supabase
 * Libere os redirects necessários, como `/auth/callback` e `/reset-password`.
 * Configure SMTP no Supabase para confirmação de e-mail, recuperação de senha e troca de e-mail.
 * Adicione `SUPABASE_SERVICE_ROLE_KEY` para que upload de avatar, operações protegidas de storage e exclusão de conta funcionem corretamente.
+* Defina `CRON_SECRET` na Vercel para proteger o endpoint `/api/keep-alive` usado pelo cron de keep-alive.
 * Nunca rode `prisma migrate dev` em produção; use `npm run db:migrate:deploy`.
 
 ---
