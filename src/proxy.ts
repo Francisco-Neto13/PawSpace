@@ -44,6 +44,7 @@ export async function proxy(request: NextRequest) {
   const isResetPasswordRoute = url.pathname.startsWith('/reset-password')
   const isAuthCallbackRoute = url.pathname.startsWith('/auth/callback')
   const isPublicApiRoute = url.pathname.startsWith('/api/auth/')
+  const isKeepAliveRoute = url.pathname.startsWith('/api/keep-alive')
   const isRobotsRoute = url.pathname === '/robots.txt'
   const isSitemapRoute = url.pathname === '/sitemap.xml'
   const hasRecoveryCode = Boolean(url.searchParams.get('code'))
@@ -69,6 +70,7 @@ export async function proxy(request: NextRequest) {
     !isResetPasswordRoute &&
     !isAuthCallbackRoute &&
     !isPublicApiRoute &&
+    !isKeepAliveRoute &&
     !isRobotsRoute &&
     !isSitemapRoute
   ) {
