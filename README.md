@@ -1,4 +1,4 @@
-# PawSpace | Hub Visual de Estudos
+﻿# PawSpace | Hub Visual de Estudos
 
 <div align="center">
   <img src="./src/app/favicon.ico" width="120" alt="PawSpace Logo" style="border-radius: 50%">
@@ -55,58 +55,13 @@ Em vez de depender de abas perdidas, notas espalhadas e memória, o projeto mant
 * **Proteção contra abuso:** Cloudflare Turnstile integrado aos fluxos sensíveis de autenticação.
 * **Deploy:** Vercel.
 
-## Desenvolvimento Local
+## Licença
 
-### Requisitos
+Este projeto utiliza a licença **PolyForm Noncommercial 1.0.0**.
 
-* Node.js 20+
-* PostgreSQL
-* Um projeto Supabase
+Isso significa que o código não é um projeto aberto para uso comercial irrestrito. O uso é permitido apenas dentro dos termos não comerciais definidos pela própria licença.
 
-### Variáveis de Ambiente
-
-Crie um arquivo `.env` com base no `.env.example` e configure:
-
-```bash
-DATABASE_URL=""
-DIRECT_URL=""
-NEXT_PUBLIC_SUPABASE_URL=""
-NEXT_PUBLIC_SUPABASE_ANON_KEY=""
-SUPABASE_SERVICE_ROLE_KEY=""
-CRON_SECRET=""
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=""
-```
-
-### Setup
-
-```bash
-npm install
-npm run db:migrate:dev
-npm run dev
-```
-
-## Scripts Disponíveis
-
-* `npm run dev` inicia o servidor local.
-* `npm run build` gera a build de produção.
-* `npm run start` sobe a aplicação em modo produção.
-* `npm run lint` executa o ESLint.
-* `npm run db:generate` executa `prisma generate`.
-* `npm run db:status` verifica o status das migrations.
-* `npm run db:migrate:dev` cria e aplica migrations em desenvolvimento.
-* `npm run db:migrate:deploy` aplica migrations em produção.
-* `npm run db:studio` abre o Prisma Studio.
-
-## Notas de Deploy
-
-Em produção, configure as variáveis de ambiente na Vercel e alinhe o Supabase Auth com o domínio publicado:
-
-* Defina a `Site URL` de produção no Supabase Auth.
-* Libere os redirects necessários, como `/auth/callback` e `/reset-password`.
-* Configure SMTP no Supabase para confirmação de e-mail, recuperação de senha e troca de e-mail.
-* Adicione `SUPABASE_SERVICE_ROLE_KEY` para que upload de avatar, operações protegidas de storage e exclusão de conta funcionem corretamente.
-* Defina `CRON_SECRET` na Vercel para proteger o endpoint `/api/keep-alive` usado pelo cron de keep-alive.
-* Nunca rode `prisma migrate dev` em produção; use `npm run db:migrate:deploy`.
+Antes de reutilizar, adaptar, redistribuir ou estudar o projeto para qualquer finalidade além das permitidas, consulte o arquivo `LICENSE` para os termos completos.
 
 ---
 
