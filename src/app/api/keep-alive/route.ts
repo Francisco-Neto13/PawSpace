@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 
 import prisma from '@/shared/lib/prisma';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 function isAuthorized(request: Request) {
   const expectedSecret = process.env.CRON_SECRET;
   if (!expectedSecret) return false;
@@ -11,6 +14,8 @@ function isAuthorized(request: Request) {
 }
 
 export async function GET(request: Request) {
+  const userAgent = request.headers.get('user-agent') ?? 'unknown';
+
   if (!process.env.CRON_SECRET) {
     return NextResponse.json(
       { ok: false, error: 'Keep-alive nao configurado.' },
@@ -27,6 +32,10 @@ export async function GET(request: Request) {
 
   try {
     await prisma.$queryRaw`SELECT 1`;
+    console.info('[Keep Alive] Ping executado com sucesso.', {
+      source: userAgent,
+      checkedAt: new Date().toISOString(),
+    });
 
     return NextResponse.json(
       { ok: true },
