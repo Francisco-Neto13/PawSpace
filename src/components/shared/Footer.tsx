@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { forwardRef } from 'react';
-import { Github, Instagram, Linkedin } from 'lucide-react';
+import { Github } from 'lucide-react';
 
 const Footer = forwardRef<HTMLElement>((_, ref) => {
   const currentYear = new Date().getFullYear();
@@ -30,28 +30,12 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
           </div>
           <div className="flex items-center justify-center gap-6 md:justify-end">
             <a
-              href="https://github.com/Francisco-Neto13"
+              href="https://github.com/Francisco-Neto13/PawSpace"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors transition-transform duration-300 hover:scale-110"
             >
               <Github size={18} />
-            </a>
-            <a
-              href="https://www.instagram.com/cisscoo_"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors transition-transform duration-300 hover:scale-110"
-            >
-              <Instagram size={18} />
-            </a>
-            <a
-              href="https://www.linkedin.com/in/jfrancisco-neto/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors transition-transform duration-300 hover:scale-110"
-            >
-              <Linkedin size={18} />
             </a>
           </div>
         </div>
