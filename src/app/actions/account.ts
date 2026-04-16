@@ -31,7 +31,7 @@ async function removeStoredFiles(fileKeys: string[], userClient: ServerSupabaseC
   for (const batch of chunkArray(fileKeys, STORAGE_DELETE_BATCH_SIZE)) {
     const { error } = await storageClient.storage.from(PDF_BUCKET).remove(batch);
     if (error) {
-      console.warn('[Account Delete] Nao foi possivel remover alguns PDFs da estante:', error.message);
+      console.warn('[Account Delete] Não foi possível remover alguns PDFs da estante:', error.message);
     }
   }
 }
@@ -43,14 +43,14 @@ async function removeAvatarFile(avatarPath: string | null, userClient: ServerSup
   if (adminClient) {
     const { error } = await adminClient.storage.from(AVATAR_BUCKET).remove([avatarPath]);
     if (error) {
-      console.warn('[Account Delete] Nao foi possivel remover o avatar do perfil:', error.message);
+      console.warn('[Account Delete] Não foi possível remover o avatar do perfil:', error.message);
     }
     return;
   }
 
   const { error } = await userClient.storage.from(AVATAR_BUCKET).remove([avatarPath]);
   if (error) {
-    console.warn('[Account Delete] Nao foi possivel remover o avatar do perfil:', error.message);
+    console.warn('[Account Delete] Não foi possível remover o avatar do perfil:', error.message);
   }
 }
 
@@ -61,7 +61,7 @@ async function deleteAuthUser(userId: string, adminClient: NonNullable<ReturnTyp
       console.error('[Account Delete] Falha ao remover usuario via admin:', error);
       return {
         success: false as const,
-        error: 'Nao foi possivel remover a conta de acesso no Supabase.',
+        error: 'Não foi possível remover a conta de acesso no Supabase.',
       };
     }
 
@@ -70,7 +70,7 @@ async function deleteAuthUser(userId: string, adminClient: NonNullable<ReturnTyp
     console.error('[Account Delete] Falha inesperada ao remover usuario via admin:', error);
     return {
       success: false as const,
-      error: 'Nao foi possivel remover a autenticacao da conta.',
+      error: 'Não foi possível remover a autenticação da conta.',
     };
   }
 }
@@ -81,7 +81,7 @@ export async function deleteCurrentAccount() {
     const user = await getCurrentUser(supabase);
 
     if (!user) {
-      return { success: false, error: 'Sessao nao encontrada.' };
+      return { success: false, error: 'Sessão não encontrada.' };
     }
 
     const rateLimit = enforceUserActionRateLimit({
@@ -101,7 +101,7 @@ export async function deleteCurrentAccount() {
     if (!adminClient) {
       return {
         success: false,
-        error: 'Exclusao de conta nao configurada. Adicione SUPABASE_SERVICE_ROLE_KEY no ambiente para habilitar essa acao.',
+        error: 'Exclusão de conta não configurada. Adicione SUPABASE_SERVICE_ROLE_KEY no ambiente para habilitar essa ação.',
       };
     }
 
@@ -149,6 +149,6 @@ export async function deleteCurrentAccount() {
     return { success: true };
   } catch (error) {
     console.error('[Account Delete] Falha inesperada:', error);
-    return { success: false, error: 'Nao foi possivel deletar sua conta agora.' };
+    return { success: false, error: 'Não foi possível deletar sua conta agora.' };
   }
 }

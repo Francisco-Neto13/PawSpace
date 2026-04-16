@@ -1,12 +1,28 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+function createSecurityHeaders(): Headers {
+  const headers = new Headers()
+  headers.set('X-Frame-Options', 'DENY')
+  headers.set('X-Content-Type-Options', 'nosniff')
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  headers.set(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://*.supabase.co https://*.vercel.app https://emojihub.yurace.pro; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com https://emojihub.yurace.pro; frame-src https://challenges.cloudflare.com; worker-src 'self' blob:"
+  )
+  return headers
+}
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
+
+  const securityHeaders = createSecurityHeaders()
+  securityHeaders.forEach((value, key) => response.headers.set(key, value))
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,6 +37,8 @@ export async function proxy(request: NextRequest) {
           response = NextResponse.next({
             request: { headers: request.headers },
           })
+          const headers = createSecurityHeaders()
+          headers.forEach((v, k) => response.headers.set(k, v))
           response.cookies.set({ name, value, ...options })
         },
         remove(name: string, options: CookieOptions) {
@@ -28,14 +46,15 @@ export async function proxy(request: NextRequest) {
           response = NextResponse.next({
             request: { headers: request.headers },
           })
+          const headers = createSecurityHeaders()
+          headers.forEach((v, k) => response.headers.set(k, v))
           response.cookies.set({ name, value: '', ...options })
         },
       },
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
-  const user = session?.user ?? null
+  const { data: { user } } = await supabase.auth.getUser()
 
   const url = request.nextUrl.clone()
   const isHomeRoute = url.pathname === '/'
@@ -54,12 +73,19 @@ export async function proxy(request: NextRequest) {
     hasRecoveryCode ||
     hasRecoveryTokenHash
 
+  const createRedirectResponse = (redirectUrl: URL) => {
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    const headers = createSecurityHeaders()
+    headers.forEach((value, key) => redirectResponse.headers.set(key, value))
+    return redirectResponse
+  }
+
   if (isRecoveryFlow && !isResetPasswordRoute && !isAuthCallbackRoute) {
     url.pathname = '/auth/callback'
     if (!url.searchParams.has('next')) {
       url.searchParams.set('next', '/reset-password')
     }
-    return NextResponse.redirect(url)
+    return createRedirectResponse(url)
   }
 
   if (
@@ -75,12 +101,12 @@ export async function proxy(request: NextRequest) {
     !isSitemapRoute
   ) {
     url.pathname = '/login'
-    return NextResponse.redirect(url)
+    return createRedirectResponse(url)
   }
 
   if (user && isLoginRoute) {
     url.pathname = '/overview'
-    return NextResponse.redirect(url)
+    return createRedirectResponse(url)
   }
 
   return response

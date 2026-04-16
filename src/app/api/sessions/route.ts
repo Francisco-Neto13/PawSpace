@@ -37,7 +37,7 @@ function parseOptionalIdentifier(name: string, raw: string | null) {
     return {
       ok: false as const,
       response: NextResponse.json(
-        { status: 'error', sessions: [], error: `${name} obrigatorio.` },
+        { status: 'error', sessions: [], error: `${name} obrigatório.` },
         { status: 400, headers: { 'Cache-Control': 'no-store' } }
       ),
     };
@@ -47,7 +47,7 @@ function parseOptionalIdentifier(name: string, raw: string | null) {
     return {
       ok: false as const,
       response: NextResponse.json(
-        { status: 'error', sessions: [], error: `${name} excede o limite permitido.` },
+        { status: 'error', sessions: [], error: `${name} excede o limite permitido permitido.` },
         { status: 413, headers: { 'Cache-Control': 'no-store' } }
       ),
     };
@@ -57,7 +57,7 @@ function parseOptionalIdentifier(name: string, raw: string | null) {
     return {
       ok: false as const,
       response: NextResponse.json(
-        { status: 'error', sessions: [], error: `${name} invalido.` },
+        { status: 'error', sessions: [], error: `${name} inválido.` },
         { status: 400, headers: { 'Cache-Control': 'no-store' } }
       ),
     };
@@ -95,7 +95,7 @@ export async function GET(request: Request) {
 
     if (requestedUserId.value && requestedUserId.value !== userId) {
       return NextResponse.json(
-        { status: 'error', sessions: [], error: 'Acesso proibido a sessoes de outro usuario.' },
+        { status: 'error', sessions: [], error: 'Acesso proibido a sessões de outro usuário.' },
         {
           status: 403,
           headers: { 'Cache-Control': 'no-store' },
@@ -113,7 +113,7 @@ export async function GET(request: Request) {
         {
           status: 'error',
           sessions: [],
-          error: 'Muitas requisicoes de sessoes. Tente novamente em instantes.',
+          error: 'Muitas requisições de sessões. Tente novamente em instantes.',
         },
         {
           status: 429,

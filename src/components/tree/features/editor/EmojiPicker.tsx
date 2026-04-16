@@ -68,7 +68,7 @@ export function EmojiPicker({ onSelect, currentEmoji }: EmojiPickerProps) {
       }));
     } catch (fetchError) {
       console.error('Falha ao acessar banco de emojis:', fetchError);
-      setError('Nao foi possivel carregar os emojis agora.');
+      setError('Não foi possível carregar os emojis agora.');
     } finally {
       setLoading(false);
     }
